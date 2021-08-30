@@ -42,7 +42,7 @@ def test_odd():
     matDeco = acts.JsonMaterialDecorator(
         rConfig=config,
         jFileName="thirdparty/OpenDataDetector/config/odd-material-mapping-config.json",
-        level=acts.logging.ERROR,
+        level=acts.logging.WARNING,
     )
 
     geo, _ = detector.finalize(dd4hepConfig, matDeco)

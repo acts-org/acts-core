@@ -34,6 +34,8 @@ try:
 except ImportError:
     hepmc3Enabled = False
 
+isCI = os.environ.get("CI", "false") == "true"
+
 
 class AssertCollectionExistsAlg(BareAlgorithm):
     events_seen = 0

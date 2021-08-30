@@ -207,7 +207,7 @@ def test_root_clusters_writer(tmp_path, fatras, conf_const, trk_geo, rng):
     s.addReader(evGen)
     s.addAlgorithm(simAlg)
     digiAlg = PlanarSteppingAlgorithm(
-        level=acts.logging.ERROR,
+        level=acts.logging.WARNING,
         inputSimHits=simAlg.config.outputSimHits,
         outputClusters="clusters",
         outputSourceLinks="sourcelinks",
@@ -227,7 +227,7 @@ def test_root_clusters_writer(tmp_path, fatras, conf_const, trk_geo, rng):
     s.addWriter(
         conf_const(
             RootPlanarClusterWriter,
-            level=acts.logging.ERROR,
+            level=acts.logging.WARNING,
             filePath=str(out),
             inputSimHits=simAlg.config.outputSimHits,
             inputClusters=digiAlg.config.outputClusters,
@@ -298,7 +298,7 @@ def test_csv_clusters_writer(tmp_path, fatras, conf_const, trk_geo, rng):
     s.addReader(evGen)
     s.addAlgorithm(simAlg)
     digiAlg = PlanarSteppingAlgorithm(
-        level=acts.logging.ERROR,
+        level=acts.logging.WARNING,
         inputSimHits=simAlg.config.outputSimHits,
         outputClusters="clusters",
         outputSourceLinks="sourcelinks",
@@ -317,7 +317,7 @@ def test_csv_clusters_writer(tmp_path, fatras, conf_const, trk_geo, rng):
     s.addWriter(
         conf_const(
             CsvPlanarClusterWriter,
-            level=acts.logging.ERROR,
+            level=acts.logging.WARNING,
             outputDir=str(out),
             inputSimHits=simAlg.config.outputSimHits,
             inputClusters=digiAlg.config.outputClusters,
@@ -419,7 +419,7 @@ def test_root_material_writer(tmp_path):
 
     assert not out.exists()
 
-    rmw = RootMaterialWriter(level=acts.logging.ERROR, filePath=str(out))
+    rmw = RootMaterialWriter(level=acts.logging.WARNING, filePath=str(out))
     assert out.exists()
     assert out.stat().st_size > 0 and out.stat().st_size < 500
     rmw.write(trackingGeometry)
@@ -442,7 +442,7 @@ def test_json_material_writer(tmp_path, fmt):
     assert not out.exists()
 
     jmw = JsonMaterialWriter(
-        level=acts.logging.ERROR, fileName=str(out.with_suffix("")), writeFormat=fmt
+        level=acts.logging.WARNING, fileName=str(out.with_suffix("")), writeFormat=fmt
     )
     assert not out.exists()
     jmw.write(trackingGeometry)

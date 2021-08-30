@@ -29,14 +29,14 @@ from acts.examples import (
 
 def test_root_particle_reader(tmp_path, conf_const, ptcl_gun):
     # need to write out some particles first
-    s = Sequencer(numThreads=1, events=10, logLevel=acts.logging.ERROR)
+    s = Sequencer(numThreads=1, events=10, logLevel=acts.logging.WARNING)
     evGen = ptcl_gun(s)
 
     file = tmp_path / "particles.root"
     s.addWriter(
         conf_const(
             RootParticleWriter,
-            acts.logging.ERROR,
+            acts.logging.WARNING,
             inputParticles=evGen.config.outputParticles,
             filePath=str(file),
         )
@@ -48,18 +48,20 @@ def test_root_particle_reader(tmp_path, conf_const, ptcl_gun):
 
     # reset sequencer for reading
 
-    s2 = Sequencer(numThreads=1, logLevel=acts.logging.ERROR)
+    s2 = Sequencer(numThreads=1, logLevel=acts.logging.WARNING)
 
     s2.addReader(
         conf_const(
             RootParticleReader,
-            acts.logging.ERROR,
+            acts.logging.WARNING,
             particleCollection="input_particles",
             filePath=str(file),
         )
     )
 
-    alg = AssertCollectionExistsAlg("input_particles", "check_alg", acts.logging.ERROR)
+    alg = AssertCollectionExistsAlg(
+        "input_particles", "check_alg", acts.logging.WARNING
+    )
     s2.addAlgorithm(alg)
 
     s2.run()
@@ -68,7 +70,7 @@ def test_root_particle_reader(tmp_path, conf_const, ptcl_gun):
 
 
 def test_csv_particle_reader(tmp_path, conf_const, ptcl_gun):
-    s = Sequencer(numThreads=1, events=10, logLevel=acts.logging.ERROR)
+    s = Sequencer(numThreads=1, events=10, logLevel=acts.logging.WARNING)
     evGen = ptcl_gun(s)
 
     out = tmp_path / "csv"
@@ -78,7 +80,7 @@ def test_csv_particle_reader(tmp_path, conf_const, ptcl_gun):
     s.addWriter(
         conf_const(
             CsvParticleWriter,
-            acts.logging.ERROR,
+            acts.logging.WARNING,
             inputParticles=evGen.config.outputParticles,
             outputStem="particle",
             outputDir=str(out),
@@ -88,19 +90,21 @@ def test_csv_particle_reader(tmp_path, conf_const, ptcl_gun):
     s.run()
 
     # reset the seeder
-    s = Sequencer(numThreads=1, logLevel=acts.logging.ERROR)
+    s = Sequencer(numThreads=1, logLevel=acts.logging.WARNING)
 
     s.addReader(
         conf_const(
             CsvParticleReader,
-            acts.logging.ERROR,
+            acts.logging.WARNING,
             inputDir=str(out),
             inputStem="particle",
             outputParticles="input_particles",
         )
     )
 
-    alg = AssertCollectionExistsAlg("input_particles", "check_alg", acts.logging.ERROR)
+    alg = AssertCollectionExistsAlg(
+        "input_particles", "check_alg", acts.logging.WARNING
+    )
 
     s.addAlgorithm(alg)
 
@@ -142,7 +146,9 @@ def test_root_material_track_reader(tmp_path, geantino_recording):
         )
     )
 
-    alg = AssertCollectionExistsAlg("material-tracks", "check_alg", acts.logging.ERROR)
+    alg = AssertCollectionExistsAlg(
+        "material-tracks", "check_alg", acts.logging.WARNING
+    )
     s.addAlgorithm(alg)
 
     s.run()
@@ -176,7 +182,7 @@ def test_csv_meas_reader(tmp_path, fatras, trk_geo, conf_const):
     s.addReader(
         conf_const(
             CsvMeasurementReader,
-            level=acts.logging.ERROR,
+            level=acts.logging.WARNING,
             outputMeasurements="measurements",
             outputMeasurementSimHitsMap="simhitsmap",
             outputSourceLinks="sourcelinks",
@@ -185,7 +191,7 @@ def test_csv_meas_reader(tmp_path, fatras, trk_geo, conf_const):
     )
 
     algs = [
-        AssertCollectionExistsAlg(k, f"check_alg_{k}", acts.logging.ERROR)
+        AssertCollectionExistsAlg(k, f"check_alg_{k}", acts.logging.WARNING)
         for k in ("measurements", "simhitsmap", "sourcelinks")
     ]
     for alg in algs:
@@ -228,7 +234,7 @@ def test_csv_simhits_reader(tmp_path, fatras, conf_const):
         )
     )
 
-    alg = AssertCollectionExistsAlg("simhits", "check_alg", acts.logging.ERROR)
+    alg = AssertCollectionExistsAlg("simhits", "check_alg", acts.logging.WARNING)
     s.addAlgorithm(alg)
 
     s.run()
@@ -244,7 +250,7 @@ def test_csv_clusters_reader(tmp_path, fatras, conf_const, trk_geo, rng):
     s.addReader(evGen)
     s.addAlgorithm(simAlg)
     digiAlg = PlanarSteppingAlgorithm(
-        level=acts.logging.ERROR,
+        level=acts.logging.WARNING,
         inputSimHits=simAlg.config.outputSimHits,
         outputClusters="clusters",
         outputSourceLinks="sourcelinks",
@@ -262,7 +268,7 @@ def test_csv_clusters_reader(tmp_path, fatras, conf_const, trk_geo, rng):
 
     s.addWriter(
         CsvPlanarClusterWriter(
-            level=acts.logging.ERROR,
+            level=acts.logging.WARNING,
             outputDir=str(out),
             inputSimHits=simAlg.config.outputSimHits,
             inputClusters=digiAlg.config.outputClusters,
@@ -277,7 +283,7 @@ def test_csv_clusters_reader(tmp_path, fatras, conf_const, trk_geo, rng):
     s.addReader(
         conf_const(
             CsvPlanarClusterReader,
-            level=acts.logging.ERROR,
+            level=acts.logging.WARNING,
             outputClusters="clusters",
             inputDir=str(out),
             outputHitIds="hits",
@@ -288,7 +294,7 @@ def test_csv_clusters_reader(tmp_path, fatras, conf_const, trk_geo, rng):
     )
 
     algs = [
-        AssertCollectionExistsAlg(k, f"check_alg_{k}", acts.logging.ERROR)
+        AssertCollectionExistsAlg(k, f"check_alg_{k}", acts.logging.WARNING)
         for k in ("clusters", "simhits", "meas_ptcl_map")
     ]
     for alg in algs:
