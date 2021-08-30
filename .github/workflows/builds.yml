@@ -60,6 +60,8 @@ jobs:
         if: contains(matrix.image, 'ubuntu')
         run: >
           ${SETUP} 
+          && . /usr/local/bin/thisroot.sh
+          && . /usr/local/bin/thisdd4hep_only.sh
           && . build/python/setup.sh 
           && pip3 install pytest
           && pytest -rFs
