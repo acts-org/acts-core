@@ -58,11 +58,12 @@ jobs:
         run: ${SETUP} && ./CI/run_examples.sh
       - name: Python level tests
         if: contains(matrix.image, 'ubuntu')
+        shell: bash
         run: >
           ${SETUP} 
-          && . /usr/local/bin/thisroot.sh
-          && . /usr/local/bin/thisdd4hep_only.sh
-          && . build/python/setup.sh 
+          && source /usr/local/bin/thisroot.sh
+          && source /usr/local/bin/thisdd4hep_only.sh
+          && source build/python/setup.sh 
           && pip3 install pytest
           && pytest -rFs
       - name: Install
