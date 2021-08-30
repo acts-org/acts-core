@@ -61,7 +61,7 @@ jobs:
         run: >
           ${SETUP} 
           && . build/python/setup.sh 
-          && pip install pytest
+          && pip3 install pytest
           && pytest -rFs
       - name: Install
         run: ${SETUP} && cmake --build build -- install
