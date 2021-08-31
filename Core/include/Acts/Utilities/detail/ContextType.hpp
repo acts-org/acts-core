@@ -79,6 +79,10 @@ class ContextType {
     return std::any_cast<const std::decay_t<T>&>(m_data);
   }
 
+  /// Check if the contained type is initialized.
+  /// @return Boolean indicating whether a type is present
+  bool hasValue() const { return m_data.has_value(); }
+
  private:
   std::any m_data;
 };
