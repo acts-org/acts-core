@@ -14,6 +14,7 @@
 #include "Acts/Plugins/Identification/IdentifiedDetectorElement.hpp"
 #include "Acts/Plugins/Identification/Identifier.hpp"
 #include "Acts/Surfaces/Surface.hpp"
+#include "ActsExamples/ContextualDetector/AlignedDetectorElement.hpp"
 #include "ActsExamples/GenericDetector/GenericDetectorElement.hpp"
 
 #include <iostream>
@@ -36,22 +37,15 @@ namespace Contextual {
 /// store and then in a contextual call the actual detector element
 /// position is taken internal multi component store - the latter
 /// has to be filled though from an external source
-class InternallyAlignedDetectorElement
-    : public Generic::GenericDetectorElement {
+class InternallyAlignedDetectorElement : public AlignedDetectorElement {
  public:
-  /// @class ContextType
-  /// convention: nested to the Detector element
   struct ContextType {
-    /// The current intervall of validity
+    /// The current interval of validity
     unsigned int iov = 0;
   };
 
-  /// Constructor for an alignable surface
-  ///
-  /// @note see Generic::GenericDetectorElement for documentation
-  template <typename... Args>
-  InternallyAlignedDetectorElement(Args&&... args)
-      : Generic::GenericDetectorElement(std::forward<Args>(args)...) {}
+  // Inherit constructor
+  using AlignedDetectorElement::AlignedDetectorElement;
 
   /// Return local to global transform associated with this identifier
   ///
@@ -71,15 +65,15 @@ class InternallyAlignedDetectorElement
   ///
   /// @param alignedTransform is a new transform
   /// @oaram iov is the batch for which it is meant
-  void addAlignedTransform(std::unique_ptr<Acts::Transform3> alignedTransform,
-                           unsigned int iov);
+  void addAlignedTransform(const Acts::Transform3& alignedTransform,
+                           Acts::GeometryContext& context) override;
 
-  /// Return the set of alignment transforms in flight
-  const std::map<unsigned int, std::unique_ptr<Acts::Transform3>>&
-  alignedTransforms() const;
+  Acts::GeometryContext makeContext(unsigned int iov) const override {
+    return Acts::GeometryContext{ContextType{iov}};
+  }
 
  private:
-  std::map<unsigned int, std::unique_ptr<Acts::Transform3>> m_alignedTransforms;
+  std::map<unsigned int, Acts::Transform3> m_alignedTransforms;
 };
 
 inline const Acts::Transform3& InternallyAlignedDetectorElement::transform(
@@ -87,10 +81,10 @@ inline const Acts::Transform3& InternallyAlignedDetectorElement::transform(
   // Check if a different transform than the nominal exists
   if (not m_alignedTransforms.empty()) {
     // cast into the right context object
-    auto alignContext = gctx.get<ContextType>();
+    const auto& alignContext = gctx.get<ContextType&>();
     auto aTransform = m_alignedTransforms.find(alignContext.iov);
     if (aTransform != m_alignedTransforms.end()) {
-      return (*aTransform->second.get());
+      return aTransform->second;
     }
   }
   // Return the standard transform if not found
@@ -104,13 +98,9 @@ InternallyAlignedDetectorElement::nominalTransform(
 }
 
 inline void InternallyAlignedDetectorElement::addAlignedTransform(
-    std::unique_ptr<Acts::Transform3> alignedTransform, unsigned int iov) {
-  m_alignedTransforms[iov] = std::move(alignedTransform);
-}
-
-inline const std::map<unsigned int, std::unique_ptr<Acts::Transform3>>&
-InternallyAlignedDetectorElement::alignedTransforms() const {
-  return m_alignedTransforms;
+    const Acts::Transform3& alignedTransform, Acts::GeometryContext& context) {
+  const auto& _context = context.get<ContextType&>();
+  m_alignedTransforms[_context.iov] = std::move(alignedTransform);
 }
 
 }  // end of namespace Contextual

@@ -52,6 +52,12 @@ ActsExamples::Contextual::AlignmentDecorator::decorate(
       // Are we in a gargabe collection event?
       for (auto& lstore : m_cfg.detectorStore) {
         for (auto& ldet : lstore) {
+          // If this event doesn't have a context object yet, ask the detector
+          // element to create one.
+          if (!context.geoContext.hasValue()) {
+            context.geoContext = ldet->makeContext(iov);
+          }
+
           // get the nominal transform
           auto& tForm = ldet->nominalTransform(context.geoContext);
           // create a new transform
@@ -86,16 +92,13 @@ ActsExamples::Contextual::AlignmentDecorator::decorate(
             }
           }
           // put it back into the store
-          ldet->addAlignedTransform(std::move(atForm), iov);
+          ldet->addAlignedTransform(*atForm, context.geoContext);
         }
       }
     }
     // book keeping
     m_iovStatus[iov] = true;
   }
-  // Set the geometry context
-  InternallyAlignedDetectorElement::ContextType alignedContext{iov};
-  context.geoContext = alignedContext;
 
   return ProcessCode::SUCCESS;
 }
