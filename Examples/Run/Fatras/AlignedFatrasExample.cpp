@@ -6,10 +6,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "ActsExamples/ContextualDetector/InternallyAlignedDetector.hpp"
+#include "ActsExamples/ContextualDetector/AlignedDetector.hpp"
 
 #include "Fatras.hpp"
 
 int main(int argc, char* argv[]) {
-  return runFatras(argc, argv, std::make_shared<InternallyAlignedDetector>());
+  return runFatras(
+      argc, argv,
+      std::make_shared<ActsExamples::Contextual::AlignedDetector>());
 }

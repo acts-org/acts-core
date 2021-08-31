@@ -19,9 +19,9 @@
 namespace ActsExamples::Contextual {
 class InternallyAlignedDetectorElement;
 class AlignmentDecorator;
-}  // namespace ActsExamples::Contextual
 
-struct InternallyAlignedDetector : public ActsExamples::IBaseDetector {
+class AlignedDetector : public ActsExamples::IBaseDetector {
+ public:
   using DetectorElement =
       ActsExamples::Contextual::InternallyAlignedDetectorElement;
   using DetectorElementPtr = std::shared_ptr<DetectorElement>;
@@ -49,9 +49,6 @@ struct InternallyAlignedDetector : public ActsExamples::IBaseDetector {
     Acts::Logging::Level decoratorLogLevel = Acts::Logging::INFO;
   };
 
-  /// The Store of the detector elements (lifetime: job)
-  DetectorStore detectorStore;
-
   void addOptions(
       boost::program_options::options_description& opt) const override;
 
@@ -62,4 +59,10 @@ struct InternallyAlignedDetector : public ActsExamples::IBaseDetector {
   std::pair<ActsExamples::IBaseDetector::TrackingGeometryPtr, ContextDecorators>
   finalize(const Config& cfg,
            std::shared_ptr<const Acts::IMaterialDecorator> mdecorator);
+
+ private:
+  /// The Store of the detector elements (lifetime: job)
+  DetectorStore m_detectorStore;
 };
+
+}  // namespace ActsExamples::Contextual

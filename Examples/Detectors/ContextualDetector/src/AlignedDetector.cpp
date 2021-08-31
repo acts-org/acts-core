@@ -6,11 +6,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "ActsExamples/ContextualDetector/InternallyAlignedDetector.hpp"
-
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Utilities/Logger.hpp"
+#include "ActsExamples/ContextualDetector/AlignedDetector.hpp"
 #include "ActsExamples/ContextualDetector/AlignmentDecorator.hpp"
 #include "ActsExamples/ContextualDetector/InternallyAlignedDetectorElement.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
@@ -20,8 +19,9 @@
 #include <boost/program_options.hpp>
 
 using namespace Acts::UnitLiterals;
+namespace ActsExamples::Contextual {
 
-void InternallyAlignedDetector::addOptions(
+void AlignedDetector::addOptions(
     boost::program_options::options_description& opt) const {
   // Add the generic geometry options
   ActsExamples::Options::addGenericGeometryOptions(opt);
@@ -56,7 +56,7 @@ void InternallyAlignedDetector::addOptions(
       "Keep the first iov batch nominal.");
 }
 
-auto InternallyAlignedDetector::finalize(
+auto AlignedDetector::finalize(
     const boost::program_options::variables_map& vm,
     std::shared_ptr<const Acts::IMaterialDecorator> mdecorator)
     -> std::pair<TrackingGeometryPtr, ContextDecorators> {
@@ -92,7 +92,7 @@ auto InternallyAlignedDetector::finalize(
   return finalize(cfg, mdecorator);
 }
 
-auto InternallyAlignedDetector::finalize(
+auto AlignedDetector::finalize(
     const Config& cfg,
     std::shared_ptr<const Acts::IMaterialDecorator> mdecorator)
     -> std::pair<ActsExamples::IBaseDetector::TrackingGeometryPtr,
@@ -102,9 +102,9 @@ auto InternallyAlignedDetector::finalize(
   /// return the generic detector - with aligned context decorator
   TrackingGeometryPtr aTrackingGeometry =
       ActsExamples::Generic::buildDetector<DetectorElement>(
-          nominalContext, detectorStore, cfg.buildLevel, std::move(mdecorator),
-          cfg.buildProto, cfg.surfaceLogLevel, cfg.layerLogLevel,
-          cfg.volumeLogLevel);
+          nominalContext, m_detectorStore, cfg.buildLevel,
+          std::move(mdecorator), cfg.buildProto, cfg.surfaceLogLevel,
+          cfg.layerLogLevel, cfg.volumeLogLevel);
 
   // Let's create a reandom number service
   ActsExamples::RandomNumbers::Config randomNumberConfig;
@@ -114,7 +114,7 @@ auto InternallyAlignedDetector::finalize(
 
   // Alignment decorator service
   Decorator::Config agcsConfig;
-  agcsConfig.detectorStore = detectorStore;
+  agcsConfig.detectorStore = m_detectorStore;
   agcsConfig.iovSize = cfg.iovSize;
   agcsConfig.flushSize = cfg.flushSize;
 
@@ -137,3 +137,5 @@ auto InternallyAlignedDetector::finalize(
   return std::make_pair<TrackingGeometryPtr, ContextDecorators>(
       std::move(aTrackingGeometry), std::move(aContextDecorators));
 }
+
+}  // namespace ActsExamples::Contextual
