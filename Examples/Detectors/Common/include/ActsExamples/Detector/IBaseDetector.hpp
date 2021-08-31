@@ -21,10 +21,6 @@ class IMaterialDecorator;
 
 namespace ActsExamples {
 class IContextDecorator;
-namespace Contextual {
-class AlignedDetectorElement;
-class AlignmentDecorator;
-}  // namespace Contextual
 }  // namespace ActsExamples
 
 namespace ActsExamples {

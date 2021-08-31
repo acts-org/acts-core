@@ -94,7 +94,7 @@ ActsExamples::Contextual::AlignmentDecorator::decorate(
     m_iovStatus[iov] = true;
   }
   // Set the geometry context
-  AlignedDetectorElement::ContextType alignedContext{iov};
+  InternallyAlignedDetectorElement::ContextType alignedContext{iov};
   context.geoContext = alignedContext;
 
   return ProcessCode::SUCCESS;

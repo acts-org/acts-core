@@ -10,7 +10,7 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "ActsExamples/ContextualDetector/AlignedDetectorElement.hpp"
+#include "ActsExamples/ContextualDetector/InternallyAlignedDetectorElement.hpp"
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
 #include "ActsExamples/Framework/RandomNumbers.hpp"
@@ -29,7 +29,8 @@ namespace Contextual {
 /// geometry context carries the full transform store (payload)
 class AlignmentDecorator : public IContextDecorator {
  public:
-  using LayerStore = std::vector<std::shared_ptr<AlignedDetectorElement>>;
+  using LayerStore =
+      std::vector<std::shared_ptr<InternallyAlignedDetectorElement>>;
   using DetectorStore = std::vector<LayerStore>;
 
   /// @brief nested configuration struct

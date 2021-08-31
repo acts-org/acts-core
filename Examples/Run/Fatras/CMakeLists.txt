@@ -11,10 +11,10 @@ target_link_libraries(
 
 # Generic detector with IOV based alignment
 add_executable(
-  ActsExampleFatrasAligned
-  AlignedFatrasExample.cpp)
+  ActsExampleFatrasInternallyAligned
+  InternallyAlignedFatrasExample.cpp)
 target_link_libraries(
-  ActsExampleFatrasAligned
+  ActsExampleFatrasInternallyAligned
   PRIVATE ActsExamplesFatrasCommon ActsExamplesDetectorContextual ActsExamplesIoJson)
 
 # Generic detector with Payload based alignment
@@ -44,7 +44,7 @@ target_link_libraries(
 install(
   TARGETS
     ActsExampleFatrasGeneric
-    ActsExampleFatrasAligned
+    ActsExampleFatrasInternallyAligned
     ActsExampleFatrasPayload
     ActsExampleFatrasTGeo
     ActsExampleFatrasTelescope

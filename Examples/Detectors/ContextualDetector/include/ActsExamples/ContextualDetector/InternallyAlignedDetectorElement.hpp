@@ -24,7 +24,7 @@ namespace ActsExamples {
 
 namespace Contextual {
 
-/// @class AlignedDetectorElement extends GenericDetectorElement
+/// @class InternallyAlignedDetectorElement extends GenericDetectorElement
 ///
 /// This is a lightweight type of detector element,
 /// it simply implements the base class.
@@ -36,7 +36,8 @@ namespace Contextual {
 /// store and then in a contextual call the actual detector element
 /// position is taken internal multi component store - the latter
 /// has to be filled though from an external source
-class AlignedDetectorElement : public Generic::GenericDetectorElement {
+class InternallyAlignedDetectorElement
+    : public Generic::GenericDetectorElement {
  public:
   /// @class ContextType
   /// convention: nested to the Detector element
@@ -49,7 +50,7 @@ class AlignedDetectorElement : public Generic::GenericDetectorElement {
   ///
   /// @note see Generic::GenericDetectorElement for documentation
   template <typename... Args>
-  AlignedDetectorElement(Args&&... args)
+  InternallyAlignedDetectorElement(Args&&... args)
       : Generic::GenericDetectorElement(std::forward<Args>(args)...) {}
 
   /// Return local to global transform associated with this identifier
@@ -81,7 +82,7 @@ class AlignedDetectorElement : public Generic::GenericDetectorElement {
   std::map<unsigned int, std::unique_ptr<Acts::Transform3>> m_alignedTransforms;
 };
 
-inline const Acts::Transform3& AlignedDetectorElement::transform(
+inline const Acts::Transform3& InternallyAlignedDetectorElement::transform(
     const Acts::GeometryContext& gctx) const {
   // Check if a different transform than the nominal exists
   if (not m_alignedTransforms.empty()) {
@@ -96,18 +97,19 @@ inline const Acts::Transform3& AlignedDetectorElement::transform(
   return nominalTransform(gctx);
 }
 
-inline const Acts::Transform3& AlignedDetectorElement::nominalTransform(
+inline const Acts::Transform3&
+InternallyAlignedDetectorElement::nominalTransform(
     const Acts::GeometryContext& gctx) const {
   return GenericDetectorElement::transform(gctx);
 }
 
-inline void AlignedDetectorElement::addAlignedTransform(
+inline void InternallyAlignedDetectorElement::addAlignedTransform(
     std::unique_ptr<Acts::Transform3> alignedTransform, unsigned int iov) {
   m_alignedTransforms[iov] = std::move(alignedTransform);
 }
 
 inline const std::map<unsigned int, std::unique_ptr<Acts::Transform3>>&
-AlignedDetectorElement::alignedTransforms() const {
+InternallyAlignedDetectorElement::alignedTransforms() const {
   return m_alignedTransforms;
 }
 

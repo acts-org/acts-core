@@ -6,7 +6,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "ActsExamples/ContextualDetector/AlignedDetector.hpp"
+#include "ActsExamples/ContextualDetector/InternallyAlignedDetector.hpp"
 #include "ActsExamples/Propagation/PropagationExampleBase.hpp"
 
 /// @brief main executable
@@ -15,7 +15,7 @@
 /// @param argv The argument list
 int main(int argc, char* argv[]) {
   // --------------------------------------------------------------------------------
-  AlignedDetector alignedDetector;
+  InternallyAlignedDetector alignedDetector;
 
   // now process it
   return propagationExample(argc, argv, alignedDetector);

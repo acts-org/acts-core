@@ -16,8 +16,14 @@
 #include <memory>
 #include <vector>
 
-struct AlignedDetector : public ActsExamples::IBaseDetector {
-  using DetectorElement = ActsExamples::Contextual::AlignedDetectorElement;
+namespace ActsExamples::Contextual {
+class InternallyAlignedDetectorElement;
+class AlignmentDecorator;
+}  // namespace ActsExamples::Contextual
+
+struct InternallyAlignedDetector : public ActsExamples::IBaseDetector {
+  using DetectorElement =
+      ActsExamples::Contextual::InternallyAlignedDetectorElement;
   using DetectorElementPtr = std::shared_ptr<DetectorElement>;
   using Decorator = ActsExamples::Contextual::AlignmentDecorator;
   using DetectorStore = std::vector<std::vector<DetectorElementPtr>>;

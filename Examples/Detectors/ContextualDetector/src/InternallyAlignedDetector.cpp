@@ -6,13 +6,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "ActsExamples/ContextualDetector/AlignedDetector.hpp"
+#include "ActsExamples/ContextualDetector/InternallyAlignedDetector.hpp"
 
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "ActsExamples/ContextualDetector/AlignedDetectorElement.hpp"
 #include "ActsExamples/ContextualDetector/AlignmentDecorator.hpp"
+#include "ActsExamples/ContextualDetector/InternallyAlignedDetectorElement.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
 #include "ActsExamples/GenericDetector/BuildGenericDetector.hpp"
 #include "ActsExamples/GenericDetector/GenericDetectorOptions.hpp"
@@ -21,7 +21,7 @@
 
 using namespace Acts::UnitLiterals;
 
-void AlignedDetector::addOptions(
+void InternallyAlignedDetector::addOptions(
     boost::program_options::options_description& opt) const {
   // Add the generic geometry options
   ActsExamples::Options::addGenericGeometryOptions(opt);
@@ -56,7 +56,7 @@ void AlignedDetector::addOptions(
       "Keep the first iov batch nominal.");
 }
 
-auto AlignedDetector::finalize(
+auto InternallyAlignedDetector::finalize(
     const boost::program_options::variables_map& vm,
     std::shared_ptr<const Acts::IMaterialDecorator> mdecorator)
     -> std::pair<TrackingGeometryPtr, ContextDecorators> {
@@ -92,7 +92,7 @@ auto AlignedDetector::finalize(
   return finalize(cfg, mdecorator);
 }
 
-auto AlignedDetector::finalize(
+auto InternallyAlignedDetector::finalize(
     const Config& cfg,
     std::shared_ptr<const Acts::IMaterialDecorator> mdecorator)
     -> std::pair<ActsExamples::IBaseDetector::TrackingGeometryPtr,
