@@ -31,26 +31,26 @@ ActsExamples::Contextual::InternalAlignmentDecorator::decorate(
   ACTS_VERBOSE("IOV resolved to " << iov << " - from event "
                                   << context.eventNumber << ".");
 
-  if (m_cfg.randomNumberSvc != nullptr) {
-    // Detect if we have a new alignment range
-    if (m_iovStatus.size() == 0 or m_iovStatus.size() < iov or
-        !m_iovStatus[iov]) {
-      auto cios = m_iovStatus.size();
-      ACTS_VERBOSE("New IOV detected at event " << context.eventNumber
-                                                << ", emulate new alignment.");
-      ACTS_VERBOSE("New IOV identifier set to "
-                   << iov << ", curently valid: " << cios);
+  m_eventsSeen++;
 
-      for (unsigned int ic = cios; ic <= iov; ++ic) {
-        m_iovStatus.push_back(false);
-      }
+  if (m_cfg.randomNumberSvc != nullptr) {
+    if (auto it = m_activeIovs.find(iov); it != m_activeIovs.end()) {
+      // Iov is already present, update last accessed
+      it->second.lastAccessed = m_eventsSeen;
+    } else {
+      // Iov is not present yet, create it
+
+      m_activeIovs.emplace(iov, IovStatus{m_eventsSeen});
+
+      ACTS_VERBOSE("New IOV " << iov << " detected at event "
+                              << context.eventNumber
+                              << ", emulate new alignment.");
 
       // Create an algorithm local random number generator
       RandomEngine rng = m_cfg.randomNumberSvc->spawnGenerator(context);
 
       context.geoContext = InternallyAlignedDetectorElement::ContextType{iov};
 
-      // Are we in a gargabe collection event?
       for (auto& lstore : m_cfg.detectorStore) {
         for (auto& ldet : lstore) {
           // get the nominal transform
@@ -63,8 +63,23 @@ ActsExamples::Contextual::InternalAlignmentDecorator::decorate(
         }
       }
     }
-    // book keeping
-    m_iovStatus[iov] = true;
+  }
+
+  // Garbage collection
+  for (auto it = m_activeIovs.begin(); it != m_activeIovs.end();) {
+    auto& [iov, status] = *it;
+    if (m_eventsSeen - status.lastAccessed > m_cfg.flushSize) {
+      ACTS_VERBOSE("IOV " << iov << " has not been accessed in the last "
+                          << m_cfg.flushSize << " events, clearing");
+      it = m_activeIovs.erase(it);
+      for (auto& lstore : m_cfg.detectorStore) {
+        for (auto& ldet : lstore) {
+          ldet->clearAlignedTransform(iov);
+        }
+      }
+    } else {
+      it++;
+    }
   }
 
   return ProcessCode::SUCCESS;

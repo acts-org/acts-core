@@ -68,23 +68,27 @@ class InternallyAlignedDetectorElement
   void addAlignedTransform(const Acts::Transform3& alignedTransform,
                            unsigned int iov);
 
+  void clearAlignedTransform(unsigned int iov);
+
  private:
   std::map<unsigned int, Acts::Transform3> m_alignedTransforms;
 };
 
 inline const Acts::Transform3& InternallyAlignedDetectorElement::transform(
     const Acts::GeometryContext& gctx) const {
-  // Check if a different transform than the nominal exists
-  if (not m_alignedTransforms.empty()) {
-    // cast into the right context object
-    const auto& alignContext = gctx.get<ContextType&>();
-    auto aTransform = m_alignedTransforms.find(alignContext.iov);
-    if (aTransform != m_alignedTransforms.end()) {
-      return aTransform->second;
-    }
+  if (!gctx.hasValue()) {
+    // Return the standard transform if geo context is empty
+    return nominalTransform(gctx);
   }
-  // Return the standard transform if not found
-  return nominalTransform(gctx);
+  const auto& alignContext = gctx.get<ContextType&>();
+
+  if (m_alignedTransforms.empty()) {
+    // no alignments -> nominal alignment
+    return nominalTransform(gctx);
+  }
+  auto aTransform = m_alignedTransforms.find(alignContext.iov);
+  assert(aTransform != m_alignedTransforms.end());
+  return aTransform->second;
 }
 
 inline const Acts::Transform3&
@@ -98,5 +102,10 @@ inline void InternallyAlignedDetectorElement::addAlignedTransform(
   m_alignedTransforms[iov] = std::move(alignedTransform);
 }
 
-}  // end of namespace Contextual
+inline void InternallyAlignedDetectorElement::clearAlignedTransform(
+    unsigned int iov) {
+  m_alignedTransforms.erase(m_alignedTransforms.find(iov));
+}
+
+}  // namespace Contextual
 }  // end of namespace ActsExamples

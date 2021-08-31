@@ -22,11 +22,11 @@ class InternalAlignmentDecorator;
 
 class AlignedDetector : public ActsExamples::IBaseDetector {
  public:
-  using DetectorElement =
-      ActsExamples::Contextual::InternallyAlignedDetectorElement;
-  using DetectorElementPtr = std::shared_ptr<DetectorElement>;
-  using Decorator = ActsExamples::Contextual::InternalAlignmentDecorator;
-  using DetectorStore = std::vector<std::vector<DetectorElementPtr>>;
+  //   using DetectorElement =
+  //       ActsExamples::Contextual::InternallyAlignedDetectorElement;
+  //   using DetectorElementPtr = std::shared_ptr<DetectorElement>;
+  //   using Decorator = ActsExamples::Contextual::InternalAlignmentDecorator;
+  //   using DetectorStore = std::vector<std::vector<DetectorElementPtr>>;
 
   struct Config : public GenericDetector::Config {
     /// Seed for the decorator random numbers.
@@ -47,6 +47,9 @@ class AlignedDetector : public ActsExamples::IBaseDetector {
     bool firstIovNominal = false;
     /// Log level for the decorator
     Acts::Logging::Level decoratorLogLevel = Acts::Logging::INFO;
+
+    enum class Mode { Internal, External };
+    Mode mode = Mode::External;
   };
 
   void addOptions(
@@ -62,7 +65,8 @@ class AlignedDetector : public ActsExamples::IBaseDetector {
 
  private:
   /// The Store of the detector elements (lifetime: job)
-  DetectorStore m_detectorStore;
+  std::vector<std::vector<std::shared_ptr<Generic::GenericDetectorElement>>>
+      m_detectorStore;
 };
 
 }  // namespace ActsExamples::Contextual

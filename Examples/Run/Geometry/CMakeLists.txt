@@ -24,20 +24,12 @@ target_link_libraries(
   ActsExampleGeometryGeneric
   PRIVATE ${_common_libraries} ActsExamplesDetectorGeneric)
 
-# Generic detector with IOV based alignment
+# Generic detector with alignment
 add_executable(
   ActsExampleGeometryAligned
   AlignedGeometryExample.cpp)
 target_link_libraries(
   ActsExampleGeometryAligned
-  PRIVATE ${_common_libraries} ActsExamplesDetectorContextual)
-
-# Generic detector with Payload based alignment
-add_executable(
-  ActsExampleGeometryPayload
-  PayloadGeometryExample.cpp)
-target_link_libraries(
-  ActsExampleGeometryPayload
   PRIVATE ${_common_libraries} ActsExamplesDetectorContextual)
 
 # TGeo detector
@@ -61,7 +53,6 @@ install(
     ActsExampleGeometryEmpty
     ActsExampleGeometryGeneric
     ActsExampleGeometryAligned
-    ActsExampleGeometryPayload
     ActsExampleGeometryTGeo
     ActsExampleGeometryTelescope
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

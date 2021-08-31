@@ -25,7 +25,7 @@ target_link_libraries(
   ActsExamplePropagationGeneric
   PRIVATE ${_common_libraries} ActsExamplesDetectorGeneric)
 
-# Generic detector with IOV based alignment
+# Generic detector with alignment
 add_executable(
   ActsExamplePropagationAligned
   AlignedPropagationExample.cpp)
@@ -33,13 +33,6 @@ target_link_libraries(
   ActsExamplePropagationAligned
   PRIVATE ${_common_libraries} ActsExamplesDetectorContextual)
 
-# Generic detector with Payload based alignment
-add_executable(
-  ActsExamplePropagationPayload
-  PayloadPropagationExample.cpp)
-target_link_libraries(
-  ActsExamplePropagationPayload
-  PRIVATE ${_common_libraries} ActsExamplesDetectorContextual)
 
 # TGeo detector
 add_executable(
@@ -54,7 +47,6 @@ install(
     ActsExamplePropagationEmpty
     ActsExamplePropagationGeneric
     ActsExamplePropagationAligned
-    ActsExamplePropagationPayload
     ActsExamplePropagationTGeo
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 

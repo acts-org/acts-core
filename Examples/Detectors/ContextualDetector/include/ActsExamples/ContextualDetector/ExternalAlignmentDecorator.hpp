@@ -11,6 +11,7 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Utilities/Logger.hpp"
+#include "ActsExamples/ContextualDetector/AlignmentDecorator.hpp"
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
 
@@ -29,31 +30,25 @@ namespace Contextual {
 ///
 /// It acts on the PayloadDetectorElement, i.e. the
 /// geometry context carries the full transform store (payload)
-class PayloadDecorator : public IContextDecorator {
+class ExternalAlignmentDecorator : public AlignmentDecorator {
  public:
   /// @brief nested configuration struct
-  struct Config {
+  struct Config : public AlignmentDecorator::Config {
     /// The trackng geometry
     std::shared_ptr<const Acts::TrackingGeometry> trackingGeometry = nullptr;
-
-    /// Incremental rotation
-    double rotationStep = 0.2 * M_PI;
-
-    /// Alignment frequency - every X events
-    unsigned int iovSize = 100;
   };
 
   /// Constructor
   ///
   /// @param cfg Configuration struct
   /// @param logger The logging framework
-  PayloadDecorator(const Config& cfg,
-                   std::unique_ptr<const Acts::Logger> logger =
-                       Acts::getDefaultLogger("PayloadDecorator",
-                                              Acts::Logging::INFO));
+  ExternalAlignmentDecorator(
+      const Config& cfg,
+      std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
+          "ExternalAlignmentDecorator", Acts::Logging::INFO));
 
   /// Virtual destructor
-  virtual ~PayloadDecorator() = default;
+  virtual ~ExternalAlignmentDecorator() = default;
 
   /// @brief decorates (adds, modifies) the AlgorithmContext
   /// with a geometric rotation per event
@@ -70,10 +65,21 @@ class PayloadDecorator : public IContextDecorator {
  private:
   Config m_cfg;                                  ///< the configuration class
   std::unique_ptr<const Acts::Logger> m_logger;  ///!< the logging instance
-  std::string m_name = "PayloadDecorator";
+  std::string m_name = "ExternalAlignmentDecorator";
 
   /// Map of nominal transforms
   std::vector<Acts::Transform3> m_nominalStore;
+
+  struct IovStatus {
+    // GenericDetector identifiers are sequential
+    std::vector<Acts::Transform3> transforms;
+    size_t lastAccessed;
+  };
+
+  std::unordered_map<unsigned int, std::unique_ptr<IovStatus>> m_activeIovs;
+  std::mutex m_iovMutex;
+
+  size_t m_eventsSeen{0};
 
   /// Private access to the logging instance
   const Acts::Logger& logger() const { return *m_logger; }
