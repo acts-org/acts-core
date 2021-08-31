@@ -18,14 +18,14 @@
 
 namespace ActsExamples::Contextual {
 class InternallyAlignedDetectorElement;
-class AlignmentDecorator;
+class InternalAlignmentDecorator;
 
 class AlignedDetector : public ActsExamples::IBaseDetector {
  public:
   using DetectorElement =
       ActsExamples::Contextual::InternallyAlignedDetectorElement;
   using DetectorElementPtr = std::shared_ptr<DetectorElement>;
-  using Decorator = ActsExamples::Contextual::AlignmentDecorator;
+  using Decorator = ActsExamples::Contextual::InternalAlignmentDecorator;
   using DetectorStore = std::vector<std::vector<DetectorElementPtr>>;
 
   struct Config : public GenericDetector::Config {

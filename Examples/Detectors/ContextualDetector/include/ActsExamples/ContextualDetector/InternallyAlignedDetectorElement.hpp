@@ -14,7 +14,6 @@
 #include "Acts/Plugins/Identification/IdentifiedDetectorElement.hpp"
 #include "Acts/Plugins/Identification/Identifier.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "ActsExamples/ContextualDetector/AlignedDetectorElement.hpp"
 #include "ActsExamples/GenericDetector/GenericDetectorElement.hpp"
 
 #include <iostream>
@@ -37,7 +36,8 @@ namespace Contextual {
 /// store and then in a contextual call the actual detector element
 /// position is taken internal multi component store - the latter
 /// has to be filled though from an external source
-class InternallyAlignedDetectorElement : public AlignedDetectorElement {
+class InternallyAlignedDetectorElement
+    : public Generic::GenericDetectorElement {
  public:
   struct ContextType {
     /// The current interval of validity
@@ -45,7 +45,7 @@ class InternallyAlignedDetectorElement : public AlignedDetectorElement {
   };
 
   // Inherit constructor
-  using AlignedDetectorElement::AlignedDetectorElement;
+  using Generic::GenericDetectorElement::GenericDetectorElement;
 
   /// Return local to global transform associated with this identifier
   ///
@@ -66,11 +66,7 @@ class InternallyAlignedDetectorElement : public AlignedDetectorElement {
   /// @param alignedTransform is a new transform
   /// @oaram iov is the batch for which it is meant
   void addAlignedTransform(const Acts::Transform3& alignedTransform,
-                           Acts::GeometryContext& context) override;
-
-  Acts::GeometryContext makeContext(unsigned int iov) const override {
-    return Acts::GeometryContext{ContextType{iov}};
-  }
+                           unsigned int iov);
 
  private:
   std::map<unsigned int, Acts::Transform3> m_alignedTransforms;
@@ -98,9 +94,8 @@ InternallyAlignedDetectorElement::nominalTransform(
 }
 
 inline void InternallyAlignedDetectorElement::addAlignedTransform(
-    const Acts::Transform3& alignedTransform, Acts::GeometryContext& context) {
-  const auto& _context = context.get<ContextType&>();
-  m_alignedTransforms[_context.iov] = std::move(alignedTransform);
+    const Acts::Transform3& alignedTransform, unsigned int iov) {
+  m_alignedTransforms[iov] = std::move(alignedTransform);
 }
 
 }  // end of namespace Contextual

@@ -1,7 +1,7 @@
 add_library(
   ActsExamplesDetectorContextual SHARED
   src/AlignedDetector.cpp
-  src/AlignmentDecorator.cpp
+  src/InternalAlignmentDecorator.cpp
   src/PayloadDecorator.cpp
   src/PayloadDetector.cpp)
 target_include_directories(

@@ -6,11 +6,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include "ActsExamples/ContextualDetector/AlignedDetector.hpp"
+
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "ActsExamples/ContextualDetector/AlignedDetector.hpp"
-#include "ActsExamples/ContextualDetector/AlignmentDecorator.hpp"
+#include "ActsExamples/ContextualDetector/InternalAlignmentDecorator.hpp"
 #include "ActsExamples/ContextualDetector/InternallyAlignedDetectorElement.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
 #include "ActsExamples/GenericDetector/BuildGenericDetector.hpp"
