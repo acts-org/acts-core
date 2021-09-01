@@ -39,6 +39,7 @@ void AlignedDetector::addOptions(
       "align-flushsize",
       boost::program_options::value<size_t>()->default_value(200),
       "Span until garbage collection is active.")(
+      "align-no-gc", boost::program_options::bool_switch())(
       "align-sigma-iplane",
       boost::program_options::value<double>()->default_value(100.),
       "Sigma of the in-plane misalignment in [um]")(
@@ -86,6 +87,7 @@ auto AlignedDetector::finalize(
   cfg.seed = vm["align-seed"].template as<size_t>();
   cfg.iovSize = vm["align-iovsize"].template as<size_t>();
   cfg.flushSize = vm["align-flushsize"].template as<size_t>();
+  cfg.doGarbageCollection = !vm["align-no-gc"].as<bool>();
 
   // The misalingments
   cfg.sigmaInPlane = vm["align-sigma-iplane"].template as<double>() * 1_um;
@@ -123,6 +125,7 @@ auto AlignedDetector::finalize(
   auto fillDecoratorConfig = [&](AlignmentDecorator::Config& config) {
     config.iovSize = cfg.iovSize;
     config.flushSize = cfg.flushSize;
+    config.doGarbageCollection = cfg.doGarbageCollection;
 
     // The misalingments
     config.gSigmaX = cfg.sigmaInPlane;
@@ -166,6 +169,7 @@ auto AlignedDetector::finalize(
         Acts::getDefaultLogger("AlignmentDecorator", cfg.decoratorLogLevel)));
   } else {
     InternallyAlignedDetectorElement::ContextType nominalContext;
+    nominalContext.nominal = true;
 
     InternalAlignmentDecorator::Config agcsConfig;
     fillDecoratorConfig(agcsConfig);

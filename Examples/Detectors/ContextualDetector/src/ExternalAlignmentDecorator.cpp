@@ -39,10 +39,13 @@ ActsExamples::Contextual::ExternalAlignmentDecorator::decorate(
     if (auto it = m_activeIovs.find(iov); it != m_activeIovs.end()) {
       // Iov is already present, update last accessed
       it->second->lastAccessed = m_eventsSeen;
+      context.geoContext =
+          ExternallyAlignedDetectorElement::ContextType{it->second};
     } else {
       // Iov is not present yet, create it
-      auto iovStatus = std::make_unique<IovStatus>();
-      iovStatus->lastAccessed = m_eventsSeen;
+      auto alignmentStore =
+          std::make_unique<ExternallyAlignedDetectorElement::AlignmentStore>();
+      alignmentStore->lastAccessed = m_eventsSeen;
 
       ACTS_VERBOSE("New IOV " << iov << " detected at event "
                               << context.eventNumber
@@ -51,31 +54,33 @@ ActsExamples::Contextual::ExternalAlignmentDecorator::decorate(
       // Create an algorithm local random number generator
       RandomEngine rng = m_cfg.randomNumberSvc->spawnGenerator(context);
 
-      iovStatus->transforms = m_nominalStore;  // copy nominal alignment
-      for (auto& tForm : iovStatus->transforms) {
+      alignmentStore->transforms = m_nominalStore;  // copy nominal alignment
+      for (auto& tForm : alignmentStore->transforms) {
         // Multiply alignment in place
         applyTransform(tForm, m_cfg, rng, iov);
       }
 
       auto [insertIterator, inserted] =
-          m_activeIovs.emplace(iov, std::move(iovStatus));
+          m_activeIovs.emplace(iov, std::move(alignmentStore));
       assert(inserted && "Expected IOV to be created in map, but wasn't");
 
       // make context from iov pointer, address should be stable
-      context.geoContext = ExternallyAlignedDetectorElement::ContextType{
-          &insertIterator->second->transforms};
+      context.geoContext =
+          ExternallyAlignedDetectorElement::ContextType{insertIterator->second};
     }
   }
 
   // Garbage collection
-  for (auto it = m_activeIovs.begin(); it != m_activeIovs.end();) {
-    auto& [iov, status] = *it;
-    if (m_eventsSeen - status->lastAccessed > m_cfg.flushSize) {
-      ACTS_DEBUG("IOV " << iov << " has not been accessed in the last "
-                        << m_cfg.flushSize << " events, clearing");
-      it = m_activeIovs.erase(it);
-    } else {
-      it++;
+  if (m_cfg.doGarbageCollection) {
+    for (auto it = m_activeIovs.begin(); it != m_activeIovs.end();) {
+      auto& [iov, status] = *it;
+      if (m_eventsSeen - status->lastAccessed > m_cfg.flushSize) {
+        ACTS_DEBUG("IOV " << iov << " has not been accessed in the last "
+                          << m_cfg.flushSize << " events, clearing");
+        it = m_activeIovs.erase(it);
+      } else {
+        it++;
+      }
     }
   }
 

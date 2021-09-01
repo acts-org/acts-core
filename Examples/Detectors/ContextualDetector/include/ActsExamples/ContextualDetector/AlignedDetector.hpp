@@ -35,6 +35,7 @@ class AlignedDetector : public ActsExamples::IBaseDetector {
     size_t iovSize = 100;
     /// Span until garbage collection is active.
     size_t flushSize = 200;
+    bool doGarbageCollection = true;
     /// Sigma of the in-plane misalignment
     double sigmaInPlane = 100 * Acts::UnitConstants::um;
     /// Sigma of the out-of-plane misalignment

@@ -33,6 +33,8 @@ ActsExamples::Contextual::InternalAlignmentDecorator::decorate(
 
   m_eventsSeen++;
 
+  context.geoContext = InternallyAlignedDetectorElement::ContextType{iov};
+
   if (m_cfg.randomNumberSvc != nullptr) {
     if (auto it = m_activeIovs.find(iov); it != m_activeIovs.end()) {
       // Iov is already present, update last accessed
@@ -49,8 +51,6 @@ ActsExamples::Contextual::InternalAlignmentDecorator::decorate(
       // Create an algorithm local random number generator
       RandomEngine rng = m_cfg.randomNumberSvc->spawnGenerator(context);
 
-      context.geoContext = InternallyAlignedDetectorElement::ContextType{iov};
-
       for (auto& lstore : m_cfg.detectorStore) {
         for (auto& ldet : lstore) {
           // get the nominal transform
@@ -66,19 +66,22 @@ ActsExamples::Contextual::InternalAlignmentDecorator::decorate(
   }
 
   // Garbage collection
-  for (auto it = m_activeIovs.begin(); it != m_activeIovs.end();) {
-    auto& [iov, status] = *it;
-    if (m_eventsSeen - status.lastAccessed > m_cfg.flushSize) {
-      ACTS_DEBUG("IOV " << iov << " has not been accessed in the last "
-                        << m_cfg.flushSize << " events, clearing");
-      it = m_activeIovs.erase(it);
-      for (auto& lstore : m_cfg.detectorStore) {
-        for (auto& ldet : lstore) {
-          ldet->clearAlignedTransform(iov);
+  if (m_cfg.doGarbageCollection) {
+    for (auto it = m_activeIovs.begin(); it != m_activeIovs.end();) {
+      unsigned int this_iov = it->first;
+      auto& status = it->second;
+      if (m_eventsSeen - status.lastAccessed > m_cfg.flushSize) {
+        ACTS_DEBUG("IOV " << this_iov << " has not been accessed in the last "
+                          << m_cfg.flushSize << " events, clearing");
+        it = m_activeIovs.erase(it);
+        for (auto& lstore : m_cfg.detectorStore) {
+          for (auto& ldet : lstore) {
+            ldet->clearAlignedTransform(this_iov);
+          }
         }
+      } else {
+        it++;
       }
-    } else {
-      it++;
     }
   }
 

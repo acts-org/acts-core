@@ -15,6 +15,7 @@
 #include "ActsExamples/Framework/IContextDecorator.hpp"
 #include "ActsExamples/Framework/RandomNumbers.hpp"
 
+#include <iostream>
 #include <mutex>
 #include <vector>
 
@@ -35,6 +36,7 @@ class AlignmentDecorator : public IContextDecorator {
     unsigned int iovSize = 100;
 
     /// Flush store size - garbage collection
+    bool doGarbageCollection = true;
     unsigned int flushSize = 200;
 
     std::shared_ptr<RandomNumbers> randomNumberSvc = nullptr;

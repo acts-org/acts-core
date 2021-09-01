@@ -19,6 +19,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <mutex>
 
 namespace ActsExamples {
 
@@ -42,6 +43,7 @@ class InternallyAlignedDetectorElement
   struct ContextType {
     /// The current interval of validity
     unsigned int iov = 0;
+    bool nominal = false;
   };
 
   // Inherit constructor
@@ -71,23 +73,31 @@ class InternallyAlignedDetectorElement
   void clearAlignedTransform(unsigned int iov);
 
  private:
-  std::map<unsigned int, Acts::Transform3> m_alignedTransforms;
+  std::unordered_map<unsigned int, Acts::Transform3> m_alignedTransforms;
+  mutable std::mutex m_alignmentMutex;
 };
 
 inline const Acts::Transform3& InternallyAlignedDetectorElement::transform(
     const Acts::GeometryContext& gctx) const {
   if (!gctx.hasValue()) {
     // Return the standard transform if geo context is empty
-    return nominalTransform(gctx);
+    // return nominalTransform(gctx);
+    throw std::runtime_error{""};
   }
   const auto& alignContext = gctx.get<ContextType&>();
 
-  if (m_alignedTransforms.empty()) {
-    // no alignments -> nominal alignment
+  std::lock_guard lock{m_alignmentMutex};
+  if (alignContext.nominal) {
+    // nominal alignment
     return nominalTransform(gctx);
   }
   auto aTransform = m_alignedTransforms.find(alignContext.iov);
-  assert(aTransform != m_alignedTransforms.end());
+  if (aTransform == m_alignedTransforms.end()) {
+    throw std::runtime_error{
+        "Aligned transform for IOV " + std::to_string(alignContext.iov) +
+        " not found. This can happen if the garbage collection runs too "
+        "early (--align-flushsize too low)"};
+  }
   return aTransform->second;
 }
 
@@ -99,12 +109,17 @@ InternallyAlignedDetectorElement::nominalTransform(
 
 inline void InternallyAlignedDetectorElement::addAlignedTransform(
     const Acts::Transform3& alignedTransform, unsigned int iov) {
-  m_alignedTransforms[iov] = std::move(alignedTransform);
+  std::lock_guard lock{m_alignmentMutex};
+  m_alignedTransforms[iov] = alignedTransform;
 }
 
 inline void InternallyAlignedDetectorElement::clearAlignedTransform(
     unsigned int iov) {
-  m_alignedTransforms.erase(m_alignedTransforms.find(iov));
+  std::lock_guard lock{m_alignmentMutex};
+  if (auto it = m_alignedTransforms.find(iov);
+      it != m_alignedTransforms.end()) {
+    m_alignedTransforms.erase(it);
+  }
 }
 
 }  // namespace Contextual

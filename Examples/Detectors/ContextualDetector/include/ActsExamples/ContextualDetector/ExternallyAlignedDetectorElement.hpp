@@ -41,11 +41,17 @@ namespace Contextual {
 class ExternallyAlignedDetectorElement
     : public Generic::GenericDetectorElement {
  public:
+  struct AlignmentStore {
+    // GenericDetector identifiers are sequential
+    std::vector<Acts::Transform3> transforms;
+    size_t lastAccessed;
+  };
+
   /// @class ContextType
   /// convention: nested to the Detector element
   struct ContextType {
     // GenericDetector identifiers are an integer sequence, so vector is fine!
-    const std::vector<Acts::Transform3>* alignmentStore{nullptr};
+    std::shared_ptr<const AlignmentStore> alignmentStore{nullptr};
   };
 
   using Generic::GenericDetectorElement::GenericDetectorElement;
@@ -74,8 +80,8 @@ inline const Acts::Transform3& ExternallyAlignedDetectorElement::transform(
   }
 
   // At this point, the alignment store should be populated
-  assert(idValue < alignContext.alignmentStore->size());
-  return (*alignContext.alignmentStore)[idValue];
+  assert(idValue < alignContext.alignmentStore->transforms.size());
+  return alignContext.alignmentStore->transforms[idValue];
 }
 
 }  // end of namespace Contextual

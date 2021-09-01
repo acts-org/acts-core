@@ -12,6 +12,7 @@
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "ActsExamples/ContextualDetector/AlignmentDecorator.hpp"
+#include "ActsExamples/ContextualDetector/ExternallyAlignedDetectorElement.hpp"
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
 
@@ -70,13 +71,11 @@ class ExternalAlignmentDecorator : public AlignmentDecorator {
   /// Map of nominal transforms
   std::vector<Acts::Transform3> m_nominalStore;
 
-  struct IovStatus {
-    // GenericDetector identifiers are sequential
-    std::vector<Acts::Transform3> transforms;
-    size_t lastAccessed;
-  };
+  std::unordered_map<
+      unsigned int,
+      std::shared_ptr<ExternallyAlignedDetectorElement::AlignmentStore>>
+      m_activeIovs;
 
-  std::unordered_map<unsigned int, std::unique_ptr<IovStatus>> m_activeIovs;
   std::mutex m_iovMutex;
 
   size_t m_eventsSeen{0};
