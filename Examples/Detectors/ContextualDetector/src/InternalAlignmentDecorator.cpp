@@ -69,8 +69,8 @@ ActsExamples::Contextual::InternalAlignmentDecorator::decorate(
   for (auto it = m_activeIovs.begin(); it != m_activeIovs.end();) {
     auto& [iov, status] = *it;
     if (m_eventsSeen - status.lastAccessed > m_cfg.flushSize) {
-      ACTS_VERBOSE("IOV " << iov << " has not been accessed in the last "
-                          << m_cfg.flushSize << " events, clearing");
+      ACTS_DEBUG("IOV " << iov << " has not been accessed in the last "
+                        << m_cfg.flushSize << " events, clearing");
       it = m_activeIovs.erase(it);
       for (auto& lstore : m_cfg.detectorStore) {
         for (auto& ldet : lstore) {
