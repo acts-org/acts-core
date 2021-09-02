@@ -90,42 +90,6 @@ else()
   target_sources(ActsPythonBindings PRIVATE src/DigitizationStub.cpp)
 endif()
 
-if(ACTS_BUILD_EXAMPLES_GEANT4)
-  pybind11_add_module(ActsPythonBindingsGeant4 src/Geant4Component.cpp)
-  target_link_libraries(ActsPythonBindingsGeant4 PUBLIC 
-    ActsExamplesGeant4 
-    ActsPythonUtilities)
-  add_dependencies(ActsPythonBindings ActsPythonBindingsGeant4)
-
-  install(TARGETS ActsPythonBindingsGeant4 DESTINATION .)
-  set_target_properties(ActsPythonBindingsGeant4 PROPERTIES INSTALL_RPATH "\$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
-  set_target_properties(ActsPythonBindingsGeant4 PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${_python_dir}/acts)
-  list(APPEND py_files examples/geant4/__init__.py)
-
-  if(ACTS_BUILD_PLUGIN_DD4HEP AND ACTS_BUILD_EXAMPLES_DD4HEP)
-    pybind11_add_module(ActsPythonBindingsGeant4DD4hep src/Geant4DD4hepComponent.cpp)
-    target_link_libraries(ActsPythonBindingsGeant4DD4hep PUBLIC 
-      ActsPythonUtilities
-      ActsExamplesGeant4
-      ActsExamplesGeant4DD4hep 
-      ActsExamplesDetectorDD4hep)
-    add_dependencies(ActsPythonBindings ActsPythonBindingsGeant4DD4hep)
-
-    install(TARGETS ActsPythonBindingsGeant4DD4hep DESTINATION .)
-    set_target_properties(ActsPythonBindingsGeant4DD4hep PROPERTIES INSTALL_RPATH "\$ORIGIN/${CMAKE_INSTALL_LIBDIR}")
-    set_target_properties(ActsPythonBindingsGeant4DD4hep PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${_python_dir}/acts)
-    list(APPEND py_files examples/geant4/dd4hep.py)
-  endif()
-
-  if(ACTS_BUILD_EXAMPLES_HEPMC3)
-    target_link_libraries(ActsPythonBindingsGeant4 PUBLIC ActsExamplesEventRecording)
-    target_sources(ActsPythonBindingsGeant4 PRIVATE src/Geant4HepMC3.cpp)
-    list(APPEND py_files examples/geant4/hepmc3.py)
-  else()
-    target_sources(ActsPythonBindingsGeant4 PRIVATE src/Geant4HepMC3Stub.cpp)
-  endif()
-
-endif()
 
 if(ACTS_BUILD_EXAMPLES_HEPMC3)
   target_link_libraries(ActsPythonBindings PUBLIC ActsExamplesHepMC3)
