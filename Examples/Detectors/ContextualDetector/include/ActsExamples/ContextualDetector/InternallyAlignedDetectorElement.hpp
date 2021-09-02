@@ -81,8 +81,7 @@ inline const Acts::Transform3& InternallyAlignedDetectorElement::transform(
     const Acts::GeometryContext& gctx) const {
   if (!gctx.hasValue()) {
     // Return the standard transform if geo context is empty
-    // return nominalTransform(gctx);
-    throw std::runtime_error{""};
+    return nominalTransform(gctx);
   }
   const auto& alignContext = gctx.get<ContextType&>();
 
