@@ -9,7 +9,7 @@
 #include "Acts/MagneticField/MagneticFieldProvider.hpp"
 #include "Acts/Plugins/Python/Utilities.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
-#include "ActsExamples/Fatras/FatrasSimulation.hpp"
+#include "ActsExamples/Fatras/FatrasAlgorithm.hpp"
 #include "ActsExamples/Io/Json/JsonGeometryList.hpp"
 #include "ActsExamples/Printers/HitsPrinter.hpp"
 #include "ActsExamples/Printers/ParticlesPrinter.hpp"
@@ -33,16 +33,16 @@ void addExampleAlgorithms(Context& ctx) {
   mex.def("readJsonGeometryList", ActsExamples::readJsonGeometryList);
 
   {
-    using Config = ActsExamples::FatrasSimulation::Config;
+    using Config = ActsExamples::FatrasAlgorithm::Config;
 
     auto alg =
-        py::class_<ActsExamples::FatrasSimulation, ActsExamples::BareAlgorithm,
-                   std::shared_ptr<ActsExamples::FatrasSimulation>>(
-            mex, "FatrasSimulation")
+        py::class_<ActsExamples::FatrasAlgorithm, ActsExamples::BareAlgorithm,
+                   std::shared_ptr<ActsExamples::FatrasAlgorithm>>(
+            mex, "FatrasAlgorithm")
             .def(py::init<const Config&, Acts::Logging::Level>(),
                  py::arg("config"), py::arg("level"))
             .def_property_readonly("config",
-                                   &ActsExamples::FatrasSimulation::config);
+                                   &ActsExamples::FatrasAlgorithm::config);
 
     auto c = py::class_<Config>(alg, "Config").def(py::init<>());
 
