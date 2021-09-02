@@ -161,7 +161,7 @@ def fatras(ptcl_gun, trk_geo, rng):
         evGen = ptcl_gun(s)
 
         field = acts.ConstantBField(acts.Vector3(0, 0, 2 * acts.UnitConstants.T))
-        simAlg = acts.examples.FatrasAlgorithm(
+        simAlg = acts.examples.FatrasSimulation(
             level=acts.logging.INFO,
             inputParticles=evGen.config.outputParticles,
             outputParticlesInitial="particles_initial",

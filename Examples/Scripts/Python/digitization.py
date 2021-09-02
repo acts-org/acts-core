@@ -55,7 +55,7 @@ def runDigitization(
     # )
 
     # Simulation
-    simAlg = acts.examples.FatrasAlgorithm(
+    simAlg = acts.examples.FatrasSimulation(
         level=acts.logging.INFO,
         inputParticles=evGen.config.outputParticles,
         # inputParticles=evGen.config.particleCollection,

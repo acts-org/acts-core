@@ -63,7 +63,7 @@ def runTruthTracking(
     s.addAlgorithm(selector)
 
     # Simulation
-    simAlg = acts.examples.FatrasAlgorithm(
+    simAlg = acts.examples.FatrasSimulation(
         level=acts.logging.INFO,
         inputParticles=selector.config.outputParticles,
         outputParticlesInitial="particles_initial",

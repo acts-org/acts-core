@@ -40,7 +40,7 @@ def runFatras(trackingGeometry, field, outputDir, s: acts.examples.Sequencer = N
     )
 
     # Simulation
-    alg = acts.examples.FatrasAlgorithm(
+    alg = acts.examples.FatrasSimulation(
         level=acts.logging.INFO,
         inputParticles=selector.config.outputParticles,
         outputParticlesInitial="particles_initial",
