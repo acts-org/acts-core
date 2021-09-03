@@ -50,7 +50,7 @@ class AlignedDetector : public ActsExamples::IBaseDetector {
     Acts::Logging::Level decoratorLogLevel = Acts::Logging::INFO;
 
     enum class Mode { Internal, External };
-    Mode mode = Mode::External;
+    Mode mode = Mode::Internal;
   };
 
   void addOptions(

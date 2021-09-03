@@ -59,7 +59,7 @@ void AlignedDetector::addOptions(
       boost::program_options::value<bool>()->default_value(false),
       "Keep the first iov batch nominal.")(
       "align-mode",
-      boost::program_options::value<std::string>()->default_value("external"));
+      boost::program_options::value<std::string>()->default_value("internal"));
 }
 
 auto AlignedDetector::finalize(
