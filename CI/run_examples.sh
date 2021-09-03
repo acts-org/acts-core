@@ -56,11 +56,11 @@ run_geometry_example() {
                   --mat-output-allmaterial true \
                   --mat-output-sensitives false
 }
-run_geometry_example Aligned
+run_geometry_example Aligned --align-mode internal
+run_geometry_example Aligned --align-mode external
 run_geometry_example DD4hep ${DD4HEP_INPUT}
 run_geometry_example Empty
 run_geometry_example Generic
-run_geometry_example Payload
 run_geometry_example Telescope
 # TODO: Add TGeo geometry example (needs an input file + knowhow)
 
