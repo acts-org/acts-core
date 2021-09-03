@@ -64,6 +64,11 @@ class AlignedDetector : public ActsExamples::IBaseDetector {
   finalize(const Config& cfg,
            std::shared_ptr<const Acts::IMaterialDecorator> mdecorator);
 
+  std::vector<std::vector<std::shared_ptr<Generic::GenericDetectorElement>>>&
+  detectorStore() {
+    return m_detectorStore;
+  }
+
  private:
   /// The Store of the detector elements (lifetime: job)
   std::vector<std::vector<std::shared_ptr<Generic::GenericDetectorElement>>>

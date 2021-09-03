@@ -73,7 +73,7 @@ ActsExamples::Contextual::ExternalAlignmentDecorator::decorate(
   // Garbage collection
   if (m_cfg.doGarbageCollection) {
     for (auto it = m_activeIovs.begin(); it != m_activeIovs.end();) {
-      auto& [iov, status] = *it;
+      auto& status = it->second;
       if (m_eventsSeen - status->lastAccessed > m_cfg.flushSize) {
         ACTS_DEBUG("IOV " << iov << " has not been accessed in the last "
                           << m_cfg.flushSize << " events, clearing");
