@@ -17,9 +17,9 @@
 #include "ActsExamples/GenericDetector/GenericDetectorElement.hpp"
 
 #include <iostream>
-#include <map>
 #include <memory>
 #include <mutex>
+#include <unordered_map>
 
 namespace ActsExamples {
 
