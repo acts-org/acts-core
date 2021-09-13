@@ -12,6 +12,7 @@
 #include "Acts/Utilities/Logger.hpp"
 #include "ActsExamples/Framework/WhiteBoard.hpp"
 #include "ActsExamples/Geant4/EventStoreRegistry.hpp"
+#include "ActsExamples/Geant4/SensitiveSurfaceMapper.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -88,13 +89,26 @@ ActsExamples::Geant4Simulation::Geant4Simulation(
     // Propagate down to all childrend
     g4World->GetLogicalVolume()->SetFieldManager(fieldMgr, true);
   }
+
+  // Map simulation to reconstruction geometry
+  if (m_cfg.sensitiveSurfaceMapper != nullptr) {
+    ACTS_INFO(
+        "Remapping selected volumes from Geant4 to Acts::Surface::GeometryID");
+
+    G4VPhysicalVolume* g4World = m_cfg.detectorConstruction->Construct();
+    int sCounter = 0;
+    m_cfg.sensitiveSurfaceMapper->remapSensitiveNames(
+        g4World, Acts::Vector3(0., 0., 0.), sCounter);
+
+    ACTS_INFO("Remapping successful for " << sCounter << " selected volumes.");
+  }
 }
 
 ActsExamples::Geant4Simulation::~Geant4Simulation() {}
 
 ActsExamples::ProcessCode ActsExamples::Geant4Simulation::execute(
     const ActsExamples::AlgorithmContext& ctx) const {
-  // Ensure exclusive access to the geant run manager
+  // Ensure exclusive access to the Geant4 run manager
   std::lock_guard<std::mutex> guard(m_runManagerLock);
 
   // Create and re-reference

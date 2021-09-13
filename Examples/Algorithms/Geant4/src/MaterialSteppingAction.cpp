@@ -95,10 +95,16 @@ void ActsExamples::MaterialSteppingAction::UserSteppingAction(
   mInteraction.materialSlab = slab;
   mInteraction.pathCorrection = (step->GetStepLength() / CLHEP::mm);
 
-  size_t trackID = step->GetTrack()->GetTrackID();
+  G4Track* g4Track = step->GetTrack();
+  size_t trackID = g4Track->GetTrackID();
   auto& materialTracks = eventData.materialTracks;
   if (materialTracks.size() < trackID) {
     Acts::RecordedMaterialTrack rmTrack;
+    const auto& g4Vertex = g4Track->GetVertexPosition();
+    Acts::Vector3 vertex(g4Vertex[0], g4Vertex[1], g4Vertex[2]);
+    const auto& g4Direction = g4Track->GetMomentumDirection();
+    Acts::Vector3 direction(g4Direction[0], g4Direction[1], g4Direction[2]);
+    rmTrack.first = {vertex, direction};
     rmTrack.second.materialInteractions.push_back(mInteraction);
     materialTracks.push_back(rmTrack);
   } else {

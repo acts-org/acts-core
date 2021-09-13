@@ -8,10 +8,10 @@
 
 #include "ActsExamples/Io/Csv/CsvParticleReader.hpp"
 
+#include "Acts/Definitions/Units.hpp"
 #include "ActsExamples/EventData/SimParticle.hpp"
 #include "ActsExamples/Framework/WhiteBoard.hpp"
 #include "ActsExamples/Utilities/Paths.hpp"
-#include <Acts/Definitions/Units.hpp>
 
 #include <fstream>
 #include <ios>
@@ -66,14 +66,14 @@ ActsExamples::ProcessCode ActsExamples::CsvParticleReader::read(
     particle.setPosition4(
         data.vx * Acts::UnitConstants::mm, data.vy * Acts::UnitConstants::mm,
         data.vz * Acts::UnitConstants::mm, data.vt * Acts::UnitConstants::ns);
-    // only used for direction; normalization/units do not matter
+    // Only used for direction; normalization/units do not matter
     particle.setDirection(data.px, data.py, data.pz);
     particle.setAbsoluteMomentum(std::hypot(data.px, data.py, data.pz) *
                                  Acts::UnitConstants::GeV);
     unordered.push_back(std::move(particle));
   }
 
-  // write ordered particles container to the EventStore
+  // Write ordered particles container to the EventStore
   SimParticleContainer particles;
   particles.insert(unordered.begin(), unordered.end());
   ctx.eventStore.add(m_cfg.outputParticles, std::move(particles));
