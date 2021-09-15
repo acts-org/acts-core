@@ -22,6 +22,7 @@
 #include "ActsExamples/Options/CommonOptions.hpp"
 #include "ActsExamples/Reconstruction/ReconstructionBase.hpp"
 #include "ActsExamples/TrackFinding/SeedingAlgorithm.hpp"
+#include "ActsExamples/TrackFinding/SeedingOrthogonalAlgorithm.hpp"
 #include "ActsExamples/TrackFinding/SpacePointMaker.hpp"
 #include "ActsExamples/TrackFinding/SpacePointMakerOptions.hpp"
 #include "ActsExamples/TrackFinding/TrackParamsEstimationAlgorithm.hpp"
@@ -35,6 +36,8 @@
 
 using namespace Acts::UnitLiterals;
 using namespace ActsExamples;
+
+#define USE_ORTHOGONAL true
 
 int runSeedingExample(int argc, char* argv[],
                       std::shared_ptr<ActsExamples::IBaseDetector> detector) {
@@ -113,38 +116,63 @@ int runSeedingExample(int argc, char* argv[],
   spCfg.trackingGeometry = tGeometry;
   sequencer.addAlgorithm(std::make_shared<SpacePointMaker>(spCfg, logLevel));
 
+#if USE_ORTHOGONAL
+  using SeedingAlgorithm_t = SeedingOrthogonalAlgorithm;
+#else
+  using SeedingAlgorithm_t = SeedingAlgorithm;
+#endif
+
   // Seeding algorithm
-  SeedingAlgorithm::Config seedingCfg;
+  SeedingAlgorithm_t::Config seedingCfg;
   seedingCfg.inputSpacePoints = {
       spCfg.outputSpacePoints,
   };
   seedingCfg.outputSeeds = "seeds";
   seedingCfg.outputProtoTracks = "prototracks";
-  seedingCfg.gridConfig.rMax = 100._mm;
+
+#if USE_ORTHOGONAL
+  seedingCfg.rMax = 200._mm;
+  seedingCfg.deltaRMin = 1._mm;
+  seedingCfg.deltaRMax = 100._mm;
+  seedingCfg.collisionRegionMin = -250._mm;
+  seedingCfg.collisionRegionMax = 250._mm;
+  seedingCfg.zMin = -3000._mm;
+  seedingCfg.zMax = 3000._mm;
+  seedingCfg.maxSeedsPerSpM = 50;
+  seedingCfg.cotThetaMax = 7.40627;  // 2.7 eta
+  seedingCfg.sigmaScattering = 5;
+  seedingCfg.radLengthPerSeed = 0.1;
+  seedingCfg.minPt = 500._MeV;
+  seedingCfg.bFieldInZ = 1.99724_T;
+  seedingCfg.beamPosX = 0_mm;
+  seedingCfg.beamPosY = 0_mm;
+  seedingCfg.impactMax = 5._mm;
+#else
+  seedingCfg.gridConfig.rMax = 200._mm;
   seedingCfg.seedFinderConfig.rMax = seedingCfg.gridConfig.rMax;
 
   seedingCfg.seedFilterConfig.deltaRMin = 1_mm;
   seedingCfg.seedFinderConfig.deltaRMin = seedingCfg.seedFilterConfig.deltaRMin;
 
-  seedingCfg.gridConfig.deltaRMax = 60._mm;
+  seedingCfg.gridConfig.deltaRMax = 100._mm;
   seedingCfg.seedFinderConfig.deltaRMax = seedingCfg.gridConfig.deltaRMax;
 
-  seedingCfg.seedFinderConfig.collisionRegionMin = -250_mm;
-  seedingCfg.seedFinderConfig.collisionRegionMax = 250._mm;
+  seedingCfg.seedFinderConfig.collisionRegionMin = -300_mm;
+  seedingCfg.seedFinderConfig.collisionRegionMax = 300._mm;
 
-  seedingCfg.gridConfig.zMin = -2000._mm;
-  seedingCfg.gridConfig.zMax = 2000._mm;
+  seedingCfg.gridConfig.zMin = -3000._mm;
+  seedingCfg.gridConfig.zMax = 3000._mm;
   seedingCfg.seedFinderConfig.zMin = seedingCfg.gridConfig.zMin;
   seedingCfg.seedFinderConfig.zMax = seedingCfg.gridConfig.zMax;
 
-  seedingCfg.seedFilterConfig.maxSeedsPerSpM = 1;
+  seedingCfg.seedFilterConfig.maxSeedsPerSpM = 50;
   seedingCfg.seedFinderConfig.maxSeedsPerSpM =
       seedingCfg.seedFilterConfig.maxSeedsPerSpM;
 
   seedingCfg.gridConfig.cotThetaMax = 7.40627;  // 2.7 eta
   seedingCfg.seedFinderConfig.cotThetaMax = seedingCfg.gridConfig.cotThetaMax;
 
-  seedingCfg.seedFinderConfig.sigmaScattering = 50;
+  seedingCfg.seedFinderConfig.sigmaScattering = 5;
   seedingCfg.seedFinderConfig.radLengthPerSeed = 0.1;
 
   seedingCfg.gridConfig.minPt = 500._MeV;
@@ -155,10 +183,11 @@ int runSeedingExample(int argc, char* argv[],
 
   seedingCfg.seedFinderConfig.beamPos = {0_mm, 0_mm};
 
-  seedingCfg.seedFinderConfig.impactMax = 3._mm;
+  seedingCfg.seedFinderConfig.impactMax = 5._mm;
+#endif
 
   sequencer.addAlgorithm(
-      std::make_shared<SeedingAlgorithm>(seedingCfg, logLevel));
+      std::make_shared<SeedingAlgorithm_t>(seedingCfg, logLevel));
 
   // Algorithm estimating track parameter from seed
   TrackParamsEstimationAlgorithm::Config paramsEstimationCfg;
