@@ -28,7 +28,7 @@ class G4MagneticField;
 
 namespace ActsExamples {
 
-class Geant4SurfaceMapper;
+class SensitiveSurfaceMapper;
 
 /// Algorithm to run Geant4 simulation in the ActsExamples framework
 ///
@@ -80,8 +80,12 @@ class Geant4Simulation final : public BareAlgorithm {
     /// Detector construction object.
     G4VUserDetectorConstruction* detectorConstruction = nullptr;
 
-    /// The ACTS Magnetic field provider
+    /// The (wrapped) ACTS Magnetic field provider as a Geant4 module
     G4MagneticField* magneticField = nullptr;
+
+    // The ACTS to Geant4 sensitive wrapper
+    std::shared_ptr<const SensitiveSurfaceMapper> sensitiveSurfaceMapper =
+        nullptr;
   };
 
   /// Constructor with arguments

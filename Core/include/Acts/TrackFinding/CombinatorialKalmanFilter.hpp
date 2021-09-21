@@ -481,10 +481,12 @@ class CombinatorialKalmanFilter {
                          state.options.maxStepSize);
 
       // Reset the navigation state
+      // Set targetSurface to nullptr for forward filtering; it's only needed
+      // after smoothing
       state.navigation.reset(state.geoContext, stepper.position(state.stepping),
                              stepper.direction(state.stepping),
                              state.stepping.navDir,
-                             &currentState.referenceSurface(), targetSurface);
+                             &currentState.referenceSurface(), nullptr);
 
       // No Kalman filtering for the starting surface, but still need
       // to consider the material effects here
@@ -709,9 +711,9 @@ class CombinatorialKalmanFilter {
             return res.error();
           }
           const auto boundState = *res;
-          // Add a hole track state to the multitrajectory
+          // Add a hole or material track state to the multitrajectory
           currentTip = addNonSourcelinkState(stateMask, boundState, result,
-                                             prevTip, logger);
+                                             isSensitive, prevTip, logger);
 
           // Check the branch
           if (not m_branchStopper(tipState)) {
@@ -864,24 +866,28 @@ class CombinatorialKalmanFilter {
       return std::make_pair(std::move(currentTip), std::move(tipState));
     }
 
-    /// @brief CombinatorialKalmanFilter actor operation : add hole track state
+    /// @brief CombinatorialKalmanFilter actor operation : add hole or material track state
     ///
     /// @param stateMask The bitmask that instructs which components to allocate
     /// @param boundState The bound state on current surface
     /// @param result is the mutable result state object
     /// and which to leave invalid
+    /// @param isSensitive The surface is sensitive or passive
     /// @param prevTip The index of the previous state
     /// @param logger The logger wrapper
     ///
     /// @return The tip of added state
     size_t addNonSourcelinkState(
         const TrackStatePropMask& stateMask, const BoundState& boundState,
-        result_type& result, size_t prevTip = SIZE_MAX,
+        result_type& result, bool isSensitive, size_t prevTip = SIZE_MAX,
         LoggerWrapper logger = getDummyLogger()) const {
       // Add a track state
       auto currentTip = result.fittedStates.addTrackState(stateMask, prevTip);
-      ACTS_VERBOSE("Creating Hole track state with tip = " << currentTip);
-
+      if (isSensitive) {
+        ACTS_VERBOSE("Creating Hole track state with tip = " << currentTip);
+      } else {
+        ACTS_VERBOSE("Creating Material track state with tip = " << currentTip);
+      }
       // now get track state proxy back
       auto trackStateProxy = result.fittedStates.getTrackState(currentTip);
 

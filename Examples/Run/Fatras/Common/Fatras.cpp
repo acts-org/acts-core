@@ -96,7 +96,7 @@ int runFatras(int argc, char* argv[],
   for (auto cdr : contextDecorators) {
     sequencer.addContextDecorator(cdr);
   }
-  // Setup algorithm chain
+  // Setup input, algorithm chain, output
   Simulation::setupInput(vars, sequencer, randomNumbers);
   setupFatrasSimulation(vars, sequencer, randomNumbers, trackingGeometry);
   Simulation::setupOutput(vars, sequencer);

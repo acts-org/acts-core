@@ -3,8 +3,12 @@ set(ACTS_EXAMPLES_G4SOURCES
     src/GdmlDetectorConstruction.cpp
     src/Geant4Options.cpp
     src/Geant4Simulation.cpp
+    src/MagneticFieldWrapper.cpp
     src/MaterialPhysicsList.cpp
     src/MaterialSteppingAction.cpp
+    src/ParticleTrackingAction.cpp
+    src/SensitiveSurfaceMapper.cpp
+    src/SensitiveSteppingAction.cpp
     src/SimParticleTranslation.cpp)
 
 if (ACTS_BUILD_EXAMPLES_DD4HEP)

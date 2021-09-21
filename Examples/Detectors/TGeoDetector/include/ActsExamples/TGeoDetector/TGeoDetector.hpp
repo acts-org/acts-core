@@ -13,6 +13,7 @@
 #include "ActsExamples/Utilities/Options.hpp"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace Acts {
@@ -35,9 +36,9 @@ struct TGeoDetector : public ActsExamples::IBaseDetector {
 
     std::string fileName;
     bool buildBeamPipe = false;
-    double beamPipeRadius;
-    double beamPipeHalflengthZ;
-    double beamPipeLayerThickness;
+    double beamPipeRadius{0};
+    double beamPipeHalflengthZ{0};
+    double beamPipeLayerThickness{0};
 
     double unitScalor = 1.0;
 
@@ -46,6 +47,7 @@ struct TGeoDetector : public ActsExamples::IBaseDetector {
     template <typename T>
     struct LayerTriplet {
       LayerTriplet() = default;
+
       LayerTriplet(T value)
           : negative{value}, central{value}, positive{value} {}
 
