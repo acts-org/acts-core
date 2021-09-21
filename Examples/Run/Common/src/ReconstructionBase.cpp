@@ -129,3 +129,22 @@ ActsExamples::ParticleSmearing::Config setupParticleSmearing(
 
   return particleSmearingCfg;
 }
+
+ActsExamples::CsvMeasurementReader::Config setupMeasurementReading(
+    const ActsExamples::Options::Variables& vars,
+    ActsExamples::Sequencer& sequencer) {
+  using namespace ActsExamples;
+  // Read some standard options
+  auto logLevel = Options::readLogLevel(vars);
+
+  // Read particles (initial states) from CSV files
+  auto measurementsReader = Options::readCsvMeasurementReaderConfig(vars);
+  measurementsReader.outputMeasurements = "measurements";
+  measurementsReader.outputMeasurementSimHitsMap = "measurements2hits";
+  measurementsReader.outputSourceLinks = "source_links";
+  measurementsReader.outputClusters = "clusters";
+  sequencer.addReader(
+      std::make_shared<CsvMeasurementReader>(measurementsReader, logLevel));
+
+  return measurementsReader;
+}

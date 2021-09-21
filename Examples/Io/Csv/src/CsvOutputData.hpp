@@ -217,4 +217,11 @@ struct SurfaceGridData {
                  nbins_loc1, min_loc1, max_loc1);
 };
 
+struct SpacepointData {
+  uint64_t measurement_id;
+  float x, y, z;
+  float var_r, var_z;
+  DFE_NAMEDTUPLE(SpacepointData, measurement_id, x, y, z, var_r, var_z);
+};
+
 }  // namespace ActsExamples

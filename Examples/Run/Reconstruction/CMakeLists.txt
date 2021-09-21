@@ -82,6 +82,43 @@ target_link_libraries(
     ActsExamplesDetectorTGeo
 )
 
+# =================================================
+# Convert measurements to spacepoints and write sp to csv
+add_executable(
+  ActsExampleMeasurements2SPTGeo
+  Measurements2SPTGeo.cpp
+)
+target_link_libraries(
+  ActsExampleMeasurements2SPTGeo
+  PRIVATE
+    ActsExamplesFramework
+    ActsExamplesCommon
+    ActsExamplesIoCsv
+    ActsExamplesIoJson
+    ActsExamplesIoRoot
+    ActsExamplesDetectorTGeo
+    ActsExamplesMagneticField
+    ActsExamplesTrackFinding
+    ActsExamplesRecTracksCommon
+)
+
+add_executable(
+  ActsExampleMeasurements2SPGeneric
+  Measurements2SPGeneric.cpp)
+target_link_libraries(
+  ActsExampleMeasurements2SPGeneric
+    PRIVATE
+      ActsExamplesFramework
+      ActsExamplesCommon
+      ActsExamplesIoCsv
+      ActsExamplesIoJson
+      ActsExamplesIoRoot
+      ActsExamplesDetectorGeneric
+      ActsExamplesMagneticField
+      ActsExamplesTrackFinding
+      ActsExamplesRecTracksCommon)
+# =================================================
+
 install(
   TARGETS
     ActsExampleTruthTracksGeneric

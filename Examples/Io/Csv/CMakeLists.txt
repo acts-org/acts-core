@@ -11,7 +11,8 @@ add_library(
   src/CsvSimHitReader.cpp
   src/CsvSimHitWriter.cpp
   src/CsvTrackingGeometryWriter.cpp
-  src/CsvMultiTrajectoryWriter.cpp )
+  src/CsvMultiTrajectoryWriter.cpp 
+  src/CsvSpacepointWriter.cpp)
 target_include_directories(
   ActsExamplesIoCsv
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
