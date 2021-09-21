@@ -35,7 +35,9 @@ class ProtoSurfaceMaterial : public ISurfaceMaterial {
   ///
   /// @param binUtility a BinUtility determining the granularity
   ///        and binning of the material on the surface/layer
-  ProtoSurfaceMaterial(const BinUtility& binUtility);
+  /// @param mappingType is the type of surface mapping associated to the surface
+  ProtoSurfaceMaterial(const BinUtility& binUtility,
+                       MappingType mappingType = MappingType::Default);
 
   /// Copy constuctor
   ///

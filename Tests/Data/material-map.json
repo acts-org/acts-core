@@ -193,6 +193,7 @@
                             ]
                         ],                        
                         "mapMaterial": true,
+                        "mappingType": "Default",
                         "type": "binned"
                     }
                 }
@@ -250,6 +251,7 @@
                             ]
                         ],                          
                         "mapMaterial": true,
+                        "mappingType": "Default",
                         "type": "binned"
                     }
                 }
@@ -318,6 +320,7 @@
                             ]
                         ],
                         "mapMaterial": true,
+                        "mappingType": "Default",
                         "type": "binned"
                     }
                 }
@@ -446,6 +449,7 @@
                             ]
                         ],
                         "mapMaterial": true,
+                        "mappingType": "Default",
                         "type": "binned"
                     }
                 }

@@ -46,9 +46,10 @@ with open(inFileName,'r+') as json_file:
             if 'layer' in entry:  
                 if 'approach' not in entry:
                     if 'sensitive' not in entry:
-                        for conf in config[str(entry['volume'])]:
+                        for conf in config['Surfaces'][str(entry['volume'])]:
                             if 'layer' in conf and conf['layer'] == 'X' and conf['value']['bounds']['type'] == entry['value']['bounds']['type']:
                                 entry['value']['material']['mapMaterial'] = conf['value']['material']['mapMaterial']
+                                entry['value']['material']['mappingType'] = conf['value']['material']['mappingType']
                                 ibin = 0
                                 for bin in entry['value']['material']['binUtility']['binningdata']:                                  
                                     bin['bins'] = conf['value']['material']['binUtility']['binningdata'][ibin]['bins']
@@ -58,9 +59,10 @@ with open(inFileName,'r+') as json_file:
 
             if 'boundary' in entry:    
                 if 'layer' not in entry:
-                    for conf in config[str(entry['volume'])]:
-                        if 'boundary' in conf and conf['boundary'] == 'X' and conf['value']['bounds']['type'] == entry['value']['bounds']['type']:
+                    for conf in config['Surfaces'][str(entry['volume'])]:
+                        if 'boundary' in conf and conf['boundary'] == entry['boundary'] and conf['value']['bounds']['type'] == entry['value']['bounds']['type']:
                             entry['value']['material']['mapMaterial'] = conf['value']['material']['mapMaterial']
+                            entry['value']['material']['mappingType'] = conf['value']['material']['mappingType']
                             ibin = 0
                             for bin in entry['value']['material']['binUtility']['binningdata']:
                                 bin['bins'] = conf['value']['material']['binUtility']['binningdata'][ibin]['bins']
@@ -70,9 +72,10 @@ with open(inFileName,'r+') as json_file:
                  
             if 'approach' in entry:
                 if 'sensitive' not in entry:
-                    for conf in config[str(entry['volume'])]:
+                    for conf in config['Surfaces'][str(entry['volume'])]:
                         if 'approach' in conf and conf['approach'] == entry['approach'] and conf['value']['bounds']['type'] == entry['value']['bounds']['type']:
                             entry['value']['material']['mapMaterial'] = conf['value']['material']['mapMaterial']
+                            entry['value']['material']['mappingType'] = conf['value']['material']['mappingType']
                             ibin = 0
                             for bin in entry['value']['material']['binUtility']['binningdata']:
                                 bin['bins'] = conf['value']['material']['binUtility']['binningdata'][ibin]['bins']
@@ -82,16 +85,17 @@ with open(inFileName,'r+') as json_file:
                  
             if 'sensitive' in entry:  
                 if 'approach' not in entry:
-                    for conf in config[str(entry['volume'])]:
+                    for conf in config['Surfaces'][str(entry['volume'])]:
                         if 'sensitive' in conf and conf['sensitive'] == 'X' and conf['layer'] == entry['layer'] and conf['value']['bounds']['type'] == entry['value']['bounds']['type']:
                             entry['value']['material']['mapMaterial'] = conf['value']['material']['mapMaterial']
+                            entry['value']['material']['mappingType'] = conf['value']['material']['mappingType']
                             ibin = 0
                             for bin in entry['value']['material']['binUtility']['binningdata']:
                                 bin['bins'] = conf['value']['material']['binUtility']['binningdata'][ibin]['bins']
                                 ibin = ibin+1
                             continue
                     continue  
-                     
+        data['Volumes'] = config['Volumes']        
     json_file.seek(0) 
     json.dump(data, json_file, indent=4)
     json_file.truncate()

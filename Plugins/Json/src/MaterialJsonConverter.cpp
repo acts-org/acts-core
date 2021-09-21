@@ -11,6 +11,7 @@
 #include "Acts/Material/BinnedSurfaceMaterial.hpp"
 #include "Acts/Material/HomogeneousSurfaceMaterial.hpp"
 #include "Acts/Material/HomogeneousVolumeMaterial.hpp"
+#include "Acts/Material/ISurfaceMaterial.hpp"
 #include "Acts/Material/InterpolatedMaterialMap.hpp"
 #include "Acts/Material/MaterialGridHelper.hpp"
 #include "Acts/Material/ProtoSurfaceMaterial.hpp"
@@ -74,6 +75,9 @@ void Acts::to_json(nlohmann::json& j, const surfaceMaterialPointer& material) {
   if (psMaterial != nullptr) {
     // Type is proto material
     jMaterial[Acts::jsonKey().typekey] = "proto";
+    // Set mapping type
+    nlohmann::json mapType(material->mappingType());
+    jMaterial[Acts::jsonKey().maptype] = mapType;
     // by default the protoMaterial is not used for mapping
     jMaterial[Acts::jsonKey().mapkey] = false;
     // write the bin utility
@@ -97,6 +101,10 @@ void Acts::to_json(nlohmann::json& j, const surfaceMaterialPointer& material) {
   if (hsMaterial != nullptr) {
     // type is homogeneous
     jMaterial[Acts::jsonKey().typekey] = "homogeneous";
+    // Set mapping type
+    nlohmann::json mapType(material->mappingType());
+    jMaterial[Acts::jsonKey().maptype] = mapType;
+    // Material has been mapped
     jMaterial[Acts::jsonKey().mapkey] = true;
     nlohmann::json jmat(hsMaterial->materialSlab(0, 0));
     jMaterial[Acts::jsonKey().datakey] = nlohmann::json::array({
@@ -112,6 +120,10 @@ void Acts::to_json(nlohmann::json& j, const surfaceMaterialPointer& material) {
   if (bsMaterial != nullptr) {
     // type is binned
     jMaterial[Acts::jsonKey().typekey] = "binned";
+    // Set mapping type
+    nlohmann::json mapType(material->mappingType());
+    jMaterial[Acts::jsonKey().maptype] = mapType;
+    // Material has been mapped
     jMaterial[Acts::jsonKey().mapkey] = true;
     bUtility = &(bsMaterial->binUtility());
     // convert the data
@@ -147,9 +159,11 @@ void Acts::from_json(const nlohmann::json& j,
   if (jMaterial[Acts::jsonKey().mapkey] == false) {
     return;
   }
+
   // The bin utility and material
   Acts::BinUtility bUtility;
   Acts::MaterialSlabMatrix mpMatrix;
+  Acts::MappingType mapType = Acts::MappingType::Default;
   for (auto& [key, value] : jMaterial.items()) {
     if (key == Acts::jsonKey().binkey and not value.empty()) {
       from_json(value, bUtility);
@@ -157,14 +171,17 @@ void Acts::from_json(const nlohmann::json& j,
     if (key == Acts::jsonKey().datakey and not value.empty()) {
       from_json(value, mpMatrix);
     }
+    if (key == Acts::jsonKey().maptype and not value.empty()) {
+      from_json(value, mapType);
+    }
   }
   // Return the appropriate typr of material
   if (mpMatrix.empty()) {
-    material = new Acts::ProtoSurfaceMaterial(bUtility);
+    material = new Acts::ProtoSurfaceMaterial(bUtility, mapType);
   } else if (bUtility.bins() == 1) {
-    material = new Acts::HomogeneousSurfaceMaterial(mpMatrix[0][0]);
+    material = new Acts::HomogeneousSurfaceMaterial(mpMatrix[0][0], mapType);
   } else {
-    material = new Acts::BinnedSurfaceMaterial(bUtility, mpMatrix);
+    material = new Acts::BinnedSurfaceMaterial(bUtility, mpMatrix, mapType);
   }
 }
 

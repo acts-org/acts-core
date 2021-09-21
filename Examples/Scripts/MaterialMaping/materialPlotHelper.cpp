@@ -114,8 +114,8 @@ void Initialise_info(sinfo& surface_info,
                    Ids[tag].end());
   }
 
-  surface_info.idname =
-      "v" + Ids[0] + "_b" + Ids[1] + "_l" + Ids[2] + "_a" + Ids[3];
+  surface_info.idname = "v" + Ids[0] + "_b" + Ids[1] + "_l" + Ids[2] + "_a" +
+                        Ids[3] + "_s" + Ids[4];
   surface_info.type = type;
 
   if (surface_name.find(surface_id) != surface_name.end()) {

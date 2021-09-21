@@ -39,7 +39,7 @@ void plot(TGraph* Dist, const sinfo& surface_info, const std::string& name){
   surface_r->SetNDC();
 
   // Disk
-  if(surface_info.type == 2){
+  if(surface_info.type == 2 || surface_info.type == 4){
     vol->Draw();
     surface->Draw();
     surface_z->Draw();
@@ -166,7 +166,7 @@ void Fill(std::map<uint64_t,TGraph*>& surface_hist,  std::map<uint64_t,sinfo>& s
         if(sur_type->at(j) == 1){
           pos = sqrt(sur_x->at(j)*sur_x->at(j)+sur_y->at(j)*sur_y->at(j));
         }
-        if(sur_type->at(j) == 2){
+        if(sur_type->at(j) == 2 || sur_type->at(j) == 4){
           pos = sur_z->at(j);
         }
         Initialise_info(surface_info[sur_id->at(j)], surface_name, sur_id->at(j), sur_type->at(j), pos, sur_range_min->at(j), sur_range_max->at(j));

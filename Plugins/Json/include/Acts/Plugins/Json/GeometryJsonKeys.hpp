@@ -31,6 +31,9 @@ struct jsonKey {
   std::string datakey = "data";
   /// The mapping key, add surface to mapping procedure if true
   std::string mapkey = "mapMaterial";
+  /// The mapping type key, used to select the type od material mapping for the
+  /// surface
+  std::string maptype = "mappingType";
 };
 
 }  // namespace Acts

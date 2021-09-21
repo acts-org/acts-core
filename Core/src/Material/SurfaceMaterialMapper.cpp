@@ -260,6 +260,14 @@ void Acts::SurfaceMaterialMapper::mapMaterialTrack(
   std::multimap<AccumulatedSurfaceMaterial*, std::array<size_t, 3>>
       touchedMapBins;
 
+  if (sfIter != mappingSurfaces.end() &&
+      sfIter->surface->surfaceMaterial()->mappingType() ==
+          Acts::MappingType::PostMapping) {
+    ACTS_WARNING(
+        "The first mapping surface is a PostMapping one. Some material from "
+        "before the PostMapping surface will be mapped onto it ");
+  }
+
   // Assign the recorded ones, break if you hit an end
   while (rmIter != rMaterial.end() && sfIter != mappingSurfaces.end()) {
     // Material not inside current volume
@@ -279,12 +287,65 @@ void Acts::SurfaceMaterialMapper::mapMaterialTrack(
       ++rmIter;
       continue;
     }
-    if (sfIter != mappingSurfaces.end() - 1 &&
-        (rmIter->position - sfIter->position).norm() >
-            (rmIter->position - (sfIter + 1)->position).norm()) {
-      // Switch to next assignment surface
-      ++sfIter;
+    // Do we need to switch to next assignment surface ?
+    if (sfIter != mappingSurfaces.end() - 1) {
+      int mappingType = sfIter->surface->surfaceMaterial()->mappingType();
+      int nextMappingType =
+          (sfIter + 1)->surface->surfaceMaterial()->mappingType();
+
+      if (mappingType == Acts::MappingType::PreMapping ||
+          mappingType == Acts::MappingType::Sensor) {
+        // Change surface if the material after the current surface.
+        if ((rmIter->position - mTrack.first.first).norm() >
+            (sfIter->position - mTrack.first.first).norm()) {
+          if (nextMappingType == Acts::MappingType::PostMapping) {
+            ACTS_WARNING(
+                "PreMapping or Sensor surface followed by PostMapping. Some "
+                "material "
+                "from before the PostMapping surface will be mapped onto it");
+          }
+          ++sfIter;
+        }
+      } else if (mappingType == Acts::MappingType::Default ||
+                 mappingType == Acts::MappingType::PostMapping) {
+        switch (nextMappingType) {
+          case Acts::MappingType::PreMapping:
+          case Acts::MappingType::Default: {
+            // Change surface if the material closest to the next surface.
+            if ((rmIter->position - sfIter->position).norm() >
+                (rmIter->position - (sfIter + 1)->position).norm()) {
+              ++sfIter;
+            }
+            break;
+          }
+          case Acts::MappingType::PostMapping: {
+            // Change surface if the material after the next surface.
+            if ((rmIter->position - sfIter->position).norm() >
+                ((sfIter + 1)->position - sfIter->position).norm()) {
+              ++sfIter;
+            }
+            break;
+          }
+          case Acts::MappingType::Sensor: {
+            // Change surface if the next material after the next surface.
+            if ((rmIter == rMaterial.end() - 1) ||
+                ((rmIter + 1)->position - sfIter->position).norm() >
+                    ((sfIter + 1)->position - sfIter->position).norm()) {
+              ++sfIter;
+            }
+            break;
+          }
+          default: {
+            ACTS_ERROR("Incorect mapping type for the next surface : "
+                       << (sfIter + 1)->surface->geometryId());
+          }
+        }
+      } else {
+        ACTS_ERROR("Incorect mapping type for surface : "
+                   << sfIter->surface->geometryId());
+      }
     }
+
     // get the current Surface ID
     currentID = sfIter->surface->geometryId();
     // We have work to do: the assignemnt surface has changed

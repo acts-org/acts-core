@@ -40,4 +40,14 @@ void to_json(nlohmann::json& j, const surfaceMaterialPointer& t);
 
 void from_json(const nlohmann::json& j, surfaceMaterialPointer& t);
 
+// This macro create a conversion for the mapping type enum
+NLOHMANN_JSON_SERIALIZE_ENUM(Acts::MappingType,
+                             {
+                                 {Acts::MappingType::PreMapping, "PreMapping"},
+                                 {Acts::MappingType::Default, "Default"},
+                                 {Acts::MappingType::PostMapping,
+                                  "PostMapping"},
+                                 {Acts::MappingType::Sensor, "Sensor"},
+                             })
+
 }  // namespace Acts

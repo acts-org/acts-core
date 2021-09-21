@@ -22,7 +22,7 @@ void plot(std::vector<TH2F*> Map, const sinfo& surface_info, const std::string& 
   gSystem->Exec( Form("mkdir %s", (name+"/"+surface_info.name).c_str()) );
 
   // Disk
-  if(surface_info.type == 2){
+  if(surface_info.type == 2  || surface_info.type == 4){
 
     TText *vol = new TText(.1,.95,surface_info.name.c_str());
     vol->SetNDC();
@@ -105,7 +105,7 @@ void Initialise_hist(std::vector<TH2F*>& surface_hist,
     Map_L0->GetZaxis()->SetTitle("L0");
   }
 
-  if(surface_info.type == 2){
+  if(surface_info.type == 2 || surface_info.type == 4){
     Map_X0    = new TH2F(("Map_X0_"+surface_info.idname).c_str(),("Map_X0_"+surface_info.idname).c_str(),
                           50,-1*surface_info.range_max,surface_info.range_max,50,-1*surface_info.range_max, surface_info.range_max);
     Map_L0    = new TH2F(("Map_L0_"+surface_info.idname).c_str(),("Map_L0_"+surface_info.idname).c_str(),
@@ -197,7 +197,7 @@ void Fill(std::map<uint64_t,std::vector<TH2F*>>& surface_hist,  std::map<uint64_
         if(sur_type->at(j) == 1){
           pos = sqrt(sur_x->at(j)*sur_x->at(j)+sur_y->at(j)*sur_y->at(j));
         }
-        if(sur_type->at(j) == 2){
+        if(sur_type->at(j) == 2 || sur_type->at(j) == 4){
           pos = sur_z->at(j);
         }
         surface_weight[sur_id->at(j)] = 0;
@@ -219,7 +219,7 @@ void Fill(std::map<uint64_t,std::vector<TH2F*>>& surface_hist,  std::map<uint64_
         surface_hist[sur_id->at(j)][1]->Fill(v_eta, v_phi, (mat_step_length->at(j)/mat_L0->at(j)));
         surface_hist[sur_id->at(j)][2]->Fill(v_eta, v_phi, (1/surface_weight[sur_id->at(j)]));
       }
-      if(sur_type->at(j) == 2){
+      if(sur_type->at(j) == 2 || sur_type->at(j) == 4){
         surface_hist[sur_id->at(j)][0]->Fill(sur_x->at(j), sur_y->at(j), (mat_step_length->at(j)/mat_X0->at(j)));
         surface_hist[sur_id->at(j)][1]->Fill(sur_x->at(j), sur_y->at(j), (mat_step_length->at(j)/mat_L0->at(j)));
         surface_hist[sur_id->at(j)][2]->Fill(sur_x->at(j), sur_y->at(j), (1/surface_weight[sur_id->at(j)]));

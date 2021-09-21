@@ -40,9 +40,11 @@ class BinnedSurfaceMaterial : public ISurfaceMaterial {
   /// @param binUtility defines the binning structure on the surface (copied)
   /// @param fullProperties is the vector of properties as recorded (moved)
   /// @param splitFactor is the pre/post splitting directive
+  /// @param mappingType is the type of surface mapping associated to the surface
   BinnedSurfaceMaterial(const BinUtility& binUtility,
                         MaterialSlabVector fullProperties,
-                        double splitFactor = 0.);
+                        double splitFactor = 0.,
+                        MappingType mappingType = MappingType::Default);
 
   /// Explicit constructor with only full MaterialSlab,
   /// for two-dimensional binning.
@@ -55,9 +57,11 @@ class BinnedSurfaceMaterial : public ISurfaceMaterial {
   /// @param binUtility defines the binning structure on the surface (copied)
   /// @param fullProperties is the vector of properties as recorded (moved)
   /// @param splitFactor is the pre/post splitting directive
+  /// @param mappingType is the type of surface mapping associated to the surface
   BinnedSurfaceMaterial(const BinUtility& binUtility,
                         MaterialSlabMatrix fullProperties,
-                        double splitFactor = 0.);
+                        double splitFactor = 0.,
+                        MappingType mappingType = MappingType::Default);
 
   /// Copy Move Constructor
   ///

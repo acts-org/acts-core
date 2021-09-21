@@ -34,11 +34,21 @@ Four types of surfaces exist:
 
 By default, all the surfaces will be written but one can turn a specific type off (for example the sensitive) by using the appropriate option : ``mat-output-XXX false``
 
-The JSON file can now be edited to select which surfaces and volumes you want to have material mapped on. The JSON file is comprise of two parts, the first one contain a list of volumes and the second a list of surfaces. Information of the surface and volumes such as their type, range, id and position are available. To add one surface to the material mapping, one simply needs to switch the ``mapMaterial`` variable to ``true``. The binning can then be changed by changing the number associated to ``bins``, the type of bin can also be changed. For the volume, the same method can be applied, except that up to 3 bins can be associated.
+The JSON file can now be edited to select which surfaces and volumes you want to have material mapped on. The JSON file is comprise of two parts, the first one contain a list of surfaces and the second a list of volumes. Information of the surface and volumes such as their type, range, id and position are available. To add one surface to the material mapping, one simply needs to switch the ``mapMaterial`` variable to ``true``. The binning can then be changed by changing the number associated to ``bins``, the type of bin can also be changed. For the volume, the same method can be applied, except that up to 3 bins can be associated.
 
 .. warning::
   When mapping onto a surface, the material inside volumes with material (or ``ProtoMaterial``) will be ignored, you should thus avoid mapping material onto surfaces within material volumes. When mapping onto a volume, only the material within that volume will be used. If you have a large gap between the last material surface and the volume you might then want to also map material onto the boundary of the material volume.
 
+In addition to this, the mapping type can be changed for surface mapping by changing the ``mappingType`` variable. Four different types of mapping are available : 
+
+- ``PreMapping`` : Only map material from before the surface.
+- ``Default`` : Map material from both before and after the surface
+- ``PostMapping`` : Only map material from after the surface.
+- ``Sensor`` : Only map the last material hits before the surface. Used to map only the sensor material onto the sensors.
+
+In case two different sufaces would receive a material hit (Default followed by Default or PreMapping for example), the material hit is associated with the closest surface.
+.. warning::
+  Due to the implementation, all the material hits need to be associated with a surface. If a PostMapping surface follows a PreMapping or a Sensor surface, all the material between the two surface will be mapped onto the PostMapping surface and a warning will be issued. The same goes if the first surface encountered is a PostMapping surface.
 
 This configuration can be cumbersome to do by hand especially when trying to map on sensitives surfaces. To simplify this task two python scripts are available in ``Examples/scripts/MaterialMapping``:
 
