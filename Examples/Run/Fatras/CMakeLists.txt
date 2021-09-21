@@ -9,20 +9,12 @@ target_link_libraries(
   ActsExampleFatrasGeneric
   PRIVATE ActsExamplesFatrasCommon ActsExamplesDetectorGeneric ActsExamplesIoJson)
 
-# Generic detector with IOV based alignment
+# Generic detector with alignment
 add_executable(
   ActsExampleFatrasAligned
   AlignedFatrasExample.cpp)
 target_link_libraries(
   ActsExampleFatrasAligned
-  PRIVATE ActsExamplesFatrasCommon ActsExamplesDetectorContextual ActsExamplesIoJson)
-
-# Generic detector with Payload based alignment
-add_executable(
-  ActsExampleFatrasPayload
-  PayloadFatrasExample.cpp)
-target_link_libraries(
-  ActsExampleFatrasPayload
   PRIVATE ActsExamplesFatrasCommon ActsExamplesDetectorContextual ActsExamplesIoJson)
 
 # TGeo detector
@@ -45,7 +37,6 @@ install(
   TARGETS
     ActsExampleFatrasGeneric
     ActsExampleFatrasAligned
-    ActsExampleFatrasPayload
     ActsExampleFatrasTGeo
     ActsExampleFatrasTelescope
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

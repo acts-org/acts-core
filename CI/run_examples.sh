@@ -56,11 +56,11 @@ run_geometry_example() {
                   --mat-output-allmaterial true \
                   --mat-output-sensitives false
 }
-run_geometry_example Aligned
+run_geometry_example Aligned --align-mode internal
+run_geometry_example Aligned --align-mode external
 run_geometry_example DD4hep ${DD4HEP_INPUT}
 run_geometry_example Empty
 run_geometry_example Generic
-run_geometry_example Payload
 run_geometry_example Telescope
 # TODO: Add TGeo geometry example (needs an input file + knowhow)
 
@@ -71,12 +71,12 @@ run_geometry_example Telescope
 # conditions have code paths that are only exercised when the
 # Sequencer actually runs.
 #
-run_example ActsExamplePropagationAligned
+run_example ActsExamplePropagationAligned --align-mode internal
 run_example ActsExamplePropagationDD4hep ${DD4HEP_INPUT}
 # FIXME: Disabled because of issue #710
 # run_example ActsExamplePropagationEmpty
 run_example ActsExamplePropagationGeneric
-run_example ActsExamplePropagationPayload
+run_example ActsExamplePropagationAligned --align-mode external
 # TODO: Add TGeo propagation example (needs an input file + knowhow)
 
 # Run event generation examples as suggested by the Fatras tutorial

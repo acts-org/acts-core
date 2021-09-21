@@ -10,11 +10,12 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "ActsExamples/ContextualDetector/AlignedDetectorElement.hpp"
+#include "ActsExamples/ContextualDetector/InternallyAlignedDetectorElement.hpp"
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
 #include "ActsExamples/Framework/RandomNumbers.hpp"
 
+#include <iostream>
 #include <mutex>
 #include <vector>
 
@@ -29,18 +30,13 @@ namespace Contextual {
 /// geometry context carries the full transform store (payload)
 class AlignmentDecorator : public IContextDecorator {
  public:
-  using LayerStore = std::vector<std::shared_ptr<AlignedDetectorElement>>;
-  using DetectorStore = std::vector<LayerStore>;
-
   /// @brief nested configuration struct
   struct Config {
-    /// The detector store (filled at creation creation)
-    DetectorStore detectorStore;
-
     /// Alignment frequency - every X events
     unsigned int iovSize = 100;
 
     /// Flush store size - garbage collection
+    bool doGarbageCollection = true;
     unsigned int flushSize = 200;
 
     std::shared_ptr<RandomNumbers> randomNumberSvc = nullptr;
@@ -56,42 +52,40 @@ class AlignmentDecorator : public IContextDecorator {
     bool firstIovNominal = false;
   };
 
-  /// Constructor
-  ///
-  /// @param cfg Configuration struct
-  /// @param logger The logging framework
-  AlignmentDecorator(const Config& cfg,
-                     std::unique_ptr<const Acts::Logger> logger =
-                         Acts::getDefaultLogger("AlignmentDecorator",
-                                                Acts::Logging::INFO));
-
-  /// Virtual destructor
-  virtual ~AlignmentDecorator() = default;
-
-  /// @brief decorates (adds, modifies) the AlgorithmContext
-  /// with a geometric rotation per event
-  ///
-  /// @note If decorators depend on each other, they have to be
-  /// added in order.
-  ///
-  /// @param context the bare (or at least non-const) Event context
-  ProcessCode decorate(AlgorithmContext& context) final override;
-
-  /// @brief decorator name() for screen output
-  const std::string& name() const final override { return m_name; }
-
- private:
-  Config m_cfg;                                  ///< the configuration class
-  std::unique_ptr<const Acts::Logger> m_logger;  ///!< the logging instance
-  std::string m_name = "AlignmentDecorator";
-
-  ///< Protect multiple alignments to be loaded at once
-  std::mutex m_alignmentMutex;
-  std::vector<bool> m_iovStatus;
-  std::vector<bool> m_flushStatus;
-
-  /// Private access to the logging instance
-  const Acts::Logger& logger() const { return *m_logger; }
+ protected:
+  static void applyTransform(Acts::Transform3& trf, const Config& cfg,
+                             RandomEngine& rng, unsigned int iov) {
+    std::normal_distribution<double> gauss(0., 1.);
+    if (iov != 0 or not cfg.firstIovNominal) {
+      // the shifts in x, y, z
+      double tx = cfg.gSigmaX != 0 ? cfg.gSigmaX * gauss(rng) : 0.;
+      double ty = cfg.gSigmaY != 0 ? cfg.gSigmaY * gauss(rng) : 0.;
+      double tz = cfg.gSigmaZ != 0 ? cfg.gSigmaZ * gauss(rng) : 0.;
+      // Add a translation - if there is any
+      if (tx != 0. or ty != 0. or tz != 0.) {
+        const auto& tMatrix = trf.matrix();
+        auto colX = tMatrix.block<3, 1>(0, 0).transpose();
+        auto colY = tMatrix.block<3, 1>(0, 1).transpose();
+        auto colZ = tMatrix.block<3, 1>(0, 2).transpose();
+        Acts::Vector3 newCenter = tMatrix.block<3, 1>(0, 3).transpose() +
+                                  tx * colX + ty * colY + tz * colZ;
+        trf.translation() = newCenter;
+      }
+      // now modify it - rotation around local X
+      if (cfg.aSigmaX != 0.) {
+        trf *=
+            Acts::AngleAxis3(cfg.aSigmaX * gauss(rng), Acts::Vector3::UnitX());
+      }
+      if (cfg.aSigmaY != 0.) {
+        trf *=
+            Acts::AngleAxis3(cfg.aSigmaY * gauss(rng), Acts::Vector3::UnitY());
+      }
+      if (cfg.aSigmaZ != 0.) {
+        trf *=
+            Acts::AngleAxis3(cfg.aSigmaZ * gauss(rng), Acts::Vector3::UnitZ());
+      }
+    }
+  }
 };
 }  // namespace Contextual
 }  // namespace ActsExamples

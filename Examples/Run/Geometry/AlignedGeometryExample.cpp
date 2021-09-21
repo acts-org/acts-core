@@ -15,7 +15,7 @@
 /// @param argv The argument list
 int main(int argc, char* argv[]) {
   // --------------------------------------------------------------------------------
-  AlignedDetector alignedDetector;
+  ActsExamples::Contextual::AlignedDetector alignedDetector;
 
   // now process it
   return processGeometry(argc, argv, alignedDetector);

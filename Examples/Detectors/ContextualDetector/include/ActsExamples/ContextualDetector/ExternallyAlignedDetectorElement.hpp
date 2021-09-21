@@ -22,12 +22,12 @@ namespace ActsExamples {
 
 namespace Contextual {
 
-/// @class PayloadDetectorElement extends GenericDetectorElement
+/// @class ExternallyAlignedDetectorElement extends GenericDetectorElement
 ///
 /// This is a lightweight type of detector element,
 /// it simply implements the base class.
 ///
-/// The PayloadDetectorElement demonstrates how a GeometryContext
+/// The ExternallyAlignedDetectorElement demonstrates how a GeometryContext
 /// can be used if it carries the entire set of Transforms through
 /// the program flow.
 ///
@@ -38,22 +38,23 @@ namespace Contextual {
 /// In this simple implementation, it does rely on the Identifier
 /// to be orderded from 0 to N-1, as the identifier is simply taken
 /// as a vector index for the alignment store
-class PayloadDetectorElement : public Generic::GenericDetectorElement {
+class ExternallyAlignedDetectorElement
+    : public Generic::GenericDetectorElement {
  public:
+  struct AlignmentStore {
+    // GenericDetector identifiers are sequential
+    std::vector<Acts::Transform3> transforms;
+    size_t lastAccessed;
+  };
+
   /// @class ContextType
   /// convention: nested to the Detector element
   struct ContextType {
-    // The alignment store of this event
-    // not the fastest, but good enough for a demonstrator
-    std::vector<Acts::Transform3> alignmentStore;
+    // GenericDetector identifiers are an integer sequence, so vector is fine!
+    std::shared_ptr<const AlignmentStore> alignmentStore{nullptr};
   };
 
-  /// Constructor for an alignable surface
-  ///
-  /// @note see Generic::GenericDetectorElement for documentation
-  template <typename... Args>
-  PayloadDetectorElement(Args&&... args)
-      : Generic::GenericDetectorElement(std::forward<Args>(args)...) {}
+  using Generic::GenericDetectorElement::GenericDetectorElement;
 
   /// Return local to global transform associated with this identifier
   ///
@@ -64,18 +65,23 @@ class PayloadDetectorElement : public Generic::GenericDetectorElement {
       const Acts::GeometryContext& gctx) const final override;
 };
 
-inline const Acts::Transform3& PayloadDetectorElement::transform(
+inline const Acts::Transform3& ExternallyAlignedDetectorElement::transform(
     const Acts::GeometryContext& gctx) const {
+  if (!gctx.hasValue()) {  // Treating empty context => nominal alignment
+    return GenericDetectorElement::transform(gctx);
+  }
   // cast into the right context object
-  auto alignContext = gctx.get<ContextType>();
+  const auto& alignContext = gctx.get<ContextType>();
   identifier_type idValue = identifier_type(identifier());
 
-  // check if we have the right alignment parameter in hand
-  if (idValue < alignContext.alignmentStore.size()) {
-    return alignContext.alignmentStore[idValue];
+  if (alignContext.alignmentStore == nullptr) {
+    // geometry construction => nominal alignment
+    return GenericDetectorElement::transform(gctx);
   }
-  // Return the standard transform if not found
-  return GenericDetectorElement::transform(gctx);
+
+  // At this point, the alignment store should be populated
+  assert(idValue < alignContext.alignmentStore->transforms.size());
+  return alignContext.alignmentStore->transforms[idValue];
 }
 
 }  // end of namespace Contextual

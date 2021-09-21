@@ -11,5 +11,7 @@
 #include "Fatras.hpp"
 
 int main(int argc, char* argv[]) {
-  return runFatras(argc, argv, std::make_shared<AlignedDetector>());
+  return runFatras(
+      argc, argv,
+      std::make_shared<ActsExamples::Contextual::AlignedDetector>());
 }

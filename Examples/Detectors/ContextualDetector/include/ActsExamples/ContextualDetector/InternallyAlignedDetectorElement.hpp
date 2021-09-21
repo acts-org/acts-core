@@ -17,14 +17,15 @@
 #include "ActsExamples/GenericDetector/GenericDetectorElement.hpp"
 
 #include <iostream>
-#include <map>
 #include <memory>
+#include <mutex>
+#include <unordered_map>
 
 namespace ActsExamples {
 
 namespace Contextual {
 
-/// @class AlignedDetectorElement extends GenericDetectorElement
+/// @class InternallyAlignedDetectorElement extends GenericDetectorElement
 ///
 /// This is a lightweight type of detector element,
 /// it simply implements the base class.
@@ -36,21 +37,17 @@ namespace Contextual {
 /// store and then in a contextual call the actual detector element
 /// position is taken internal multi component store - the latter
 /// has to be filled though from an external source
-class AlignedDetectorElement : public Generic::GenericDetectorElement {
+class InternallyAlignedDetectorElement
+    : public Generic::GenericDetectorElement {
  public:
-  /// @class ContextType
-  /// convention: nested to the Detector element
   struct ContextType {
-    /// The current intervall of validity
+    /// The current interval of validity
     unsigned int iov = 0;
+    bool nominal = false;
   };
 
-  /// Constructor for an alignable surface
-  ///
-  /// @note see Generic::GenericDetectorElement for documentation
-  template <typename... Args>
-  AlignedDetectorElement(Args&&... args)
-      : Generic::GenericDetectorElement(std::forward<Args>(args)...) {}
+  // Inherit constructor
+  using Generic::GenericDetectorElement::GenericDetectorElement;
 
   /// Return local to global transform associated with this identifier
   ///
@@ -70,46 +67,59 @@ class AlignedDetectorElement : public Generic::GenericDetectorElement {
   ///
   /// @param alignedTransform is a new transform
   /// @oaram iov is the batch for which it is meant
-  void addAlignedTransform(std::unique_ptr<Acts::Transform3> alignedTransform,
+  void addAlignedTransform(const Acts::Transform3& alignedTransform,
                            unsigned int iov);
 
-  /// Return the set of alignment transforms in flight
-  const std::map<unsigned int, std::unique_ptr<Acts::Transform3>>&
-  alignedTransforms() const;
+  void clearAlignedTransform(unsigned int iov);
 
  private:
-  std::map<unsigned int, std::unique_ptr<Acts::Transform3>> m_alignedTransforms;
+  std::unordered_map<unsigned int, Acts::Transform3> m_alignedTransforms;
+  mutable std::mutex m_alignmentMutex;
 };
 
-inline const Acts::Transform3& AlignedDetectorElement::transform(
+inline const Acts::Transform3& InternallyAlignedDetectorElement::transform(
     const Acts::GeometryContext& gctx) const {
-  // Check if a different transform than the nominal exists
-  if (not m_alignedTransforms.empty()) {
-    // cast into the right context object
-    auto alignContext = gctx.get<ContextType>();
-    auto aTransform = m_alignedTransforms.find(alignContext.iov);
-    if (aTransform != m_alignedTransforms.end()) {
-      return (*aTransform->second.get());
-    }
+  if (!gctx.hasValue()) {
+    // Return the standard transform if geo context is empty
+    return nominalTransform(gctx);
   }
-  // Return the standard transform if not found
-  return nominalTransform(gctx);
+  const auto& alignContext = gctx.get<ContextType&>();
+
+  std::lock_guard lock{m_alignmentMutex};
+  if (alignContext.nominal) {
+    // nominal alignment
+    return nominalTransform(gctx);
+  }
+  auto aTransform = m_alignedTransforms.find(alignContext.iov);
+  if (aTransform == m_alignedTransforms.end()) {
+    throw std::runtime_error{
+        "Aligned transform for IOV " + std::to_string(alignContext.iov) +
+        " not found. This can happen if the garbage collection runs too "
+        "early (--align-flushsize too low)"};
+  }
+  return aTransform->second;
 }
 
-inline const Acts::Transform3& AlignedDetectorElement::nominalTransform(
+inline const Acts::Transform3&
+InternallyAlignedDetectorElement::nominalTransform(
     const Acts::GeometryContext& gctx) const {
   return GenericDetectorElement::transform(gctx);
 }
 
-inline void AlignedDetectorElement::addAlignedTransform(
-    std::unique_ptr<Acts::Transform3> alignedTransform, unsigned int iov) {
-  m_alignedTransforms[iov] = std::move(alignedTransform);
+inline void InternallyAlignedDetectorElement::addAlignedTransform(
+    const Acts::Transform3& alignedTransform, unsigned int iov) {
+  std::lock_guard lock{m_alignmentMutex};
+  m_alignedTransforms[iov] = alignedTransform;
 }
 
-inline const std::map<unsigned int, std::unique_ptr<Acts::Transform3>>&
-AlignedDetectorElement::alignedTransforms() const {
-  return m_alignedTransforms;
+inline void InternallyAlignedDetectorElement::clearAlignedTransform(
+    unsigned int iov) {
+  std::lock_guard lock{m_alignmentMutex};
+  if (auto it = m_alignedTransforms.find(iov);
+      it != m_alignedTransforms.end()) {
+    m_alignedTransforms.erase(it);
+  }
 }
 
-}  // end of namespace Contextual
+}  // namespace Contextual
 }  // end of namespace ActsExamples
