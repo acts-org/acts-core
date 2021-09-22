@@ -120,7 +120,7 @@ int runSeedingExample(int argc, char* argv[],
   };
   seedingCfg.outputSeeds = "seeds";
   seedingCfg.outputProtoTracks = "prototracks";
-  seedingCfg.gridConfig.rMax = 100._mm;
+  seedingCfg.gridConfig.rMax = 200._mm;
   seedingCfg.seedFinderConfig.rMax = seedingCfg.gridConfig.rMax;
 
   seedingCfg.seedFilterConfig.deltaRMin = 1_mm;
@@ -144,8 +144,8 @@ int runSeedingExample(int argc, char* argv[],
   seedingCfg.gridConfig.cotThetaMax = 7.40627;  // 2.7 eta
   seedingCfg.seedFinderConfig.cotThetaMax = seedingCfg.gridConfig.cotThetaMax;
 
-  seedingCfg.seedFinderConfig.sigmaScattering = 50;
-  seedingCfg.seedFinderConfig.radLengthPerSeed = 0.1;
+  seedingCfg.seedFinderConfig.sigmaScattering = 5;
+  seedingCfg.seedFinderConfig.radLengthPerSeed = 0.5;
 
   seedingCfg.gridConfig.minPt = 500._MeV;
   seedingCfg.seedFinderConfig.minPt = seedingCfg.gridConfig.minPt;
