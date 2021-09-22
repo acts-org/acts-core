@@ -1,6 +1,6 @@
 // This file is part of the Acts project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2020-2021 CERN for the benefit of the Acts project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,6 +18,9 @@
 #include "Acts/Seeding/SeedfinderConfig.hpp"
 #include "Acts/Seeding/SpacePointGrid.hpp"
 #include "Acts/Utilities/Logger.hpp"
+
+#include "vecmem/memory/sycl/device_memory_resource.hpp"
+#include "vecmem/memory/sycl/host_memory_resource.hpp"
 
 #include <chrono>
 #include <cmath>
@@ -148,11 +151,13 @@ auto main(int argc, char** argv) -> int {
 
   const Acts::Logging::Level logLvl =
       cmdlTool.csvFormat ? Acts::Logging::WARNING : Acts::Logging::INFO;
+  Acts::Sycl::QueueWrapper
+      queue(cmdlTool.deviceName,
+            Acts::getDefaultLogger("Sycl::QueueWrapper", logLvl));
+  vecmem::sycl::host_memory_resource resource(queue.getQueue());
+  vecmem::sycl::device_memory_resource device_resource(queue.getQueue());
   Acts::Sycl::Seedfinder<SpacePoint> syclSeedfinder(
-      config, deviceAtlasCuts,
-      Acts::Sycl::QueueWrapper(
-          cmdlTool.deviceName,
-          Acts::getDefaultLogger("Sycl::QueueWrapper", logLvl)));
+      config, deviceAtlasCuts, queue, resource, &device_resource);
   Acts::Seedfinder<SpacePoint> normalSeedfinder(config);
   auto globalTool =
       [=](const SpacePoint& sp, float /*unused*/, float /*unused*/,

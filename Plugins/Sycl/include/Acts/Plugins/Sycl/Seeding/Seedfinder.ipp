@@ -1,6 +1,6 @@
 // This file is part of the Acts project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2020-2021 CERN for the benefit of the Acts project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,6 +10,9 @@
 #include <algorithm>
 #include <cmath>
 #include <utility>
+
+// VecMem include(s).
+#include "vecmem/containers/vector.hpp"
 
 // Acts include(s).
 #include "Acts/Seeding/InternalSeed.hpp"
@@ -24,10 +27,14 @@ template <typename external_spacepoint_t>
 Seedfinder<external_spacepoint_t>::Seedfinder(
     Acts::SeedfinderConfig<external_spacepoint_t> config,
     const Acts::Sycl::DeviceExperimentCuts& cuts,
-    Acts::Sycl::QueueWrapper wrappedQueue)
+    Acts::Sycl::QueueWrapper wrappedQueue,
+    vecmem::memory_resource& resource,
+    vecmem::memory_resource* device_resource)
     : m_config(config.toInternalUnits()),
       m_deviceCuts(cuts),
-      m_wrappedQueue(std::move(wrappedQueue)) {
+      m_wrappedQueue(std::move(wrappedQueue)),
+      m_resource(&resource),
+      m_device_resource(device_resource) {
   // init m_config
   m_config.highland = 13.6f * std::sqrt(m_config.radLengthPerSeed) *
                       (1 + 0.038f * std::log(m_config.radLengthPerSeed));
@@ -72,9 +79,11 @@ Seedfinder<external_spacepoint_t>::createSeedsForGroup(
   // that are easily comprehensible by the GPU. This allows us
   // less memory access operations than with simple (float) arrays.
 
-  std::vector<detail::DeviceSpacePoint> deviceBottomSPs;
-  std::vector<detail::DeviceSpacePoint> deviceMiddleSPs;
-  std::vector<detail::DeviceSpacePoint> deviceTopSPs;
+  // Creating VecMem vectors of the space points, linked to the host/shared memory resource
+  // They will be filled and passed to CreateSeedsForGroup().
+  vecmem::vector<detail::DeviceSpacePoint> deviceBottomSPs(m_resource);
+  vecmem::vector<detail::DeviceSpacePoint> deviceMiddleSPs(m_resource);
+  vecmem::vector<detail::DeviceSpacePoint> deviceTopSPs(m_resource);
 
   std::vector<const Acts::InternalSpacePoint<external_spacepoint_t>*>
       bottomSPvec;
@@ -84,31 +93,38 @@ Seedfinder<external_spacepoint_t>::createSeedsForGroup(
 
   for (const Acts::InternalSpacePoint<external_spacepoint_t>* SP : bottomSPs) {
     bottomSPvec.push_back(SP);
-    deviceBottomSPs.push_back(
-        detail::DeviceSpacePoint{SP->x(), SP->y(), SP->z(), SP->radius(),
-                                 SP->varianceR(), SP->varianceZ()});
+  }
+  deviceBottomSPs.reserve(bottomSPvec.size());
+  for (const Acts::InternalSpacePoint<external_spacepoint_t>* SP : bottomSPvec) {
+    deviceBottomSPs.push_back({SP->x(), SP->y(), SP->z(), SP->radius(),
+                               SP->varianceR(), SP->varianceZ()});
   }
 
   for (const Acts::InternalSpacePoint<external_spacepoint_t>* SP : middleSPs) {
     middleSPvec.push_back(SP);
-    deviceMiddleSPs.push_back(
-        detail::DeviceSpacePoint{SP->x(), SP->y(), SP->z(), SP->radius(),
-                                 SP->varianceR(), SP->varianceZ()});
+  }
+  deviceMiddleSPs.reserve(middleSPvec.size());
+  for (const Acts::InternalSpacePoint<external_spacepoint_t>* SP : middleSPvec) {
+    deviceMiddleSPs.push_back({SP->x(), SP->y(), SP->z(), SP->radius(),
+                               SP->varianceR(), SP->varianceZ()});
   }
 
   for (const Acts::InternalSpacePoint<external_spacepoint_t>* SP : topSPs) {
     topSPvec.push_back(SP);
-    deviceTopSPs.push_back(
-        detail::DeviceSpacePoint{SP->x(), SP->y(), SP->z(), SP->radius(),
-                                 SP->varianceR(), SP->varianceZ()});
+  }
+  deviceTopSPs.reserve(topSPvec.size());
+  for (const Acts::InternalSpacePoint<external_spacepoint_t>* SP : topSPvec) {
+    deviceTopSPs.push_back({SP->x(), SP->y(), SP->z(), SP->radius(),
+                            SP->varianceR(), SP->varianceZ()});
   }
 
+  //std::vector<std::vector<detail::SeedData>> seeds;
   std::vector<std::vector<detail::SeedData>> seeds;
 
   // Call the SYCL seeding algorithm
-  createSeedsForGroupSycl(m_wrappedQueue, m_deviceConfig, m_deviceCuts,
-                          deviceBottomSPs, deviceMiddleSPs, deviceTopSPs,
-                          seeds);
+  createSeedsForGroupSycl(m_wrappedQueue, *m_resource, m_device_resource, m_deviceConfig,
+                          m_deviceCuts, deviceBottomSPs, deviceMiddleSPs,
+                          deviceTopSPs, seeds);
 
   // Iterate through seeds returned by the SYCL algorithm and perform the last
   // step of filtering for fixed middle SP.
@@ -127,8 +143,7 @@ Seedfinder<external_spacepoint_t>::createSeedsForGroup(
           weight, std::make_unique<const InternalSeed<external_spacepoint_t>>(
                       bottomSP, middleSP, topSP, 0)));
     }
-    m_config.seedFilter->filterSeeds_1SpFixed(seedsPerSPM,
-                                              std::back_inserter(outputVec));
+    m_config.seedFilter->filterSeeds_1SpFixed(seedsPerSPM, std::back_inserter(outputVec));
   }
   return outputVec;
 }

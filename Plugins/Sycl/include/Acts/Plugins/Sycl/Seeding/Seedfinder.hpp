@@ -1,6 +1,6 @@
 // This file is part of the Acts project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2020-2021 CERN for the benefit of the Acts project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,6 +17,9 @@
 #include "Acts/Plugins/Sycl/Seeding/detail/Types.hpp"
 #include "Acts/Plugins/Sycl/Utilities/QueueWrapper.hpp"
 
+// VecMem include(s).
+#include "vecmem/memory/memory_resource.hpp"
+
 namespace Acts::Sycl {
 
 template <typename external_spacepoint_t>
@@ -25,7 +28,9 @@ class Seedfinder {
   Seedfinder(
       Acts::SeedfinderConfig<external_spacepoint_t> config,
       const Acts::Sycl::DeviceExperimentCuts& cuts,
-      Acts::Sycl::QueueWrapper wrappedQueue = Acts::Sycl::QueueWrapper());
+      Acts::Sycl::QueueWrapper wrappedQueue,
+      vecmem::memory_resource& resource,
+      vecmem::memory_resource* device_resource = nullptr);
 
   ~Seedfinder() = default;
   Seedfinder() = delete;
@@ -56,6 +61,12 @@ class Seedfinder {
 
   /// Wrapper around a SYCL queue object.
   QueueWrapper m_wrappedQueue;
+
+  /// host/shared memory resource to use in the seed-finder
+  vecmem::memory_resource* m_resource;
+
+  /// Device memory resource for use
+  vecmem::memory_resource* m_device_resource;
 };
 
 }  // namespace Acts::Sycl

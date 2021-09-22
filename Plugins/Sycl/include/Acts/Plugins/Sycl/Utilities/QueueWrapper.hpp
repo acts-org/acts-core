@@ -1,6 +1,6 @@
 // This file is part of the Acts project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2020-2021 CERN for the benefit of the Acts project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -31,6 +31,10 @@ class QueueWrapper {
   QueueWrapper(const std::string& = "",
                std::unique_ptr<const Logger> logger =
                    getDefaultLogger("Sycl::QueueWrapper", Logging::INFO));
+  /// Constructor around an existing queue object
+  QueueWrapper(cl::sycl::queue& queue,
+               std::unique_ptr<const Logger> logger =
+                   getDefaultLogger("Sycl::QueueWrapper", Logging::INFO));
   /// Move constructor
   /// It takes ownership (if it is given).
   QueueWrapper(QueueWrapper&& parent) noexcept;
@@ -46,8 +50,25 @@ class QueueWrapper {
   /// Copy assignment operator
   QueueWrapper& operator=(const QueueWrapper& other);
 
-  /// Get stored pointer
-  cl::sycl::queue* getQueue() const;
+  /// @name Accessor functions/operators
+  /// @{
+
+  /// Get stored pointer (const)
+  const cl::sycl::queue* getQueue() const;
+  /// Get stored pointer (non-const)
+  cl::sycl::queue* getQueue();
+
+  /// Operator implementing smart pointer behaviour (const)
+  const cl::sycl::queue* operator->() const;
+  /// Operator implementing smart pointer behaviour (non-const)
+  cl::sycl::queue* operator->();
+
+  /// De-referencing operator (const)
+  const cl::sycl::queue& operator*() const;
+  /// De-referencing operator (non-const)
+  cl::sycl::queue& operator*();
+
+  /// @}
 
  private:
   /// Raw pointer to SYCL queue object

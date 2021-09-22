@@ -1,6 +1,6 @@
 // This file is part of the Acts project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2020-2021 CERN for the benefit of the Acts project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,6 +14,12 @@
 #include "../Utilities/Arrays.hpp"
 #include "SpacePointType.hpp"
 
+// VecMem include(s).
+#include "vecmem/containers/data/jagged_vector_view.hpp"
+#include "vecmem/containers/data/vector_view.hpp"
+#include "vecmem/containers/jagged_device_vector.hpp"
+#include "vecmem/containers/device_vector.hpp"
+
 // SYCL include(s).
 #include <CL/sycl.hpp>
 
@@ -23,7 +29,7 @@
 namespace Acts::Sycl::detail {
 
 /// Functor taking care of finding viable spacepoint duplets
-template <SpacePointType OtherSPType, class AtomicAccessorType>
+template <SpacePointType OtherSPType>
 class DupletSearch {
   // Sanity check(s).
   static_assert((OtherSPType == SpacePointType::Bottom) ||
@@ -34,19 +40,13 @@ class DupletSearch {
 
  public:
   /// Constructor with all the necessary arguments
-  DupletSearch(uint32_t nMiddleSPs,
-               const device_array<DeviceSpacePoint>& middleSPs,
-               uint32_t nOtherSPs,
-               const device_array<DeviceSpacePoint>& otherSPs,
-               device_array<uint32_t>& middleOtherSPIndices,
-               const AtomicAccessorType& middleOtherSPCounts,
+  DupletSearch(vecmem::data::vector_view<const DeviceSpacePoint> middleSPs,
+               vecmem::data::vector_view<const DeviceSpacePoint> otherSPs,
+               vecmem::data::jagged_vector_view<uint32_t> middleOtherSPIndices,
                const DeviceSeedfinderConfig& config)
-      : m_nMiddleSPs(nMiddleSPs),
-        m_middleSPs(middleSPs.get()),
-        m_nOtherSPs(nOtherSPs),
-        m_otherSPs(otherSPs.get()),
-        m_middleOtherSPIndices(middleOtherSPIndices.get()),
-        m_middleOtherSPCounts(middleOtherSPCounts),
+      : m_middleSPs(middleSPs),
+        m_otherSPs(otherSPs),
+        m_middleOtherSPIndices(middleOtherSPIndices),
         m_config(config) {}
 
   /// Operator performing the duplet search
@@ -58,15 +58,18 @@ class DupletSearch {
     // We check whether this thread actually makes sense (within bounds).
     // The number of threads is usually a factor of 2, or 3*2^k (k \in N), etc.
     // Without this check we may index out of arrays.
-    if ((middleIndex >= m_nMiddleSPs) || (otherIndex >= m_nOtherSPs)) {
+    if ((middleIndex >= m_middleSPs.size()) ||
+        (otherIndex >= m_otherSPs.size())) {
       return;
     }
 
     // Create a copy of the spacepoint objects for the current thread. On
     // dedicated GPUs this provides a better performance than accessing
     // variables one-by-one from global device memory.
-    const DeviceSpacePoint middleSP = m_middleSPs[middleIndex];
-    const DeviceSpacePoint otherSP = m_otherSPs[otherIndex];
+    const vecmem::device_vector<const DeviceSpacePoint> middleSPs(m_middleSPs);
+    const DeviceSpacePoint middleSP = middleSPs[middleIndex];
+    const vecmem::device_vector<const DeviceSpacePoint> otherSPs(m_otherSPs);
+    const DeviceSpacePoint otherSP = otherSPs[otherIndex];
 
     // Calculate the variables that the duplet quality selection are based on.
     // Note that the asserts of the functor make sure that 'OtherSPType' must be
@@ -86,27 +89,21 @@ class DupletSearch {
         (cl::sycl::abs(cotTheta) <= m_config.cotThetaMax) &&
         (zOrigin >= m_config.collisionRegionMin) &&
         (zOrigin <= m_config.collisionRegionMax)) {
-      // We keep counting duplets with atomic access.
-      const uint32_t ind = m_middleOtherSPCounts[middleIndex].fetch_add(1);
-      m_middleOtherSPIndices[middleIndex * m_nOtherSPs + ind] = otherIndex;
+      // Create device vector based on the view and push to it
+      vecmem::jagged_device_vector<uint32_t>
+          middleOtherSPIndices(m_middleOtherSPIndices);
+      middleOtherSPIndices.at(middleIndex).push_back(otherIndex);
     }
   }
 
  private:
-  /// Total number of middle spacepoints
-  uint32_t m_nMiddleSPs;
-  /// Pointer to the middle spacepoints (in global device memory)
-  const DeviceSpacePoint* m_middleSPs;
-  /// Total number of "other" (bottom or top) spacepoints
-  uint32_t m_nOtherSPs;
-  /// Pointer to the "other" (bottom or top) spacepoints (in global device mem.)
-  const DeviceSpacePoint* m_otherSPs;
+  /// Middle spacepoints
+  vecmem::data::vector_view<const DeviceSpacePoint> m_middleSPs;
+  /// "Other" (bottom or top) spacepoints
+  vecmem::data::vector_view<const DeviceSpacePoint> m_otherSPs;
 
   /// The 2D array storing the compatible middle-other spacepoint indices
-  uint32_t* m_middleOtherSPIndices;
-  /// The atomic accessor used for modifying the count of compatible
-  /// middle-other spacepoint duplets
-  AtomicAccessorType m_middleOtherSPCounts;
+  vecmem::data::jagged_vector_view<uint32_t> m_middleOtherSPIndices;
 
   /// Configuration for the seed finding
   DeviceSeedfinderConfig m_config;
