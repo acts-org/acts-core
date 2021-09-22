@@ -27,11 +27,8 @@ ActsExamples::MaterialSteppingAction::~MaterialSteppingAction() {}
 
 void ActsExamples::MaterialSteppingAction::UserSteppingAction(
     const G4Step* step) {
-  auto g4RunManager = G4RunManager::GetRunManager();
-  unsigned int eventNr = g4RunManager->GetCurrentEvent()->GetEventID();
-
   // Get the event data
-  auto& eventData = EventStoreRegistry::eventData[eventNr];
+  auto& eventData = EventStoreRegistry::eventData();
 
   // Get the material & check if it is present
   G4Material* material = step->GetPreStepPoint()->GetMaterial();

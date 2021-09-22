@@ -57,9 +57,6 @@ void setupGeant4Simulation(
     std::shared_ptr<const Acts::TrackingGeometry> trackingGeometry,
     std::shared_ptr<const Acts::MagneticFieldProvider> magneticField,
     bool materialRecording) {
-  // Create an event Store registry
-  EventStoreRegistry esRegistry;
-
   auto g4loglevel =
       Acts::Logging::Level(vars["g4-loglevel"].as<unsigned int>());
 

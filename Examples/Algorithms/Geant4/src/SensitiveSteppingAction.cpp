@@ -30,9 +30,6 @@ void ActsExamples::SensitiveSteppingAction::UserSteppingAction(
   constexpr double convertLength = Acts::UnitConstants::mm / CLHEP::mm;
   constexpr double convertEnergy = Acts::UnitConstants::GeV / CLHEP::GeV;
 
-  auto g4RunManager = G4RunManager::GetRunManager();
-  unsigned int eventNr = g4RunManager->GetCurrentEvent()->GetEventID();
-
   // The particle after the step
   G4Track* track = step->GetTrack();
   G4PrimaryParticle* primaryParticle =
@@ -110,7 +107,7 @@ void ActsExamples::SensitiveSteppingAction::UserSteppingAction(
     Acts::Vector4 afterMomentum(mXpost, mYpost, mZpost, mEpost);
 
     // Retrieve the event data registry
-    auto& eventData = EventStoreRegistry::eventData[eventNr];
+    auto& eventData = EventStoreRegistry::eventData();
 
     // Fill into the registry
     eventData.hits.emplace_back(geoID, particleID, particlePosition,

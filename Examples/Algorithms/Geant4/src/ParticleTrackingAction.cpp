@@ -24,19 +24,13 @@ ActsExamples::ParticleTrackingAction::ParticleTrackingAction(
 
 void ActsExamples::ParticleTrackingAction::PreUserTrackingAction(
     const G4Track* aTrack) {
-  auto g4RunManager = G4RunManager::GetRunManager();
-  unsigned int eventID = g4RunManager->GetCurrentEvent()->GetEventID();
-
-  auto& eventData = EventStoreRegistry::eventData[eventID];
+  auto& eventData = EventStoreRegistry::eventData();
   eventData.particlesInitial.push_back(convert(*aTrack));
 }
 
 void ActsExamples::ParticleTrackingAction::PostUserTrackingAction(
     const G4Track* aTrack) {
-  auto g4RunManager = G4RunManager::GetRunManager();
-  unsigned int eventID = g4RunManager->GetCurrentEvent()->GetEventID();
-
-  auto& eventData = EventStoreRegistry::eventData[eventID];
+  auto& eventData = EventStoreRegistry::eventData();
   eventData.particlesFinal.push_back(convert(*aTrack));
 }
 

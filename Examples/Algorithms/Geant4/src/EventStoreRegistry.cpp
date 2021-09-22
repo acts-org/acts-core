@@ -8,6 +8,11 @@
 
 #include "ActsExamples/Geant4/EventStoreRegistry.hpp"
 
-std::map<unsigned int, ActsExamples::EventStoreRegistry::Access>
-    ActsExamples::EventStoreRegistry::eventData =
-        std::map<unsigned int, ActsExamples::EventStoreRegistry::Access>();
+namespace ActsExamples {
+
+EventStoreRegistry::State& EventStoreRegistry::eventData() {
+  static thread_local State state;
+  return state;
+}
+
+}  // namespace ActsExamples

@@ -111,10 +111,9 @@ ActsExamples::ProcessCode ActsExamples::Geant4Simulation::execute(
   // Ensure exclusive access to the Geant4 run manager
   std::lock_guard<std::mutex> guard(m_runManagerLock);
 
-  // Create and re-reference
-  EventStoreRegistry::eventData[ctx.eventNumber] = EventStoreRegistry::Access{};
-  EventStoreRegistry::Access& eventData =
-      EventStoreRegistry::eventData[ctx.eventNumber];
+  // Get and reset event registry state
+  auto& eventData = EventStoreRegistry::eventData();
+  eventData = EventStoreRegistry::State{};
 
   // Register the current event store to the registry
   // this will allow access from the User*Actions
@@ -127,14 +126,14 @@ ActsExamples::ProcessCode ActsExamples::Geant4Simulation::execute(
   // Output handling: Initial/Final particles
   if (not m_cfg.outputParticlesInitial.empty() and
       not m_cfg.outputParticlesFinal.empty()) {
-    // Initial state of partciles
+    // Initial state of particles
     SimParticleContainer outputParticlesInitial;
     outputParticlesInitial.insert(eventData.particlesInitial.begin(),
                                   eventData.particlesInitial.end());
     // Register to the event store
     ctx.eventStore.add(m_cfg.outputParticlesInitial,
                        std::move(outputParticlesInitial));
-    // Final state of partciles
+    // Final state of particles
     SimParticleContainer outputParticlesFinal;
     outputParticlesFinal.insert(eventData.particlesFinal.begin(),
                                 eventData.particlesFinal.end());
@@ -156,9 +155,6 @@ ActsExamples::ProcessCode ActsExamples::Geant4Simulation::execute(
     ctx.eventStore.add(m_cfg.outputMaterialTracks,
                        std::move(eventData.materialTracks));
   }
-
-  // Clear the EventStoreRegistry
-  EventStoreRegistry::eventData.erase(ctx.eventNumber);
 
   return ActsExamples::ProcessCode::SUCCESS;
 }
