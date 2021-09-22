@@ -10,6 +10,7 @@ add_library(
   src/CsvPlanarClusterWriter.cpp
   src/CsvSimHitReader.cpp
   src/CsvSimHitWriter.cpp
+  src/CsvSpacePointReader.cpp
   src/CsvTrackingGeometryWriter.cpp
   src/CsvMultiTrajectoryWriter.cpp )
 target_include_directories(

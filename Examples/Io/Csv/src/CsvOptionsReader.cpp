@@ -28,6 +28,15 @@ ActsExamples::Options::readCsvSimHitReaderConfig(const Variables& vm) {
   return cfg;
 }
 
+ActsExamples::CsvSpacePointReader::Config
+ActsExamples::Options::readCsvSpacePointReaderConfig(const Variables& vm) {
+  ActsExamples::CsvSpacePointReader::Config cfg;
+  if (not vm["input-dir"].empty()) {
+    cfg.inputDir = vm["input-dir"].as<std::string>();
+  }
+  return cfg;
+}
+
 ActsExamples::CsvMeasurementReader::Config
 ActsExamples::Options::readCsvMeasurementReaderConfig(const Variables& vm) {
   ActsExamples::CsvMeasurementReader::Config cfg;
