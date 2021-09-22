@@ -34,9 +34,9 @@ Acts::SpacePointGridCreator::createGrid(
     // intersection of helix and max detector radius minus maximum R distance
     // from middle SP to top SP
     float innerAngle = 0;
-    float Rmin = config.rMax;
+    float rMin = config.rMax;
     if (config.rMax > config.deltaRMax) {
-      Rmin = config.rMax - config.deltaRMax;
+      rMin = config.rMax - config.deltaRMax;
       float innerCircleR2 =
           (config.rMax - config.deltaRMax) * (config.rMax - config.deltaRMax);
       float xInner = innerCircleR2 / (2 * minHelixRadius);
@@ -46,7 +46,7 @@ Acts::SpacePointGridCreator::createGrid(
 
     // evaluating the azimutal deflection including the maximum impact parameter
     float deltaAngleWithMaxD0 =
-        std::abs(std::asin(config.impactMax / (Rmin)) -
+        std::abs(std::asin(config.impactMax / (rMin)) -
                  std::asin(config.impactMax / config.rMax));
 
     // evaluating delta Phi based on the inner and outer angle, and the azimutal
@@ -86,8 +86,7 @@ Acts::SpacePointGridCreator::createGrid(
   } else {
     // Use the zBinEdges defined in the config
     for (auto& bin : config.zBinEdges) {
-      AxisScalar edge = bin;
-      zValues.push_back(edge);
+      zValues.push_back(bin);
     }
   }
 
