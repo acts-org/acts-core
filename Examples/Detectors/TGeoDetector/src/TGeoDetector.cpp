@@ -24,6 +24,7 @@
 #include "Acts/Utilities/Logger.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
 #include "ActsExamples/TGeoDetector/JsonTGeoDetectorConfig.hpp"
+#include "ActsExamples/TGeoDetector/TGeoITkModuleSplitter.hpp"
 #include "ActsExamples/Utilities/Options.hpp"
 
 #include <cstdlib>
@@ -114,6 +115,12 @@ std::vector<Acts::TGeoLayerBuilder::Config> makeLayerBuilderConfigs(
       cdsConfig.discRadialSegments = volume.discNRSegments;
       layerBuilderConfig.detectorElementSplitter =
           std::make_shared<const Acts::TGeoCylinderDiscSplitter>(cdsConfig);
+    } else if (volume.itkModuleSplit) {
+      ActsExamples::TGeoITkModuleSplitter::Config itkConfig;
+      itkConfig.barrelMap = volume.barrelMap;
+      itkConfig.discMap = volume.discMap;
+      layerBuilderConfig.detectorElementSplitter =
+          std::make_shared<ActsExamples::TGeoITkModuleSplitter>(itkConfig);
     }
 
     detLayerConfigs.push_back(layerBuilderConfig);
