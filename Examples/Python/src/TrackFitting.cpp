@@ -118,19 +118,21 @@ void addTrackFitting(Context& ctx) {
         [](std::shared_ptr<const Acts::TrackingGeometry> trackingGeometry,
            std::shared_ptr<const Acts::MagneticFieldProvider> magneticField,
            BetheHeitlerApprox betheHeitlerApprox, std::size_t maxComponents,
-           double weightCutoff, Acts::ComponentMergeMethod componentMergeMethod,
+           double weightCutoff, double momentumCutoff,
+           Acts::ComponentMergeMethod componentMergeMethod,
            ActsExamples::MixtureReductionAlgorithm mixtureReductionAlgorithm,
            Logging::Level level) {
           return ActsExamples::makeGsfFitterFunction(
               trackingGeometry, magneticField, betheHeitlerApprox,
-              maxComponents, weightCutoff, componentMergeMethod,
+              maxComponents, weightCutoff, momentumCutoff, componentMergeMethod,
               mixtureReductionAlgorithm,
               *Acts::getDefaultLogger("GSFFunc", level));
         },
         py::arg("trackingGeometry"), py::arg("magneticField"),
         py::arg("betheHeitlerApprox"), py::arg("maxComponents"),
-        py::arg("weightCutoff"), py::arg("componentMergeMethod"),
-        py::arg("mixtureReductionAlgorithm"), py::arg("level"));
+        py::arg("weightCutoff"), py::arg("momentumCutoff"),
+        py::arg("componentMergeMethod"), py::arg("mixtureReductionAlgorithm"),
+        py::arg("level"));
 
     mex.def(
         "makeGlobalChiSquareFitterFunction",

@@ -54,6 +54,7 @@ class TrackingGeometry;
 }  // namespace Acts
 
 using namespace ActsExamples;
+using namespace Acts::UnitLiterals;
 
 namespace {
 
@@ -78,6 +79,7 @@ struct GsfFitterFunctionImpl final : public ActsExamples::TrackFitterFunction {
 
   std::size_t maxComponents = 0;
   double weightCutoff = 0;
+  double momentumCutoff = 0;
   bool abortOnError = false;
   bool disableAllMaterialHandling = false;
   MixtureReductionAlgorithm reductionAlg =
@@ -110,6 +112,7 @@ struct GsfFitterFunctionImpl final : public ActsExamples::TrackFitterFunction {
         &(*options.referenceSurface),
         maxComponents,
         weightCutoff,
+        momentumCutoff,
         abortOnError,
         disableAllMaterialHandling};
     gsfOptions.componentMergeMethod = mergeMethod;
@@ -177,7 +180,8 @@ std::shared_ptr<TrackFitterFunction> ActsExamples::makeGsfFitterFunction(
     std::shared_ptr<const Acts::TrackingGeometry> trackingGeometry,
     std::shared_ptr<const Acts::MagneticFieldProvider> magneticField,
     BetheHeitlerApprox betheHeitlerApprox, std::size_t maxComponents,
-    double weightCutoff, Acts::ComponentMergeMethod componentMergeMethod,
+    double weightCutoff, double momentumCutoff,
+    Acts::ComponentMergeMethod componentMergeMethod,
     MixtureReductionAlgorithm mixtureReductionAlgorithm,
     const Acts::Logger& logger) {
   // Standard fitter
@@ -211,6 +215,7 @@ std::shared_ptr<TrackFitterFunction> ActsExamples::makeGsfFitterFunction(
       std::move(trackFitter), std::move(directTrackFitter), geo);
   fitterFunction->maxComponents = maxComponents;
   fitterFunction->weightCutoff = weightCutoff;
+  fitterFunction->momentumCutoff = momentumCutoff;
   fitterFunction->mergeMethod = componentMergeMethod;
   fitterFunction->reductionAlg = mixtureReductionAlgorithm;
 

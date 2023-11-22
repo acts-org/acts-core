@@ -109,9 +109,8 @@ class ScopedGsfInfoPrinterAndChecker {
       assert(allFinite && "weights not finite at the start");
       assert(allNormalized && "not normalized at the start");
     } else {
-      assert(!zeroComponents && "no cmps at the end");
+      assert((zeroComponents || allNormalized) && "not normalized at the end");
       assert(allFinite && "weights not finite at the end");
-      assert(allNormalized && "not normalized at the end");
     }
   }
 

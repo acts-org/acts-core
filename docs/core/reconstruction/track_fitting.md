@@ -83,7 +83,8 @@ outline:
 
 The fit can be customized with several options. Important ones are:
 * *maximum components*: How many components at maximum should be kept.
-* *weight cut*: When to drop components.
+* *weight cut*: When to drop components because of too little weight.
+* *momentum cut*: When to drop components because of too low momentum. This can help stabilizing the fit, as low momenta tend to disturb the navigation.
 * *component merging*: How a multi-component state is reduced to a single set of parameters and covariance. The method can be chosen with the enum {enum}`Acts::ComponentMergeMethod`. Two methods are supported currently:
     * The *mean* computes the mean and the covariance of the mean.
     * *max weight* takes the parameters of component with the maximum weight and computes the variance around these. This is a cheap approximation of the mode, which is not implemented currently.
