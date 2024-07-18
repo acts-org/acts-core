@@ -21,7 +21,7 @@ s = runTruthTrackingKalman(
     field,
     digiConfigFile=srcdir
     / "Examples/Algorithms/Digitization/share/default-smearing-config-generic.json",
-    # "thirdparty/OpenDataDetector/config/odd-digi-smearing-config.json",
+    # "Examples/Algorithms/Digitization/share/odd-digi-smearing-config.json",
     outputDir=outputDir,
 )
 

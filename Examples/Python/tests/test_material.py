@@ -27,7 +27,7 @@ def test_json_material_decorator():
         rConfig=config,
         jFileName=str(
             Path(__file__).parent.parent.parent.parent
-            / "thirdparty/OpenDataDetector/config/odd-material-mapping-config.json"
+            / "Examples/Algorithms/MaterialMapping/share/odd-material-mapping-config.json"
         ),
         level=acts.logging.WARNING,
     )

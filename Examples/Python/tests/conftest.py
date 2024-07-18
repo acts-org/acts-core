@@ -241,6 +241,7 @@ DetectorConfig = namedtuple(
 @pytest.fixture(params=["generic", pytest.param("odd", marks=pytest.mark.odd)])
 def detector_config(request):
     srcdir = Path(__file__).resolve().parent.parent.parent.parent
+    algdir = srcdir / "Examples/Algorithms"
 
     if request.param == "generic":
         detector, trackingGeometry, decorators = acts.examples.GenericDetector.create()
@@ -248,14 +249,10 @@ def detector_config(request):
             detector,
             trackingGeometry,
             decorators,
-            geometrySelection=(
-                srcdir
-                / "Examples/Algorithms/TrackFinding/share/geoSelection-genericDetector.json"
-            ),
-            digiConfigFile=(
-                srcdir
-                / "Examples/Algorithms/Digitization/share/default-smearing-config-generic.json"
-            ),
+            geometrySelection=algdir
+            / "TrackFinding/share/geoSelection-genericDetector.json",
+            digiConfigFile=algdir
+            / "Digitization/share/default-smearing-config-generic.json",
             name=request.param,
         )
     elif request.param == "odd":
@@ -271,13 +268,8 @@ def detector_config(request):
             detector,
             trackingGeometry,
             decorators,
-            digiConfigFile=(
-                srcdir
-                / "thirdparty/OpenDataDetector/config/odd-digi-smearing-config.json"
-            ),
-            geometrySelection=(
-                srcdir / "thirdparty/OpenDataDetector/config/odd-seeding-config.json"
-            ),
+            digiConfigFile=algdir / "Digitization/share/odd-digi-smearing-config.json",
+            geometrySelection=algdir / "Digitization/share/odd-seeding-config.json",
             name=request.param,
         )
 

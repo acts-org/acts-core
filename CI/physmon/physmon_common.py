@@ -22,6 +22,7 @@ PhysmonSetup = collections.namedtuple(
 def makeSetup() -> PhysmonSetup:
     u = acts.UnitConstants
     srcdir = Path(__file__).resolve().parent.parent.parent
+    algdir = srcdir / "Examples/Algorithms"
 
     parser = argparse.ArgumentParser()
     parser.add_argument("outdir")
@@ -38,9 +39,8 @@ def makeSetup() -> PhysmonSetup:
         detector=detector,
         trackingGeometry=trackingGeometry,
         decorators=decorators,
-        digiConfig=srcdir
-        / "thirdparty/OpenDataDetector/config/odd-digi-smearing-config.json",
-        geoSel=srcdir / "thirdparty/OpenDataDetector/config/odd-seeding-config.json",
+        digiConfig=algdir / "Digitization/share/odd-digi-smearing-config.json",
+        geoSel=algdir / "TrackFinding/share/odd-seeding-config.json",
         field=acts.ConstantBField(acts.Vector3(0, 0, 2 * u.T)),
         outdir=Path(args.outdir),
     )

@@ -163,7 +163,7 @@ if "__main__" == __name__:
 
     detector, trackingGeometry, _ = getOpenDataDetector()
     digiConfigFile = (
-        srcdir / "thirdparty/OpenDataDetector/config/odd-digi-smearing-config.json"
+        srcdir / "Examples/Algorithms/Digitization/share/odd-digi-smearing-config.json"
     )
 
     ## GenericDetector

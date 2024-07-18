@@ -17,6 +17,7 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
+#include <sstream>
 
 namespace Acts {
 
@@ -220,7 +221,9 @@ inline void GeometryHierarchyMap<value_t>::sortAndCheckDuplicates(
     return lhs.first == rhs.first;
   });
   if (dup != end) {
-    throw std::invalid_argument("Input elements contain duplicates");
+    std::stringstream ss;
+    ss << "Input elements contain duplicates (" << dup->first << ")";
+    throw std::invalid_argument(ss.str());
   }
 }
 

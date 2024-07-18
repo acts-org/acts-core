@@ -6,6 +6,7 @@ import tarfile
 import urllib.request
 import subprocess
 import sys
+import importlib
 import re
 import collections
 
@@ -936,6 +937,52 @@ def test_digitization_example(trk_geo, tmp_path, assert_root_hash, digi_config_f
         assert_has_entries(root_file, entry)
 
     assert_root_hash(root_file.name, root_file)
+
+
+@pytest.mark.parametrize(
+    "digi_config_file",
+    [
+        DIGI_SHARE_DIR / "odd-digi-smearing-config.json",
+        DIGI_SHARE_DIR / "odd-digi-geometric-config.json",
+    ],
+    ids=["smeared", "geometric"],
+)
+@pytest.mark.odd
+def test_digitization_example(tmp_path, digi_config_file):
+    from digitization import runDigitization
+
+    s = Sequencer(events=10, numThreads=-1)
+    _, trackingGeometry, _ = getOpenDataDetector()
+
+    csv_dir = tmp_path / "csv"
+    root_file = tmp_path / "measurements.root"
+
+    assert digi_config_file.exists()
+    assert not root_file.exists()
+    assert not csv_dir.exists()
+
+    field = acts.ConstantBField(acts.Vector3(0, 0, 2 * u.T))
+    runDigitization(
+        trackingGeometry,
+        field,
+        outputDir=tmp_path,
+        digiConfigFile=digi_config_file,
+        s=s,
+    )
+
+    s.run()
+
+
+def test_odd_geometric_file_generator():
+    from pydoc import importfile
+
+    gen_odd = importfile(str(DIGI_SHARE_DIR / "../scripts/gen-odd-geometric.py"))
+    gen_dict = gen_odd.generate()
+
+    with open(DIGI_SHARE_DIR / "../share/odd-digi-geometric-config.json", "r") as f:
+        read_dict = json.load(f)
+
+    assert gen_dict == read_dict
 
 
 @pytest.mark.parametrize(

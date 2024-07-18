@@ -1,0 +1,657 @@
+{
+    "acts-geometry-hierarchy-map": {
+        "format-version": 0,
+        "value-identifier": "digitization-configuration"
+    },
+    "entries": [
+        {
+            "description": "pixel barrel",
+            "volume": 17,
+            "value": {
+                "geometric": {
+                    "digital": false,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 336,
+                                "max": 8.4,
+                                "min": -8.4,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 1440,
+                                "max": 36.0,
+                                "min": -36.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.125,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "pixel endcap (ring 0)",
+            "volume": 16,
+            "extra": 1,
+            "value": {
+                "geometric": {
+                    "digital": false,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 644,
+                                "max": 16.1,
+                                "min": -16.1,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 1560,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.125,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "pixel endcap (ring 1)",
+            "volume": 16,
+            "extra": 2,
+            "value": {
+                "geometric": {
+                    "digital": false,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 336,
+                                "max": 8.4,
+                                "min": -8.4,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 1560,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.125,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "pixel endcap (ring 0)",
+            "volume": 18,
+            "extra": 1,
+            "value": {
+                "geometric": {
+                    "digital": false,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 644,
+                                "max": 16.1,
+                                "min": -16.1,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 1560,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.125,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "pixel endcap (ring 1)",
+            "volume": 18,
+            "extra": 2,
+            "value": {
+                "geometric": {
+                    "digital": false,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 336,
+                                "max": 8.4,
+                                "min": -8.4,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 1560,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.125,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip barrel",
+            "volume": 24,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 640,
+                                "max": 24.0,
+                                "min": -24.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 216,
+                                "max": 54.0,
+                                "min": -54.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.2,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 0)",
+            "volume": 23,
+            "extra": 1,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 429,
+                                "max": 16.1,
+                                "min": -16.1,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 156,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.2,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 1)",
+            "volume": 23,
+            "extra": 2,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 586,
+                                "max": 22.0,
+                                "min": -22.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 156,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.2,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 2)",
+            "volume": 23,
+            "extra": 3,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 752,
+                                "max": 28.2,
+                                "min": -28.2,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 156,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.2,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 0)",
+            "volume": 25,
+            "extra": 1,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 429,
+                                "max": 16.1,
+                                "min": -16.1,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 156,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.2,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 1)",
+            "volume": 25,
+            "extra": 2,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 586,
+                                "max": 22.0,
+                                "min": -22.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 156,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.2,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 2)",
+            "volume": 25,
+            "extra": 3,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0,
+                        1
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 752,
+                                "max": 28.2,
+                                "min": -28.2,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            },
+                            {
+                                "bins": 156,
+                                "max": 39.0,
+                                "min": -39.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binY"
+                            }
+                        ]
+                    },
+                    "thickness": 0.2,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip barrel",
+            "volume": 29,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 640,
+                                "max": 48.0,
+                                "min": -48.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            }
+                        ]
+                    },
+                    "thickness": 0.25,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 0)",
+            "volume": 28,
+            "extra": 1,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 390,
+                                "max": 29.3,
+                                "min": -29.3,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            }
+                        ]
+                    },
+                    "thickness": 0.25,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 1)",
+            "volume": 28,
+            "extra": 2,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 466,
+                                "max": 35.0,
+                                "min": -35.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            }
+                        ]
+                    },
+                    "thickness": 0.25,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 0)",
+            "volume": 30,
+            "extra": 1,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 390,
+                                "max": 29.3,
+                                "min": -29.3,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            }
+                        ]
+                    },
+                    "thickness": 0.25,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sstrip endcap (ring 1)",
+            "volume": 30,
+            "extra": 2,
+            "value": {
+                "geometric": {
+                    "digital": true,
+                    "indices": [
+                        0
+                    ],
+                    "segmentation": {
+                        "binningdata": [
+                            {
+                                "bins": 466,
+                                "max": 35.0,
+                                "min": -35.0,
+                                "option": "open",
+                                "type": "equidistant",
+                                "value": "binX"
+                            }
+                        ]
+                    },
+                    "thickness": 0.25,
+                    "threshold": 0.001,
+                    "charge-smearing": {
+                        "mean": 0.0,
+                        "stddev": 0.001,
+                        "type": "Gauss"
+                    }
+                }
+            }
+        }
+    ]
+}

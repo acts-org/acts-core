@@ -1,0 +1,80 @@
+{
+  "acts-geometry-hierarchy-map": {
+    "format-version": 0,
+    "value-identifier": "digitization-configuration"
+  },
+  "entries": [
+    {
+      "volume": 16,
+      "value": {
+        "smearing": [
+          { "index": 0, "stddev": 0.015, "type": "Gauss" },
+          { "index": 1, "stddev": 0.015, "type": "Gauss" }
+        ]
+      }
+    },
+    {
+      "volume": 17,
+      "value": {
+        "smearing": [
+          { "index": 0, "stddev": 0.015, "type": "Gauss" },
+          { "index": 1, "stddev": 0.015, "type": "Gauss" }
+        ]
+      }
+    },
+    {
+      "volume": 18,
+      "value": {
+        "smearing": [
+          { "index": 0, "stddev": 0.015, "type": "Gauss" },
+          { "index": 1, "stddev": 0.015, "type": "Gauss" }
+        ]
+      }
+    },
+    {
+      "volume": 23,
+      "value": {
+        "smearing": [
+          { "index": 0, "stddev": 0.043, "type": "Gauss" },
+          { "index": 1, "stddev": 1.2, "type": "Gauss" }
+        ]
+      }
+    },
+    {
+      "volume": 24,
+      "value": {
+        "smearing": [
+          { "index": 0, "stddev": 0.043, "type": "Gauss" },
+          { "index": 1, "stddev": 1.2, "type": "Gauss" }
+        ]
+      }
+    },
+    {
+      "volume": 25,
+      "value": {
+        "smearing": [
+          { "index": 0, "stddev": 0.043, "type": "Gauss" },
+          { "index": 1, "stddev": 1.2, "type": "Gauss" }
+        ]
+      }
+    },
+    {
+      "volume": 28,
+      "value": {
+        "smearing": [{ "index": 0, "stddev": 0.072, "type": "Gauss" }]
+      }
+    },
+    {
+      "volume": 29,
+      "value": {
+        "smearing": [{ "index": 0, "stddev": 0.072, "type": "Gauss" }]
+      }
+    },
+    {
+      "volume": 30,
+      "value": {
+        "smearing": [{ "index": 0, "stddev": 0.072, "type": "Gauss" }]
+      }
+    }
+  ]
+}
