@@ -6,14 +6,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "ActsExamples/GenericDetector/GenericDetectorElement.hpp"
+#include "Acts/Plugins/GenericDetector/GenericDetectorElement.hpp"
 
 #include "Acts/Surfaces/DiscSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 
 #include <utility>
 
-ActsExamples::Generic::GenericDetectorElement::GenericDetectorElement(
+Acts::Generic::GenericDetectorElement::GenericDetectorElement(
     const Identifier identifier,
     std::shared_ptr<const Acts::Transform3> transform,
     std::shared_ptr<const Acts::PlanarBounds> pBounds, double thickness,
@@ -29,7 +29,7 @@ ActsExamples::Generic::GenericDetectorElement::GenericDetectorElement(
   m_elementSurface->assignSurfaceMaterial(std::move(material));
 }
 
-ActsExamples::Generic::GenericDetectorElement::GenericDetectorElement(
+Acts::Generic::GenericDetectorElement::GenericDetectorElement(
     const Identifier identifier,
     std::shared_ptr<const Acts::Transform3> transform,
     std::shared_ptr<const Acts::DiscBounds> dBounds, double thickness,

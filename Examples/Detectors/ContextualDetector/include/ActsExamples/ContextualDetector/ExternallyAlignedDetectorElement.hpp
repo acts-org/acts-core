@@ -11,8 +11,8 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
+#include "Acts/Plugins/GenericDetector/GenericDetectorElement.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "ActsExamples/GenericDetector/GenericDetectorElement.hpp"
 
 #include <map>
 
@@ -35,7 +35,7 @@ namespace ActsExamples::Contextual {
 /// to be orderded from 0 to N-1, as the identifier is simply taken
 /// as a vector index for the alignment store
 class ExternallyAlignedDetectorElement
-    : public Generic::GenericDetectorElement {
+    : public Acts::Generic::GenericDetectorElement {
  public:
   struct AlignmentStore {
     // GenericDetector identifiers are sequential
@@ -50,7 +50,7 @@ class ExternallyAlignedDetectorElement
     std::shared_ptr<const AlignmentStore> alignmentStore{nullptr};
   };
 
-  using Generic::GenericDetectorElement::GenericDetectorElement;
+  using Acts::Generic::GenericDetectorElement::GenericDetectorElement;
 
   /// Return local to global transform associated with this identifier
   ///

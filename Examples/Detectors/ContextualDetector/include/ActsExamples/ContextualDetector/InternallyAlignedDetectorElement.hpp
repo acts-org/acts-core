@@ -11,8 +11,8 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
+#include "Acts/Plugins/GenericDetector/GenericDetectorElement.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "ActsExamples/GenericDetector/GenericDetectorElement.hpp"
 
 #include <iostream>
 #include <memory>
@@ -34,7 +34,7 @@ namespace ActsExamples::Contextual {
 /// position is taken internal multi component store - the latter
 /// has to be filled though from an external source
 class InternallyAlignedDetectorElement
-    : public Generic::GenericDetectorElement {
+    : public Acts::Generic::GenericDetectorElement {
  public:
   struct ContextType {
     /// The current interval of validity
@@ -43,7 +43,7 @@ class InternallyAlignedDetectorElement
   };
 
   // Inherit constructor
-  using Generic::GenericDetectorElement::GenericDetectorElement;
+  using Acts::Generic::GenericDetectorElement::GenericDetectorElement;
 
   /// Return local to global transform associated with this identifier
   ///

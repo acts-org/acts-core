@@ -30,14 +30,14 @@ def runDigitization(
     )
 
     s = s or acts.examples.Sequencer(
-        events=100, numThreads=-1, logLevel=acts.logging.INFO
+        events=1000, numThreads=-1, logLevel=acts.logging.INFO
     )
     rnd = acts.examples.RandomNumbers(seed=42)
 
     if particlesInput is None:
         addParticleGun(
             s,
-            EtaConfig(-2.0, 2.0),
+            EtaConfig(-3.0, 3.0),
             ParticleConfig(4, acts.PdgParticle.eMuon, True),
             PhiConfig(0.0, 360.0 * u.degree),
             multiplicity=2,
@@ -69,20 +69,40 @@ def runDigitization(
         outputDirRoot=outputDir if outputRoot else None,
         rnd=rnd,
         doMerge=doMerge,
+        logLevel=acts.logging.INFO,
+    )
+
+    s.addWriter(
+        acts.examples.CsvTrackingGeometryWriter(
+            level=acts.logging.INFO,
+            trackingGeometry=trackingGeometry,
+            outputDir=outputDir,
+            writePerEvent=False,
+        )
     )
 
     return s
 
 
 if "__main__" == __name__:
-    detector, trackingGeometry, _ = acts.examples.GenericDetector.create()
-
-    digiConfigFile = (
+    digi_share_dir = (
         Path(__file__).resolve().parent.parent.parent.parent
-        / "Examples/Algorithms/Digitization/share/default-smearing-config-generic.json"
+        / "Examples/Algorithms/Digitization/share"
     )
+
+    if False:
+        detector, trackingGeometry, _ = acts.examples.GenericDetector.create()
+        digiConfigFile = digi_share_dir / "default-smearing-config-generic.json"
+    else:
+        from acts.examples.odd import getOpenDataDetector
+
+        detector, trackingGeometry, _ = getOpenDataDetector()
+        digiConfigFile = digi_share_dir / "odd-digi-geometric-config.json"
+
     assert digiConfigFile.exists()
 
     field = acts.ConstantBField(acts.Vector3(0, 0, 2 * u.T))
 
-    runDigitization(trackingGeometry, field, outputDir=Path.cwd()).run()
+    runDigitization(
+        trackingGeometry, field, outputDir=Path.cwd(), digiConfigFile=digiConfigFile
+    ).run()

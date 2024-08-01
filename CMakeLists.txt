@@ -40,6 +40,7 @@ option(ACTS_BUILD_PLUGIN_GEOMODEL "Build GeoModel plugin" OFF)
 option(ACTS_BUILD_PLUGIN_COVFIE "Build Covfie plugin" OFF)
 option(ACTS_BUILD_PLUGIN_DETRAY "Build Detray plugin" OFF)
 option(ACTS_BUILD_PLUGIN_TRACCC "Build Traccc plugin" OFF)
+option(ACTS_BUILD_PLUGIN_GENERIC_DETECTOR "Build Traccc plugin" OFF)
 option(ACTS_USE_SYSTEM_GEOMODEL "Use a system-provided GeoModel installation" ${ACTS_USE_SYSTEM_LIBS})
 option(ACTS_BUILD_PLUGIN_GEANT4 "Build Geant4 plugin" OFF)
 option(ACTS_BUILD_PLUGIN_EXATRKX "Build the Exa.TrkX plugin" OFF)
@@ -163,6 +164,8 @@ set_option_if(
 set_option_if(ACTS_BUILD_PLUGIN_LEGACY ACTS_BUILD_EVERYTHING)
 set_option_if(ACTS_BUILD_PLUGIN_EXATRKX ACTS_BUILD_EXAMPLES_EXATRKX)
 set_option_if(ACTS_BUILD_PLUGIN_FPEMON
+  ACTS_BUILD_EXAMPLES OR ACTS_BUILD_EVERYTHING)
+set_option_if(ACTS_BUILD_PLUGIN_GENERIC_DETECTOR
   ACTS_BUILD_EXAMPLES OR ACTS_BUILD_EVERYTHING)
 
 # feature tests

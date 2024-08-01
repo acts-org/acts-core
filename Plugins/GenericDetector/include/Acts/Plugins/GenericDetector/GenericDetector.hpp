@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "Acts/Plugins/GenericDetector/GenericDetectorElement.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <cstddef>
@@ -16,25 +17,15 @@
 #include <vector>
 
 namespace Acts {
+
 class TrackingGeometry;
 class IMaterialDecorator;
-}  // namespace Acts
-
-namespace ActsExamples {
-class IContextDecorator;
-}  // namespace ActsExamples
-
-namespace ActsExamples::Generic {
-class GenericDetectorElement;
-}  // namespace ActsExamples::Generic
 
 struct GenericDetector {
-  using DetectorElement = ActsExamples::Generic::GenericDetectorElement;
+  using DetectorElement = Generic::GenericDetectorElement;
   using DetectorElementPtr = std::shared_ptr<DetectorElement>;
   using DetectorStore = std::vector<std::vector<DetectorElementPtr>>;
 
-  using ContextDecorators =
-      std::vector<std::shared_ptr<ActsExamples::IContextDecorator>>;
   using TrackingGeometryPtr = std::shared_ptr<const Acts::TrackingGeometry>;
 
   struct Config {
@@ -48,7 +39,9 @@ struct GenericDetector {
   /// The Store of the detector elements (lifetime: job)
   DetectorStore detectorStore;
 
-  std::pair<TrackingGeometryPtr, ContextDecorators> finalize(
+  TrackingGeometryPtr finalize(
       const Config& cfg,
       std::shared_ptr<const Acts::IMaterialDecorator> mdecorator);
 };
+
+}  // namespace Acts

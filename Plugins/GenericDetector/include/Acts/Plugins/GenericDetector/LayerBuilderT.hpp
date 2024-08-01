@@ -19,14 +19,14 @@
 #include "Acts/Material/HomogeneousSurfaceMaterial.hpp"
 #include "Acts/Material/Material.hpp"
 #include "Acts/Material/MaterialSlab.hpp"
+#include "Acts/Plugins/GenericDetector/GenericDetectorElement.hpp"
+#include "Acts/Plugins/GenericDetector/ProtoLayerCreatorT.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "ActsExamples/GenericDetector/GenericDetectorElement.hpp"
-#include "ActsExamples/GenericDetector/ProtoLayerCreatorT.hpp"
 
 #include <iostream>
 
-namespace ActsExamples::Generic {
+namespace Acts::Generic {
 
 using Acts::VectorHelpers::eta;
 using Acts::VectorHelpers::perp;
@@ -242,4 +242,4 @@ LayerBuilderT<detector_element_t>::constructEndcapLayers(
   return eLayers;
 }
 
-}  // namespace ActsExamples::Generic
+}  // namespace Acts::Generic

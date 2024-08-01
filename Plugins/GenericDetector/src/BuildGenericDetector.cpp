@@ -6,11 +6,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include "ActsExamples/GenericDetector/BuildGenericDetector.hpp"
+#include "Acts/Plugins/GenericDetector/BuildGenericDetector.hpp"
 
 #include <cmath>
 
-namespace ActsExamples::Generic {
+namespace Acts::Generic {
 
 /// helper method for cylinder
 std::vector<Acts::Vector3> modulePositionsCylinder(
@@ -130,4 +130,4 @@ std::vector<Acts::Vector3> modulePositionsRing(double z, double radius,
   return rPositions;
 }
 
-}  // namespace ActsExamples::Generic
+}  // namespace Acts::Generic

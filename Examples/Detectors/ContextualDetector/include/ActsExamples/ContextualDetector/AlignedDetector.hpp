@@ -9,8 +9,8 @@
 #pragma once
 
 #include "Acts/Definitions/Units.hpp"
+#include "Acts/Plugins/GenericDetector/GenericDetector.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "ActsExamples/GenericDetector/GenericDetector.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -20,13 +20,13 @@
 namespace Acts {
 class TrackingGeometry;
 class IMaterialDecorator;
+namespace Generic {
+class GenericDetectorElement;
+}  // namespace Generic
 }  // namespace Acts
 
 namespace ActsExamples {
 class IContextDecorator;
-namespace Generic {
-class GenericDetectorElement;
-}  // namespace Generic
 }  // namespace ActsExamples
 
 namespace ActsExamples::Contextual {
@@ -39,7 +39,7 @@ class AlignedDetector {
       std::vector<std::shared_ptr<ActsExamples::IContextDecorator>>;
   using TrackingGeometryPtr = std::shared_ptr<const Acts::TrackingGeometry>;
 
-  struct Config : public GenericDetector::Config {
+  struct Config : public Acts::GenericDetector::Config {
     /// Seed for the decorator random numbers.
     std::size_t seed = 1324354657;
     /// Size of a valid IOV.
@@ -69,14 +69,16 @@ class AlignedDetector {
       const Config& cfg,
       std::shared_ptr<const Acts::IMaterialDecorator> mdecorator);
 
-  std::vector<std::vector<std::shared_ptr<Generic::GenericDetectorElement>>>&
+  std::vector<
+      std::vector<std::shared_ptr<Acts::Generic::GenericDetectorElement>>>&
   detectorStore() {
     return m_detectorStore;
   }
 
  private:
   /// The Store of the detector elements (lifetime: job)
-  std::vector<std::vector<std::shared_ptr<Generic::GenericDetectorElement>>>
+  std::vector<
+      std::vector<std::shared_ptr<Acts::Generic::GenericDetectorElement>>>
       m_detectorStore;
 };
 
