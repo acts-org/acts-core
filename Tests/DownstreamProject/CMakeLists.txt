@@ -10,7 +10,9 @@ find_package(
     Fatras
     PluginJson
     PluginLegacy
-    PluginTGeo)
+    PluginTGeo
+    PluginCovfie
+    PluginDetray)
 
 # place artifacts in GNU-like paths, e.g. binaries in `<build>/bin`
 include(GNUInstallDirs)
@@ -27,7 +29,9 @@ target_link_libraries(
     ActsFatras
     ActsPluginJson
     ActsPluginLegacy
-    ActsPluginTGeo)
+    ActsPluginTGeo
+    ActsPluginCovfie
+    ActsPluginDetray)
 
 option(DD4HEP "Build with DD4hep" ON)
 if(DD4HEP)

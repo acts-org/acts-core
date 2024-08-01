@@ -22,7 +22,7 @@ set( TRACCC_SETUP_VECMEM OFF CACHE BOOL
    "Do not set up Actsvg as part of Traccc" )
 set( TRACCC_SETUP_EIGEN3 OFF CACHE BOOL
    "Do not set up Eigen3 as part of Traccc" )
-set( TRACCC_SETUP_THRUST OFF CACHE BOOL
+set( TRACCC_SETUP_THRUST ON CACHE BOOL
     "Do not set up Thrust as part of Traccc" ) 
 set( TRACCC_SETUP_ALGEBRA_PLUGINS OFF CACHE BOOL
     "Do not set up Algebra Plugins as part of Traccc" ) 
@@ -34,6 +34,8 @@ set( TRACCC_SETUP_DETRAY OFF CACHE BOOL
     "Do not set up Detray as part of Traccc" ) 
 set( TRACCC_SETUP_ACTS OFF CACHE BOOL
     "Do not set up ACTS as part of Traccc" ) 
+set( TRACCC_SETUP_TBB OFF CACHE BOOL
+    "Do not set up TBB as part of Traccc" ) 
 
 set( TRACCC_BUILD_TESTING OFF CACHE BOOL
     "Turn off the build of the Traccc unit tests" ) 
