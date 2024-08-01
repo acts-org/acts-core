@@ -9,8 +9,12 @@
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
+#include "Acts/Detector/Detector.hpp"
+#include "Acts/Detector/DetectorVolume.hpp"
+#include "Acts/Detector/Portal.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
+#include "Acts/Surfaces/Surface.hpp"
 
 #include <vector>
 
@@ -23,15 +27,6 @@
 #include "detray/utils/consistency_checker.hpp"
 
 namespace Acts {
-
-class Surface;
-class SurfaceBounds;
-
-namespace Experimental {
-class Detector;
-class DetectorVolume;
-class Portal;
-}  //  namespace Experimental
 
 namespace DetrayConverter {
 

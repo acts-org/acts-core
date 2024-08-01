@@ -48,6 +48,7 @@ clang_tidy:
         clang-tidy/clang-tidy.json
         --exclude "*thirdparty*"
         --exclude "*ActsPodioEdm*"
+        --exclude "*build/_deps/*"
 
     # Check the combined report against the defined limits
     - CI/clang_tidy/check_clang_tidy.py --report clang-tidy/clang-tidy.json --config CI/clang_tidy/limits.yml

@@ -27,8 +27,8 @@ set( DETRAY_BUILD_TUTORIALS OFF CACHE BOOL
    "Turn off the build of the Detray tutorials" )
 set( DETRAY_EIGEN_PLUGIN ON CACHE BOOL
    "Turn on the build of the Detray Eigen code" )
-set( DETRAY_VC_PLUGIN ON CACHE BOOL
-   "Turn on the build of the Detray Vc code" )
+set( DETRAY_VC_PLUGIN OFF CACHE BOOL
+   "Turn off the build of the Detray Vc code" )
 
 set( DETRAY_SETUP_VECMEM OFF CACHE BOOL
    "Do not set up VecMem as part of Detray" )
@@ -48,11 +48,10 @@ set( DETRAY_SETUP_ACTSVG OFF CACHE BOOL
    "Do not set up Actsvg as part of Detray" )
 set( DETRAY_SETUP_DFELIBS OFF CACHE BOOL
    "Do not set up Dfelibs as part of Detray" )
-#set( DETRAY_VC_PLUGIN OFF CACHE BOOL
-#   "Do not build Vc based math plugin" )
-#set( DETRAY_SVG_DISPLAY ON CACHE BOOL
-#    "Build the ActSVG display module" )
-
+set( DETRAY_SVG_DISPLAY ${ACTS_BUILD_PLUGIN_ACTSVG} CACHE BOOL
+    "Build the ActSVG display module depending on the ACTS_BUILD_PLUGIN_ACTSVG" )
+set ( DETRAY_BUILD_CUDA OFF CACHE BOOL
+    "Do not build Cuda sources in Detray" )
 
 #Now set up its build.
 FetchContent_MakeAvailable(Detray)

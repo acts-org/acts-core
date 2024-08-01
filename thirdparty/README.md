@@ -41,3 +41,23 @@ CMake instructions to build [Pybind11](https://github.com/pybind/pybind11), whic
 ## FRNN
 
 CMake instructions to build [FRNN](https://github.com/lxxue/FRNN), which is used by the Exa.TrkX plugin.
+
+## Algebra plugins
+
+CMake instruction to build [algebra-plugins](https://github.com/acts-project/algebra-plugins), which is used by the traccc plugin.
+
+## VecMem
+
+CMake instruction to build [VecMem](https://github.com/acts-project/vecmem), which is used by the traccc plugin.
+
+## Covfie
+
+CMake instruction to build [covfie](https://github.com/acts-project/covfie), which is used by the traccc plugin.
+
+## Detray
+
+CMake instruction to build [detray](https://github.com/acts-project/detray), which is used by the traccc plugin.
+
+## Traccc
+
+CMake instruction to build [traccc](https://github.com/acts-project/traccc), which is used by the traccc plugin.

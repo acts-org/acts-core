@@ -139,6 +139,8 @@ class DigitizationConfig {
   std::string outputSourceLinks = "sourcelinks";
   /// Output measurements collection.
   std::string outputMeasurements = "measurements";
+  /// Output cells map (geoID -> collection of cells).
+  std::string outputCells = "cells";
   /// Output cluster collection.
   std::string outputClusters = "clusters";
   /// Output collection to map measured hits to contributing particles.
@@ -155,7 +157,7 @@ class DigitizationConfig {
   /// How close do parameters have to be to consider merged
   const double mergeNsigma;
   /// Consider clusters that share a corner as merged (8-cell connectivity)
-  const bool mergeCommonCorner;
+  bool mergeCommonCorner;
   /// Energy deposit threshold for accepting a hit
   /// For a generic readout frontend we assume 1000 e/h pairs, in Si each
   /// e/h-pair requiers on average an energy of 3.65 eV (PDG  review 2023,
