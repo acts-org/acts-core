@@ -1870,7 +1870,7 @@ def addAmbiguityResolutionMLDBScan(
     addTrackWriters(
         s,
         name="ambiMLDBScan",
-        trajectories=alg.config.outputTracks,
+        tracks=alg.config.outputTracks,
         outputDirRoot=outputDirRoot,
         outputDirCsv=outputDirCsv,
         writeStates=writeTrajectories,

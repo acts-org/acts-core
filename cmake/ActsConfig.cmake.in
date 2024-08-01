@@ -81,6 +81,23 @@ if(PluginGeoModel IN_LIST Acts_COMPONENTS)
   find_dependency(GeoModelIO @GeoModel_VERSION@ CONFIG EXACT)
 endif()
 
+if (PluginCovfie IN_LIST Acts_COMPONENTS)
+  find_dependency(covfie @covfie_VERSION@ CONFIG EXACT)
+endif()
+
+if(PluginDetray IN_LIST Acts_COMPONENTS OR PluginTraccc IN_LIST Acts_COMPONENTS)
+  find_dependency(vecmem @vecmem_VERSION@ CONFIG EXACT)
+  find_dependency(algebra-plugins @algebra-plugins_VERSION@ CONFIG EXACT)
+endif()
+
+if(PluginDetray IN_LIST Acts_COMPONENTS)
+  find_dependency(detray @detray_VERSION@ CONFIG EXACT)
+endif()
+
+if(PluginTraccc IN_LIST Acts_COMPONENTS)
+  find_dependency(traccc @traccc_VERSION@ CONFIG EXACT)
+endif()
+
 # dependencies that we have built ourselves but cannot be
 # straightforwardly handed to cmake
 if(NOT @ACTS_USE_SYSTEM_BOOST@)

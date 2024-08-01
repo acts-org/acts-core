@@ -36,12 +36,26 @@ using namespace pybind11::literals;
 
 namespace Acts::Python {
 
+/// @brief Get the field value without needing a cache.
+/// @note Does not return an Acts::Result, so will throw an error if the lookup fails.
+Acts::Vector3 getField(Acts::MagneticFieldProvider& self,
+                       const Acts::Vector3& position) {
+  Acts::MagneticFieldContext mctx;
+  Acts::MagneticFieldProvider::Cache cache = self.makeCache(mctx);
+  auto lookupResult = self.getField(position, cache);
+  if (!lookupResult.ok()) {
+    throw std::runtime_error{"Field lookup failure"};
+  }
+  return *lookupResult;
+}
+
 void addMagneticField(Context& ctx) {
   auto [m, mex, prop] = ctx.get("main", "examples", "propagation");
 
   py::class_<Acts::MagneticFieldProvider,
              std::shared_ptr<Acts::MagneticFieldProvider>>(
-      m, "MagneticFieldProvider");
+      m, "MagneticFieldProvider")
+      .def("getField", &getField);
 
   py::class_<Acts::InterpolatedMagneticField,
              std::shared_ptr<Acts::InterpolatedMagneticField>>(

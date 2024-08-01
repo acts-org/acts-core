@@ -9,8 +9,12 @@
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
+#include "Acts/Detector/Detector.hpp"
+#include "Acts/Detector/DetectorVolume.hpp"
+#include "Acts/Detector/Portal.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
+#include "Acts/Surfaces/Surface.hpp"
 
 #include <vector>
 
@@ -22,18 +26,7 @@
 #include "detray/io/frontend/payloads.hpp"
 #include "detray/utils/consistency_checker.hpp"
 
-namespace Acts {
-
-class Surface;
-class SurfaceBounds;
-
-namespace Experimental {
-class Detector;
-class DetectorVolume;
-class Portal;
-}  //  namespace Experimental
-
-namespace DetrayConverter {
+namespace Acts::DetrayConverter {
 
 using DetrayDetector = detray::detector<detray::default_metadata>;
 
@@ -135,10 +128,9 @@ std::tuple<detector_t, vecmem::memory_resource&> convertDetector(
 
   // checks and print
   detray::detail::check_consistency(detrayDetector);
-  converterPrint(detrayDetector, names);
+  writeToJson(detrayDetector, names);
 
   return {std::move(detrayDetector), mr};
 }
 
-}  // namespace DetrayConverter
-}  // namespace Acts
+}  // namespace Acts::DetrayConverter

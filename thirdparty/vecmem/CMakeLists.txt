@@ -25,3 +25,6 @@ set( VECMEM_BUILD_BENCHMARKING FALSE CACHE BOOL
 
 # Now set up its build.
 FetchContent_MakeAvailable( VecMem )
+
+# Make the "VecMem language code" available for the whole project.
+include( "${VECMEM_LANGUAGE_DIR}/vecmem-check-language.cmake" )
