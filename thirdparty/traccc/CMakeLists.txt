@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.14)
 include(FetchContent)
 
 # Tell the user what's happening.
-message( STATUS "Building tracc as part of the Acts project" )
+message( STATUS "Building traccc as part of the Acts project" )
 
 set( TRACCC_VERSION "${_acts_traccc_version}")
 
@@ -34,11 +34,16 @@ set( TRACCC_SETUP_DETRAY OFF CACHE BOOL
     "Do not set up Detray as part of Traccc" ) 
 set( TRACCC_SETUP_ACTS OFF CACHE BOOL
     "Do not set up ACTS as part of Traccc" ) 
+set( TRACCC_SETUP_TBB OFF CACHE BOOL
+    "Do not set up TBB as part of Traccc" ) 
 
 set( TRACCC_BUILD_TESTING OFF CACHE BOOL
     "Turn off the build of the Traccc unit tests" ) 
 set( TRACCC_BUILD_EXAMPLES OFF CACHE BOOL
     "Turn off the build of the Traccc examples" ) 
+
+set ( TRACCC_BUILD_CUDA ${ACTS_BUILD_CUDA} CACHE BOOL
+    "Turn on/off the traccc cuda build")
 
 # Now set up its build.
 FetchContent_MakeAvailable( traccc )

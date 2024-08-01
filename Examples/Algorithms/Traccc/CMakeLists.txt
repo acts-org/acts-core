@@ -1,0 +1,3 @@
+add_subdirectory(Common)
+add_subdirectory(Host)
+add_subdirectory_if(Cuda ACTS_BUILD_CUDA)

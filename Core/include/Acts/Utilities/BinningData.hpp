@@ -243,10 +243,10 @@ class BinningData {
     // ordered after occurrence
     if (binvalue == BinningValue::binR || binvalue == BinningValue::binRPhi ||
         binvalue == BinningValue::binX || binvalue == BinningValue::binH) {
-      return lposition[0];
+      return static_cast<float>(lposition[0]);
     }
 
-    return lposition[1];
+    return static_cast<float>(lposition[1]);
   }
 
   /// Take the right float value
@@ -260,19 +260,19 @@ class BinningData {
     using VectorHelpers::phi;
     // ordered after occurrence
     if (binvalue == BinningValue::binR || binvalue == BinningValue::binH) {
-      return (perp(position));
+      return static_cast<float>(perp(position));
     }
     if (binvalue == BinningValue::binRPhi) {
-      return (perp(position) * phi(position));
+      return static_cast<float>(perp(position) * phi(position));
     }
     if (binvalue == BinningValue::binEta) {
-      return (eta(position));
+      return static_cast<float>(eta(position));
     }
     if (toUnderlying(binvalue) < 3) {
       return static_cast<float>(position[toUnderlying(binvalue)]);
     }
     // phi gauging
-    return phi(position);
+    return static_cast<float>(phi(position));
   }
 
   /// Get the center value of a bin
@@ -284,7 +284,7 @@ class BinningData {
     const std::vector<float>& bvals = boundaries();
     // take the center between bin boundaries
     float value =
-        bin < (bvals.size() - 1) ? 0.5 * (bvals[bin] + bvals[bin + 1]) : 0.;
+        bin < (bvals.size() - 1) ? 0.5f * (bvals[bin] + bvals[bin + 1]) : 0.f;
     return value;
   }
 
@@ -296,7 +296,7 @@ class BinningData {
   float width(std::size_t bin) const {
     const std::vector<float>& bvals = boundaries();
     // take the center between bin boundaries
-    float value = bin < (bvals.size() - 1) ? bvals[bin + 1] - bvals[bin] : 0.;
+    float value = bin < (bvals.size() - 1) ? bvals[bin + 1] - bvals[bin] : 0.f;
     return value;
   }
 
@@ -419,11 +419,11 @@ class BinningData {
   /// @return the center value of the bin is given
   float centerValue(std::size_t bin) const {
     if (zdim) {
-      return 0.5 * (min + max);
+      return 0.5f * (min + max);
     }
     float bmin = m_boundaries[bin];
     float bmax = bin < m_boundaries.size() ? m_boundaries[bin + 1] : max;
-    return 0.5 * (bmin + bmax);
+    return 0.5f * (bmin + bmax);
   }
 
  private:
