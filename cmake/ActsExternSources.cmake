@@ -15,11 +15,11 @@ set( ACTS_COVFIE_SOURCE
 mark_as_advanced( ACTS_COVFIE_SOURCE )
 
 set( ACTS_DETRAY_SOURCE
-   "URL;https://github.com/acts-project/detray/archive/refs/tags/v0.65.1.tar.gz;URL_MD5;fbf57a881565fa6019d79d13409b588f" CACHE STRING "Source to take DETRAY from")
+   "URL;https://github.com/acts-project/detray/archive/refs/tags/v0.70.0.tar.gz;URL_MD5;ce913a3dbd38d4453fb680b9667dfbaf" CACHE STRING "Source to take DETRAY from")
 mark_as_advanced( ACTS_DETRAY_SOURCE )
 
 set( ACTS_TRACCC_SOURCE
-   "URL;https://github.com/acts-project/traccc/archive/refs/tags/v0.10.0.tar.gz;URL_MD5;131399d26e3280c4d7f7ca2995efd256" CACHE STRING "Source to take TRACCC from")
+   "GIT_REPOSITORY;https://github.com/fredevb/traccc;GIT_TAG;77473d3e67afaa535705cdb9dfe5a4337452be2a" CACHE STRING "Source to take TRACCC from")
 mark_as_advanced( ACTS_TRACCC_SOURCE )
 
 set( ACTS_DFELIBS_SOURCE
@@ -31,14 +31,14 @@ set( ACTS_FRNN_SOURCE
 mark_as_advanced( ACTS_FRNN_SOURCE )
 
 set( ACTS_GEOMODEL_SOURCE
-   "GIT_REPOSITORY;https://gitlab.cern.ch/GeoModelDev/GeoModel;GIT_TAG;4.6.0;" CACHE STRING "Source to take GeoModel from")
+   "GIT_REPOSITORY;https://gitlab.cern.ch/GeoModelDev/GeoModel;GIT_TAG;4.6.0" CACHE STRING "Source to take GeoModel from")
 mark_as_advanced( ACTS_GEOMODEL_SOURCE )
 
 set( ACTS_NLOHMANNJSON_SOURCE
    "URL;https://github.com/nlohmann/json/archive/refs/tags/v3.10.5.tar.gz;URL_HASH;SHA1=8969f5ad1a422e01f040ff48dcae9c0e6ad0811d" CACHE STRING "Source to take nlohmann_json from")
 mark_as_advanced( ACTS_NLOHMANN_JSON_SOURCE )
 
-string(REPLACE "." "_" _acts_boost_recommended_version_ ${_acts_boost_recommended_version})
+string(REPLACE "." "_" _acts_boost_recommended_version_ "${_acts_boost_recommended_version}")
 set( ACTS_BOOST_SOURCE
    "URL;https://boostorg.jfrog.io/artifactory/main/release/${_acts_boost_recommended_version}/source/boost_${_acts_boost_recommended_version_}.tar.gz" CACHE STRING "Source to take boost from")
 mark_as_advanced( ACTS_BOOST_SOURCE )

@@ -777,6 +777,7 @@ def addDigitization(
     outputDirRoot: Optional[Union[Path, str]] = None,
     rnd: Optional[acts.examples.RandomNumbers] = None,
     doMerge: Optional[bool] = None,
+    mergeCommonCorner: Optional[bool] = None,
     minEnergyDeposit: Optional[float] = None,
     logLevel: Optional[acts.logging.Level] = None,
 ) -> acts.examples.Sequencer:
@@ -816,6 +817,7 @@ def addDigitization(
         outputMeasurementParticlesMap="measurement_particles_map",
         outputMeasurementSimHitsMap="measurement_simhits_map",
         doMerge=doMerge,
+        mergeCommonCorner=mergeCommonCorner,
     )
 
     # Not sure how to do this in our style

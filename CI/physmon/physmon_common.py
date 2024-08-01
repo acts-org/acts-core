@@ -19,7 +19,7 @@ PhysmonSetup = collections.namedtuple(
 )
 
 
-def makeSetup() -> PhysmonSetup:
+def makeSetup(useGeometricConfig=False) -> PhysmonSetup:
     u = acts.UnitConstants
     srcdir = Path(__file__).resolve().parent.parent.parent
 
@@ -38,8 +38,7 @@ def makeSetup() -> PhysmonSetup:
         detector=detector,
         trackingGeometry=trackingGeometry,
         decorators=decorators,
-        digiConfig=srcdir
-        / "thirdparty/OpenDataDetector/config/odd-digi-smearing-config.json",
+        digiConfig=srcdir / "Examples/Algorithms/Digitization/share/odd-digi-geometric-config.json" if useGeometricConfig else srcdir / "thirdparty/OpenDataDetector/config/odd-digi-smearing-config.json",
         geoSel=srcdir / "thirdparty/OpenDataDetector/config/odd-seeding-config.json",
         field=acts.ConstantBField(acts.Vector3(0, 0, 2 * u.T)),
         outdir=Path(args.outdir),

@@ -20,8 +20,8 @@ shopt -s extglob
 
 
 mode=${1:-all}
-if ! [[ $mode = @(all|kalman|gsf|gx2f|fullchains|vertexing|simulation) ]]; then
-    echo "Usage: $0 <all|kalman|gsf|gx2f|fullchains|vertexing|simulation> (outdir)"
+if ! [[ $mode = @(all|kalman|gsf|gx2f|fullchains|vertexing|simulation|traccc_host|traccc_cuda) ]]; then
+    echo "Usage: $0 <all|kalman|gsf|gx2f|fullchains|vertexing|simulation|traccc_host|traccc_cuda> (outdir)"
     exit 1
 fi
 
@@ -155,6 +155,12 @@ if [[ "$mode" == "all" || "$mode" == "vertexing" ]]; then
 fi
 if [[ "$mode" == "all" || "$mode" == "simulation" ]]; then
     run_physmon_gen "Simulation" "simulation"
+fi
+if [[ "$mode" == "all" || "$mode" == "traccc_host" ]]; then
+    run_physmon_gen "Traccc Host Chain" "traccc_chain_host"
+fi
+if [[ "$mode" == "traccc_cuda" ]]; then
+    run_physmon_gen "Traccc Cuda Chain" "traccc_chain_cuda"
 fi
 echo "::endgroup::"
 
@@ -432,6 +438,24 @@ if [[ "$mode" == "all" || "$mode" == "fullchains" ]]; then
       $refdir/vertices_ttbar_hist.root \
       "Vertices ttbar" \
       vertices_ttbar
+fi
+
+if [[ "$mode" == "all" || "$mode" == "traccc" ]]; then
+    run Examples/Scripts/generic_plotter.py \
+        $outdir/tracksummary_traccc.root \
+        tracksummary \
+        $outdir/tracksummary_traccc_hist.root \
+        --silent \
+        --config CI/physmon/traccc_config.yml
+    ec=$(($ec | $?))
+
+    rm $outdir/tracksummary_traccc.root
+
+    run_histcmp \
+        $outdir/tracksummary_traccc_hist.root \
+        $refdir/tracksummary_traccc_hist.root \
+        "Track Summary Traccc Chain" \
+        tracksummary_traccc
 fi
 
 if [[ "$mode" == "all" || "$mode" == "gsf" ]]; then

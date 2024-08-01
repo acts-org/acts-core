@@ -72,6 +72,7 @@ ActsExamples::DigitizationAlgorithm::DigitizationAlgorithm(
   m_simContainerReadHandle.initialize(m_cfg.inputSimHits);
   m_sourceLinkWriteHandle.initialize(m_cfg.outputSourceLinks);
   m_measurementWriteHandle.initialize(m_cfg.outputMeasurements);
+  m_cellsWriteHandle.initialize(m_cfg.outputCells);
   m_clusterWriteHandle.initialize(m_cfg.outputClusters);
   m_measurementParticlesMapWriteHandle.initialize(
       m_cfg.outputMeasurementParticlesMap);
@@ -153,6 +154,10 @@ ActsExamples::ProcessCode ActsExamples::DigitizationAlgorithm::execute(
 
   // Some statistics
   std::size_t skippedHits = 0;
+
+  // Some algorithms do the clusterization themselves such as the traccc chain.
+  // Thus we need to store the cell data from the simulation.
+  CellsMap cellsMap;
 
   ACTS_DEBUG("Starting loop over modules ...");
   for (const auto& simHitsGroup : groupByModule(simHits)) {
@@ -255,8 +260,18 @@ ActsExamples::ProcessCode ActsExamples::DigitizationAlgorithm::execute(
             moduleClusters.add(std::move(dParameters), simHitIdx);
           }
 
-          for (auto& [dParameters, simhits] :
-               moduleClusters.digitizedParameters()) {
+          auto digitizeParametersResult = moduleClusters.digitizedParameters();
+
+          // Store the data of the cells from the simulation.
+          std::vector<Cluster::Cell> cells;
+          for (auto& [dParameters, simhits] : digitizeParametersResult) {
+            for (auto cell : dParameters.cluster.channels) {
+              cells.push_back(std::move(cell));
+            }
+          }
+          cellsMap.insert({moduleGeoId, cells});
+
+          for (auto& [dParameters, simhits] : digitizeParametersResult) {
             // The measurement container is unordered and the index under which
             // the measurement will be stored is known before adding it.
             Index measurementIdx = measurements.size();
@@ -293,6 +308,7 @@ ActsExamples::ProcessCode ActsExamples::DigitizationAlgorithm::execute(
 
   m_sourceLinkWriteHandle(ctx, std::move(sourceLinks));
   m_measurementWriteHandle(ctx, std::move(measurements));
+  m_cellsWriteHandle(ctx, std::move(cellsMap));
   m_clusterWriteHandle(ctx, std::move(clusters));
   m_measurementParticlesMapWriteHandle(ctx, std::move(measurementParticlesMap));
   m_measurementSimHitsMapWriteHandle(ctx, std::move(measurementSimHitsMap));

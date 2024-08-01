@@ -389,6 +389,7 @@ jobs:
           -DACTS_FORCE_ASSERTIONS=ON
           -DACTS_BUILD_EXAMPLES_EDM4HEP=ON
           -DACTS_BUILD_PLUGIN_ACTSVG=ON
+          -DACTS_USE_SYSTEM_NLOHMANN_JSON=ON
       - name: Build
         run: cmake --build build
       - name: ccache stats

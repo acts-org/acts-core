@@ -70,12 +70,12 @@ void addDigitization(Context& ctx) {
     ACTS_PYTHON_MEMBER(surfaceByIdentifier);
     ACTS_PYTHON_MEMBER(randomNumbers);
     ACTS_PYTHON_MEMBER(doMerge);
+    ACTS_PYTHON_MEMBER(mergeCommonCorner);
     ACTS_PYTHON_MEMBER(minEnergyDeposit);
     ACTS_PYTHON_MEMBER(digitizationConfigs);
     ACTS_PYTHON_STRUCT_END();
 
     c.def_readonly("mergeNsigma", &Config::mergeNsigma);
-    c.def_readonly("mergeCommonCorner", &Config::mergeCommonCorner);
 
     patchKwargsConstructor(c);
 
