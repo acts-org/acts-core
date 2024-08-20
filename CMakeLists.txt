@@ -235,10 +235,6 @@ set(_acts_covfie_version 0.10.0)
 set(_acts_vecmem_version 1.4.0)
 set(_acts_algebraplugins_version 0.22.0)
 
-# recommended dependency version. if there is an opportunity to reach
-# this version we will try so.
-set(_acts_boost_recommended_version 1.78.0)
-
 # Include the sources for the external dependencies.
 include(ActsExternSources)
 
@@ -269,13 +265,6 @@ if(ACTS_SETUP_BOOST)
         )
     else()
         find_package(Boost ${_acts_boost_version} REQUIRED COMPONENTS)
-    endif()
-
-    if(Boost_VERSION VERSION_LESS _acts_boost_recommended_version)
-        message(
-            WARNING
-            "Found Boost ${Boost_VERSION} - recommended is at least ${_acts_boost_recommended_version}"
-        )
     endif()
 
     if(Boost_VERSION VERSION_EQUAL "1.85.0")
