@@ -215,7 +215,7 @@ endif()
 # dependency is included via `add_subdirectory(...)`.
 set(_acts_actsvg_version 0.4.40)
 set(_acts_autodiff_version 0.6)
-set(_acts_boost_version 1.71.0)
+set(_acts_boost_version 1.78.0)
 set(_acts_dd4hep_version 1.21)
 set(_acts_edm4hep_version 0.7)
 set(_acts_geomodel_version 6.3.0)
