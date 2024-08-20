@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+#include <boost/version.hpp>
+
 int main(void) {
   std::cout << "Using Acts version " << Acts::VersionMajor << "."
             << Acts::VersionMinor << "." << Acts::VersionPatch << " commit "

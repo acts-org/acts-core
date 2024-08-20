@@ -12,7 +12,6 @@
 #include <cstdint>
 
 #include <boost/container/flat_map.hpp>
-#include <boost/version.hpp>
 
 namespace ActsExamples {
 
@@ -50,15 +49,9 @@ inline boost::container::flat_multimap<value_t, Index> invertIndexMultimap(
 
   // adopting the unordered sequence will reestablish the correct order
   InverseMultimap inverse;
-#if BOOST_VERSION < 107800
-  for (const auto& i : unordered) {
-    inverse.insert(i);
-  }
-#else
   std::sort(unordered.begin(), unordered.end());
   inverse.insert(boost::container::ordered_range_t{}, unordered.begin(),
                  unordered.end());
-#endif
 
   return inverse;
 }
