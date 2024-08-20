@@ -1,5 +1,1 @@
-target_sources(
-  ActsCore
-  PRIVATE
-  Kernels.cu
-)
+target_sources(ActsCore PRIVATE Kernels.cu)

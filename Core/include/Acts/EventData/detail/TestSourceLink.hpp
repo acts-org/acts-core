@@ -1,6 +1,6 @@
 // This file is part of the Acts project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2020-2024 CERN for the benefit of the Acts project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,7 +17,6 @@
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Utilities/CalibrationContext.hpp"
-#include "Acts/Utilities/detail/Subspace.hpp"
 
 #include <algorithm>
 #include <array>
@@ -139,22 +138,20 @@ void testSourceLinkCalibratorReturn(
     trackState.allocateCalibrated(2);
     trackState.template calibrated<2>() = sl.parameters;
     trackState.template calibratedCovariance<2>() = sl.covariance;
-    trackState.setProjector(FixedSizeSubspace<BoundIndices::eBoundSize, 2>(
-                                std::array{sl.indices[0], sl.indices[1]})
-                                .projector<double>());
+    trackState.template setSubspaceIndices(
+        std::array{sl.indices[0], sl.indices[1]});
   } else if (sl.indices[0] != Acts::eBoundSize) {
     trackState.allocateCalibrated(1);
     trackState.template calibrated<1>() = sl.parameters.head<1>();
     trackState.template calibratedCovariance<1>() =
         sl.covariance.topLeftCorner<1, 1>();
-    trackState.setProjector(FixedSizeSubspace<BoundIndices::eBoundSize, 1>(
-                                std::array{sl.indices[0]})
-                                .projector<double>());
+    trackState.template setSubspaceIndices(std::array{sl.indices[0]});
   } else {
     throw std::runtime_error(
         "Tried to extract measurement from invalid TestSourceLink");
   }
 }
+
 /// Extract the measurement from a TestSourceLink.
 ///
 /// @param gctx Unused

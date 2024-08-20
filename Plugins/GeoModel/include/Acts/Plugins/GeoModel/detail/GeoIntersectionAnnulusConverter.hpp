@@ -17,9 +17,8 @@
 
 #include <GeoModelKernel/GeoShapeIntersection.h>
 
-namespace Acts {
+namespace Acts::detail {
 
-namespace detail {
 struct GeoIntersectionAnnulusConverter {
   /// @brief Convert a GeoBox to a detector element and surface
   ///
@@ -33,6 +32,5 @@ struct GeoIntersectionAnnulusConverter {
       const GeoFullPhysVol& geoFPV, const GeoShapeIntersection& geoIntersection,
       const Transform3& absTransform, bool sensitive) const;
 };
-}  // namespace detail
 
-}  // namespace Acts
+}  // namespace Acts::detail

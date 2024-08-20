@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(CsvMeasurementRoundTrip) {
   BOOST_REQUIRE(measRead.size() == measOriginal.size());
   for (const auto &[a, b] : Acts::zip(measRead, measOriginal)) {
     if (a.size() == b.size()) {
-      CHECK_CLOSE_REL(a.effectiveParameters(), b.effectiveParameters(), 1e-4);
+      CHECK_CLOSE_REL(a.parameters(), b.parameters(), 1e-4);
     }
   }
 

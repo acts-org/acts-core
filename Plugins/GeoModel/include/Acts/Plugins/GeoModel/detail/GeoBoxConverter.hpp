@@ -17,9 +17,8 @@
 
 #include <GeoModelKernel/GeoBox.h>
 
-namespace Acts {
+namespace Acts::detail {
 
-namespace detail {
 struct GeoBoxConverter {
   /// @brief Convert a GeoBox to a detector element and surface
   ///
@@ -34,6 +33,5 @@ struct GeoBoxConverter {
                                               const Transform3& absTransform,
                                               bool sensitive) const;
 };
-}  // namespace detail
 
-}  // namespace Acts
+}  // namespace Acts::detail

@@ -532,11 +532,11 @@ void ActsExamples::HoughTransformSeeder::addMeasurements(
         assert(measurement.contains(Acts::eBoundLoc1) &&
                "Measurement does not contain the required bound loc1");
 
-        auto boundLoc0 = measurement.subspace().indexOf(Acts::eBoundLoc0);
-        auto boundLoc1 = measurement.subspace().indexOf(Acts::eBoundLoc1);
+        auto boundLoc0 = measurement.indexOf(Acts::eBoundLoc0);
+        auto boundLoc1 = measurement.indexOf(Acts::eBoundLoc1);
 
-        Acts::Vector2 localPos{measurement.effectiveParameters()[boundLoc0],
-                               measurement.effectiveParameters()[boundLoc1]};
+        Acts::Vector2 localPos{measurement.parameters()[boundLoc0],
+                               measurement.parameters()[boundLoc1]};
 
         // transform local position to global coordinates
         Acts::Vector3 globalFakeMom(1, 1, 1);

@@ -10,6 +10,7 @@
 
 #include "Acts/EventData/MeasurementHelpers.hpp"
 #include "Acts/EventData/MultiTrajectory.hpp"
+#include "Acts/EventData/Types.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/TrackFitting/KalmanFitterError.hpp"
 #include "Acts/Utilities/Logger.hpp"
@@ -28,8 +29,7 @@ class GainMatrixUpdater {
     // This is used to build a covariance matrix view in the .cpp file
     const double* calibrated;
     const double* calibratedCovariance;
-    TrackStateTraits<MultiTrajectoryTraits::MeasurementSizeMax,
-                     false>::Projector projector;
+    BoundSubspaceIndices projector;
 
     TrackStateTraits<MultiTrajectoryTraits::MeasurementSizeMax,
                      false>::Parameters predicted;
@@ -80,7 +80,7 @@ class GainMatrixUpdater {
             // shape later
             trackState.effectiveCalibrated().data(),
             trackState.effectiveCalibratedCovariance().data(),
-            trackState.projector(),
+            trackState.boundSubspaceIndices(),
             trackState.predicted(),
             trackState.predictedCovariance(),
             trackState.filtered(),

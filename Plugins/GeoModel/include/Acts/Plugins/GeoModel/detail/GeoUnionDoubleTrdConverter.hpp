@@ -21,9 +21,8 @@
 class GeoFullPhysVol;
 class GeoTube;
 
-namespace Acts {
+namespace Acts::detail {
 
-namespace detail {
 struct GeoUnionDoubleTrdConverter {
   /// Merge trapezoids up to this gap
   double gapTolerance = 0.2;
@@ -31,16 +30,15 @@ struct GeoUnionDoubleTrdConverter {
   /// @brief Convert a GeoTube to a detector element and surface
   ///
   /// @param geoFPV The full physical volume to convert (contains shape)
-  /// @param geoTube The GeoTube shape to convert
+  /// @param geoUnion The GeoUnion shape to convert
   /// @param absTransform from the GeoPhysVol
   /// @param bool sensitive
   ///
   /// @return The detector element and surface
   Result<GeoModelSensitiveSurface> operator()(const GeoFullPhysVol& geoFPV,
-                                              const GeoShapeUnion& geoTube,
+                                              const GeoShapeUnion& geoUnion,
                                               const Transform3& absTransform,
                                               bool sensitive) const;
 };
-}  // namespace detail
 
-}  // namespace Acts
+}  // namespace Acts::detail

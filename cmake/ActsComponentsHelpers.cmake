@@ -29,16 +29,21 @@ set(_components)
 
 # add an optional directory and register its name as a component
 function(add_component_if path name)
-  file(RELATIVE_PATH _rel ${PROJECT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/${path}")
-  if(${ARGN})
-    list(APPEND _components "${name}")
-    # propagate variable outside function scope
-    set(_components "${_components}" PARENT_SCOPE)
-    message(STATUS "Enable component '${name}' in '${_rel}'")
-    add_subdirectory(${path})
-  else()
-    message(STATUS "Ignore component '${name}' in '${_rel}'")
-  endif()
+    file(
+        RELATIVE_PATH
+        _rel
+        ${PROJECT_SOURCE_DIR}
+        "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+    )
+    if(${ARGN})
+        list(APPEND _components "${name}")
+        # propagate variable outside function scope
+        set(_components "${_components}" PARENT_SCOPE)
+        message(STATUS "Enable component '${name}' in '${_rel}'")
+        add_subdirectory(${path})
+    else()
+        message(STATUS "Ignore component '${name}' in '${_rel}'")
+    endif()
 endfunction()
 
 # add a directory and register its name as a component
@@ -48,16 +53,21 @@ endmacro()
 
 # propagate the list of components to the parent scope
 macro(propagate_components_to_parent)
-  set(_components "${_components}" PARENT_SCOPE)
+    set(_components "${_components}" PARENT_SCOPE)
 endmacro()
 
 # add an optional subdirectory that is **not** registered as a component
 function(add_subdirectory_if path)
-  file(RELATIVE_PATH _rel ${PROJECT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}/${path}")
-  if(${ARGN})
-    message(STATUS "Enable subdirectory '${_rel}'")
-    add_subdirectory(${path})
-  else()
-    message(STATUS "Ignore subdirectory '${_rel}'")
-  endif()
+    file(
+        RELATIVE_PATH
+        _rel
+        ${PROJECT_SOURCE_DIR}
+        "${CMAKE_CURRENT_SOURCE_DIR}/${path}"
+    )
+    if(${ARGN})
+        message(STATUS "Enable subdirectory '${_rel}'")
+        add_subdirectory(${path})
+    else()
+        message(STATUS "Ignore subdirectory '${_rel}'")
+    endif()
 endfunction()

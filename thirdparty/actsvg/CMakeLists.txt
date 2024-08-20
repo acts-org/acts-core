@@ -7,12 +7,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # CMake include(s).
-include( FetchContent )
+include(FetchContent)
 
 # Tell the user what's happening.
-message( STATUS "Building actsvg as part of the ACTS project" )
+message(STATUS "Building actsvg as part of the ACTS project")
 
-FetchContent_Declare( actsvg ${ACTS_ACTSVG_SOURCE} )
+FetchContent_Declare(actsvg ${ACTS_ACTSVG_SOURCE})
 
 # Now set up its build.
-FetchContent_MakeAvailable( actsvg )
+FetchContent_MakeAvailable(actsvg)

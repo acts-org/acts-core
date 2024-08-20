@@ -13,17 +13,11 @@
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/Result.hpp"
 
-#include <memory>
-#include <tuple>
-
-#include <GeoModelKernel/GeoTube.h>
-
 class GeoFullPhysVol;
 class GeoTube;
 
-namespace Acts {
+namespace Acts::detail {
 
-namespace detail {
 struct GeoTubeConverter {
   Surface::SurfaceType targetShape = Surface::SurfaceType::Straw;
 
@@ -40,6 +34,5 @@ struct GeoTubeConverter {
                                               const Transform3& absTransform,
                                               bool sensitive) const;
 };
-}  // namespace detail
 
-}  // namespace Acts
+}  // namespace Acts::detail

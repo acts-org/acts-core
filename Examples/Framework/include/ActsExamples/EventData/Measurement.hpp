@@ -11,16 +11,20 @@
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/EventData/MeasurementHelpers.hpp"
 #include "Acts/EventData/SourceLink.hpp"
+#include "Acts/EventData/SubspaceHelpers.hpp"
+#include "Acts/EventData/Types.hpp"
 #include "Acts/EventData/detail/CalculateResiduals.hpp"
 #include "Acts/EventData/detail/ParameterTraits.hpp"
 #include "Acts/EventData/detail/PrintParameters.hpp"
-#include "Acts/Utilities/detail/Subspace.hpp"
 
 #include <array>
 #include <cstddef>
 #include <iosfwd>
+#include <type_traits>
 #include <variant>
 #include <vector>
+
+#include <boost/container/static_vector.hpp>
 
 namespace ActsExamples {
 
@@ -46,13 +50,15 @@ namespace ActsExamples {
 /// these complications altogether.
 template <typename indices_t>
 class VariableSizeMeasurement {
+ public:
   static constexpr std::size_t kFullSize =
       Acts::detail::kParametersSize<indices_t>;
 
-  using Subspace = Acts::detail::VariableSizeSubspace<kFullSize>;
-
- public:
   using Scalar = Acts::ActsScalar;
+
+  using SubspaceIndex = std::uint8_t;
+  using SubspaceIndices =
+      boost::container::static_vector<SubspaceIndex, kFullSize>;
 
   /// Vector type containing for measured parameter values.
   template <std::size_t dim>
@@ -90,24 +96,32 @@ class VariableSizeMeasurement {
   /// @tparam parameters_t Input parameters vector type
   /// @tparam covariance_t Input covariance matrix type
   /// @param source The link that connects to the underlying detector readout
-  /// @param indices Which parameters are measured
+  /// @param subspaceIndices Which parameters are measured
   /// @param params Measured parameters values
   /// @param cov Measured parameters covariance
   ///
   /// @note The indices must be ordered and must describe/match the content
   ///   of parameters and covariance.
-  template <std::size_t kSize, typename parameters_t, typename covariance_t>
-  VariableSizeMeasurement(Acts::SourceLink source,
-                          const std::array<indices_t, kSize>& indices,
-                          const Eigen::MatrixBase<parameters_t>& params,
-                          const Eigen::MatrixBase<covariance_t>& cov)
-      : m_source(std::move(source)), m_subspace(indices) {
+  template <typename other_indices_t, std::size_t kSize, typename parameters_t,
+            typename covariance_t>
+  VariableSizeMeasurement(
+      Acts::SourceLink source,
+      const std::array<other_indices_t, kSize>& subspaceIndices,
+      const Eigen::MatrixBase<parameters_t>& params,
+      const Eigen::MatrixBase<covariance_t>& cov)
+      : m_source(std::move(source)) {
     static_assert(kSize == parameters_t::RowsAtCompileTime,
                   "Parameter size mismatch");
     static_assert(kSize == covariance_t::RowsAtCompileTime,
                   "Covariance rows mismatch");
     static_assert(kSize == covariance_t::ColsAtCompileTime,
                   "Covariance cols mismatch");
+
+    m_subspaceIndices.resize(subspaceIndices.size());
+    std::transform(subspaceIndices.begin(), subspaceIndices.end(),
+                   m_subspaceIndices.begin(), [](auto index) {
+                     return static_cast<SubspaceIndex>(index);
+                   });
 
     parameters<kSize>() = params;
     covariance<kSize>() = cov;
@@ -120,47 +134,79 @@ class VariableSizeMeasurement {
   VariableSizeMeasurement& operator=(const VariableSizeMeasurement&) = default;
   VariableSizeMeasurement& operator=(VariableSizeMeasurement&&) = default;
 
-  constexpr std::size_t size() const { return m_subspace.size(); }
-
   /// Source link that connects to the underlying detector readout.
   const Acts::SourceLink& sourceLink() const { return m_source; }
 
-  const Subspace& subspace() const { return m_subspace; }
+  constexpr std::size_t size() const { return m_subspaceIndices.size(); }
 
   /// Check if a specific parameter is part of this measurement.
-  bool contains(indices_t i) const { return m_subspace.contains(i); }
+  bool contains(indices_t i) const {
+    return std::find(m_subspaceIndices.begin(), m_subspaceIndices.end(), i) !=
+           m_subspaceIndices.end();
+  }
+
+  std::size_t indexOf(indices_t i) const {
+    auto it = std::find(m_subspaceIndices.begin(), m_subspaceIndices.end(), i);
+    assert(it != m_subspaceIndices.end());
+    return std::distance(m_subspaceIndices.begin(), it);
+  }
+
+  /// The measurement indices
+  const SubspaceIndices& subspaceIndices() const { return m_subspaceIndices; }
+
+  template <std::size_t dim>
+  Acts::SubspaceIndices<dim> subspaceIndices() const {
+    assert(dim == size());
+    Acts::SubspaceIndices<dim> result;
+    std::copy(m_subspaceIndices.begin(), m_subspaceIndices.end(),
+              result.begin());
+    return result;
+  }
+
+  Acts::BoundSubspaceIndices boundSubsetIndices() const
+    requires(std::is_same_v<indices_t, Acts::BoundIndices>)
+  {
+    Acts::BoundSubspaceIndices result = Acts::kBoundSubspaceIndicesInvalid;
+    std::copy(m_subspaceIndices.begin(), m_subspaceIndices.end(),
+              result.begin());
+    return result;
+  }
 
   template <std::size_t dim>
   ConstParametersVectorMap<dim> parameters() const {
+    assert(dim == size());
     return ConstParametersVectorMap<dim>{m_params.data()};
   }
   template <std::size_t dim>
   ParametersVectorMap<dim> parameters() {
+    assert(dim == size());
     return ParametersVectorMap<dim>{m_params.data()};
   }
-  ConstEffectiveParametersVectorMap effectiveParameters() const {
+  ConstEffectiveParametersVectorMap parameters() const {
     return ConstEffectiveParametersVectorMap{m_params.data(),
                                              static_cast<Eigen::Index>(size())};
   }
-  EffectiveParametersVectorMap effectiveParameters() {
+  EffectiveParametersVectorMap parameters() {
     return EffectiveParametersVectorMap{m_params.data(),
                                         static_cast<Eigen::Index>(size())};
   }
 
   template <std::size_t dim>
   ConstCovarianceMatrixMap<dim> covariance() const {
+    assert(dim == size());
     return ConstCovarianceMatrixMap<dim>{m_cov.data()};
   }
   template <std::size_t dim>
   CovarianceMatrixMap<dim> covariance() {
+    assert(dim == size());
     return CovarianceMatrixMap<dim>{m_cov.data()};
   }
-  ConstEffectiveCovarianceMatrixMap effectiveCovariance() const {
+  ConstEffectiveCovarianceMatrixMap covariance() const {
     return ConstEffectiveCovarianceMatrixMap{m_cov.data(),
                                              static_cast<Eigen::Index>(size()),
                                              static_cast<Eigen::Index>(size())};
   }
-  EffectiveCovarianceMatrixMap effectiveCovariance() {
+  EffectiveCovarianceMatrixMap covariance() {
     return EffectiveCovarianceMatrixMap{m_cov.data(),
                                         static_cast<Eigen::Index>(size()),
                                         static_cast<Eigen::Index>(size())};
@@ -169,7 +215,7 @@ class VariableSizeMeasurement {
   FullParametersVector fullParameters() const {
     FullParametersVector result = FullParametersVector::Zero();
     for (std::size_t i = 0; i < size(); ++i) {
-      result[m_subspace[i]] = effectiveParameters()[i];
+      result[m_subspaceIndices[i]] = parameters()[i];
     }
     return result;
   }
@@ -178,7 +224,7 @@ class VariableSizeMeasurement {
     FullCovarianceMatrix result = FullCovarianceMatrix::Zero();
     for (std::size_t i = 0; i < size(); ++i) {
       for (std::size_t j = 0; j < size(); ++j) {
-        result(m_subspace[i], m_subspace[j]) = effectiveCovariance()(i, j);
+        result(m_subspaceIndices[i], m_subspaceIndices[j]) = covariance()(i, j);
       }
     }
     return result;
@@ -186,7 +232,7 @@ class VariableSizeMeasurement {
 
  private:
   Acts::SourceLink m_source;
-  Subspace m_subspace;
+  SubspaceIndices m_subspaceIndices;
   std::array<Scalar, kFullSize> m_params{};
   std::array<Scalar, kFullSize * kFullSize> m_cov{};
 };

@@ -988,7 +988,7 @@ class Navigator {
                      << targetIntersection.position().x() << ", "
                      << targetIntersection.position().y() << ", "
                      << targetIntersection.position().z() << ")");
-        /// get the target volume from the intersection
+        // get the target volume from the intersection
         auto tPosition = targetIntersection.position();
         state.navigation.targetVolume =
             m_cfg.trackingGeometry->lowestTrackingVolume(state.geoContext,

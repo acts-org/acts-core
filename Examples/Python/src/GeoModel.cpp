@@ -7,8 +7,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Must be on top to avoid some conflict between forward declare and typedef
+// Needed until https://gitlab.cern.ch/GeoModelDev/GeoModel/-/merge_requests/351
+// is deployed
 // clang-format off
-#include "GeoModelRead/ReadGeoModel.h"
+#include <GeoModelRead/ReadGeoModel.h>
 // clang-format on
 
 #include "Acts/Detector/CylindricalContainerBuilder.hpp"

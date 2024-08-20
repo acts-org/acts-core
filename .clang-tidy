@@ -21,7 +21,6 @@ Checks: '-*, \
   readability-named-parameter, \
   readability-operators-representation'
 HeaderFilterRegex: '.*(?<!nlohmann\/json)\.(hpp|cpp|ipp)$'
-AnalyzeTemporaryDtors: true
 CheckOptions:
   readability-operators-representation.BinaryOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='
   readability-operators-representation.OverloadedOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='

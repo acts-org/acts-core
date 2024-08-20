@@ -18,7 +18,6 @@
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 #include "Acts/TrackFitting/MbfSmoother.hpp"
 #include "Acts/Utilities/Result.hpp"
-#include "Acts/Utilities/detail/Subspace.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -41,9 +40,7 @@ BOOST_AUTO_TEST_SUITE(TrackFittingMbfSmoother)
 BOOST_AUTO_TEST_CASE(Smooth) {
   VectorMultiTrajectory traj;
 
-  auto projector = detail::FixedSizeSubspace<eBoundSize, 2>(
-                       std::array{eBoundLoc0, eBoundLoc1})
-                       .projector<double>();
+  std::array<BoundIndices, 2> projector{eBoundLoc0, eBoundLoc1};
 
   // Make dummy track parameter
   CovarianceMatrix covTrk;
@@ -58,10 +55,10 @@ BOOST_AUTO_TEST_CASE(Smooth) {
   ts.predicted() << 0.3, 0.5, 0.5 * M_PI, 0., 1 / 100., 0.;
   ts.predictedCovariance() = covTrk;
 
-  ts.setProjector(projector);
   ts.allocateCalibrated(2);
   ts.calibrated<2>() << 0.351, 0.473;
   ts.calibratedCovariance<2>() << 1e+8, 0., 0., 1e+8;
+  ts.setSubspaceIndices<2>(projector);
 
   ts.filtered() << 0.301, 0.503, 0.5 * M_PI, 0., 1 / 100., 0.;
   ts.filteredCovariance() = covTrk;
@@ -75,10 +72,10 @@ BOOST_AUTO_TEST_CASE(Smooth) {
   ts.predicted() << 0.2, 0.5, 0.5 * M_PI, 0., 1 / 100., 0.;
   ts.predictedCovariance() = covTrk;
 
-  ts.setProjector(projector);
   ts.allocateCalibrated(2);
   ts.calibrated<2>() << 0.351, 0.473;
   ts.calibratedCovariance<2>() << 1e+8, 0., 0., 1e+8;
+  ts.setSubspaceIndices<2>(projector);
 
   ts.filtered() << 0.27, 0.53, 0.5 * M_PI, 0., 1 / 100., 0.;
   ts.filteredCovariance() = covTrk;
@@ -92,10 +89,10 @@ BOOST_AUTO_TEST_CASE(Smooth) {
   ts.predicted() << 0.35, 0.49, 0.5 * M_PI, 0., 1 / 100., 0.;
   ts.predictedCovariance() = covTrk;
 
-  ts.setProjector(projector);
   ts.allocateCalibrated(2);
   ts.calibrated<2>() << 0.351, 0.473;
   ts.calibratedCovariance<2>() << 1e+8, 0., 0., 1e+8;
+  ts.setSubspaceIndices<2>(projector);
 
   ts.filtered() << 0.33, 0.43, 0.5 * M_PI, 0., 1 / 100., 0.;
   ts.filteredCovariance() = covTrk;

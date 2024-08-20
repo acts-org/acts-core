@@ -12,7 +12,7 @@
 #include "Acts/Detector/DetectorVolume.hpp"
 #include "Acts/Detector/Portal.hpp"
 #include "Acts/Navigation/PortalNavigation.hpp"
-#include "Acts/Plugins/Detray/DetrayConversionHelper.hpp"
+#include "Acts/Plugins/Json/DetrayJsonHelper.hpp"
 #include "Acts/Surfaces/CylinderBounds.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/Surfaces/DiscSurface.hpp"
@@ -69,8 +69,7 @@ detray::io::transform_payload Acts::DetrayConverter::convertTransform(
 detray::io::mask_payload Acts::DetrayConverter::convertMask(
     const Acts::SurfaceBounds& bounds, bool portal) {
   detray::io::mask_payload maskPayload;
-  auto [shape, boundaries] =
-      DetrayConversionHelper::maskFromBounds(bounds, portal);
+  auto [shape, boundaries] = DetrayJsonHelper::maskFromBounds(bounds, portal);
   maskPayload.shape = static_cast<io::mask_payload::mask_shape>(shape);
   maskPayload.boundaries = static_cast<std::vector<real_io>>(boundaries);
   // default maskPayload.volume_link

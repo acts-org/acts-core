@@ -83,7 +83,7 @@ class GeoModelBlueprintCreater {
   /// bounds TEXT, internals TEXT, binnings TEXT, materials TEXT)")
   ///
   struct TableEntry {
-    int id;
+    int id{};
     std::string type;
     std::string name;
     std::string bounds;
@@ -116,13 +116,13 @@ class GeoModelBlueprintCreater {
   /// @param gctx the geometry context
   /// @param entry the table entry
   /// @param tableEntryMap the map of table entries allows construction of children
-  /// @param externalExtent an extent given from external parameters (e.g. mother volume)
+  /// @param motherExtent an extent given from external parameters (e.g. mother volume)
   ///
   /// @return a newly created node
   std::unique_ptr<Experimental::Blueprint::Node> createNode(
       Cache& cache, const GeometryContext& gctx, const TableEntry& entry,
       const std::map<std::string, TableEntry>& tableEntryMap,
-      const Extent& externalExtent = Extent()) const;
+      const Extent& motherExtent = Extent()) const;
 
   /// Create an IInternalStructureBuilder
   ///
@@ -151,7 +151,7 @@ class GeoModelBlueprintCreater {
   std::tuple<VolumeBounds::BoundsType, Extent, std::vector<ActsScalar>, Vector3>
   parseBounds(const std::string& boundsEntry,
               const Extent& externalExtent = Extent(),
-              const Extent& internalExtant = Extent()) const;
+              const Extent& internalExtent = Extent()) const;
 
   /// Private access to the logger
   const Logger& logger() const { return *m_logger; }

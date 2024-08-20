@@ -255,7 +255,7 @@ Particle::Vector3 PhotonConversion::generateChildDirection(
   return direction;
 }
 
-std::array<Particle, 2> PhotonConversion::generateChildren(
+inline std::array<Particle, 2> PhotonConversion::generateChildren(
     const Particle& photon, Scalar childEnergy,
     const Particle::Vector3& childDirection) const {
   using namespace Acts::UnitLiterals;

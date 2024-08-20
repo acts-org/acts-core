@@ -87,7 +87,7 @@ struct SimulationActor {
   void operator()(propagator_state_t &state, stepper_t &stepper,
                   navigator_t &navigator, result_type &result,
                   const Acts::Logger &logger) const {
-    assert(generator and "The generator pointer must be valid");
+    assert(generator && "The generator pointer must be valid");
 
     // actors are called once more after the propagation terminated
     if (!result.isAlive) {

@@ -1,6 +1,4 @@
 target_sources(
-  ActsCore
-  PRIVATE
-    GreedyAmbiguityResolution.cpp
-    ScoreBasedAmbiguityResolution.cpp
+    ActsCore
+    PRIVATE GreedyAmbiguityResolution.cpp ScoreBasedAmbiguityResolution.cpp
 )

@@ -16,7 +16,12 @@
 #include "Acts/Surfaces/StrawSurface.hpp"
 #include "Acts/Surfaces/TrapezoidBounds.hpp"
 
+#include <GeoModelKernel/GeoShapeShift.h>
+#include <GeoModelKernel/GeoTube.h>
+
 namespace Acts::detail {
+
+namespace {
 
 template <typename ContainedShape, typename Converter, typename Surface,
           typename Bounds>
@@ -57,6 +62,8 @@ Result<GeoModelSensitiveSurface> impl(const GeoFullPhysVol& geoFPV,
   auto newSurface = newEl->surface().getSharedPtr();
   return std::make_tuple(newEl, newSurface);
 }
+
+}  // namespace
 
 Result<GeoModelSensitiveSurface> GeoShiftConverter::operator()(
     const GeoFullPhysVol& geoFPV, const GeoShapeShift& geoShift,

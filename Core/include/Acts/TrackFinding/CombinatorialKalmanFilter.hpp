@@ -255,9 +255,6 @@ struct CombinatorialKalmanFilterResult {
   /// Indices into `tracks` which mark active branches
   std::vector<TrackProxy> collectedTracks;
 
-  /// This is used internally to store candidate trackstates
-  std::shared_ptr<TrackStateContainerBackend> stateBuffer;
-
   /// Track state candidates buffer
   std::vector<TrackStateProxy> trackStateCandidates;
 
@@ -363,8 +360,6 @@ class CombinatorialKalmanFilter {
                         std::random_access_iterator_tag>) {
         trackStateCandidates.reserve(std::distance(slBegin, slEnd));
       }
-
-      bufferTrajectory.clear();
 
       // Calibrate all the source links on the surface since the selection has
       // to be done based on calibrated measurement
@@ -734,7 +729,7 @@ class CombinatorialKalmanFilter {
             Acts::Result<CkfTypes::BranchVector<TrackIndexType>>;
         TrackStatesResult tsRes = trackStateCandidateCreator(
             state.geoContext, *calibrationContextPtr, *surface, boundState,
-            slBegin, slEnd, prevTip, *result.stateBuffer,
+            slBegin, slEnd, prevTip, *result.trackStates,
             result.trackStateCandidates, *result.trackStates, logger());
         if (!tsRes.ok()) {
           ACTS_ERROR(
@@ -1290,7 +1285,6 @@ class CombinatorialKalmanFilter {
             .template get<CombinatorialKalmanFilterResult<track_container_t>>();
     r.tracks = &trackContainer;
     r.trackStates = &trackContainer.trackStateContainer();
-    r.stateBuffer = std::make_shared<TrackStateContainerBackend>();
 
     auto rootBranch = trackContainer.makeTrack();
     r.activeBranches.push_back(rootBranch);

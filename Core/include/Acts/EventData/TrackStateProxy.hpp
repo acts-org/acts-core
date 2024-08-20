@@ -1,6 +1,6 @@
 // This file is part of the Acts project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2023-2024 CERN for the benefit of the Acts project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,6 +11,7 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/EventData/SourceLink.hpp"
+#include "Acts/EventData/SubspaceHelpers.hpp"
 #include "Acts/EventData/TrackStatePropMask.hpp"
 #include "Acts/EventData/TrackStateProxyConcept.hpp"
 #include "Acts/EventData/TrackStateType.hpp"
@@ -21,6 +22,7 @@
 #include "Acts/Utilities/Helpers.hpp"
 
 #include <cstddef>
+#include <span>
 
 #include <Eigen/Core>
 
@@ -646,7 +648,8 @@ class TrackStateProxy {
   /// @param projector The projector in the form of a dense matrix
   /// @note @p projector is assumed to only have 0s or 1s as components.
   template <typename Derived>
-  void setProjector(const Eigen::MatrixBase<Derived>& projector)
+  [[deprecated("use setProjector(span) instead")]] void setProjector(
+      const Eigen::MatrixBase<Derived>& projector)
     requires(!ReadOnly)
   {
     constexpr int rows = Eigen::MatrixBase<Derived>::RowsAtCompileTime;
@@ -669,9 +672,8 @@ class TrackStateProxy {
     fullProjector.template topLeftCorner<rows, cols>() = projector;
 
     // convert to bitset before storing
-    auto projectorBitset = matrixToBitset(fullProjector);
-    component<ProjectorBitset, hashString("projector")>() =
-        projectorBitset.to_ullong();
+    ProjectorBitset projectorBitset = matrixToBitset(fullProjector).to_ulong();
+    setProjectorBitset(projectorBitset);
   }
 
   /// Directly get the projector bitset, a compressed form of a projection
@@ -680,9 +682,9 @@ class TrackStateProxy {
   ///       to another. Use the `projector` or `effectiveProjector` method if
   ///       you want to access the matrix.
   /// @return The projector bitset
-  ProjectorBitset projectorBitset() const {
-    assert(has<hashString("projector")>());
-    return component<ProjectorBitset, hashString("projector")>();
+  [[deprecated("use projector() instead")]] ProjectorBitset projectorBitset()
+      const {
+    return variableBoundSubspaceHelper().projectorBitset();
   }
 
   /// Set the projector bitset, a compressed form of a projection matrix
@@ -691,11 +693,70 @@ class TrackStateProxy {
   /// @note This is mainly to copy explicitly a projector from one state
   ///       to another. If you have a projection matrix, set it with
   ///       `setProjector`.
-  void setProjectorBitset(ProjectorBitset proj)
+  [[deprecated("use setProjector(span) instead")]] void setProjectorBitset(
+      ProjectorBitset proj)
+    requires(!ReadOnly)
+  {
+    BoundMatrix projMatrix = bitsetToMatrix<BoundMatrix>(proj);
+    BoundSubspaceIndices boundSubspace =
+        projectorToSubspaceIndices<eBoundSize>(projMatrix);
+    setBoundSubspaceIndices(boundSubspace);
+  }
+
+  BoundSubspaceIndices boundSubspaceIndices() const {
+    assert(has<hashString("projector")>());
+    return component<BoundSubspaceIndices, hashString("projector")>();
+  }
+
+  template <std::size_t measdim>
+  SubspaceIndices<measdim> subspaceIndices() const {
+    BoundSubspaceIndices boundSubspace = BoundSubspaceIndices();
+    SubspaceIndices<measdim> subspace;
+    std::copy(boundSubspace.begin(), boundSubspace.begin() + measdim,
+              subspace.begin());
+    return subspace;
+  }
+
+  void setBoundSubspaceIndices(BoundSubspaceIndices boundSubspace)
     requires(!ReadOnly)
   {
     assert(has<hashString("projector")>());
-    component<ProjectorBitset, hashString("projector")>() = proj;
+    component<BoundSubspaceIndices, hashString("projector")>() = boundSubspace;
+  }
+
+  template <std::size_t measdim>
+  void setSubspaceIndices(SubspaceIndices<measdim> proj)
+    requires(!ReadOnly)
+  {
+    assert(has<hashString("projector")>());
+    BoundSubspaceIndices& boundSubspace =
+        component<BoundSubspaceIndices, hashString("projector")>();
+    std::copy(proj.begin(), proj.end(), boundSubspace.begin());
+  }
+
+  template <std::size_t measdim, typename index_t>
+  void setSubspaceIndices(std::array<index_t, measdim> subspaceIndices)
+    requires(!ReadOnly)
+  {
+    assert(has<hashString("projector")>());
+    BoundSubspaceIndices& boundSubspace =
+        component<BoundSubspaceIndices, hashString("projector")>();
+    std::transform(subspaceIndices.begin(), subspaceIndices.end(),
+                   boundSubspace.begin(),
+                   [](index_t i) { return static_cast<std::uint8_t>(i); });
+  }
+
+  VariableBoundSubspaceHelper variableBoundSubspaceHelper() const {
+    BoundSubspaceIndices boundSubspace = boundSubspaceIndices();
+    std::span<std::uint8_t> validSubspaceIndices(
+        boundSubspace.begin(), boundSubspace.begin() + calibratedSize());
+    return VariableBoundSubspaceHelper(validSubspaceIndices);
+  }
+
+  template <std::size_t measdim>
+  FixedBoundSubspaceHelper<measdim> fixedBoundSubspaceHelper() const {
+    SubspaceIndices<measdim> subspace = subspaceIndices<measdim>();
+    return FixedBoundSubspaceHelper<measdim>(subspace);
   }
 
   /// Uncalibrated measurement in the form of a source link. Const version
@@ -960,7 +1021,7 @@ class TrackStateProxy {
               other.template calibratedCovariance<measdim>();
         });
 
-        setProjectorBitset(other.projectorBitset());
+        setBoundSubspaceIndices(other.boundSubspaceIndices());
       }
     } else {
       if (ACTS_CHECK_BIT(mask, PM::Predicted) &&
@@ -1007,7 +1068,7 @@ class TrackStateProxy {
               other.template calibratedCovariance<measdim>();
         });
 
-        setProjectorBitset(other.projectorBitset());
+        setBoundSubspaceIndices(other.boundSubspaceIndices());
       }
     }
 

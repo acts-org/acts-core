@@ -98,6 +98,7 @@ endif()
 
 if(PluginDetray IN_LIST Acts_COMPONENTS)
   find_dependency(vecmem @vecmem_VERSION@ CONFIG EXACT)
+  find_dependency(covfie @cofvie_VERSION@ CONFIG EXACT)
   find_dependency(algebra-plugins @algebra-plugins_VERSION@ CONFIG EXACT)
   find_dependency(detray @detray_VERSION@ CONFIG EXACT)
 endif()

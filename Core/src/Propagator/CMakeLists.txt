@@ -1,14 +1,14 @@
 target_sources(
-  ActsCore
-  PRIVATE
-    EigenStepperError.cpp
-    MultiStepperError.cpp
-    SympyStepper.cpp
-    PropagatorError.cpp
-    StraightLineStepper.cpp
-    detail/PointwiseMaterialInteraction.cpp
-    detail/CovarianceEngine.cpp
-    detail/JacobianEngine.cpp
-    detail/SympyCovarianceEngine.cpp
-    detail/SympyJacobianEngine.cpp
+    ActsCore
+    PRIVATE
+        EigenStepperError.cpp
+        MultiStepperError.cpp
+        SympyStepper.cpp
+        PropagatorError.cpp
+        StraightLineStepper.cpp
+        detail/PointwiseMaterialInteraction.cpp
+        detail/CovarianceEngine.cpp
+        detail/JacobianEngine.cpp
+        detail/SympyCovarianceEngine.cpp
+        detail/SympyJacobianEngine.cpp
 )

@@ -52,7 +52,7 @@ Result<GeoModelSensitiveSurface> GeoUnionDoubleTrdConverter::operator()(
   const auto shiftA = dynamic_cast<const GeoShapeShift *>(geoUnion.getOpA());
   const auto shiftB = dynamic_cast<const GeoShapeShift *>(geoUnion.getOpB());
 
-  if (!(shiftA && shiftB)) {
+  if (shiftA == nullptr || shiftB == nullptr) {
     return GeoModelConversionError::WrongShapeForConverter;
   }
 

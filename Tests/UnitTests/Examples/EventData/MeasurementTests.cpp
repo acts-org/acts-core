@@ -61,8 +61,8 @@ BOOST_DATA_TEST_CASE(VariableBoundOne, bd::make(boundIndices), index) {
       BOOST_CHECK(!meas.contains(i));
     }
   }
-  BOOST_CHECK_EQUAL(meas.effectiveParameters(), params);
-  BOOST_CHECK_EQUAL(meas.effectiveCovariance(), cov);
+  BOOST_CHECK_EQUAL(meas.parameters(), params);
+  BOOST_CHECK_EQUAL(meas.covariance(), cov);
   BOOST_CHECK_EQUAL(meas.sourceLink().template get<TestSourceLink>(),
                     sourceOrig);
 }
@@ -77,8 +77,8 @@ BOOST_AUTO_TEST_CASE(VariableBoundAll) {
   for (auto i : boundIndices) {
     BOOST_CHECK(meas.contains(i));
   }
-  BOOST_CHECK_EQUAL(meas.effectiveParameters(), params);
-  BOOST_CHECK_EQUAL(meas.effectiveCovariance(), cov);
+  BOOST_CHECK_EQUAL(meas.parameters(), params);
+  BOOST_CHECK_EQUAL(meas.covariance(), cov);
   BOOST_CHECK_EQUAL(meas.sourceLink().get<TestSourceLink>(), sourceOrig);
 }
 

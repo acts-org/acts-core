@@ -13,6 +13,7 @@
 
 #include <GeoModelKernel/GeoFullPhysVol.h>
 #include <GeoModelKernel/GeoLogVol.h>
+#include <GeoModelKernel/GeoTube.h>
 
 namespace Acts::detail {
 

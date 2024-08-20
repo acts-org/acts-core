@@ -8,7 +8,6 @@
 
 #include "Acts/Plugins/GeoModel/detail/GeoTubeConverter.hpp"
 
-#include "Acts/Definitions/Common.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/Plugins/GeoModel/GeoModelConversionError.hpp"
 #include "Acts/Surfaces/CylinderBounds.hpp"

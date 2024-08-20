@@ -22,8 +22,7 @@
 #include <GeoModelKernel/GeoMaterial.h>
 #include <GeoModelKernel/GeoTrap.h>
 #include <GeoModelKernel/GeoTrd.h>
-
-#include "GeoModelKernel/GeoVPhysVol.h"
+#include <GeoModelKernel/GeoVPhysVol.h>
 
 Acts::GeometryContext tContext;
 Acts::RotationMatrix3 idRotation = Acts::RotationMatrix3::Identity();

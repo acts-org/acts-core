@@ -6,7 +6,7 @@ variables:
 
 clang_tidy:
   stage: build
-  image: ghcr.io/acts-project/ubuntu2404:57
+  image: ghcr.io/acts-project/ubuntu2404:58
   tags:
     - large
   artifacts:
@@ -55,7 +55,7 @@ clang_tidy:
 
 build_exatrkx_cpu:
   stage: build
-  image: ghcr.io/acts-project/ubuntu2204_exatrkx:52
+  image: ghcr.io/acts-project/ubuntu2204_exatrkx:58
   tags:
     - large
 
@@ -86,7 +86,7 @@ build_exatrkx_cpu:
 
 build_exatrkx:
   stage: build
-  image: ghcr.io/acts-project/ubuntu2204_exatrkx:52
+  image: ghcr.io/acts-project/ubuntu2204_exatrkx:58
   tags:
     - large
 
@@ -126,7 +126,7 @@ build_exatrkx:
 #   stage: test
 #   needs:
 #     - build_exatrkx
-#   image: ghcr.io/acts-project/ubuntu2204_exatrkx:52
+#   image: ghcr.io/acts-project/ubuntu2204_exatrkx:58
 #   tags:
 #     - docker-gpu-nvidia
 #   script:
@@ -136,7 +136,7 @@ build_exatrkx:
 #   stage: test
 #   needs:
 #     - build_exatrkx
-#   image: ghcr.io/acts-project/ubuntu2204_exatrkx:52
+#   image: ghcr.io/acts-project/ubuntu2204_exatrkx:58
 #   tags:
 #     - docker-gpu-nvidia
 #   script:
@@ -152,7 +152,7 @@ build_exatrkx:
 
 build_linux_ubuntu:
   stage: build
-  image: ghcr.io/acts-project/ubuntu2404:57
+  image: ghcr.io/acts-project/ubuntu2404:58
 
   cache:
     key: ccache-${CI_JOB_NAME_SLUG}-${HEAD_REF}-${CCACHE_KEY_SUFFIX}
@@ -191,7 +191,7 @@ build_linux_ubuntu:
 
 linux_test_examples:
   stage: test
-  image: ghcr.io/acts-project/ubuntu2404:57
+  image: ghcr.io/acts-project/ubuntu2404:58
   needs: [build_linux_ubuntu]
 
   script:
@@ -212,7 +212,7 @@ linux_test_examples:
 
 linux_physmon:
   stage: test
-  image: ghcr.io/acts-project/ubuntu2404:57
+  image: ghcr.io/acts-project/ubuntu2404:58
   needs: [build_linux_ubuntu]
 
   artifacts:
@@ -299,13 +299,13 @@ linux_ubuntu_2404:
   <<: *linux_ubuntu_extra
   variables:
     CXXSTD: 20
-  image: ghcr.io/acts-project/ubuntu2404:57
+  image: ghcr.io/acts-project/ubuntu2404:58
 
 linux_ubuntu_2204_clang:
   <<: *linux_ubuntu_extra
   variables:
     CXXSTD: 20
-  image: ghcr.io/acts-project/ubuntu2204_clang:52
+  image: ghcr.io/acts-project/ubuntu2204_clang:58
 
 
 ######################
@@ -313,7 +313,7 @@ linux_ubuntu_2204_clang:
 ######################
 
 .lcg: &lcg_base_job
-  image: ghcr.io/acts-project/${OS}-base:57
+  image: ghcr.io/acts-project/${OS}-base:58
   stage: build
   tags:
     - cvmfs
@@ -364,6 +364,7 @@ linux_ubuntu_2204_clang:
       cmake -B build -S src
       --preset=gitlab-ci
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
+      -DACTS_BUILD_PLUGIN_GEOMODEL=OFF # GeoModel is not in LCG at this point
 
     - ccache -z
     - cmake --build build -- -j2
@@ -371,19 +372,6 @@ linux_ubuntu_2204_clang:
 
     - ctest --test-dir build -j$(nproc)
 
-
-lcg_104:
-  <<: *lcg_base_job
-
-  variables:
-    LCG_VERSION: "104"
-
-  parallel:
-    matrix:
-      - OS: [alma9]
-        COMPILER:
-          - gcc13
-          - clang16
 
 lcg_105:
   <<: *lcg_base_job

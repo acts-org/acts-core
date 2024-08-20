@@ -9,9 +9,9 @@
 #pragma once
 
 #include "Acts/Surfaces/SurfaceBounds.hpp"
-#include "Acts/Utilities/BinningData.hpp"
+#include "Acts/Utilities/BinningType.hpp"
 
-#include <string>
+#include <span>
 #include <tuple>
 
 #include <nlohmann/json.hpp>
@@ -40,56 +40,14 @@ namespace Acts::DetrayJsonHelper {
 /// @param portal is the flag for conversion into detray portal format
 ///
 /// @return type and value array in detray format
-inline static std::tuple<unsigned int, std::vector<ActsScalar>> maskFromBounds(
-    const Acts::SurfaceBounds& sBounds, bool portal = false) {
-  auto bType = sBounds.type();
-  auto bValues = sBounds.values();
-  // Return value
-  unsigned int type = 13u;
-  std::vector<double> boundaries = bValues;
-  // Special treatment for some portals
-  if (portal && bType == SurfaceBounds::BoundsType::eCylinder) {
-    boundaries = {bValues[0u], -bValues[1u], bValues[1u]};
-    type = 4u;
-  } else {
-    switch (bType) {
-      case SurfaceBounds::BoundsType::eAnnulus: {
-        type = 0u;
-      } break;
-      case SurfaceBounds::BoundsType::eRectangle: {
-        type = 5u;
-        // ACTS: eMinX = 0, eMinY = 1, eMaxX = 2, eMaxY = 3,
-        // detray: e_half_x, e_half_y
-        boundaries = {0.5 * (bValues[2] - bValues[0]),
-                      0.5 * (bValues[3] - bValues[1])};
-      } break;
-      case SurfaceBounds::BoundsType::eCylinder: {
-        boundaries = {bValues[0u], -bValues[1u], bValues[1u]};
-        type = 2u;
-      } break;
-      case SurfaceBounds::BoundsType::eTrapezoid: {
-        type = 7u;
-        boundaries = {bValues[0u], bValues[1u], bValues[2u],
-                      1 / (2 * bValues[2u])};
-      } break;
-      case SurfaceBounds::BoundsType::eDisc: {
-        boundaries = {bValues[0u], bValues[1u]};
-        type = 6u;
-      } break;
-      default:
-        break;
-    }
-  }
-  return std::tie(type, boundaries);
-}
+std::tuple<unsigned int, std::vector<ActsScalar>> maskFromBounds(
+    const Acts::SurfaceBounds& sBounds, bool portal = false);
 
 /// @brief add volume link
 ///
 /// @param jSurface [in,out] is the json object to be patched
 /// @param vLink is the volume link to be added
-inline static void addVolumeLink(nlohmann::json& jSurface, int vLink) {
-  jSurface["volume_link"] = vLink;
-}
+void addVolumeLink(nlohmann::json& jSurface, int vLink);
 
 /// Determine the acceleration link from a grid
 ///
@@ -104,34 +62,6 @@ inline static void addVolumeLink(nlohmann::json& jSurface, int vLink) {
 /// @param casts are the grid axes cast types
 ///
 /// @return the acceleration link idnetifier
-template <typename binning_values_t>
-inline static std::size_t accelerationLink(const binning_values_t& casts) {
-  // Default is `brute_force`
-  std::size_t accLink = 0u;
-  if (casts.size() == 2u) {
-    if (casts[0u] == BinningValue::binX && casts[1u] == BinningValue::binY) {
-      accLink = 1u;
-    } else if (casts[0u] == BinningValue::binR &&
-               casts[1u] == BinningValue::binPhi) {
-      accLink = 3u;
-    } else if (casts[0u] == BinningValue::binZ &&
-               casts[1u] == BinningValue::binPhi) {
-      accLink = 4u;
-    } else if (casts[0u] == BinningValue::binZ &&
-               casts[1u] == BinningValue::binR) {
-      accLink = 5u;
-    }
-  } else if (casts.size() == 3u) {
-    if (casts[0u] == BinningValue::binX && casts[1u] == BinningValue::binY &&
-        casts[2u] == BinningValue::binZ) {
-      accLink = 2u;
-    } else if (casts[0u] == BinningValue::binZ &&
-               casts[1u] == BinningValue::binPhi &&
-               casts[2u] == BinningValue::binR) {
-      accLink = 5u;
-    }
-  }
-  return accLink;
-}
+std::size_t accelerationLink(std::span<const BinningValue> casts);
 
 }  // namespace Acts::DetrayJsonHelper

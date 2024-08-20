@@ -17,8 +17,6 @@
 #include <GeoModelKernel/GeoShapeUnion.h>
 
 namespace {
-std::string recType(const GeoShapeShift &gshift);
-std::string recType(const GeoShapeUnion &gunion);
 std::string recType(const GeoShape &gshape);
 
 std::string recType(const GeoShapeShift &gshift) {
@@ -37,6 +35,7 @@ std::string recType(const GeoShape &gshape) {
   }
   return gshape.type();
 }
+
 }  // namespace
 
 Acts::GeoModelDetectorSurfaceFactory::GeoModelDetectorSurfaceFactory(
@@ -44,8 +43,8 @@ Acts::GeoModelDetectorSurfaceFactory::GeoModelDetectorSurfaceFactory(
     : m_cfg(cfg), m_logger(std::move(mlogger)) {}
 
 void Acts::GeoModelDetectorSurfaceFactory::construct(
-    Cache &cache, const GeometryContext &, const GeoModelTree &geoModelTree,
-    const Options &options) {
+    Cache &cache, const GeometryContext & /*gctx*/,
+    const GeoModelTree &geoModelTree, const Options &options) {
   if (geoModelTree.geoReader == nullptr) {
     throw std::invalid_argument("GeoModelTree has no GeoModelReader");
   }
