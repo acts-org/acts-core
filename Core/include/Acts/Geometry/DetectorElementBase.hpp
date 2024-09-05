@@ -10,6 +10,7 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
+#include "Acts/Surfaces/Surface.hpp"
 
 #include <memory>
 #include <vector>
@@ -31,8 +32,17 @@ class Surface;
 
 class DetectorElementBase {
  public:
-  DetectorElementBase() = default;
-  virtual ~DetectorElementBase() = default;
+  /// Construct a detector element. It will have ownership of the surface
+  explicit DetectorElementBase(std::shared_ptr<Surface>&& surface) : m_surface(surface) {
+    if (m_surface->m_associatedDetElement != nullptr) {
+      throw std::runtime_error("Detector Element already associated");
+    }
+
+    m_surface->m_associatedDetElement = this;
+  }
+  virtual ~DetectorElementBase() {
+    m_surface->m_associatedDetElement = nullptr;
+  }
 
   /// Return the transform for the Element proxy mechanism
   ///
@@ -40,14 +50,17 @@ class DetectorElementBase {
   virtual const Transform3& transform(const GeometryContext& gctx) const = 0;
 
   /// Return surface representation - const return pattern
-  virtual const Surface& surface() const = 0;
+  virtual const Surface& surface() const { return *m_surface; };
 
   /// Non-const return pattern
-  virtual Surface& surface() = 0;
+  virtual Surface& surface() { return *m_surface; };
 
   /// Returns the thickness of the module
   /// @return double that indicates the thickness of the module
   virtual double thickness() const = 0;
+
+ private:
+  std::shared_ptr<Surface> m_surface;
 };
 
 }  // namespace Acts

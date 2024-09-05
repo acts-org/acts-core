@@ -68,13 +68,6 @@ class CylinderSurface : public RegularSurface {
   CylinderSurface(const Transform3& transform,
                   std::shared_ptr<const CylinderBounds> cbounds);
 
-  /// Constructor from DetectorElementBase: Element proxy
-  ///
-  /// @param cbounds are the provided cylinder bounds (shared)
-  /// @param detelement is the linked detector element to this surface
-  CylinderSurface(std::shared_ptr<const CylinderBounds> cbounds,
-                  const DetectorElementBase& detelement);
-
   /// Copy constructor
   ///
   /// @param other is the source cylinder for the copy

@@ -67,13 +67,6 @@ class PlaneSurface : public RegularSurface {
   /// @param normal is thenormal vector of the plane surface
   PlaneSurface(const Vector3& center, const Vector3& normal);
 
-  /// Constructor from DetectorElementBase : Element proxy
-  ///
-  /// @param pbounds are the provided planar bounds
-  /// @param detelement is the linked detector element to this surface
-  PlaneSurface(std::shared_ptr<const PlanarBounds> pbounds,
-               const DetectorElementBase& detelement);
-
   /// Constructor for Planes with (optional) shared bounds object
   ///
   /// @param transform transform in 3D that positions this surface

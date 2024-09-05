@@ -87,13 +87,6 @@ class DiscSurface : public RegularSurface {
   DiscSurface(const Transform3& transform,
               std::shared_ptr<const DiscBounds> dbounds = nullptr);
 
-  /// Constructor from DetectorElementBase : Element proxy
-  ///
-  /// @param dbounds The disc bounds describing the surface coverage
-  /// @param detelement The detector element represented by this surface
-  DiscSurface(std::shared_ptr<const DiscBounds> dbounds,
-              const DetectorElementBase& detelement);
-
   /// Copy Constructor
   ///
   /// @param other The source surface for the copy
