@@ -1,6 +1,6 @@
 // This file is part of the Acts project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2023-2024 CERN for the benefit of the Acts project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,28 +23,38 @@ void fillGridIndices2D(
         rootVolumes,
     const std::array<std::vector<Acts::ActsScalar>, 2u>& boundaries,
     const std::array<Acts::BinningValue, 2u>& casts) {
+  if (casts != std::array<Acts::BinningValue, 2u>{Acts::BinningValue::binZ,
+                                                  Acts::BinningValue::binR}) {
+    return;
+  }
+
   // Brute force loop over all bins & all volumes
   for (const auto [ic0, c0] : Acts::enumerate(boundaries[0u])) {
-    if (ic0 > 0) {
-      Acts::ActsScalar v0 = 0.5 * (c0 + boundaries[0u][ic0 - 1]);
-      for (const auto [ic1, c1] : Acts::enumerate(boundaries[1u])) {
-        if (ic1 > 0) {
-          Acts::ActsScalar v1 = 0.5 * (c1 + boundaries[1u][ic1 - 1]);
-          if (casts ==
-              std::array<Acts::BinningValue, 2u>{Acts::BinningValue::binZ,
-                                                 Acts::BinningValue::binR}) {
-            Acts::Vector3 zrPosition{v1, 0., v0};
-            for (const auto [iv, v] : Acts::enumerate(rootVolumes)) {
-              if (v->inside(gctx, zrPosition)) {
-                typename Grid2D::point_t p{v0, v1};
-                grid.atPosition(p) = iv;
-              }
-            }
-          }
+    if (ic0 == 0) {
+      continue;
+    }
+
+    const Acts::ActsScalar v0 = 0.5 * (c0 + boundaries[0u][ic0 - 1]);
+
+    for (const auto [ic1, c1] : Acts::enumerate(boundaries[1u])) {
+      if (ic1 == 0) {
+        continue;
+      }
+
+      const Acts::ActsScalar v1 = 0.5 * (c1 + boundaries[1u][ic1 - 1]);
+      const Acts::Vector3 zrPosition{v1, 0., v0};
+
+      for (const auto [iv, v] : Acts::enumerate(rootVolumes)) {
+        if (!v->inside(gctx, zrPosition)) {
+          continue;
         }
+        typename Grid2D::point_t p{v0, v1};
+        grid.atPosition(p) = iv;
       }
     }
   }
+
+  return;
 }
 }  // namespace
 

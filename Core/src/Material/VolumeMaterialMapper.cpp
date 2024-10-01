@@ -196,34 +196,34 @@ void Acts::VolumeMaterialMapper::collectMaterialSurfaces(
   if (tVolume.confinedLayers() != nullptr) {
     for (auto& cLayer : tVolume.confinedLayers()->arrayObjects()) {
       // Take only layers that are not navigation layers
-      if (cLayer->layerType() != navigation) {
-        // Check the representing surface
-        if (cLayer->surfaceRepresentation().surfaceMaterial() != nullptr) {
-          mState.surfaceMaterial[cLayer->surfaceRepresentation().geometryId()] =
-              cLayer->surfaceRepresentation().surfaceMaterialSharedPtr();
-        }
-        // Get the approach surfaces if present
-        if (cLayer->approachDescriptor() != nullptr) {
-          for (auto& aSurface :
-               cLayer->approachDescriptor()->containedSurfaces()) {
-            if (aSurface != nullptr) {
-              if (aSurface->surfaceMaterial() != nullptr) {
-                mState.surfaceMaterial[aSurface->geometryId()] =
-                    aSurface->surfaceMaterialSharedPtr();
-              }
-            }
+      if (cLayer->layerType() == navigation) {
+        continue;
+      }
+
+      // Check the representing surface
+      if (cLayer->surfaceRepresentation().surfaceMaterial() != nullptr) {
+        mState.surfaceMaterial[cLayer->surfaceRepresentation().geometryId()] =
+            cLayer->surfaceRepresentation().surfaceMaterialSharedPtr();
+      }
+
+      // Get the approach surfaces if present
+      if (cLayer->approachDescriptor() != nullptr) {
+        for (auto& aSurface :
+             cLayer->approachDescriptor()->containedSurfaces()) {
+          if (aSurface != nullptr && aSurface->surfaceMaterial() != nullptr) {
+            mState.surfaceMaterial[aSurface->geometryId()] =
+                aSurface->surfaceMaterialSharedPtr();
           }
         }
-        // Get the sensitive surface is present
-        if (cLayer->surfaceArray() != nullptr) {
-          // Sensitive surface loop
-          for (auto& sSurface : cLayer->surfaceArray()->surfaces()) {
-            if (sSurface != nullptr) {
-              if (sSurface->surfaceMaterial() != nullptr) {
-                mState.surfaceMaterial[sSurface->geometryId()] =
-                    sSurface->surfaceMaterialSharedPtr();
-              }
-            }
+      }
+
+      // Get the sensitive surface is present
+      if (cLayer->surfaceArray() != nullptr) {
+        // Sensitive surface loop
+        for (auto& sSurface : cLayer->surfaceArray()->surfaces()) {
+          if (sSurface != nullptr && sSurface->surfaceMaterial() != nullptr) {
+            mState.surfaceMaterial[sSurface->geometryId()] =
+                sSurface->surfaceMaterialSharedPtr();
           }
         }
       }

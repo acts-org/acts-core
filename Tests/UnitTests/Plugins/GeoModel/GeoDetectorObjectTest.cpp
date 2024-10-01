@@ -50,6 +50,7 @@ void test(const Acts::GeoModelDetectorObjectFactory::Cache& cache,
 
     for (auto surface : surfaces) {
       const Acts::SurfaceBounds& sbounds = surface->bounds();
+
       // check straws
       if (surface->type() == Acts::Surface::SurfaceType::Straw) {
         const auto* lineBounds =
@@ -58,6 +59,7 @@ void test(const Acts::GeoModelDetectorObjectFactory::Cache& cache,
         BOOST_CHECK(geoDims.tube[2] ==
                     lineBounds->get(Acts::LineBounds::eHalfLengthZ));
       }
+
       // rectangle Surface check corner position without trf
       if (sbounds.type() == Acts::SurfaceBounds::eRectangle) {
         double csxmin = sbounds.values()[0];
@@ -69,16 +71,19 @@ void test(const Acts::GeoModelDetectorObjectFactory::Cache& cache,
         BOOST_CHECK(geoDims.boxI[0] == csxmax);
         BOOST_CHECK(geoDims.boxI[1] == csymax);
       }
-      // trap Surface without trf
-      if (sbounds.type() == Acts::SurfaceBounds::eTrapezoid) {
-        const auto* trapBounds =
-            dynamic_cast<const Acts::TrapezoidBounds*>(&sbounds);
-        std::vector<Acts::Vector2> trapVerts = trapBounds->vertices();
 
-        for (long unsigned int i = 0; i < trapVerts.size(); i++) {
-          BOOST_CHECK(trapVerts[i][0] == geoDims.trapVerts[i][0]);
-          BOOST_CHECK(trapVerts[i][1] == geoDims.trapVerts[i][1]);
-        }
+      if (sbounds.type() != Acts::SurfaceBounds::eTrapezoid) {
+        continue;
+      }
+
+      // trap Surface without trf
+      const auto* trapBounds =
+          dynamic_cast<const Acts::TrapezoidBounds*>(&sbounds);
+      std::vector<Acts::Vector2> trapVerts = trapBounds->vertices();
+
+      for (long unsigned int i = 0; i < trapVerts.size(); i++) {
+        BOOST_CHECK(trapVerts[i][0] == geoDims.trapVerts[i][0]);
+        BOOST_CHECK(trapVerts[i][1] == geoDims.trapVerts[i][1]);
       }
     }
   }

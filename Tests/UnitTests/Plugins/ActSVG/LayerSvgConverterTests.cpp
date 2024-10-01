@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(DiscLayerTrapezoidSvg) {
 }
 
 BOOST_AUTO_TEST_CASE(CylinderLayerSvg) {
-  // Planar style
+  //  Planar style
   Acts::Svg::Style cylinderLayerStyle;
   cylinderLayerStyle.fillColor = {51, 153, 255};
   cylinderLayerStyle.fillOpacity = 0.75;
@@ -198,17 +198,19 @@ BOOST_AUTO_TEST_CASE(CylinderLayerSvg) {
     std::size_t il = 0;
     for (const auto& layer : layers) {
       if (layer->surfaceArray() != nullptr) {
-        Acts::Svg::LayerConverter::Options lOptions;
-        lOptions.name = "cylinder_layer_" + std::to_string(il++);
-        lOptions.surfaceStyles = Acts::GeometryHierarchyMap<Acts::Svg::Style>(
-            {{geoID, cylinderLayerStyle}});
+        continue;
+      }
 
-        // Get the layer sheets
-        auto layerSheets =
-            Acts::Svg::LayerConverter::convert(tgContext, *layer, lOptions);
-        for (const auto& s : layerSheets) {
-          Acts::Svg::toFile({s}, s._id + ".svg");
-        }
+      Acts::Svg::LayerConverter::Options lOptions;
+      lOptions.name = "cylinder_layer_" + std::to_string(il++);
+      lOptions.surfaceStyles = Acts::GeometryHierarchyMap<Acts::Svg::Style>(
+          {{geoID, cylinderLayerStyle}});
+
+      // Get the layer sheets
+      auto layerSheets =
+          Acts::Svg::LayerConverter::convert(tgContext, *layer, lOptions);
+      for (const auto& s : layerSheets) {
+        Acts::Svg::toFile({s}, s._id + ".svg");
       }
     }
   }

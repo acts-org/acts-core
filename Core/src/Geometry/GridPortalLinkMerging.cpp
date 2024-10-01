@@ -513,43 +513,49 @@ void GridPortalLink::fillMergedGrid(const GridPortalLink& a,
     for (std::size_t i = 1; i <= nBinsB; ++i) {
       merged.atLocalBins({nBinsA + i}) = b.atLocalBins({i});
     }
-  } else {
-    if (a.direction() == direction) {
-      std::size_t nBinsA = locBinsA.at(0);
-      std::size_t nBinsB = locBinsB.at(0);
-      std::size_t nBinsCommon = locBinsB.at(1);
 
-      for (std::size_t i = 1; i <= nBinsA; ++i) {
-        for (std::size_t j = 1; j <= nBinsCommon; ++j) {
-          merged.atLocalBins({i, j}) = a.atLocalBins({i, j});
-        }
-      }
+    return;
+  }
 
-      for (std::size_t i = 1; i <= nBinsB; ++i) {
-        for (std::size_t j = 1; j <= nBinsCommon; ++j) {
-          std::size_t ti = i + nBinsA;
-          merged.atLocalBins({ti, j}) = b.atLocalBins({i, j});
-        }
-      }
-    } else {
-      std::size_t nBinsA = locBinsA.at(1);
-      std::size_t nBinsB = locBinsB.at(1);
-      std::size_t nBinsCommon = locBinsB.at(0);
+  if (a.direction() == direction) {
+    std::size_t nBinsA = locBinsA.at(0);
+    std::size_t nBinsB = locBinsB.at(0);
+    std::size_t nBinsCommon = locBinsB.at(1);
 
-      for (std::size_t i = 1; i <= nBinsCommon; ++i) {
-        for (std::size_t j = 1; j <= nBinsA; ++j) {
-          merged.atLocalBins({i, j}) = a.atLocalBins({i, j});
-        }
-      }
-
-      for (std::size_t i = 1; i <= nBinsCommon; ++i) {
-        for (std::size_t j = 1; j <= nBinsB; ++j) {
-          std::size_t tj = j + nBinsA;
-          merged.atLocalBins({i, tj}) = b.atLocalBins({i, j});
-        }
+    for (std::size_t i = 1; i <= nBinsA; ++i) {
+      for (std::size_t j = 1; j <= nBinsCommon; ++j) {
+        merged.atLocalBins({i, j}) = a.atLocalBins({i, j});
       }
     }
+
+    for (std::size_t i = 1; i <= nBinsB; ++i) {
+      for (std::size_t j = 1; j <= nBinsCommon; ++j) {
+        std::size_t ti = i + nBinsA;
+        merged.atLocalBins({ti, j}) = b.atLocalBins({i, j});
+      }
+    }
+
+    return;
   }
+
+  std::size_t nBinsA = locBinsA.at(1);
+  std::size_t nBinsB = locBinsB.at(1);
+  std::size_t nBinsCommon = locBinsB.at(0);
+
+  for (std::size_t i = 1; i <= nBinsCommon; ++i) {
+    for (std::size_t j = 1; j <= nBinsA; ++j) {
+      merged.atLocalBins({i, j}) = a.atLocalBins({i, j});
+    }
+  }
+
+  for (std::size_t i = 1; i <= nBinsCommon; ++i) {
+    for (std::size_t j = 1; j <= nBinsB; ++j) {
+      std::size_t tj = j + nBinsA;
+      merged.atLocalBins({i, tj}) = b.atLocalBins({i, j});
+    }
+  }
+
+  return;
 }
 
 std::unique_ptr<PortalLinkBase> GridPortalLink::merge(const GridPortalLink& a,

@@ -73,18 +73,26 @@ void Acts::TGeoParser::select(Acts::TGeoParser::State& state,
                 dynamic_cast<TGeoBBox*>(state.node->GetVolume()->GetShape());
             shape != nullptr) {
           // @TODO this should be replace by a proper TGeo to Acts::VolumeBounds
-          // and vertices converision which would make a more appropriate
-          // parsomg
-          double dx = options.unit * shape->GetDX();
-          double dy = options.unit * shape->GetDY();
-          double dz = options.unit * shape->GetDZ();
+          // and vertices conversion which would make a more appropriate parsing
+          const double dx = options.unit * shape->GetDX();
+          const double dy = options.unit * shape->GetDY();
+          const double dz = options.unit * shape->GetDZ();
           for (auto x : std::vector<double>{-dx, dx}) {
+            if (!accept) {
+              break;
+            }
             for (auto y : std::vector<double>{-dy, dy}) {
+              if (!accept) {
+                break;
+              }
               for (auto z : std::vector<double>{-dz, dz}) {
-                Vector3 edge = etrf * Vector3(x, y, z);
-                for (auto& check : options.parseRanges) {
-                  double val = VectorHelpers::cast(edge, check.first);
-                  if (val < check.second.first || val > check.second.second) {
+                if (!accept) {
+                  break;
+                }
+                const Vector3 edge = etrf * Vector3(x, y, z);
+                for (auto& [chkKey, chkValue] : options.parseRanges) {
+                  const double val = VectorHelpers::cast(edge, chkKey);
+                  if (val < chkValue.first || val > chkValue.second) {
                     accept = false;
                     break;
                   }
