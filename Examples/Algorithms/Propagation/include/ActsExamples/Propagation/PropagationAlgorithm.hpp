@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -13,6 +13,7 @@
 #include "Acts/Propagator/MaterialInteractor.hpp"
 #include "Acts/Propagator/detail/SteppingLogger.hpp"
 #include "Acts/Utilities/Logger.hpp"
+#include "ActsExamples/EventData/PropagationSummary.hpp"
 #include "ActsExamples/EventData/Track.hpp"
 #include "ActsExamples/Framework/DataHandle.hpp"
 #include "ActsExamples/Framework/IAlgorithm.hpp"
@@ -27,19 +28,6 @@ namespace ActsExamples {
 class PropagatorInterface;
 struct AlgorithmContext;
 
-/// Using some short hands for Recorded Material
-using RecordedMaterial = Acts::MaterialInteractor::result_type;
-
-/// And recorded material track
-/// - this is start:  position, start momentum
-///   and the Recorded material
-using RecordedMaterialTrack =
-    std::pair<std::pair<Acts::Vector3, Acts::Vector3>, Acts::RecordedMaterial>;
-
-/// Finally the output of the propagation test
-using PropagationOutput =
-    std::pair<std::vector<Acts::detail::Step>, Acts::RecordedMaterial>;
-
 /// @brief this test algorithm performs test propagation
 /// within the Acts::Propagator
 ///
@@ -48,6 +36,13 @@ using PropagationOutput =
 class PropagationAlgorithm : public IAlgorithm {
  public:
   struct Config {
+    /// Input track parameters
+    std::string inputTrackParameters = "InputTrackParameters";
+    /// The step collection to be stored
+    std::string outputSummaryCollection = "PropagationSummary";
+    /// The material collection to be stored
+    std::string outputMaterialCollection = "RecordedMaterialTracks";
+
     /// Instance of a propagator wrapper that performs the actual propagation
     std::shared_ptr<PropagatorInterface> propagatorImpl = nullptr;
     /// Switch the logger to sterile - for timing measurements
@@ -66,12 +61,6 @@ class PropagationAlgorithm : public IAlgorithm {
     double maxStepSize = 5 * Acts::UnitConstants::m;
     /// Switch covariance transport on
     bool covarianceTransport = false;
-    /// Input track parameters
-    std::string inputTrackParameters = "InputTrackParameters";
-    /// The step collection to be stored
-    std::string outputPropagationSteps = "PropagationSteps";
-    /// The material collection to be stored
-    std::string outputMaterialTracks = "RecordedMaterialTracks";
   };
 
   /// Constructor
@@ -94,8 +83,7 @@ class PropagationAlgorithm : public IAlgorithm {
   ReadDataHandle<TrackParametersContainer> m_inputTrackParameters{
       this, "InputTrackParameters"};
 
-  WriteDataHandle<std::vector<std::vector<Acts::detail::Step>>>
-      m_outputPropagationSteps{this, "OutputPropagationSteps"};
+  WriteDataHandle<PropagationSummaries> m_outputSummary{this, "OutputSummary"};
 
   WriteDataHandle<std::unordered_map<std::size_t, Acts::RecordedMaterialTrack>>
       m_outputMaterialTracks{this, "RecordedMaterial"};

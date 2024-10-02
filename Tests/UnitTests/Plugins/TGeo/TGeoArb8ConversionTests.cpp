@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -36,9 +36,9 @@ namespace Acts::Test {
 
 GeometryContext tgContext = GeometryContext();
 
-ViewConfig red({200, 0, 0});
-ViewConfig green({0, 200, 0});
-ViewConfig blue({0, 0, 200});
+ViewConfig red{.color = {200, 0, 0}};
+ViewConfig green{.color = {0, 200, 0}};
+ViewConfig blue{.color = {0, 0, 200}};
 
 /// @brief Unit test to convert a TGeoTrd2 into a Plane
 ///

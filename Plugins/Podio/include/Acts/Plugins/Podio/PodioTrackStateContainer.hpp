@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -19,10 +19,14 @@
 #include "Acts/Plugins/Podio/PodioUtil.hpp"
 #include "Acts/Utilities/HashedString.hpp"
 #include "Acts/Utilities/Helpers.hpp"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
 #include "ActsPodioEdm/BoundParametersCollection.h"
 #include "ActsPodioEdm/JacobianCollection.h"
 #include "ActsPodioEdm/TrackStateCollection.h"
 #include "ActsPodioEdm/TrackStateInfo.h"
+#pragma GCC diagnostic pop
 
 #include <any>
 #include <memory>
@@ -32,8 +36,6 @@
 
 #include <podio/CollectionBase.h>
 #include <podio/Frame.h>
-
-#include "podio/UserDataCollection.h"
 
 namespace Acts {
 
@@ -86,7 +88,7 @@ class PodioTrackStateContainerBase {
       case "typeFlags"_hash:
         return true;
       default:
-        return instance.m_dynamic.find(key) != instance.m_dynamic.end();
+        return instance.m_dynamic.contains(key);
     }
 
     return false;
@@ -122,10 +124,7 @@ class PodioTrackStateContainerBase {
       case "smoothed"_hash:
         return &data.ismoothed;
       case "projector"_hash:
-        // workaround podio not allowing `std::uint8_t` as a type
-        return reinterpret_cast<std::conditional_t<
-            EnsureConst, const BoundSubspaceIndices*, BoundSubspaceIndices*>>(
-            &data.projector);
+        return &data.projector;
       case "measdim"_hash:
         return &data.measdim;
       case "chi2"_hash:
@@ -167,7 +166,7 @@ class PodioTrackStateContainerBase {
       case "typeFlags"_hash:
         return true;
       default:
-        return instance.m_dynamic.find(key) != instance.m_dynamic.end();
+        return instance.m_dynamic.contains(key);
     }
   }
 
@@ -225,20 +224,17 @@ class ConstPodioTrackStateContainer final
     std::string paramsKey = "trackStateParameters" + s;
     std::string jacsKey = "trackStateJacobians" + s;
 
-    if (std::find(available.begin(), available.end(), trackStatesKey) ==
-        available.end()) {
+    if (!rangeContainsValue(available, trackStatesKey)) {
       throw std::runtime_error{"Track state collection '" + trackStatesKey +
                                "' not found in frame"};
     }
 
-    if (std::find(available.begin(), available.end(), paramsKey) ==
-        available.end()) {
+    if (!rangeContainsValue(available, paramsKey)) {
       throw std::runtime_error{"Track state parameters collection '" +
                                paramsKey + "' not found in frame"};
     }
 
-    if (std::find(available.begin(), available.end(), jacsKey) ==
-        available.end()) {
+    if (!rangeContainsValue(available, jacsKey)) {
       throw std::runtime_error{"Track state jacobian collection '" + jacsKey +
                                "' not found in frame"};
     }

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -57,8 +57,7 @@ BOOST_AUTO_TEST_CASE(InterpolatedMaterialMap_MaterialCell_test) {
   BOOST_CHECK_EQUAL(materialCell.isInside(Vector3(0., 0., 2.)), true);
 
   // Test the getter
-  CHECK_CLOSE_REL(materialCell.getMaterial({0.5, 0.5, 0.5}), Material(mat),
-                  1e-4);
+  BOOST_CHECK_EQUAL(materialCell.getMaterial({0.5, 0.5, 0.5}), Material(mat));
 }
 
 BOOST_AUTO_TEST_CASE(InterpolatedMaterialMap_MaterialMapper_test) {
@@ -77,12 +76,12 @@ BOOST_AUTO_TEST_CASE(InterpolatedMaterialMap_MaterialMapper_test) {
   MaterialMapper<grid_t> matMap(trafoGlobalToLocal, grid);
 
   // Test Material getter
-  CHECK_CLOSE_REL(matMap.getMaterial({0.5, 0.5, 0.5}), Material(mat), 1e-4);
+  BOOST_CHECK_EQUAL(matMap.getMaterial({0.5, 0.5, 0.5}), Material(mat));
 
   // Test the MaterialCell getter
   MaterialMapper<grid_t>::MaterialCell matCell =
       matMap.getMaterialCell({0.5, 0.5, 0.5});
-  CHECK_CLOSE_REL(matCell.getMaterial({0.5, 0.5, 0.5}), Material(mat), 1e-4);
+  BOOST_CHECK_EQUAL(matCell.getMaterial({0.5, 0.5, 0.5}), Material(mat));
 
   // Test the number of bins getter
   std::vector<std::size_t> nBins = matMap.getNBins();
@@ -137,7 +136,7 @@ BOOST_AUTO_TEST_CASE(InterpolatedMaterialMap_test) {
   InterpolatedMaterialMap ipolMatMap(std::move(matMap));
 
   // Test the material getter
-  CHECK_CLOSE_REL(ipolMatMap.material({0.5, 0.5, 0.5}), Material(mat), 1e-4);
+  BOOST_CHECK_EQUAL(ipolMatMap.material({0.5, 0.5, 0.5}), Material(mat));
 
   // Test the material getter with a cache
   // Build a material cell
@@ -151,8 +150,8 @@ BOOST_AUTO_TEST_CASE(InterpolatedMaterialMap_test) {
   InterpolatedMaterialMap<MaterialMapper<grid_t>>::Cache cache;
   cache.matCell = materialCell;
   cache.initialized = true;
-  CHECK_CLOSE_REL(ipolMatMap.getMaterial(Vector3(0.5, 0.5, 0.5), cache),
-                  Material(mat), 1e-4);
+  BOOST_CHECK_EQUAL(ipolMatMap.getMaterial(Vector3(0.5, 0.5, 0.5), cache),
+                    Material(mat));
 
   // Test the inside check
   BOOST_CHECK_EQUAL(ipolMatMap.isInside(Vector3(1., 1., 1.)), true);

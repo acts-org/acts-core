@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Io/Performance/CKFPerformanceWriter.hpp"
 
@@ -150,7 +150,6 @@ ProcessCode CKFPerformanceWriter::finalize() {
 ProcessCode CKFPerformanceWriter::writeT(const AlgorithmContext& ctx,
                                          const ConstTrackContainer& tracks) {
   // The number of majority particle hits and fitted track parameters
-  using RecoTrackInfo = std::pair<std::size_t, Acts::BoundTrackParameters>;
   using Acts::VectorHelpers::perp;
 
   // Read truth input collections

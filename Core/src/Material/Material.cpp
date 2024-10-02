@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Material/Material.hpp"
 
@@ -96,7 +96,7 @@ Acts::Material::ParametersVector Acts::Material::parameters() const {
 }
 
 std::ostream& Acts::operator<<(std::ostream& os, const Material& material) {
-  if (!material) {
+  if (!material.isValid()) {
     os << "vacuum";
   } else {
     os << "x0=" << material.X0();

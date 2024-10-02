@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -133,7 +133,7 @@ class VectorMultiTrajectoryBase {
         h("meas", isMeas, weight(meas_size));
         h("measCov", isMeas, weight(meas_cov_size));
         h("sourceLinks", isMeas, weight(sizeof(const SourceLink)));
-        h("projectors", isMeas, weight(sizeof(BoundSubspaceIndices)));
+        h("projectors", isMeas, weight(sizeof(SerializedSubspaceIndices)));
       }
 
       if (ts.hasJacobian() &&
@@ -157,8 +157,8 @@ class VectorMultiTrajectoryBase {
     double pathLength = 0;
     TrackStateType::raw_type typeFlags{};
 
-    IndexType iuncalibrated = kInvalid;
-    IndexType icalibratedsourcelink = kInvalid;
+    IndexType iUncalibrated = kInvalid;
+    IndexType iCalibratedSourceLink = kInvalid;
     IndexType measdim = kInvalid;
 
     TrackStatePropMask allocMask = TrackStatePropMask::None;
@@ -209,7 +209,7 @@ class VectorMultiTrajectoryBase {
       case "projector"_hash:
         return instance.m_index[istate].iprojector != kInvalid;
       case "uncalibratedSourceLink"_hash:
-        return instance.m_sourceLinks[instance.m_index[istate].iuncalibrated]
+        return instance.m_sourceLinks[instance.m_index[istate].iUncalibrated]
             .has_value();
       case "previous"_hash:
       case "next"_hash:
@@ -220,7 +220,7 @@ class VectorMultiTrajectoryBase {
       case "typeFlags"_hash:
         return true;
       default:
-        return instance.m_dynamic.find(key) != instance.m_dynamic.end();
+        return instance.m_dynamic.contains(key);
     }
   }
 
@@ -287,7 +287,7 @@ class VectorMultiTrajectoryBase {
       case "typeFlags"_hash:
         return true;
       default:
-        return instance.m_dynamic.find(key) != instance.m_dynamic.end();
+        return instance.m_dynamic.contains(key);
     }
   }
 
@@ -304,7 +304,7 @@ class VectorMultiTrajectoryBase {
   }
 
   SourceLink getUncalibratedSourceLink_impl(IndexType istate) const {
-    return m_sourceLinks[m_index[istate].iuncalibrated].value();
+    return m_sourceLinks[m_index[istate].iUncalibrated].value();
   }
 
   const Surface* referenceSurface_impl(IndexType istate) const {
@@ -327,7 +327,7 @@ class VectorMultiTrajectoryBase {
 
   std::vector<typename detail_lt::FixedSizeTypes<eBoundSize>::Covariance> m_jac;
   std::vector<std::optional<SourceLink>> m_sourceLinks;
-  std::vector<BoundSubspaceIndices> m_projectors;
+  std::vector<SerializedSubspaceIndices> m_projectors;
 
   // owning vector of shared pointers to surfaces
   //
@@ -485,7 +485,7 @@ class VectorMultiTrajectory final
 
   void setUncalibratedSourceLink_impl(IndexType istate,
                                       SourceLink&& sourceLink) {
-    m_sourceLinks[m_index[istate].iuncalibrated] = std::move(sourceLink);
+    m_sourceLinks[m_index[istate].iUncalibrated] = std::move(sourceLink);
   }
 
   void setReferenceSurface_impl(IndexType istate,

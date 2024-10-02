@@ -5,6 +5,7 @@ add_library(
     ActsTestsCommonHelpers
     SHARED
     Acts/Tests/CommonHelpers/DataDirectory.cpp
+    Acts/Tests/CommonHelpers/CylindricalDetector.cpp
 )
 target_compile_definitions(
     ActsTestsCommonHelpers

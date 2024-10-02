@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -72,12 +72,11 @@ namespace Acts {
 ///    - (4,5,3): 110 = 6
 ///    - (4,5,6): 111 = 7
 template <typename T, std::size_t N, class Point1, class Point2 = Point1,
-          class Point3 = Point2,
-          typename = std::enable_if_t<
-              detail::can_interpolate<Point1, Point2, Point3, T>::value>>
+          class Point3 = Point2>
 inline T interpolate(const Point1& position, const Point2& lowerCorner,
-                     const Point3& upperCorner,
-                     const std::array<T, N>& values) {
+                     const Point3& upperCorner, const std::array<T, N>& values)
+  requires(Concepts::interpolatable<T, Point1, Point2, Point3>)
+{
   return detail::interpolate_impl<T, Point1, Point2, Point3,
                                   detail::get_dimension<N>::value - 1,
                                   N>::run(position, lowerCorner, upperCorner,

@@ -80,6 +80,9 @@ if(PluginGeoModel IN_LIST Acts_COMPONENTS)
   find_dependency(GeoModelCore @GeoModel_VERSION@ CONFIG EXACT)
   find_dependency(GeoModelIO @GeoModel_VERSION@ CONFIG EXACT)
 endif()
+if (PluginHashing IN_LIST Acts_COMPONENTS)
+  find_dependency(Annoy @ANNOY_VERSION@ CONFIG EXACT)
+endif()
 
 # dependencies that we have built ourselves but cannot be
 # straightforwardly handed to cmake
@@ -100,7 +103,12 @@ if(PluginDetray IN_LIST Acts_COMPONENTS)
   find_dependency(vecmem @vecmem_VERSION@ CONFIG EXACT)
   find_dependency(covfie @cofvie_VERSION@ CONFIG EXACT)
   find_dependency(algebra-plugins @algebra-plugins_VERSION@ CONFIG EXACT)
+  find_dependency(actsvg @actsvg_VERSION@ CONFIG EXACT)
   find_dependency(detray @detray_VERSION@ CONFIG EXACT)
+endif()
+
+if (PluginCovfie IN_LIST Acts_COMPONENTS)
+  find_dependency(covfie @covfie_VERSION@ CONFIG EXACT)
 endif()
 
 # load **all** available components. we can not just include the requested

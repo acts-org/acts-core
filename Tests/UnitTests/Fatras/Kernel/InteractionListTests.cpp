@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -39,9 +39,9 @@ struct SterileContinuousProcess {
   }
 };
 
-static_assert(detail::IsContinuousProcess<SterileContinuousProcess>::value,
+static_assert(detail::ContinuousProcessConcept<SterileContinuousProcess>,
               "Is not a continuous process");
-static_assert(!detail::IsPointLikeProcess<SterileContinuousProcess>::value,
+static_assert(!detail::PointLikeProcessConcept<SterileContinuousProcess>,
               "Is a point-like process");
 
 /// Continuous process that DOES trigger a break
@@ -53,9 +53,9 @@ struct FatalContinuousProcess {
     return true;
   }
 };
-static_assert(detail::IsContinuousProcess<FatalContinuousProcess>::value,
+static_assert(detail::ContinuousProcessConcept<FatalContinuousProcess>,
               "Is not a continuous process");
-static_assert(!detail::IsPointLikeProcess<FatalContinuousProcess>::value,
+static_assert(!detail::PointLikeProcessConcept<FatalContinuousProcess>,
               "Is a point-like process");
 
 /// EM-like point-like process that triggers on X0 and keeps the particle alive.
@@ -77,9 +77,9 @@ struct X0PointLikeProcess {
   }
 };
 
-static_assert(!detail::IsContinuousProcess<X0PointLikeProcess>::value,
+static_assert(!detail::ContinuousProcessConcept<X0PointLikeProcess>,
               "Is a continuous process");
-static_assert(detail::IsPointLikeProcess<X0PointLikeProcess>::value,
+static_assert(detail::PointLikeProcessConcept<X0PointLikeProcess>,
               "Is not a point-like process");
 
 /// Nuclear-like point-like process that triggers on L0 and kills the particle.
@@ -103,9 +103,9 @@ struct L0PointLikeProcess {
   }
 };
 
-static_assert(!detail::IsContinuousProcess<L0PointLikeProcess>::value,
+static_assert(!detail::ContinuousProcessConcept<L0PointLikeProcess>,
               "Is a continuous process");
-static_assert(detail::IsPointLikeProcess<L0PointLikeProcess>::value,
+static_assert(detail::PointLikeProcessConcept<L0PointLikeProcess>,
               "Is not a point-like process");
 
 struct Fixture {

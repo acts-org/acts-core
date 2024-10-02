@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -59,8 +59,8 @@ class Ray {
   /// Helper to draw this ray using a given visualization helper.
   /// @param helper The visualization helper
   /// @param far_distance The "length" of the drawn line representing the ray
-  template <std::size_t D = DIM, std::enable_if_t<D == 3, int> = 0>
-  void draw(IVisualization3D& helper, value_type far_distance = 10) const;
+  void draw(IVisualization3D& helper, value_type far_distance = 10) const
+    requires(DIM == 3);
 
  private:
   VertexType m_origin;

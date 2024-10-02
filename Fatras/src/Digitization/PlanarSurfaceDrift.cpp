@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsFatras/Digitization/PlanarSurfaceDrift.hpp"
 
@@ -25,7 +25,7 @@ ActsFatras::PlanarSurfaceDrift::toReadout(const Acts::GeometryContext& gctx,
   Acts::Vector3 seg3Local = invTransform.linear() * dir;
   // Scale unit direction to the actual segment in the (depletion/drift) zone
   seg3Local *= thickness / std::cos(Acts::VectorHelpers::theta(seg3Local));
-  // Calulate local entry/exit before drift
+  // Calculate local entry/exit before drift
   Acts::Vector2 entry = pos2Local - 0.5 * seg3Local.segment<2>(0);
   Acts::Vector2 exit = pos2Local + 0.5 * seg3Local.segment<2>(0);
   // Actually apply a drift

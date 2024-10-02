@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -69,7 +69,7 @@ class TrackFindingAlgorithm final : public IAlgorithm {
     virtual ~TrackFinderFunction() = default;
     virtual TrackFinderResult operator()(const TrackParameters&,
                                          const TrackFinderOptions&,
-                                         TrackContainer&) const = 0;
+                                         TrackContainer&, TrackProxy) const = 0;
   };
 
   /// Create the track finder function implementation.
@@ -126,6 +126,8 @@ class TrackFindingAlgorithm final : public IAlgorithm {
     bool stayOnSeed = false;
     /// Compute shared hit information
     bool computeSharedHits = false;
+    /// Whether to trim the tracks
+    bool trimTracks = true;
 
     // Pixel and strip volume ids to be used for maxPixel/StripHoles cuts
     std::set<Acts::GeometryIdentifier::Value> pixelVolumes;
@@ -154,7 +156,7 @@ class TrackFindingAlgorithm final : public IAlgorithm {
 
  private:
   template <typename source_link_accessor_container_t>
-  void computeSharedHits(const source_link_accessor_container_t& sourcelinks,
+  void computeSharedHits(const source_link_accessor_container_t& sourceLinks,
                          TrackContainer& tracks) const;
 
   ActsExamples::ProcessCode finalize() override;

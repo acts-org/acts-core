@@ -1,16 +1,18 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Material/IntersectionMaterialAssigner.hpp"
 
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/StringHelpers.hpp"
+
+#include <algorithm>
 
 namespace {
 
@@ -35,8 +37,8 @@ std::vector<Acts::SurfaceIntersection> forwardOrderedIntersections(
     }
   }
   // Sort the intersection along the pathlength
-  std::sort(sIntersections.begin(), sIntersections.end(),
-            &Acts::SurfaceIntersection::pathLengthOrder);
+  std::ranges::sort(sIntersections,
+                    &Acts::SurfaceIntersection::pathLengthOrder);
   return sIntersections;
 }
 

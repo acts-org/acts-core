@@ -1,11 +1,12 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+#include <algorithm>
 #include <array>
 #include <vector>
 
@@ -273,7 +274,7 @@ void labelClusters(CellCollection& cells, Connect connect) {
   internal::DisjointSets ds{};
 
   // Sort cells by position to enable in-order scan
-  std::sort(cells.begin(), cells.end(), internal::Compare<Cell, GridDim>());
+  std::ranges::sort(cells, internal::Compare<Cell, GridDim>());
 
   // First pass: Allocate labels and record equivalences
   for (auto it = cells.begin(); it != cells.end(); ++it) {
@@ -308,9 +309,7 @@ ClusterCollection mergeClusters(CellCollection& cells) {
   if constexpr (GridDim > 1) {
     // Sort the cells by their cluster label, only needed if more than
     // one spatial dimension
-    std::sort(cells.begin(), cells.end(), [](Cell& lhs, Cell& rhs) {
-      return getCellLabel(lhs) < getCellLabel(rhs);
-    });
+    std::ranges::sort(cells, {}, [](Cell& c) { return getCellLabel(c); });
   }
 
   return internal::mergeClustersImpl<CellCollection, ClusterCollection>(cells);

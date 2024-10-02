@@ -1,17 +1,16 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
 #include <array>
 
-namespace Acts::detail {
-
+namespace Acts::Concepts {
 /// @brief check types for requirements needed by interpolation
 ///
 /// @tparam Point1 type for specifying geometric positions
@@ -29,8 +28,7 @@ namespace Acts::detail {
 ///
 /// is @c true if all @c Point types and @c Value fulfill the type
 /// requirements for being used in the interpolation function, otherwise it is
-/// @c false. This expression can be employed in @c std::enable_if_t to use
-/// SFINAE patterns to enable/disable (member) functions.
+/// @c false.
 template <typename Point1, typename Point2, typename Point3, typename Value>
 struct can_interpolate {
   template <typename C>
@@ -48,15 +46,24 @@ struct can_interpolate {
   static std::false_type point_type_test(...);
 
   static const bool value =
-      std::is_same<std::true_type,
-                   decltype(value_type_test<Value>(nullptr))>::value &&
-      std::is_same<std::true_type,
-                   decltype(point_type_test<Point1>(nullptr))>::value &&
-      std::is_same<std::true_type,
-                   decltype(point_type_test<Point2>(nullptr))>::value &&
-      std::is_same<std::true_type,
-                   decltype(point_type_test<Point3>(nullptr))>::value;
+      std::is_same_v<std::true_type,
+                     decltype(value_type_test<Value>(nullptr))> &&
+      std::is_same_v<std::true_type,
+                     decltype(point_type_test<Point1>(nullptr))> &&
+      std::is_same_v<std::true_type,
+                     decltype(point_type_test<Point2>(nullptr))> &&
+      std::is_same_v<std::true_type,
+                     decltype(point_type_test<Point3>(nullptr))>;
 };
+
+/// @brief concept equivalent to `can_interpolate`
+/// @todo this is a concept based on a traditional type trait, meaning it won't
+/// have nice errors; should be rewritten as a real concept!
+template <typename T, typename P1, typename P2, typename P3>
+concept interpolatable = can_interpolate<P1, P2, P3, T>::value;
+}  // namespace Acts::Concepts
+
+namespace Acts::detail {
 
 /// @brief determine number of dimension from power of 2
 ///

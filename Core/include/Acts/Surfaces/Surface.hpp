@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -25,6 +25,7 @@
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 #include "Acts/Utilities/Result.hpp"
+#include "Acts/Visualization/ViewConfig.hpp"
 
 #include <array>
 #include <cstddef>
@@ -164,11 +165,6 @@ class Surface : public virtual GeometryObject,
   /// @param other source surface for the comparison
   virtual bool operator==(const Surface& other) const;
 
-  /// Comparison (non-equality) operator
-  ///
-  /// @param sf Source surface for the comparison
-  virtual bool operator!=(const Surface& sf) const;
-
  public:
   /// Return method for the Surface type to avoid dynamic casts
   virtual SurfaceType type() const = 0;
@@ -252,12 +248,14 @@ class Surface : public virtual GeometryObject,
   /// @param position global position to be evaludated
   /// @param direction global momentum direction (required for line-type surfaces)
   /// @param boundaryTolerance BoundaryTolerance directive for this onSurface check
+  /// @param tolerance optional tolerance within which a point is considered on surface
   ///
   /// @return boolean indication if operation was successful
-  bool isOnSurface(const GeometryContext& gctx, const Vector3& position,
-                   const Vector3& direction,
-                   const BoundaryTolerance& boundaryTolerance =
-                       BoundaryTolerance::None()) const;
+  bool isOnSurface(
+      const GeometryContext& gctx, const Vector3& position,
+      const Vector3& direction,
+      const BoundaryTolerance& boundaryTolerance = BoundaryTolerance::None(),
+      double tolerance = s_onSurfaceTolerance) const;
 
   /// The insideBounds method for local positions
   ///
@@ -481,6 +479,9 @@ class Surface : public virtual GeometryObject,
   /// cartesian coordinates
   virtual ActsMatrix<2, 3> localCartesianToBoundLocalDerivative(
       const GeometryContext& gctx, const Vector3& position) const = 0;
+
+  void visualize(IVisualization3D& helper, const GeometryContext& gctx,
+                 const ViewConfig& viewConfig = {}) const;
 
  protected:
   /// Output Method for std::ostream, to be overloaded by child classes

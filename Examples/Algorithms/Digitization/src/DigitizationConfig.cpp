@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Digitization/DigitizationConfig.hpp"
 
@@ -66,7 +66,7 @@ std::vector<Acts::ActsScalar> ActsExamples::GeometricConfig::variances(
   std::vector<Acts::ActsScalar> rVariances;
   for (const auto& bIndex : indices) {
     Acts::ActsScalar var = 0.;
-    if (varianceMap.find(bIndex) != varianceMap.end()) {
+    if (varianceMap.contains(bIndex)) {
       // Try to find the variance for this cluster size
       std::size_t lsize =
           std::min(csizes[bIndex], varianceMap.at(bIndex).size());

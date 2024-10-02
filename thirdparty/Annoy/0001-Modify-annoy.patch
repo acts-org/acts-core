@@ -1,0 +1,306 @@
+From 16f4711d53903e2541dd518122d52e11e8569908 Mon Sep 17 00:00:00 2001
+From: Jeremy Couthures <jeremy.couthures@lapp.in2p3.fr>
+Date: Wed, 10 Jul 2024 10:31:31 +0200
+Subject: [PATCH] Add AngularEuclidean metric, get_seed function and
+ optimizations
+
+---
+ src/annoylib.h | 118 ++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 93 insertions(+), 25 deletions(-)
+
+diff --git a/src/annoylib.h b/src/annoylib.h
+index 492d9ca..5c83601 100644
+--- a/src/annoylib.h
++++ b/src/annoylib.h
+@@ -12,6 +12,10 @@
+ // License for the specific language governing permissions and limitations under
+ // the License.
+ 
++/*
++ * Note: This file has been modified to meet the needs of the ACTS projects and
++ * differs from the original provided by Spotify AB.
++ */
+ 
+ #ifndef ANNOY_ANNOYLIB_H
+ #define ANNOY_ANNOYLIB_H
+@@ -128,7 +132,11 @@ inline void set_error_from_errno(char **error, const char* msg) {
+   annoylib_showUpdate("%s: %s (%d)\n", msg, strerror(errno), errno);
+   if (error) {
+     *error = (char *)malloc(256);  // TODO: win doesn't support snprintf
+-    snprintf(*error, 255, "%s: %s (%d)", msg, strerror(errno), errno);
++#if defined(_MSC_VER) || defined(__MINGW32__)
++    sprintf(*error, "%s: %s (%d)", msg, strerror(errno), errno);
++#else
++    snprintf(*error, 256, "%s: %s (%d)", msg, strerror(errno), errno);
++#endif
+   }
+ }
+ 
+@@ -201,6 +209,35 @@ inline T euclidean_distance(const T* x, const T* y, int f) {
+   return d;
+ }
+ 
++template <typename T>
++inline T angular_euclidean_distance(const T *x, const T *y, int f) {
++  /// First dimension is an angle, so we need to be careful about periodicity.
++  /// Here we assume that the angle is in radians, and that the difference is
++  /// less than 2pi. Other dimensions are regular Euclidean.
++
++  /// Angular part
++  T tmp = std::fabs(*x - *y);
++
++  /// If the difference is larger than pi, then we can get a smaller distance by
++  /// going the other way around the circle.
++  if (tmp > M_PI) {
++    tmp = 2 * M_PI - tmp;
++  }
++
++  T d = tmp * tmp;
++  ++x;
++  ++y;
++
++  /// Euclidean part
++  for (int i = 1; i < f; ++i) {
++    tmp = *x - *y;
++    d += tmp * tmp;
++    ++x;
++    ++y;
++  }
++  return d;
++}
++
+ #ifdef ANNOYLIB_USE_AVX
+ // Horizontal single sum of 256bit vector.
+ inline float hsum256_ps_avx(__m256 v) {
+@@ -412,13 +449,13 @@ inline void two_means(const vector<Node*>& nodes, int f, Random& random, bool co
+ 
+ struct Base {
+   template<typename T, typename S, typename Node>
+-  static inline void preprocess(void* nodes, size_t _s, const S node_count, const int f) {
++  static inline void preprocess(void* /*unused*/, size_t /*unused*/, const S /*unused*/, const int /*unused*/) {
+     // Override this in specific metric structs below if you need to do any pre-processing
+     // on the entire set of nodes passed into this index.
+   }
+ 
+   template<typename Node>
+-  static inline void zero_value(Node* dest) {
++  static inline void zero_value(Node* /*unused*/) {
+     // Initialize any fields that require sane defaults within this node.
+   }
+ 
+@@ -547,7 +584,7 @@ struct DotProduct : Angular {
+   }
+ 
+   template<typename S, typename T>
+-  static inline void init_node(Node<S, T>* n, int f) {
++  static inline void init_node(Node<S, T>* /*unused*/, int /*unused*/) {
+   }
+ 
+   template<typename T, typename Node>
+@@ -671,17 +708,17 @@ struct Hamming : Base {
+     return dist;
+   }
+   template<typename S, typename T>
+-  static inline bool margin(const Node<S, T>* n, const T* y, int f) {
++  static inline bool margin(const Node<S, T>* n, const T* y, int /*unused*/) {
+     static const size_t n_bits = sizeof(T) * 8;
+     T chunk = n->v[0] / n_bits;
+     return (y[chunk] & (static_cast<T>(1) << (n_bits - 1 - (n->v[0] % n_bits)))) != 0;
+   }
+   template<typename S, typename T, typename Random>
+-  static inline bool side(const Node<S, T>* n, const T* y, int f, Random& random) {
++  static inline bool side(const Node<S, T>* n, const T* y, int f, Random& /*unused*/) {
+     return margin(n, y, f);
+   }
+   template<typename S, typename T, typename Random>
+-  static inline void create_split(const vector<Node<S, T>*>& nodes, int f, size_t s, Random& random, Node<S, T>* n) {
++  static inline void create_split(const vector<Node<S, T>*>& nodes, int f, size_t /*unused*/, Random& random, Node<S, T>* n) {
+     size_t cur_size = 0;
+     size_t i = 0;
+     int dim = f * 8 * sizeof(T);
+@@ -720,7 +757,7 @@ struct Hamming : Base {
+     return distance;
+   }
+   template<typename S, typename T>
+-  static inline void init_node(Node<S, T>* n, int f) {
++  static inline void init_node(Node<S, T>* /*unused*/, int /*unused*/) {
+   }
+   static const char* name() {
+     return "hamming";
+@@ -784,7 +821,7 @@ struct Euclidean : Minkowski {
+     return sqrt(std::max(distance, T(0)));
+   }
+   template<typename S, typename T>
+-  static inline void init_node(Node<S, T>* n, int f) {
++  static inline void init_node(Node<S, T>* /*unused*/, int /*unused*/) {
+   }
+   static const char* name() {
+     return "euclidean";
+@@ -792,6 +829,35 @@ struct Euclidean : Minkowski {
+ 
+ };
+ 
++struct AngularEuclidean : Minkowski {
++  template <typename S, typename T>
++  static inline T distance(const Node<S, T> *x, const Node<S, T> *y, int f) {
++    return angular_euclidean_distance(x->v, y->v, f);
++  }
++  template <typename S, typename T, typename Random>
++  static inline void create_split(const vector<Node<S, T> *> &nodes, int f,
++                                  size_t s, Random &random,
++                                  Node<S, T> *n) {
++    Node<S, T> *p = (Node<S, T> *)alloca(s);
++    Node<S, T> *q = (Node<S, T> *)alloca(s);
++    two_means<T, Random, AngularEuclidean, Node<S, T>>(nodes, f, random, false,
++                                                       p, q);
++
++    for (int z = 0; z < f; z++)
++      n->v[z] = p->v[z] - q->v[z];
++    Base::normalize<T, Node<S, T>>(n, f);
++    n->a = 0.0;
++    for (int z = 0; z < f; z++)
++      n->a += -n->v[z] * (p->v[z] + q->v[z]) / 2;
++  }
++  template <typename T> static inline T normalized_distance(T distance) {
++    return sqrt(std::max(distance, T(0)));
++  }
++  template <typename S, typename T>
++  static inline void init_node(Node<S, T> * /*unused*/, int /*unused*/) {}
++  static const char *name() { return "angular_euclidean"; }
++};
++
+ struct Manhattan : Minkowski {
+   template<typename S, typename T>
+   static inline T distance(const Node<S, T>* x, const Node<S, T>* y, int f) {
+@@ -815,7 +881,7 @@ struct Manhattan : Minkowski {
+     return std::max(distance, T(0));
+   }
+   template<typename S, typename T>
+-  static inline void init_node(Node<S, T>* n, int f) {
++  static inline void init_node(Node<S, T>* /*unused*/, int /*unused*/) {
+   }
+   static const char* name() {
+     return "manhattan";
+@@ -841,6 +907,7 @@ class AnnoyIndexInterface {
+   virtual void verbose(bool v) = 0;
+   virtual void get_item(S item, T* v) const = 0;
+   virtual void set_seed(R q) = 0;
++  virtual R get_seed() const = 0;
+   virtual bool on_disk_build(const char* filename, char** error=NULL) = 0;
+ };
+ 
+@@ -869,14 +936,14 @@ public:
+ #endif
+ 
+ protected:
+-  const int _f;
+-  size_t _s;
++  const unsigned int _f;
++  size_t _s; // Size of each node
+   S _n_items;
+   void* _nodes; // Could either be mmapped, or point to a memory buffer that we reallocate
+   S _n_nodes;
+   S _nodes_size;
+   vector<S> _roots;
+-  S _K;
++  S _K; // Max number of descendants to fit into node
+   R _seed;
+   bool _loaded;
+   bool _verbose;
+@@ -885,7 +952,7 @@ protected:
+   bool _built;
+ public:
+ 
+-   AnnoyIndex(int f) : _f(f), _seed(Random::default_seed) {
++   AnnoyIndex(unsigned int f) : _f(f), _seed(Random::default_seed) {
+     _s = offsetof(Node, v) + _f * sizeof(T); // Size of each node
+     _verbose = false;
+     _built = false;
+@@ -896,7 +963,7 @@ public:
+     unload();
+   }
+ 
+-  int get_f() const {
++  unsigned int get_f() const {
+     return _f;
+   }
+ 
+@@ -911,6 +978,9 @@ public:
+       return false;
+     }
+     _allocate_size(item + 1);
++    if (item >= _n_items)
++      _n_items = item + 1;
++
+     Node* n = _get(item);
+ 
+     D::zero_value(n);
+@@ -919,14 +989,11 @@ public:
+     n->children[1] = 0;
+     n->n_descendants = 1;
+ 
+-    for (int z = 0; z < _f; z++)
++    for (unsigned int z = 0; z < _f; z++)
+       n->v[z] = w[z];
+ 
+     D::init_node(n, _f);
+ 
+-    if (item >= _n_items)
+-      _n_items = item + 1;
+-
+     return true;
+   }
+     
+@@ -976,8 +1043,7 @@ public:
+     // This way we can load them faster without reading the whole file
+     _allocate_size(_n_nodes + (S)_roots.size());
+     for (size_t i = 0; i < _roots.size(); i++)
+-      memcpy(_get(_n_nodes + (S)i), _get(_roots[i]), _s);
+-    _n_nodes += _roots.size();
++      memcpy(_get(_n_nodes++), _get(_roots[i]), _s);
+ 
+     if (_verbose) annoylib_showUpdate("has %d nodes\n", _n_nodes);
+     
+@@ -1119,10 +1185,10 @@ public:
+ 
+     // Find the roots by scanning the end of the file and taking the nodes with most descendants
+     _roots.clear();
+-    S m = -1;
++    S m = (S)-1;
+     for (S i = _n_nodes - 1; i >= 0; i--) {
+       S k = _get(i)->n_descendants;
+-      if (m == -1 || k == m) {
++      if (m == (S)-1 || k == m) {
+         _roots.push_back(i);
+         m = k;
+       } else {
+@@ -1175,6 +1241,8 @@ public:
+     _seed = seed;
+   }
+ 
++  R get_seed() const { return _seed; }
++
+   void thread_build(int q, int thread_idx, ThreadedBuildPolicy& threaded_build_policy) {
+     // Each thread needs its own seed, otherwise each thread would be building the same tree(s)
+     Random _random(_seed + thread_idx);
+@@ -1332,7 +1400,7 @@ protected:
+       children_indices[1].clear();
+ 
+       // Set the vector to 0.0
+-      for (int z = 0; z < _f; z++)
++      for (unsigned int z = 0; z < _f; z++)
+         m->v[z] = 0;
+ 
+       for (size_t i = 0; i < indices.size(); i++) {
+@@ -1425,7 +1493,7 @@ protected:
+ class AnnoyIndexSingleThreadedBuildPolicy {
+ public:
+   template<typename S, typename T, typename D, typename Random>
+-  static void build(AnnoyIndex<S, T, D, Random, AnnoyIndexSingleThreadedBuildPolicy>* annoy, int q, int n_threads) {
++  static void build(AnnoyIndex<S, T, D, Random, AnnoyIndexSingleThreadedBuildPolicy>* annoy, int q, int /*unused*/) {
+     AnnoyIndexSingleThreadedBuildPolicy threaded_build_policy;
+     annoy->thread_build(q, 0, threaded_build_policy);
+   }
+-- 
+2.34.1
+

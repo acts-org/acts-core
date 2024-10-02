@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Material/Interactions.hpp"
 
@@ -154,7 +154,7 @@ namespace detail {
 inline float computeEnergyLossLandauFwhm(const Acts::MaterialSlab& slab,
                                          const RelativisticQuantities& rq) {
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 
@@ -171,7 +171,7 @@ inline float computeEnergyLossLandauFwhm(const Acts::MaterialSlab& slab,
 float Acts::computeEnergyLossBethe(const MaterialSlab& slab, float m,
                                    float qOverP, float absQ) {
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 
@@ -196,7 +196,7 @@ float Acts::computeEnergyLossBethe(const MaterialSlab& slab, float m,
 float Acts::deriveEnergyLossBetheQOverP(const MaterialSlab& slab, float m,
                                         float qOverP, float absQ) {
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 
@@ -233,7 +233,7 @@ float Acts::deriveEnergyLossBetheQOverP(const MaterialSlab& slab, float m,
 float Acts::computeEnergyLossLandau(const MaterialSlab& slab, float m,
                                     float qOverP, float absQ) {
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 
@@ -253,7 +253,7 @@ float Acts::computeEnergyLossLandau(const MaterialSlab& slab, float m,
 float Acts::deriveEnergyLossLandauQOverP(const MaterialSlab& slab, float m,
                                          float qOverP, float absQ) {
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 
@@ -288,7 +288,7 @@ float Acts::deriveEnergyLossLandauQOverP(const MaterialSlab& slab, float m,
 float Acts::computeEnergyLossLandauSigma(const MaterialSlab& slab, float m,
                                          float qOverP, float absQ) {
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 
@@ -386,7 +386,7 @@ float Acts::computeEnergyLossRadiative(const MaterialSlab& slab,
          "pdg is not absolute");
 
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 
@@ -415,7 +415,7 @@ float Acts::deriveEnergyLossRadiativeQOverP(const MaterialSlab& slab,
          "pdg is not absolute");
 
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 
@@ -504,7 +504,7 @@ float Acts::computeMultipleScatteringTheta0(const MaterialSlab& slab,
          "pdg is not absolute");
 
   // return early in case of vacuum or zero thickness
-  if (!slab) {
+  if (!slab.isValid()) {
     return 0.0f;
   }
 

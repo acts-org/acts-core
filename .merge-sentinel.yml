@@ -14,6 +14,7 @@ rules:
     required_checks:
      - Docs / docs
      - Analysis / build_debug
+     - SonarCloud Code Analysis
 
     required_pattern:
      - "Builds / *"

@@ -1,13 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <array>
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -189,19 +190,9 @@ void defineReconstructionPerformance(
       for (auto& [id, matchedTracks] : matchedParticles) {
         // Sort all tracks matched to this particle according to majority prob
         // and track quality
-        std::sort(matchedTracks.begin(), matchedTracks.end(),
-                  [](const RecoTrackInfo& lhs, const RecoTrackInfo& rhs) {
-                    if (lhs.nMajorityHits > rhs.nMajorityHits) {
-                      return true;
-                    }
-                    if (lhs.nMajorityHits < rhs.nMajorityHits) {
-                      return false;
-                    }
-                    if (lhs.nMeasurements > rhs.nMeasurements) {
-                      return true;
-                    }
-                    return false;
-                  });
+        std::ranges::sort(matchedTracks, std::greater{}, [](const auto& m) {
+            return std::make_tuple(m.nMajorityHits, m.nMeasurements);
+          });
         // Fill the duplication rate plots
         for (std::size_t k = 0; k < matchedTracks.size(); ++k) {
           auto eta = matchedTracks[k].eta;

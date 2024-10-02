@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -82,14 +82,6 @@ struct ExtentEnvelope {
     return lhs.m_values == rhs.m_values;
   }
 
-  /// Comparison operator between envelope sets
-  /// @param lhs the left hand side
-  /// @param rhs the right hand side
-  /// @return true if the envelopes are not equal
-  friend bool operator!=(const ExtentEnvelope& lhs, const ExtentEnvelope& rhs) {
-    return !(lhs.m_values == rhs.m_values);
-  }
-
  private:
   std::array<Envelope, numBinningValues()> m_values{};
 };
@@ -107,9 +99,6 @@ class Extent {
 
   /// Define a comparison operator
   bool operator==(const Extent& e) const;
-
-  /// Define a comparison operator
-  bool operator!=(const Extent& e) const { return (!operator==(e)); }
 
   /// Extend with a position vertex
   ///

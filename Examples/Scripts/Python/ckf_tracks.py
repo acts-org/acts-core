@@ -158,7 +158,8 @@ def runCKFTracks(
             maxOutliers=2,
         ),
         CkfConfig(
-            chi2CutOff=15,
+            chi2CutOffMeasurement=15.0,
+            chi2CutOffOutlier=25.0,
             numMeasurementsCutOff=10,
             seedDeduplication=True if not truthSmearedSeeded else False,
             stayOnSeed=True if not truthSmearedSeeded else False,

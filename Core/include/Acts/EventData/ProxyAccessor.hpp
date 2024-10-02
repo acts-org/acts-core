@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -80,9 +80,10 @@ struct ProxyAccessorBase {
   /// @tparam proxy_t the type of the proxy
   /// @param proxy the proxy object to access
   /// @return mutable reference to the column behind the key
-  template <detail::MutableProxyType proxy_t, bool RO = ReadOnly,
-            typename = std::enable_if_t<!RO>>
-  T& operator()(proxy_t proxy) const {
+  template <detail::MutableProxyType proxy_t>
+  T& operator()(proxy_t proxy) const
+    requires(!ReadOnly)
+  {
     static_assert(!proxy_t::ReadOnly,
                   "Cannot get mutable ref for const track proxy");
     return proxy.template component<T>(key);
@@ -92,9 +93,10 @@ struct ProxyAccessorBase {
   /// @tparam proxy_t the type of the track proxy
   /// @param proxy the proxy to access
   /// @return const reference to the column behind the key
-  template <detail::ProxyType proxy_t, bool RO = ReadOnly,
-            typename = std::enable_if_t<RO>>
-  const T& operator()(proxy_t proxy) const {
+  template <detail::ProxyType proxy_t>
+  const T& operator()(proxy_t proxy) const
+    requires(ReadOnly)
+  {
     if constexpr (proxy_t::ReadOnly) {
       return proxy.template component<T>(key);
 

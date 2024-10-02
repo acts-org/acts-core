@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -37,7 +37,7 @@ namespace ActsFatras {
 /// filter the generated child particles.
 ///
 /// @note The output and child particle selectors are identical unless the
-///       child particle selector is explicitely specified.
+///       child particle selector is explicitly specified.
 template <typename physics_t, typename input_particle_selector_t,
           typename output_particle_selector_t,
           typename child_particle_selector_t = output_particle_selector_t>

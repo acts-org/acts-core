@@ -15,6 +15,7 @@ def runTruthTrackingKalman(
     digiConfigFile: Path,
     outputDir: Path,
     inputParticlePath: Optional[Path] = None,
+    inputHitsPath: Optional[Path] = None,
     decorators=[],
     directNavigation=False,
     reverseFilteringMomThreshold=0 * u.GeV,
@@ -46,6 +47,8 @@ def runTruthTrackingKalman(
     rnd = acts.examples.RandomNumbers(seed=42)
     outputDir = Path(outputDir)
 
+    logger = acts.logging.getLogger("Truth tracking example")
+
     if inputParticlePath is None:
         addParticleGun(
             s,
@@ -61,9 +64,7 @@ def runTruthTrackingKalman(
             rnd=rnd,
         )
     else:
-        acts.logging.getLogger("Truth tracking example").info(
-            "Reading particles from %s", inputParticlePath.resolve()
-        )
+        logger.info("Reading particles from %s", inputParticlePath.resolve())
         assert inputParticlePath.exists()
         s.addReader(
             acts.examples.RootParticleReader(
@@ -72,14 +73,26 @@ def runTruthTrackingKalman(
                 outputParticles="particles_input",
             )
         )
+        s.addWhiteboardAlias("particles", "particles_input")
 
-    addFatras(
-        s,
-        trackingGeometry,
-        field,
-        rnd=rnd,
-        enableInteractions=True,
-    )
+    if inputHitsPath is None:
+        addFatras(
+            s,
+            trackingGeometry,
+            field,
+            rnd=rnd,
+            enableInteractions=True,
+        )
+    else:
+        logger.info("Reading hits from %s", inputHitsPath.resolve())
+        assert inputHitsPath.exists()
+        s.addReader(
+            acts.examples.RootSimHitReader(
+                level=acts.logging.INFO,
+                filePath=str(inputHitsPath.resolve()),
+                outputSimHits="simhits",
+            )
+        )
 
     addDigitization(
         s,

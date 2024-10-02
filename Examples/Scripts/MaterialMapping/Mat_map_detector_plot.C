@@ -1,12 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <TROOT.h>
+
+#include "Acts/Utilities/Helpers.hpp"
 
 #include "materialPlotHelper.cpp"
 
@@ -153,7 +155,7 @@ void Fill(std::vector<TH2F*>& detector_hist, const std::string& input_file, std:
       }
 
       // Check if the volume/surface is part of the selected ones
-      if(std::find(detectors.begin(), detectors.end(), ID.volume()) != detectors.end()) {
+      if(rangeContainsValue(detectors, ID.volume())) {
         matX0 += mat_step_length->at(j) / mat_X0->at(j);
         matL0 += mat_step_length->at(j) / mat_L0->at(j);
       }

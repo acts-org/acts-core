@@ -10,7 +10,9 @@ repos:
     rev: v3.2.0
     hooks:
     - id: trailing-whitespace
+      exclude: \.(diff|patch)$
     - id: end-of-file-fixer
+      exclude: \.(diff|patch)$
     - id: check-yaml
     - id: check-added-large-files
 
@@ -26,3 +28,61 @@ repos:
     hooks:
     - id: gersemi
       args: ["-i", "--no-warn-about-unknown-commands"]
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.4
+    hooks:
+    - id: codespell
+      args: [
+        "-S", "*.ipynb,*.onnx,_build,*.svg",
+        "-I", "./CI/codespell_ignore.txt"
+      ]
+      exclude: ^CI/.*$
+
+  - repo: local
+    hooks:
+    - id: license
+      name: license
+      language: system
+      entry: CI/check_license.py
+      files: \.(cpp|hpp|ipp|cu|cuh)$
+
+  - repo: local
+    hooks:
+    - id: include_guards
+      name: include_guards
+      language: system
+      entry: CI/check_include_guards.py --fail-global
+      files: \.hpp$
+
+  - repo: local
+    hooks:
+    - id: pragma_once
+      name: pragma_once
+      language: system
+      entry: CI/check_pragma_once.sh
+      files: \.hpp$
+
+  - repo: local
+    hooks:
+    - id: type_t
+      name: type_t
+      language: system
+      entry: CI/check_type_t.py
+      files: \.(cpp|hpp|ipp|cu|cuh)$
+
+  - repo: local
+    hooks:
+    - id: boost_test
+      name: boost_test
+      language: system
+      entry: CI/check_boost_test_macro.sh
+      files: ^Tests\/.*\.(cpp|hpp|ipp|cu|cuh)$
+
+  - repo: local
+    hooks:
+    - id: cmake_options
+      name: cmake_options
+      language: system
+      entry: docs/parse_cmake_options.py --write docs/getting_started.md
+      files: ^CMakeLists.txt$

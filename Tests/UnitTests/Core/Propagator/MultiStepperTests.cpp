@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -20,12 +20,12 @@
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/MagneticField/NullBField.hpp"
-#include "Acts/Propagator/DefaultExtension.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
+#include "Acts/Propagator/EigenStepperDefaultExtension.hpp"
 #include "Acts/Propagator/MultiEigenStepperLoop.hpp"
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
-#include "Acts/Propagator/StepperExtensionList.hpp"
+#include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/Helpers.hpp"
@@ -46,6 +46,11 @@
 #include <vector>
 
 namespace Acts {
+namespace Concepts {
+template <typename T>
+concept has_components = requires { typename T::components; };
+}  // namespace Concepts
+
 struct MultiStepperSurfaceReached;
 }  // namespace Acts
 
@@ -58,9 +63,8 @@ using namespace Acts::VectorHelpers;
 const MagneticFieldContext magCtx;
 const GeometryContext geoCtx;
 
-using MultiStepperLoop =
-    MultiEigenStepperLoop<StepperExtensionList<DefaultExtension>>;
-using SingleStepper = EigenStepper<StepperExtensionList<DefaultExtension>>;
+using MultiStepperLoop = MultiEigenStepperLoop<EigenStepperDefaultExtension>;
+using SingleStepper = EigenStepper<EigenStepperDefaultExtension>;
 
 const double defaultStepSize = 123.;
 const auto defaultNDir = Direction::Backward;
@@ -105,9 +109,6 @@ struct DummyPropState {
   }
 };
 
-template <typename T>
-using components_t = typename T::components;
-
 // Makes random bound parameters and covariance and a plane surface at {0,0,0}
 // with normal {1,0,0}. Optionally some external fixed bound parameters can be
 // supplied
@@ -128,10 +129,65 @@ auto makeDefaultBoundPars(bool cov = true, std::size_t n = 4,
                     cov ? Opt{make_random_sym_matrix()} : Opt{}});
   }
 
-  auto surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Zero(), Vector3{1., 0., 0.});
+  auto surface = Acts::CurvilinearSurface(Vector3::Zero(), Vector3{1., 0., 0.})
+                     .planeSurface();
 
   return MultiComponentBoundTrackParameters(surface, cmps, particleHypothesis);
+}
+
+//////////////////////
+/// Test the reducers
+//////////////////////
+BOOST_AUTO_TEST_CASE(test_max_weight_reducer) {
+  // Can use this multistepper since we only care about the state which is
+  // invariant
+  using MultiState = typename MultiStepperLoop::State;
+
+  constexpr std::size_t N = 4;
+  const auto multi_pars = makeDefaultBoundPars(false, N);
+  MultiState state(geoCtx, magCtx, defaultBField, multi_pars, defaultStepSize);
+  SingleStepper singleStepper(defaultBField);
+
+  double w = 0.1;
+  double wSum = 0.0;
+  for (auto &[sstate, weight, _] : state.components) {
+    weight = w;
+    wSum += w;
+    w += 0.1;
+  }
+  BOOST_CHECK_EQUAL(wSum, 1.0);
+  BOOST_CHECK_EQUAL(state.components.back().weight, 0.4);
+
+  MaxWeightReducerLoop reducer{};
+  BOOST_CHECK_EQUAL(reducer.position(state),
+                    singleStepper.position(state.components.back().state));
+  BOOST_CHECK_EQUAL(reducer.direction(state),
+                    singleStepper.direction(state.components.back().state));
+}
+
+BOOST_AUTO_TEST_CASE(test_max_momentum_reducer) {
+  // Can use this multistepper since we only care about the state which is
+  // invariant
+  using MultiState = typename MultiStepperLoop::State;
+
+  constexpr std::size_t N = 4;
+  const auto multi_pars = makeDefaultBoundPars(false, N);
+  MultiState state(geoCtx, magCtx, defaultBField, multi_pars, defaultStepSize);
+  SingleStepper singleStepper(defaultBField);
+
+  double p = 1.0;
+  double q = 1.0;
+  for (auto &[sstate, weight, _] : state.components) {
+    sstate.pars[eFreeQOverP] = q / p;
+    p *= 2.0;
+  }
+  BOOST_CHECK_EQUAL(state.components.back().state.pars[eFreeQOverP], q / 8.0);
+
+  MaxMomentumReducerLoop reducer{};
+  BOOST_CHECK_EQUAL(reducer.position(state),
+                    singleStepper.position(state.components.back().state));
+  BOOST_CHECK_EQUAL(reducer.direction(state),
+                    singleStepper.direction(state.components.back().state));
 }
 
 //////////////////////////////////////////////////////
@@ -170,7 +226,7 @@ void test_multi_stepper_state() {
   // covTransport in the MultiEigenStepperLoop is redundant and
   // thus not part of the interface. However, we want to check them for
   // consistency.
-  if constexpr (Acts::Concepts::exists<components_t, MultiState>) {
+  if constexpr (Acts::Concepts::has_components<MultiState>) {
     BOOST_CHECK(!state.covTransport);
     for (const auto &cmp : state.components) {
       BOOST_CHECK_EQUAL(cmp.state.covTransport, Cov);
@@ -212,8 +268,9 @@ void test_multi_stepper_vs_eigen_stepper() {
   std::vector<std::tuple<double, BoundVector, std::optional<BoundSquareMatrix>>>
       cmps(4, {0.25, pars, cov});
 
-  auto surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Zero(), Vector3::Ones().normalized());
+  auto surface =
+      Acts::CurvilinearSurface(Vector3::Zero(), Vector3::Ones().normalized())
+          .planeSurface();
 
   MultiComponentBoundTrackParameters multi_pars(surface, cmps,
                                                 particleHypothesis);
@@ -362,11 +419,13 @@ void test_multi_stepper_surface_status_update() {
   using MultiState = typename multi_stepper_t::State;
   using MultiStepper = multi_stepper_t;
 
-  auto start_surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Zero(), Vector3{1.0, 0.0, 0.0});
+  auto start_surface =
+      Acts::CurvilinearSurface(Vector3::Zero(), Vector3{1.0, 0.0, 0.0})
+          .planeSurface();
 
-  auto right_surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3{1.0, 0.0, 0.0}, Vector3{1.0, 0.0, 0.0});
+  auto right_surface =
+      Acts::CurvilinearSurface(Vector3{1.0, 0.0, 0.0}, Vector3{1.0, 0.0, 0.0})
+          .planeSurface();
 
   std::vector<std::tuple<double, BoundVector, std::optional<BoundSquareMatrix>>>
       cmps(2, {0.5, BoundVector::Zero(), std::nullopt});
@@ -471,11 +530,13 @@ void test_component_bound_state() {
   using MultiState = typename multi_stepper_t::State;
   using MultiStepper = multi_stepper_t;
 
-  auto start_surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Zero(), Vector3{1.0, 0.0, 0.0});
+  auto start_surface =
+      Acts::CurvilinearSurface(Vector3::Zero(), Vector3{1.0, 0.0, 0.0})
+          .planeSurface();
 
-  auto right_surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3{1.0, 0.0, 0.0}, Vector3{1.0, 0.0, 0.0});
+  auto right_surface =
+      Acts::CurvilinearSurface(Vector3{1.0, 0.0, 0.0}, Vector3{1.0, 0.0, 0.0})
+          .planeSurface();
 
   std::vector<std::tuple<double, BoundVector, std::optional<BoundSquareMatrix>>>
       cmps(2, {0.5, BoundVector::Zero(), std::nullopt});
@@ -549,8 +610,9 @@ void test_combined_bound_state_function() {
   using MultiState = typename multi_stepper_t::State;
   using MultiStepper = multi_stepper_t;
 
-  auto surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Zero(), Vector3{1.0, 0.0, 0.0});
+  auto surface =
+      Acts::CurvilinearSurface(Vector3::Zero(), Vector3{1.0, 0.0, 0.0})
+          .planeSurface();
 
   // Use Ones() here, so that the angles are in correct range
   const auto pars = BoundVector::Ones().eval();
@@ -594,8 +656,9 @@ void test_combined_curvilinear_state_function() {
   using MultiState = typename multi_stepper_t::State;
   using MultiStepper = multi_stepper_t;
 
-  auto surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Zero(), Vector3{1.0, 0.0, 0.0});
+  auto surface =
+      Acts::CurvilinearSurface(Vector3::Zero(), Vector3{1.0, 0.0, 0.0})
+          .planeSurface();
 
   // Use Ones() here, so that the angles are in correct range
   const auto pars = BoundVector::Ones().eval();
@@ -646,8 +709,9 @@ void test_single_component_interface_function() {
     cmps.push_back({0.25, BoundVector::Random(), BoundSquareMatrix::Random()});
   }
 
-  auto surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Zero(), Vector3::Ones().normalized());
+  auto surface =
+      Acts::CurvilinearSurface(Vector3::Zero(), Vector3::Ones().normalized())
+          .planeSurface();
 
   MultiComponentBoundTrackParameters multi_pars(surface, cmps,
                                                 particleHypothesis);
@@ -732,8 +796,9 @@ void propagator_instatiation_test_function() {
   Propagator<multi_stepper_t, Navigator> propagator(
       std::move(multi_stepper), Navigator{Navigator::Config{}});
 
-  auto surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Zero(), Vector3{1.0, 0.0, 0.0});
+  auto surface =
+      Acts::CurvilinearSurface(Vector3::Zero(), Vector3{1.0, 0.0, 0.0})
+          .planeSurface();
   using PropagatorOptions =
       typename Propagator<multi_stepper_t, Navigator>::template Options<>;
   PropagatorOptions options(geoCtx, magCtx);
@@ -751,9 +816,11 @@ void propagator_instatiation_test_function() {
       decltype(propagator.template propagate<decltype(pars), decltype(options),
                                              MultiStepperSurfaceReached>(
           pars, *surface, options));
+  static_assert(!std::is_same_v<type_a, void>);
 
   // Instantiate without target
-  using tybe_b = decltype(propagator.propagate(pars, options));
+  using type_b = decltype(propagator.propagate(pars, options));
+  static_assert(!std::is_same_v<type_b, void>);
 }
 
 BOOST_AUTO_TEST_CASE(propagator_instatiation_test) {

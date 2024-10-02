@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <cmath>
 #include <iostream>
@@ -43,10 +43,10 @@ struct MaterialHistograms {
         (iA == 0) ? name + std::string("_l0_vs_eta_all")
                   : name + std::string("_l0_vs_eta_A") + std::to_string(iA);
 
-    x0_vs_eta = new TProfile(x0NameEta.c_str(), "X_{0} vs. #eta", bins, -eta,
-                             eta);
-    l0_vs_eta = new TProfile(l0NameEta.c_str(), "L_{0} vs. #eta", bins, -eta,
-                             eta);
+    x0_vs_eta =
+        new TProfile(x0NameEta.c_str(), "X_{0} vs. #eta", bins, -eta, eta);
+    l0_vs_eta =
+        new TProfile(l0NameEta.c_str(), "L_{0} vs. #eta", bins, -eta, eta);
 
     std::string x0NamePhi =
         (iA == 0) ? name + std::string("_x0_vs_phi_all")
@@ -55,10 +55,10 @@ struct MaterialHistograms {
         (iA == 0) ? name + std::string("_l0_vs_phi_all")
                   : name + std::string("_l0_vs_phi_A") + std::to_string(iA);
 
-    x0_vs_phi = new TProfile(x0NamePhi.c_str(), "X_{0} vs. #phi", bins, -M_PI,
-                             M_PI);
-    l0_vs_phi = new TProfile(l0NamePhi.c_str(), "L_{0} vs. #phi", bins, -M_PI,
-                             M_PI);
+    x0_vs_phi =
+        new TProfile(x0NamePhi.c_str(), "X_{0} vs. #phi", bins, -M_PI, M_PI);
+    l0_vs_phi =
+        new TProfile(l0NamePhi.c_str(), "L_{0} vs. #phi", bins, -M_PI, M_PI);
   }
 
   /// This fills the event into the histograms
@@ -132,6 +132,10 @@ void materialComposition(const std::string& inFile, const std::string& treeName,
   // Draw all the atomic elements & get the histogram
   inputTree->Draw("mat_A>>hA(200,0.5,200.5)");
   TH1F* histA = dynamic_cast<TH1F*>(gDirectory->Get("hA"));
+  if (histA == nullptr) {
+    throw std::runtime_error{"Could not get the histogram"};
+  }
+
   histA->Draw();
 
   auto outputFile = TFile::Open(outFile.c_str(), "recreate");

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -30,7 +30,7 @@ class PropagatorInterface {
   ///@param logger A logger wrapper instance
   ///@param startParameters The start parameters
   ///@return PropagationOutput
-  virtual PropagationOutput execute(
+  virtual Acts::Result<PropagationOutput> execute(
       const AlgorithmContext& context, const PropagationAlgorithm::Config& cfg,
       const Acts::Logger& logger,
       const Acts::BoundTrackParameters& startParameters) const = 0;
@@ -53,75 +53,78 @@ class ConcretePropagator : public PropagatorInterface {
   ConcretePropagator(propagator_t propagator)
       : m_propagator{std::move(propagator)} {}
 
-  PropagationOutput execute(
+  Acts::Result<PropagationOutput> execute(
       const AlgorithmContext& context, const PropagationAlgorithm::Config& cfg,
       const Acts::Logger& logger,
       const Acts::BoundTrackParameters& startParameters) const override {
-    return executeTest(context, cfg, logger, startParameters);
-  }
-
- private:
-  /// Templated execute test method for
-  /// charged and neutral particles
-  /// @param [in] context is the contextual data of this event
-  /// @param [in] startParameters the start parameters
-  /// @param [in] pathLength the maximal path length to go
-  template <typename parameters_t>
-  PropagationOutput executeTest(
-      const AlgorithmContext& context, const PropagationAlgorithm::Config& cfg,
-      const Acts::Logger& logger, const parameters_t& startParameters,
-      double pathLength = std::numeric_limits<double>::max()) const {
     ACTS_DEBUG("Test propagation/extrapolation starts");
 
-    PropagationOutput pOutput;
+    PropagationSummary summary(startParameters);
+    RecordedMaterial recordedMaterial;
 
     // The step length logger for testing & end of world aborter
     using MaterialInteractor = Acts::MaterialInteractor;
     using SteppingLogger = Acts::detail::SteppingLogger;
     using EndOfWorld = Acts::EndOfWorldReached;
 
-    // Action list and abort list
-    using ActionList = Acts::ActionList<SteppingLogger, MaterialInteractor>;
-    using AbortList = Acts::AbortList<EndOfWorld>;
+    // Actor list
+    using ActorList =
+        Acts::ActorList<SteppingLogger, MaterialInteractor, EndOfWorld>;
     using PropagatorOptions =
-        typename propagator_t::template Options<ActionList, AbortList>;
+        typename propagator_t::template Options<ActorList>;
 
     PropagatorOptions options(context.geoContext, context.magFieldContext);
-    options.pathLimit = pathLength;
-
     // Activate loop protection at some pt value
     options.loopProtection =
         startParameters.transverseMomentum() < cfg.ptLoopers;
 
     // Switch the material interaction on/off & eventually into logging mode
-    auto& mInteractor = options.actionList.template get<MaterialInteractor>();
+    auto& mInteractor = options.actorList.template get<MaterialInteractor>();
     mInteractor.multipleScattering = cfg.multipleScattering;
     mInteractor.energyLoss = cfg.energyLoss;
     mInteractor.recordInteractions = cfg.recordMaterialInteractions;
 
     // Switch the logger to sterile, e.g. for timing checks
-    auto& sLogger = options.actionList.template get<SteppingLogger>();
+    auto& sLogger = options.actorList.template get<SteppingLogger>();
     sLogger.sterile = cfg.sterileLogger;
     // Set a maximum step size
     options.stepping.maxStepSize = cfg.maxStepSize;
 
-    // Propagate using the propagator
-    auto result = m_propagator.propagate(startParameters, options);
-    if (result.ok()) {
-      const auto& resultValue = result.value();
-      auto steppingResults =
-          resultValue.template get<SteppingLogger::result_type>();
+    auto state = m_propagator.makeState(startParameters, options);
 
-      // Set the stepping result
-      pOutput.first = std::move(steppingResults.steps);
-      // Also set the material recording result - if configured
-      if (cfg.recordMaterialInteractions) {
-        auto materialResult =
-            resultValue.template get<MaterialInteractor::result_type>();
-        pOutput.second = std::move(materialResult);
-      }
+    // Propagate using the propagator
+    auto resultTmp = m_propagator.propagate(state);
+    if (!resultTmp.ok()) {
+      return resultTmp.error();
     }
-    return pOutput;
+
+    // Collect internal stepping information
+    summary.nStepTrials = state.stepping.nStepTrials;
+
+    auto result =
+        m_propagator.makeResult(std::move(state), resultTmp, options, true);
+    if (!result.ok()) {
+      return result.error();
+    }
+    auto& resultValue = result.value();
+
+    // Collect general summary information
+    summary.nSteps = resultValue.steps;
+    summary.pathLength = resultValue.pathLength;
+
+    // Collect the steps
+    auto& steppingResults =
+        resultValue.template get<SteppingLogger::result_type>();
+    summary.steps = std::move(steppingResults.steps);
+
+    // Also set the material recording result - if configured
+    if (cfg.recordMaterialInteractions) {
+      auto materialResult =
+          resultValue.template get<MaterialInteractor::result_type>();
+      recordedMaterial = std::move(materialResult);
+    }
+
+    return std::pair{std::move(summary), std::move(recordedMaterial)};
   }
 
  private:

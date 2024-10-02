@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Utilities/EventDataTransforms.hpp"
 
@@ -12,14 +12,15 @@
 #include "ActsExamples/EventData/IndexSourceLink.hpp"
 #include "ActsExamples/EventData/SimSpacePoint.hpp"
 
+#include <algorithm>
 #include <vector>
 
 ActsExamples::ProtoTrack ActsExamples::seedToPrototrack(
     const ActsExamples::SimSeed& seed) {
   ProtoTrack track;
   track.reserve(seed.sp().size());
-  for (auto spacePointPtr : seed.sp()) {
-    for (const auto& slink : spacePointPtr->sourceLinks()) {
+  for (const auto& spacePoints : seed.sp()) {
+    for (const auto& slink : spacePoints->sourceLinks()) {
       const auto& islink = slink.get<IndexSourceLink>();
       track.emplace_back(islink.index());
     }
@@ -68,8 +69,7 @@ ActsExamples::SimSeed ActsExamples::prototrackToSeed(
 
   std::transform(track.begin(), track.end(), std::back_inserter(ps),
                  findSpacePoint);
-  std::sort(ps.begin(), ps.end(),
-            [](const auto& a, const auto& b) { return a->r() < b->r(); });
+  std::ranges::sort(ps, {}, [](const auto& p) { return p->r(); });
 
   // Simply use r = m*z + t and solve for r=0 to find z vertex position...
   // Probably not the textbook way to do
@@ -78,5 +78,7 @@ ActsExamples::SimSeed ActsExamples::prototrackToSeed(
   const auto t = ps.front()->r() - m * ps.front()->z();
   const auto z_vertex = -t / m;
 
-  return SimSeed(*ps[0], *ps[s / 2], *ps[s - 1], z_vertex);
+  SimSeed seed(*ps[0], *ps[s / 2], *ps[s - 1]);
+  seed.setVertexZ(z_vertex);
+  return seed;
 }

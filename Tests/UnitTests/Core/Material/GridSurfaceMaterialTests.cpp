@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -62,7 +62,6 @@ BOOST_AUTO_TEST_CASE(GridIndexedMaterial_invalid_bound2Grid_Unconnected) {
 
   using EqBound = Acts::GridAxisGenerators::EqBound;
   using EqGrid = EqBound::grid_type<std::size_t>;
-  using Point = EqGrid::point_t;
 
   EqBound eqBound{{0., 5.}, 5};
   EqGrid eqGrid{eqBound()};
@@ -86,7 +85,6 @@ BOOST_AUTO_TEST_CASE(GridIndexedMaterial_invalid_global2Grid_Unconnected) {
 
   using EqBound = Acts::GridAxisGenerators::EqBound;
   using EqGrid = EqBound::grid_type<std::size_t>;
-  using Point = EqGrid::point_t;
 
   EqBound eqBound{{0., 5.}, 5};
   EqGrid eqGrid{eqBound()};
@@ -154,7 +152,7 @@ BOOST_AUTO_TEST_CASE(GridIndexedMaterial1D) {
   const Acts::MaterialSlab& mg4 = ism.materialSlab(g4);
 
   BOOST_CHECK_EQUAL(mg0.material().X0(), 1.);
-  BOOST_CHECK(!mg1.material());
+  BOOST_CHECK(!mg1.material().isValid());
   BOOST_CHECK_EQUAL(mg2.material().X0(), 11.);
   BOOST_CHECK_EQUAL(mg3.material().X0(), 11.);
   BOOST_CHECK_EQUAL(mg4.material().X0(), 21.);
@@ -173,7 +171,7 @@ BOOST_AUTO_TEST_CASE(GridIndexedMaterial1D) {
   const Acts::MaterialSlab& ml4 = ism.materialSlab(l4);
 
   BOOST_CHECK_EQUAL(ml0.material().X0(), 1.);
-  BOOST_CHECK(!ml1.material());
+  BOOST_CHECK(!ml1.material().isValid());
   BOOST_CHECK_EQUAL(ml2.material().X0(), 11.);
   BOOST_CHECK_EQUAL(ml3.material().X0(), 11.);
   BOOST_CHECK_EQUAL(ml4.material().X0(), 21.);
@@ -187,7 +185,7 @@ BOOST_AUTO_TEST_CASE(GridIndexedMaterial1D) {
   const Acts::MaterialSlab& sml4 = ism.materialSlab(l4);
 
   BOOST_CHECK_EQUAL(sml0.thickness(), 2.);
-  BOOST_CHECK(!sml1.material());
+  BOOST_CHECK(!sml1.material().isValid());
   BOOST_CHECK_EQUAL(sml2.thickness(), 4.);
   BOOST_CHECK_EQUAL(sml3.thickness(), 4.);
   BOOST_CHECK_EQUAL(sml4.thickness(), 6.);
@@ -247,7 +245,7 @@ BOOST_AUTO_TEST_CASE(GridIndexedMaterial2D) {
 
   Acts::Vector3 g2(0.5, 0.5, -10.5);
   const Acts::MaterialSlab& mg2 = ism.materialSlab(g2);
-  BOOST_CHECK(!mg2.material());  // vacuum
+  BOOST_CHECK(!mg2.material().isValid());  // vacuum
 
   Acts::Vector3 g3(0.5, 0.5,
                    -9.5);  // should be material 3, same phi but different z
@@ -308,7 +306,7 @@ BOOST_AUTO_TEST_CASE(GridGloballyIndexedMaterialNonShared) {
   const Acts::MaterialSlab& ml4 = ism.materialSlab(l4);
 
   BOOST_CHECK_EQUAL(ml0.material().X0(), 1.);
-  BOOST_CHECK(!ml1.material());
+  BOOST_CHECK(!ml1.material().isValid());
   BOOST_CHECK_EQUAL(ml2.material().X0(), 11.);
   BOOST_CHECK_EQUAL(ml3.material().X0(), 11.);
   BOOST_CHECK_EQUAL(ml4.material().X0(), 21.);

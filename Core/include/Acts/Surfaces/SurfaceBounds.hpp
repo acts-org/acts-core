@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 #include "Acts/Definitions/Algebra.hpp"
@@ -72,21 +72,17 @@ class SurfaceBounds {
   ///
   /// @param os is the outstream in which the string dump is done
   virtual std::ostream& toStream(std::ostream& os) const = 0;
-};
 
-inline bool operator==(const SurfaceBounds& lhs, const SurfaceBounds& rhs) {
-  if (&lhs == &rhs) {
-    return true;
+  friend bool operator==(const SurfaceBounds& lhs, const SurfaceBounds& rhs) {
+    if (&lhs == &rhs) {
+      return true;
+    }
+    return (lhs.type() == rhs.type()) && (lhs.values() == rhs.values());
   }
-  return (lhs.type() == rhs.type()) && (lhs.values() == rhs.values());
-}
 
-inline bool operator!=(const SurfaceBounds& lhs, const SurfaceBounds& rhs) {
-  return !(lhs == rhs);
-}
-
-inline std::ostream& operator<<(std::ostream& os, const SurfaceBounds& sb) {
-  return sb.toStream(os);
-}
+  friend std::ostream& operator<<(std::ostream& os, const SurfaceBounds& sb) {
+    return sb.toStream(os);
+  }
+};
 
 }  // namespace Acts

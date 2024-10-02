@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -64,13 +64,13 @@ class GeometryHierarchyMap {
   /// Combined geometry identifier and value element. Only used for input.
   using InputElement = typename std::pair<GeometryIdentifier, value_t>;
   using Iterator = typename std::vector<value_t>::const_iterator;
-  using Size = typename std::vector<value_t>::size_type;
   using Value = value_t;
 
   /// Construct the container from the given elements.
   ///
   /// @param elements input elements (must be unique with respect to identifier)
   GeometryHierarchyMap(std::vector<InputElement> elements);
+
   /// Construct the container from an initializer list.
   ///
   /// @param elements input initializer list
@@ -86,21 +86,25 @@ class GeometryHierarchyMap {
 
   /// Return an iterator pointing to the beginning of the stored values.
   Iterator begin() const { return m_values.begin(); }
+
   /// Return an iterator pointing to the end of the stored values.
   Iterator end() const { return m_values.end(); }
+
   /// Check if any elements are stored.
   bool empty() const { return m_values.empty(); }
+
   /// Return the number of stored elements.
-  Size size() const { return m_values.size(); }
+  std::size_t size() const { return m_values.size(); }
 
   /// Access the geometry identifier for the i-th element with bounds check.
   ///
   /// @throws std::out_of_range for invalid indices
-  GeometryIdentifier idAt(Size index) const { return m_ids.at(index); }
+  GeometryIdentifier idAt(std::size_t index) const { return m_ids.at(index); }
+
   /// Access the value of the i-th element in the container with bounds check.
   ///
   /// @throws std::out_of_range for invalid indices
-  const Value& valueAt(Size index) const { return m_values.at(index); }
+  const Value& valueAt(std::size_t index) const { return m_values.at(index); }
 
   /// Find the most specific value for a given geometry identifier.
   ///
@@ -111,7 +115,18 @@ class GeometryHierarchyMap {
   /// @param id geometry identifier for which information is requested
   /// @retval iterator to an existing value
   /// @retval `.end()` iterator if no matching element exists
-  Iterator find(GeometryIdentifier id) const;
+  Iterator find(const GeometryIdentifier& id) const;
+
+  /// Check if the most specific value exists for a given geometry identifier.
+  ///
+  /// This function checks if there is an element matching exactly the given
+  /// geometry id, or from the element for the next available higher level
+  /// within the geometry hierarchy.
+  ///
+  /// @param id geometry identifier for which existence is being checked
+  /// @retval `true` if a matching element exists
+  /// @retval `false` if no matching element exists
+  bool contains(const GeometryIdentifier& id) const;
 
  private:
   // NOTE this class assumes that it knows the ordering of the levels within
@@ -171,25 +186,26 @@ class GeometryHierarchyMap {
     // no valid levels; all bits are zero.
     return Identifier{0u};
   }
+
   /// Construct a mask where only the highest level is set.
   static constexpr Identifier makeHighestLevelMask() {
     return makeLeadingLevelsMask(GeometryIdentifier(0u).setVolume(1u));
   }
+
   /// Compare the two identifiers only within the masked bits.
   static constexpr bool equalWithinMask(Identifier lhs, Identifier rhs,
                                         Identifier mask) {
     return (lhs & mask) == (rhs & mask);
   }
+
   /// Ensure identifier ordering and uniqueness.
-  template <typename iterator_t>
-  static void sortAndCheckDuplicates(iterator_t beg, iterator_t end);
+  static void sortAndCheckDuplicates(std::vector<InputElement>& elements);
 
   /// Fill the container from the input elements.
   ///
   /// This assumes that the elements are ordered and unique with respect to
   /// their identifiers.
-  template <typename iterator_t>
-  void fill(iterator_t beg, iterator_t end);
+  void fill(const std::vector<InputElement>& elements);
 };
 
 // implementations
@@ -197,8 +213,8 @@ class GeometryHierarchyMap {
 template <typename value_t>
 inline GeometryHierarchyMap<value_t>::GeometryHierarchyMap(
     std::vector<InputElement> elements) {
-  sortAndCheckDuplicates(elements.begin(), elements.end());
-  fill(elements.begin(), elements.end());
+  sortAndCheckDuplicates(elements);
+  fill(elements);
 }
 
 template <typename value_t>
@@ -208,43 +224,44 @@ inline GeometryHierarchyMap<value_t>::GeometryHierarchyMap(
           std::vector<InputElement>(elements.begin(), elements.end())) {}
 
 template <typename value_t>
-template <typename iterator_t>
 inline void GeometryHierarchyMap<value_t>::sortAndCheckDuplicates(
-    iterator_t beg, iterator_t end) {
+    std::vector<InputElement>& elements) {
   // ensure elements are sorted by identifier
-  std::sort(beg, end, [=](const auto& lhs, const auto& rhs) {
+  std::ranges::sort(elements, [=](const auto& lhs, const auto& rhs) {
     return lhs.first < rhs.first;
   });
-  // check that all elements have unique identifier
-  auto dup = std::adjacent_find(beg, end, [](const auto& lhs, const auto& rhs) {
-    return lhs.first == rhs.first;
-  });
-  if (dup != end) {
+
+  // Check that all elements have unique identifier
+  auto dup = std::ranges::adjacent_find(
+      elements,
+      [](const auto& lhs, const auto& rhs) { return lhs.first == rhs.first; });
+
+  if (dup != elements.end()) {
     throw std::invalid_argument("Input elements contain duplicates");
   }
 }
 
 template <typename value_t>
-template <typename iterator_t>
-inline void GeometryHierarchyMap<value_t>::fill(iterator_t beg,
-                                                iterator_t end) {
-  const auto n = std::distance(beg, end);
+inline void GeometryHierarchyMap<value_t>::fill(
+    const std::vector<InputElement>& elements) {
   m_ids.clear();
-  m_ids.reserve(n);
   m_masks.clear();
-  m_masks.reserve(n);
   m_values.clear();
-  m_values.reserve(n);
-  for (; beg != end; ++beg) {
-    m_ids.push_back(beg->first.value());
-    m_masks.push_back(makeLeadingLevelsMask(beg->first.value()));
-    m_values.push_back(std::move(beg->second));
+
+  m_ids.reserve(elements.size());
+  m_masks.reserve(elements.size());
+  m_values.reserve(elements.size());
+
+  for (const auto& element : elements) {
+    m_ids.push_back(element.first.value());
+    m_masks.push_back(makeLeadingLevelsMask(element.first.value()));
+    m_values.push_back(std::move(element.second));
   }
 }
 
 template <typename value_t>
-inline auto GeometryHierarchyMap<value_t>::find(GeometryIdentifier id) const
-    -> Iterator {
+inline auto GeometryHierarchyMap<value_t>::find(
+    const GeometryIdentifier& id) const -> Iterator {
   assert((m_ids.size() == m_values.size()) &&
          "Inconsistent container state: #ids != # values");
   assert((m_masks.size() == m_values.size()) &&
@@ -295,6 +312,12 @@ inline auto GeometryHierarchyMap<value_t>::find(GeometryIdentifier id) const
 
   // all options are exhausted and no matching element was found.
   return end();
+}
+
+template <typename value_t>
+inline auto GeometryHierarchyMap<value_t>::contains(
+    const GeometryIdentifier& id) const -> bool {
+  return this->find(id) != this->end();
 }
 
 }  // namespace Acts

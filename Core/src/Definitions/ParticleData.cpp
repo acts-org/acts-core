@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Definitions/ParticleData.hpp"
 
@@ -51,12 +51,12 @@ static inline auto findByPdg(std::int32_t pdg, const ColumnContainer& column)
   return column[*index];
 }
 
-static constexpr inline float extractCharge(float value) {
+static constexpr float extractCharge(float value) {
   // convert three charge to regular charge in native units
   return (value / 3.0f) * Acts::UnitConstants::e;
 }
 
-static constexpr inline float extractMass(float value) {
+static constexpr float extractMass(float value) {
   return value * Acts::UnitConstants::MeV;
 }
 

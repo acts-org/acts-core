@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/PdgParticle.hpp"
@@ -115,6 +115,43 @@ void addGenerators(Context& ctx) {
           &ActsExamples::GaussianPrimaryVertexPositionGenerator::stddev)
       .def_readwrite(
           "mean", &ActsExamples::GaussianPrimaryVertexPositionGenerator::mean);
+  py::class_<
+      ActsExamples::GaussianDisplacedVertexPositionGenerator,
+      ActsExamples::EventGenerator::PrimaryVertexPositionGenerator,
+      std::shared_ptr<ActsExamples::GaussianDisplacedVertexPositionGenerator>>(
+      mex, "GaussianDisplacedVertexPositionGenerator")
+      .def(py::init<>())
+      .def(py::init([](double rMean, double rStdDev, double zMean,
+                       double zStdDev, double tMean, double tStdDev) {
+             ActsExamples::GaussianDisplacedVertexPositionGenerator g;
+             g.rMean = rMean;
+             g.rStdDev = rStdDev;
+             g.zMean = zMean;
+             g.zStdDev = zStdDev;
+             g.tMean = tMean;
+             g.tStdDev = tStdDev;
+             return g;
+           }),
+           py::arg("rMean"), py::arg("rStdDev"), py::arg("zMean"),
+           py::arg("zStdDev"), py::arg("tMean"), py::arg("tStdDev"))
+      .def_readwrite(
+          "rMean",
+          &ActsExamples::GaussianDisplacedVertexPositionGenerator::rMean)
+      .def_readwrite(
+          "rStdDev",
+          &ActsExamples::GaussianDisplacedVertexPositionGenerator::rStdDev)
+      .def_readwrite(
+          "zMean",
+          &ActsExamples::GaussianDisplacedVertexPositionGenerator::zMean)
+      .def_readwrite(
+          "zStdDev",
+          &ActsExamples::GaussianDisplacedVertexPositionGenerator::zStdDev)
+      .def_readwrite(
+          "tMean",
+          &ActsExamples::GaussianDisplacedVertexPositionGenerator::tMean)
+      .def_readwrite(
+          "tStdDev",
+          &ActsExamples::GaussianDisplacedVertexPositionGenerator::tStdDev);
 
   py::class_<
       ActsExamples::FixedPrimaryVertexPositionGenerator,

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Geometry/CylinderVolumeStack.hpp"
 
@@ -15,6 +15,7 @@
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <sstream>
 
@@ -150,7 +151,7 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
     const auto* cylBounds = dynamic_cast<const CylinderVolumeBounds*>(
         &m_volumes.front()->volumeBounds());
     assert(cylBounds != nullptr && "Volume bounds are not cylinder bounds");
-    m_volumeBounds = std::make_shared<CylinderVolumeBounds>(*cylBounds);
+    Volume::update(std::make_shared<CylinderVolumeBounds>(*cylBounds));
     return;
   }
 
@@ -159,11 +160,9 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
 
   if (direction == Acts::BinningValue::binZ) {
     ACTS_VERBOSE("Sorting by volume z position");
-    std::sort(volumeTuples.begin(), volumeTuples.end(),
-              [](const auto& a, const auto& b) {
-                return a.localTransform.translation()[eZ] <
-                       b.localTransform.translation()[eZ];
-              });
+    std::ranges::sort(volumeTuples, {}, [](const auto& v) {
+      return v.localTransform.translation()[eZ];
+    });
 
     ACTS_VERBOSE("Checking for overlaps and attaching volumes in z");
     std::vector<VolumeTuple> gapVolumes =
@@ -192,8 +191,7 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
     ACTS_VERBOSE("*** Volume configuration after r synchronization:");
     printVolumeSequence(volumeTuples, logger, Acts::Logging::VERBOSE);
 
-    std::sort(volumeTuples.begin(), volumeTuples.end(),
-              [](const auto& a, const auto& b) { return a.midZ() < b.midZ(); });
+    std::ranges::sort(volumeTuples, {}, [](const auto& v) { return v.midZ(); });
 
     m_volumes.clear();
     for (const auto& vt : volumeTuples) {
@@ -211,8 +209,8 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
 
     m_transform = m_groupTransform * Translation3{0, 0, midZ};
 
-    m_volumeBounds = std::make_shared<CylinderVolumeBounds>(minR, maxR, hlZ);
-    ACTS_DEBUG("Outer bounds are:\n" << *m_volumeBounds);
+    Volume::update(std::make_shared<CylinderVolumeBounds>(minR, maxR, hlZ));
+    ACTS_DEBUG("Outer bounds are:\n" << volumeBounds());
     ACTS_DEBUG("Outer transform / new group transform is:\n"
                << m_transform.matrix());
 
@@ -222,8 +220,7 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
 
   } else if (direction == Acts::BinningValue::binR) {
     ACTS_VERBOSE("Sorting by volume r middle point");
-    std::sort(volumeTuples.begin(), volumeTuples.end(),
-              [](const auto& a, const auto& b) { return a.midR() < b.midR(); });
+    std::ranges::sort(volumeTuples, {}, [](const auto& v) { return v.midR(); });
 
     ACTS_VERBOSE("Checking for overlaps and attaching volumes in r");
     std::vector<VolumeTuple> gapVolumes =
@@ -250,8 +247,7 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
     ACTS_VERBOSE("*** Volume configuration after z synchronization:");
     printVolumeSequence(volumeTuples, logger, Acts::Logging::VERBOSE);
 
-    std::sort(volumeTuples.begin(), volumeTuples.end(),
-              [](const auto& a, const auto& b) { return a.midR() < b.midR(); });
+    std::ranges::sort(volumeTuples, {}, [](const auto& v) { return v.midR(); });
 
     m_volumes.clear();
     for (const auto& vt : volumeTuples) {
@@ -269,9 +265,9 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
 
     m_transform = m_groupTransform * Translation3{0, 0, midZ};
 
-    m_volumeBounds = std::make_shared<CylinderVolumeBounds>(minR, maxR, hlZ);
+    Volume::update(std::make_shared<CylinderVolumeBounds>(minR, maxR, hlZ));
 
-    ACTS_DEBUG("Outer bounds are:\n" << *m_volumeBounds);
+    ACTS_DEBUG("Outer bounds are:\n" << volumeBounds());
     ACTS_DEBUG("Outer transform is:\n" << m_transform.matrix());
 
     // Update group transform to the new center
@@ -625,13 +621,12 @@ std::pair<ActsScalar, ActsScalar> CylinderVolumeStack::synchronizeZBounds(
   return {minZ, maxZ};
 }
 
-void CylinderVolumeStack::update(std::shared_ptr<const VolumeBounds> volbounds,
+void CylinderVolumeStack::update(std::shared_ptr<VolumeBounds> volbounds,
                                  std::optional<Transform3> transform) {
   if (volbounds == nullptr) {
     throw std::invalid_argument("New bounds are nullptr");
   }
-  auto cylBounds =
-      std::dynamic_pointer_cast<const CylinderVolumeBounds>(volbounds);
+  auto cylBounds = std::dynamic_pointer_cast<CylinderVolumeBounds>(volbounds);
   if (cylBounds == nullptr) {
     throw std::invalid_argument(
         "CylinderVolumeStack requires CylinderVolumeBounds");
@@ -641,7 +636,7 @@ void CylinderVolumeStack::update(std::shared_ptr<const VolumeBounds> volbounds,
 }
 
 void CylinderVolumeStack::update(
-    std::shared_ptr<const CylinderVolumeBounds> newBounds,
+    std::shared_ptr<CylinderVolumeBounds> newBounds,
     std::optional<Transform3> transform, const Logger& logger) {
   ACTS_DEBUG(
       "Resizing CylinderVolumeStack with strategy: " << m_resizeStrategy);
@@ -934,7 +929,7 @@ void CylinderVolumeStack::update(
   }
 
   m_transform = newVolume.globalTransform;
-  m_volumeBounds = std::move(newBounds);
+  Volume::update(std::move(newBounds));
 }
 
 void CylinderVolumeStack::checkNoPhiOrBevel(const CylinderVolumeBounds& bounds,

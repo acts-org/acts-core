@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Detector/Detector.hpp"
 #include "Acts/Detector/DetectorVolume.hpp"
@@ -20,6 +20,7 @@
 #include "Acts/Plugins/ActSVG/TrackingGeometrySvgConverter.hpp"
 #include "Acts/Plugins/Python/Utilities.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
+#include "Acts/Utilities/Helpers.hpp"
 #include "ActsExamples/EventData/GeometryContainers.hpp"
 #include "ActsExamples/EventData/SimHit.hpp"
 #include "ActsExamples/EventData/SimSpacePoint.hpp"
@@ -60,7 +61,7 @@ using ViewAndRange =
 /// @param portalCache is a portal cache to avoid multiple drawings of the same portal
 ///
 /// Returns an svg object in the right view
-actsvg::svg::object viewDetectorVolume(const Svg::ProtoVolume& pVolume,
+actsvg::svg::object drawDetectorVolume(const Svg::ProtoVolume& pVolume,
                                        const std::string& identification,
                                        const ViewAndRange& viewAndRange,
                                        PortalCache& portalCache) {
@@ -68,22 +69,17 @@ actsvg::svg::object viewDetectorVolume(const Svg::ProtoVolume& pVolume,
   svgDet._id = identification;
   svgDet._tag = "g";
 
-  auto [view, selection, viewRange] = viewAndRange;
+  const auto& [view, selection, viewRange] = viewAndRange;
 
   // Translate selection into booleans
-  bool all =
-      std::find(selection.begin(), selection.end(), "all") != selection.end();
-  bool sensitives = std::find(selection.begin(), selection.end(),
-                              "sensitives") != selection.end();
-  bool portals = std::find(selection.begin(), selection.end(), "portals") !=
-                 selection.end();
-  bool materials = std::find(selection.begin(), selection.end(), "materials") !=
-                   selection.end();
+  const bool all = rangeContainsValue(selection, "all");
+  const bool sensitives = rangeContainsValue(selection, "sensitives");
+  const bool portals = rangeContainsValue(selection, "portals");
+  const bool materials = rangeContainsValue(selection, "materials");
 
   // Helper lambda for material selection
   auto materialSel = [&](const Svg::ProtoSurface& s) -> bool {
-    return (materials &&
-            s._decorations.find("material") != s._decorations.end());
+    return (materials && s._decorations.contains("material"));
   };
 
   // Helper lambda for view range selection
@@ -138,8 +134,7 @@ actsvg::svg::object viewDetectorVolume(const Svg::ProtoVolume& pVolume,
       gpIDs = pgID->second._id;
     }
 
-    if (std::find(portalCache.begin(), portalCache.end(), gpIDs) !=
-        portalCache.end()) {
+    if (rangeContainsValue(portalCache, gpIDs)) {
       continue;
     }
 
@@ -158,13 +153,13 @@ actsvg::svg::object viewDetectorVolume(const Svg::ProtoVolume& pVolume,
 }
 
 // Helper function to be picked in different access patterns
-void viewDetector(
+std::vector<actsvg::svg::object> drawDetector(
     const Acts::GeometryContext& gctx,
     const Acts::Experimental::Detector& detector,
     const std::string& identification,
     const std::vector<std::tuple<int, Svg::DetectorVolumeConverter::Options>>&
         volumeIdxOpts,
-    const std::vector<ViewAndRange>& viewAndRanges, const std::string& saveAs) {
+    const std::vector<ViewAndRange>& viewAndRanges) {
   PortalCache portalCache;
 
   // The svg object to be returned
@@ -186,17 +181,13 @@ void viewDetector(
     for (auto [iv, var] : Acts::enumerate(viewAndRanges)) {
       auto [view, selection, range] = var;
       // Get the view and the range
-      auto svgVolView = viewDetectorVolume(
+      auto svgVolView = drawDetectorVolume(
           pVolume, identification + "_vol" + std::to_string(vidx) + "_" + view,
           var, portalCache);
       svgDetViews[iv].add_object(svgVolView);
     }
   }
-
-  for (auto [iv, var] : Acts::enumerate(viewAndRanges)) {
-    auto [view, selection, range] = var;
-    Svg::toFile({svgDetViews[iv]}, saveAs + "_" + view + ".svg");
-  }
+  return svgDetViews;
 }
 
 }  // namespace
@@ -209,6 +200,20 @@ void addSvg(Context& ctx) {
 
   // Some basics
   py::class_<actsvg::svg::object>(svg, "object");
+
+  py::class_<actsvg::svg::file>(svg, "file")
+      .def(py::init<>())
+      .def("addObject", &actsvg::svg::file::add_object)
+      .def("addObjects", &actsvg::svg::file::add_objects)
+      .def("clip",
+           [](actsvg::svg::file& self, std::array<actsvg::scalar, 4> box) {
+             self.set_view_box(box);
+           })
+      .def("write", [](actsvg::svg::file& self, const std::string& filename) {
+        std::ofstream file(filename);
+        file << self;
+        file.close();
+      });
 
   // Core components, added as an acts.svg submodule
   {
@@ -287,6 +292,42 @@ void addSvg(Context& ctx) {
     });
   }
 
+  // Draw primitives
+  {
+    svg.def("drawArrow", &actsvg::draw::arrow);
+
+    svg.def("drawText", &actsvg::draw::text);
+  }
+
+  // Draw Eta Lines
+  {
+    svg.def(
+        "drawEtaLines",
+        [](const std::string& id, actsvg ::scalar z, actsvg::scalar r,
+           const std::vector<actsvg::scalar>& etaMain,
+           actsvg::scalar strokeWidthMain, unsigned int sizeMain,
+           bool labelMain, const std::vector<actsvg::scalar>& etaSub,
+           actsvg::scalar strokeWidthSub, const std::vector<int> strokeDashSub,
+           unsigned int sizeSub, bool labelSub) {
+          // The main eta lines
+          actsvg::style::stroke strokeMain;
+          strokeMain._width = strokeWidthMain;
+          actsvg::style::font fontMain;
+          fontMain._size = sizeMain;
+
+          actsvg::style::stroke strokeSub;
+          strokeSub._width = strokeWidthSub;
+          strokeSub._dasharray = strokeDashSub;
+          actsvg::style::font fontSub;
+          fontSub._size = sizeSub;
+
+          return actsvg::display::eta_lines(
+              id, z, r,
+              {std::tie(etaMain, strokeMain, labelMain, fontMain),
+               std::tie(etaSub, strokeSub, labelSub, fontSub)});
+        });
+  }
+
   // How detector volumes are drawn: Svg DetectorVolume options & drawning
   {
     auto c = py::class_<Svg::DetectorVolumeConverter::Options>(
@@ -308,11 +349,11 @@ void addSvg(Context& ctx) {
     svg.def("convertDetectorVolume", &Svg::DetectorVolumeConverter::convert);
 
     // Define the view functions
-    svg.def("viewDetectorVolume", &viewDetectorVolume);
+    svg.def("drawDetectorVolume", &drawDetectorVolume);
   }
 
   // How a detector is drawn: Svg Detector options & drawning
-  { svg.def("viewDetector", &viewDetector); }
+  { svg.def("drawDetector", &drawDetector); }
 
   // Legacy geometry drawing
   {

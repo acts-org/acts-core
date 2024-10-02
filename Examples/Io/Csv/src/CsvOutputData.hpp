@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -352,6 +352,32 @@ struct GraphData {
   std::int64_t edge1 = 0;
   float weight = 0.0;
   DFE_NAMEDTUPLE(GraphData, edge0, edge1, weight);
+};
+
+struct SpacePointBucketData {
+  /// @brief Data structure for space point buckets
+  /// @details A bucket is a collection of space points
+  ///        Different buckets can contain the same space point
+  ///        Measurement IDs are used to uniquely identify space points
+
+  /// Bucket index
+  std::uint64_t bucketIdx;
+  /// Bucket size (number of space points)
+  std::uint64_t bucketSize;
+
+  /// Measurement IDs of the space points in the bucket
+  /// To allow for variable size, the bucket data is split into several lines
+  /// A line can contain up to 20 space points (arbitrary number)
+  std::array<std::uint64_t, 20> measurement_id;
+
+  DFE_NAMEDTUPLE(SpacePointBucketData, bucketIdx, bucketSize, measurement_id[0],
+                 measurement_id[1], measurement_id[2], measurement_id[3],
+                 measurement_id[4], measurement_id[5], measurement_id[6],
+                 measurement_id[7], measurement_id[8], measurement_id[9],
+                 measurement_id[10], measurement_id[11], measurement_id[12],
+                 measurement_id[13], measurement_id[14], measurement_id[15],
+                 measurement_id[16], measurement_id[17], measurement_id[18],
+                 measurement_id[19]);
 };
 
 }  // namespace ActsExamples

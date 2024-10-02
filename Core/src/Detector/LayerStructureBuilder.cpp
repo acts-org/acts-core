@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Detector/LayerStructureBuilder.hpp"
 
@@ -23,7 +23,9 @@
 #include "Acts/Utilities/Enumerate.hpp"
 #include "Acts/Utilities/Grid.hpp"
 #include "Acts/Utilities/GridAxisGenerators.hpp"
+#include "Acts/Utilities/Helpers.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <ostream>
@@ -242,9 +244,7 @@ Acts::Experimental::LayerStructureBuilder::construct(
       // the binning value that are not constrained by the internal surfaces
       for (const auto& bv : allBinningValues()) {
         if (support.volumeExtent.constrains(bv) &&
-            std::find(support.internalConstraints.begin(),
-                      support.internalConstraints.end(),
-                      bv) == support.internalConstraints.end()) {
+            !rangeContainsValue(support.internalConstraints, bv)) {
           ACTS_VERBOSE("  Support surface is constrained by volume extent in "
                        << binningValueName(bv));
           supportExtent.set(bv, support.volumeExtent.min(bv),
@@ -339,10 +339,7 @@ Acts::Experimental::LayerStructureBuilder::construct(
         adaptBinningRange(binnings, m_cfg.extent.value());
       }
       // Sort the binning for conventions
-      std::sort(binnings.begin(), binnings.end(),
-                [](const ProtoBinning& a, const ProtoBinning& b) {
-                  return a.binValue < b.binValue;
-                });
+      std::ranges::sort(binnings, {}, [](const auto& b) { return b.binValue; });
 
       ACTS_DEBUG("- 2-dimensional surface binning detected.");
       // Capture the binnings

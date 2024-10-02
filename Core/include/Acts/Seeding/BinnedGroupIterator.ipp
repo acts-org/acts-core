@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 // Binned SP Group Iterator
 
@@ -28,12 +28,6 @@ template <typename grid_t>
 bool Acts::BinnedGroupIterator<grid_t>::operator==(
     const Acts::BinnedGroupIterator<grid_t>& other) const {
   return m_group.ptr == other.m_group.ptr && m_gridItr == other.m_gridItr;
-}
-
-template <typename grid_t>
-bool Acts::BinnedGroupIterator<grid_t>::operator!=(
-    const Acts::BinnedGroupIterator<grid_t>& other) const {
-  return !(*this == other);
 }
 
 template <typename grid_t>

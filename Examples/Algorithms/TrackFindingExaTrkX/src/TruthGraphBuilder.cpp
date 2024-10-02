@@ -1,13 +1,15 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <Acts/Definitions/Units.hpp>
 #include <ActsExamples/TrackFindingExaTrkX/TruthGraphBuilder.hpp>
+
+#include <algorithm>
 
 using namespace Acts::UnitLiterals;
 
@@ -82,9 +84,8 @@ std::vector<std::int64_t> TruthGraphBuilder::buildFromMeasurements(
     };
 
     // Sort by radius (this breaks down if the particle has to low momentum)
-    std::sort(track.begin(), track.end(), [&](const auto& a, const auto& b) {
-      return radiusForOrdering(a) < radiusForOrdering(b);
-    });
+    std::ranges::sort(track, {},
+                      [&](const auto& t) { return radiusForOrdering(t); });
 
     if (m_cfg.uniqueModules) {
       auto newEnd = std::unique(
@@ -148,9 +149,7 @@ std::vector<std::int64_t> TruthGraphBuilder::buildFromSimhits(
 
   for (auto& [pid, track] : tracks) {
     // Sort by hit index, so the edges are connected correctly
-    std::sort(track.begin(), track.end(), [](const auto& a, const auto& b) {
-      return a.hitIndex < b.hitIndex;
-    });
+    std::ranges::sort(track, {}, [](const auto& t) { return t.hitIndex; });
 
     auto found = particles.find(pid);
     if (found == particles.end()) {

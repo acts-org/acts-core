@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/tools/output_test_stream.hpp>
@@ -195,13 +195,13 @@ BOOST_AUTO_TEST_CASE(CylinderSurfaceProperties) {
       testContext, offSurface, direction, BoundaryTolerance::Infinite());
   Intersection3D expectedIntersect{Vector3{1, 1, 2}, 99.,
                                    Intersection3D::Status::reachable};
-  BOOST_CHECK(sfIntersection[0]);
+  BOOST_CHECK(sfIntersection[0].isValid());
   CHECK_CLOSE_ABS(sfIntersection[0].position(), expectedIntersect.position(),
                   1e-9);
   CHECK_CLOSE_ABS(sfIntersection[0].pathLength(),
                   expectedIntersect.pathLength(), 1e-9);
   // there is a second solution & and it should be valid
-  BOOST_CHECK(sfIntersection[1]);
+  BOOST_CHECK(sfIntersection[1].isValid());
   // And it's path should be further away then the primary solution
   double pn = sfIntersection[0].pathLength();
   double pa = sfIntersection[1].pathLength();

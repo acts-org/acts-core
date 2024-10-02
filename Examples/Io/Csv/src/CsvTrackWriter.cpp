@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Io/Csv/CsvTrackWriter.hpp"
 
@@ -28,6 +28,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -159,19 +160,13 @@ ProcessCode CsvTrackWriter::writeT(const AlgorithmContext& context,
   // Find duplicates
   std::unordered_set<std::size_t> listGoodTracks;
   for (auto& [particleId, matchedTracks] : matched) {
-    std::sort(matchedTracks.begin(), matchedTracks.end(),
-              [](const RecoTrackInfo& lhs, const RecoTrackInfo& rhs) {
-                // sort by nMajorityHits
-                if (lhs.first.nMajorityHits != rhs.first.nMajorityHits) {
-                  return (lhs.first.nMajorityHits > rhs.first.nMajorityHits);
-                }
-                // sort by nOutliers
-                if (lhs.first.nOutliers != rhs.first.nOutliers) {
-                  return (lhs.first.nOutliers < rhs.first.nOutliers);
-                }
-                // sort by chi2
-                return (lhs.first.chi2Sum < rhs.first.chi2Sum);
-              });
+    std::ranges::sort(matchedTracks, [](const auto& lhs, const auto& rhs) {
+      const auto& t1 = lhs.first;
+      const auto& t2 = rhs.first;
+      // nMajorityHits are sorted descending, others ascending
+      return std::tie(t2.nMajorityHits, t1.nOutliers, t1.chi2Sum) <
+             std::tie(t1.nMajorityHits, t2.nOutliers, t2.chi2Sum);
+    });
 
     listGoodTracks.insert(matchedTracks.front().first.trackId);
   }
@@ -190,7 +185,7 @@ ProcessCode CsvTrackWriter::writeT(const AlgorithmContext& context,
 
   // good/duplicate/fake = 0/1/2
   for (auto& [id, trajState] : infoMap) {
-    if (listGoodTracks.find(id) != listGoodTracks.end()) {
+    if (listGoodTracks.contains(id)) {
       trajState.trackType = "good";
     } else if (trajState.trackType != "fake") {
       trajState.trackType = "duplicate";

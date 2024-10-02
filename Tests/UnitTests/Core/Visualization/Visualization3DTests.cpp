@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/tools/output_test_stream.hpp>
 #include <boost/test/unit_test.hpp>
@@ -298,7 +298,8 @@ BOOST_AUTO_TEST_CASE(ObjOutputTest) {
 
   output << obj;
 
-  std::string exp = R"(v 1 0 0
+  std::string exp = R"(usemtl material_120_120_120
+v 1 0 0
 )";
 
   BOOST_CHECK(output.is_equal(exp));
@@ -307,13 +308,33 @@ BOOST_AUTO_TEST_CASE(ObjOutputTest) {
   obj.face({{1, 0, 0}, {1, 1, 0}, {0, 1, 0}});
   output << obj;
 
-  exp = R"(v 1 0 0
+  exp = R"(usemtl material_120_120_120
+v 1 0 0
 v 1 1 0
 v 0 1 0
+usemtl material_120_120_120
 f 1 2 3
 )";
 
   BOOST_CHECK(output.is_equal(exp));
+}
+
+BOOST_AUTO_TEST_CASE(ColorTests) {
+  Color red{"#ff0000"};
+  BOOST_CHECK_EQUAL(red, Color(255, 0, 0));
+
+  Color green{"#00ff00"};
+  BOOST_CHECK_EQUAL(green, Color(0, 255, 0));
+
+  Color blue{"#0000ff"};
+  BOOST_CHECK_EQUAL(blue, Color(0, 0, 255));
+
+  Color grey{"#808080"};
+  BOOST_CHECK_EQUAL(grey, Color(128, 128, 128));
+  BOOST_CHECK_EQUAL(grey, Color(std::array{128, 128, 128}));
+  BOOST_CHECK_EQUAL(grey,
+                    Color(std::array{128 / 255.0, 128 / 255.0, 128 / 255.0}));
+  BOOST_CHECK_EQUAL(grey, Color(128 / 255.0, 128 / 255.0, 128 / 255.0));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

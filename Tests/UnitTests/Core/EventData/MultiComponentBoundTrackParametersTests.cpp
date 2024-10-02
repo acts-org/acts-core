@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -14,6 +14,7 @@
 #include "Acts/EventData/GenericBoundTrackParameters.hpp"
 #include "Acts/EventData/ParticleHypothesis.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
+#include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include <Acts/EventData/Charge.hpp>
 #include <Acts/EventData/MultiComponentTrackParameters.hpp>
@@ -38,8 +39,9 @@ BOOST_AUTO_TEST_CASE(test_constructors) {
       b;
   b.push_back({1.0, BoundVector::Ones(), BoundSquareMatrix::Identity()});
 
-  auto surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Vector3::Ones(), Vector3::Ones().normalized());
+  auto surface =
+      CurvilinearSurface(Vector3::Ones(), Vector3::Ones().normalized())
+          .planeSurface();
 
   const auto ap =
       MultiComponentBoundTrackParameters(surface, a, particleHypothesis);
@@ -62,8 +64,9 @@ BOOST_AUTO_TEST_CASE(test_accessors) {
   using cov_t = std::optional<BoundSquareMatrix>;
   for (const auto &cov : {cov_t{}, cov_t{BoundSquareMatrix::Identity()},
                           cov_t{BoundSquareMatrix::Identity()}}) {
-    auto surface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-        Vector3::Ones(), Vector3::Ones().normalized());
+    auto surface =
+        CurvilinearSurface(Vector3::Ones(), Vector3::Ones().normalized())
+            .planeSurface();
 
     const BoundTrackParameters single_pars(surface, BoundVector::Ones(), cov,
                                            particleHypothesis);

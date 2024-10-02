@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -54,7 +54,7 @@ bool clHashComp(const Cluster1D& left, const Cluster1D& right) {
 }
 
 void hash(Cluster1D& cl) {
-  std::sort(cl.cells.begin(), cl.cells.end(), cellComp);
+  std::ranges::sort(cl.cells, cellComp);
   cl.hash = 0;
   for (const Cell1D& c : cl.cells) {
     boost::hash_combine(cl.hash, c.col);
@@ -117,8 +117,8 @@ BOOST_AUTO_TEST_CASE(Grid_1D_rand) {
       hash(cl);
     }
 
-    std::sort(clusters.begin(), clusters.end(), clHashComp);
-    std::sort(newCls.begin(), newCls.end(), clHashComp);
+    std::ranges::sort(clusters, clHashComp);
+    std::ranges::sort(newCls, clHashComp);
 
     BOOST_CHECK_EQUAL(clusters.size(), newCls.size());
     for (std::size_t i = 0; i < clusters.size(); i++) {

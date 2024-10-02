@@ -57,21 +57,19 @@ def runMaterialValidation(
     alg = acts.examples.PropagationAlgorithm(
         propagatorImpl=prop,
         level=acts.logging.INFO,
-        sterileLogger=False,
+        sterileLogger=True,
         recordMaterialInteractions=True,
         inputTrackParameters="start_parameters",
-        outputPropagationSteps="propagation_steps",
-        outputMaterialTracks="material-tracks",
+        outputSummaryCollection="propagation_summary",
+        outputMaterialCollection="material_tracks",
     )
 
     s.addAlgorithm(alg)
 
-    print(os.path.join(outputDir, (outputName + ".root")))
-
     s.addWriter(
         RootMaterialTrackWriter(
             level=acts.logging.INFO,
-            inputMaterialTracks=alg.config.outputMaterialTracks,
+            inputMaterialTracks=alg.config.outputMaterialCollection,
             filePath=os.path.join(outputDir, (outputName + ".root")),
             storeSurface=True,
             storeVolume=True,

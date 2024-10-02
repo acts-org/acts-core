@@ -1,13 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
+#include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/EventData/MeasurementHelpers.hpp"
 #include "Acts/EventData/SourceLink.hpp"
@@ -16,8 +17,10 @@
 #include "Acts/EventData/detail/CalculateResiduals.hpp"
 #include "Acts/EventData/detail/ParameterTraits.hpp"
 #include "Acts/EventData/detail/PrintParameters.hpp"
+#include "ActsExamples/EventData/MeasurementConcept.hpp"
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <iosfwd>
 #include <type_traits>
@@ -28,253 +31,508 @@
 
 namespace ActsExamples {
 
-/// A measurement of a variable-size subspace of the full parameters.
+template <typename Derived, std::size_t FullSize, bool ReadOnly>
+class MeasurementProxyBase;
+template <std::size_t FullSize, std::size_t Size, bool ReadOnly>
+class FixedMeasurementProxy;
+template <std::size_t FullSize, bool ReadOnly>
+class VariableMeasurementProxy;
+
+template <std::size_t Size>
+using FixedBoundMeasurementProxy =
+    FixedMeasurementProxy<Acts::eBoundSize, Size, false>;
+template <std::size_t Size>
+using ConstFixedBoundMeasurementProxy =
+    FixedMeasurementProxy<Acts::eBoundSize, Size, true>;
+using VariableBoundMeasurementProxy =
+    VariableMeasurementProxy<Acts::eBoundSize, false>;
+using ConstVariableBoundMeasurementProxy =
+    VariableMeasurementProxy<Acts::eBoundSize, true>;
+
+/// @brief A container to store and access measurements
 ///
-/// @tparam indices_t Parameter index type, determines the full parameter space
+/// This container stores measurements of different sizes and provides
+/// access to them through fixed-size and variable-size proxies.
 ///
-/// The measurement intentionally does not store a pointer/reference to the
-/// reference object in the geometry hierarchy, i.e. the surface or volume. The
-/// reference object can already be identified via the geometry identifier
-/// provided by the source link. Since a measurement **must** be anchored within
-/// the geometry hierarchy, all measurement surfaces and volumes **must**
-/// provide valid geometry identifiers. In all use-cases, e.g. Kalman filtering,
-/// a pointer/reference to the reference object is available before the
-/// measurement is accessed; e.g. the propagator provides the surface pointer
-/// during navigation, which is then used to lookup possible measurements.
-///
-/// The pointed-to geometry object would differ depending on the parameter type.
-/// This means either, that there needs to be an additional variable type or
-/// that a pointer to a base object is stored (requiring a `dynamic_cast` later
-/// on). Both variants add additional complications. Since the geometry object
-/// is not required anyway (as discussed above), not storing it removes all
-/// these complications altogether.
-template <typename indices_t>
-class VariableSizeMeasurement {
+/// The measurements are stored densely in a flat buffer and the proxies
+/// provide access to the individual measurements.
+class MeasurementContainer {
  public:
-  static constexpr std::size_t kFullSize =
-      Acts::detail::kParametersSize<indices_t>;
+  using Index = std::size_t;
+  template <std::size_t Size>
+  using FixedProxy = FixedMeasurementProxy<Acts::eBoundSize, Size, false>;
+  template <std::size_t Size>
+  using ConstFixedProxy = FixedMeasurementProxy<Acts::eBoundSize, Size, true>;
+  using VariableProxy = VariableMeasurementProxy<Acts::eBoundSize, false>;
+  using ConstVariableProxy = VariableMeasurementProxy<Acts::eBoundSize, true>;
 
-  using Scalar = Acts::ActsScalar;
+  MeasurementContainer();
 
-  using SubspaceIndex = std::uint8_t;
-  using SubspaceIndices =
-      boost::container::static_vector<SubspaceIndex, kFullSize>;
+  /// @brief Get the number of measurements
+  /// @return The number of measurements
+  std::size_t size() const;
 
-  /// Vector type containing for measured parameter values.
-  template <std::size_t dim>
-  using ParametersVector = Eigen::Matrix<Scalar, dim, 1>;
-  template <std::size_t dim>
-  using ParametersVectorMap = Eigen::Map<ParametersVector<dim>>;
-  template <std::size_t dim>
-  using ConstParametersVectorMap = Eigen::Map<const ParametersVector<dim>>;
-  using EffectiveParametersVector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
-  using EffectiveParametersVectorMap = Eigen::Map<EffectiveParametersVector>;
-  using ConstEffectiveParametersVectorMap =
-      Eigen::Map<const EffectiveParametersVector>;
+  /// @brief Reserve space for a number of measurements
+  /// @param size The number of measurements to reserve space for
+  void reserve(std::size_t size);
 
-  /// Matrix type for the measurement covariance.
-  template <std::size_t dim>
-  using CovarianceMatrix = Eigen::Matrix<Scalar, dim, dim>;
-  template <std::size_t dim>
-  using CovarianceMatrixMap = Eigen::Map<CovarianceMatrix<dim>>;
-  template <std::size_t dim>
-  using ConstCovarianceMatrixMap = Eigen::Map<const CovarianceMatrix<dim>>;
-  using EffectiveCovarianceMatrix =
-      Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
-  using EffectiveCovarianceMatrixMap = Eigen::Map<EffectiveCovarianceMatrix>;
-  using ConstEffectiveCovarianceMatrixMap =
-      Eigen::Map<const EffectiveCovarianceMatrix>;
+  /// @brief Add a measurement of a given size
+  /// @param size The size of the measurement
+  /// @return The index of the added measurement
+  Index addMeasurement(std::uint8_t size);
 
-  using FullParametersVector = Acts::ActsVector<kFullSize>;
-  using FullCovarianceMatrix = Acts::ActsSquareMatrix<kFullSize>;
+  /// @brief Get a variable-size measurement proxy
+  /// @param index The index of the measurement
+  /// @return The variable-size measurement proxy
+  VariableProxy getMeasurement(Index index);
+  /// @brief Get a const variable-size measurement proxy
+  /// @param index The index of the measurement
+  /// @return The const variable-size measurement proxy
+  ConstVariableProxy getMeasurement(Index index) const;
 
-  using ProjectionMatrix = Eigen::Matrix<Scalar, Eigen::Dynamic, kFullSize>;
-  using ExpansionMatrix = Eigen::Matrix<Scalar, kFullSize, Eigen::Dynamic>;
-
-  /// Construct from source link, subset indices, and measured data.
-  ///
-  /// @tparam parameters_t Input parameters vector type
-  /// @tparam covariance_t Input covariance matrix type
-  /// @param source The link that connects to the underlying detector readout
-  /// @param subspaceIndices Which parameters are measured
-  /// @param params Measured parameters values
-  /// @param cov Measured parameters covariance
-  ///
-  /// @note The indices must be ordered and must describe/match the content
-  ///   of parameters and covariance.
-  template <typename other_indices_t, std::size_t kSize, typename parameters_t,
-            typename covariance_t>
-  VariableSizeMeasurement(
-      Acts::SourceLink source,
-      const std::array<other_indices_t, kSize>& subspaceIndices,
-      const Eigen::MatrixBase<parameters_t>& params,
-      const Eigen::MatrixBase<covariance_t>& cov)
-      : m_source(std::move(source)) {
-    static_assert(kSize == parameters_t::RowsAtCompileTime,
-                  "Parameter size mismatch");
-    static_assert(kSize == covariance_t::RowsAtCompileTime,
-                  "Covariance rows mismatch");
-    static_assert(kSize == covariance_t::ColsAtCompileTime,
-                  "Covariance cols mismatch");
-
-    m_subspaceIndices.resize(subspaceIndices.size());
-    std::transform(subspaceIndices.begin(), subspaceIndices.end(),
-                   m_subspaceIndices.begin(), [](auto index) {
-                     return static_cast<SubspaceIndex>(index);
-                   });
-
-    parameters<kSize>() = params;
-    covariance<kSize>() = cov;
+  /// @brief Get a fixed-size measurement proxy
+  /// @tparam Size The size of the measurement
+  /// @param index The index of the measurement
+  /// @return The fixed-size measurement proxy
+  template <std::size_t Size>
+  FixedProxy<Size> getMeasurement(Index index) {
+    return FixedProxy<Size>{*this, index};
   }
-  /// A measurement can only be constructed with valid parameters.
-  VariableSizeMeasurement() = delete;
-  VariableSizeMeasurement(const VariableSizeMeasurement&) = default;
-  VariableSizeMeasurement(VariableSizeMeasurement&&) = default;
-  ~VariableSizeMeasurement() = default;
-  VariableSizeMeasurement& operator=(const VariableSizeMeasurement&) = default;
-  VariableSizeMeasurement& operator=(VariableSizeMeasurement&&) = default;
-
-  /// Source link that connects to the underlying detector readout.
-  const Acts::SourceLink& sourceLink() const { return m_source; }
-
-  constexpr std::size_t size() const { return m_subspaceIndices.size(); }
-
-  /// Check if a specific parameter is part of this measurement.
-  bool contains(indices_t i) const {
-    return std::find(m_subspaceIndices.begin(), m_subspaceIndices.end(), i) !=
-           m_subspaceIndices.end();
+  /// @brief Get a const fixed-size measurement proxy
+  /// @tparam Size The size of the measurement
+  /// @param index The index of the measurement
+  /// @return The const fixed-size measurement proxy
+  template <std::size_t Size>
+  ConstFixedProxy<Size> getMeasurement(Index index) const {
+    return ConstFixedProxy<Size>{*this, index};
   }
 
-  std::size_t indexOf(indices_t i) const {
-    auto it = std::find(m_subspaceIndices.begin(), m_subspaceIndices.end(), i);
-    assert(it != m_subspaceIndices.end());
-    return std::distance(m_subspaceIndices.begin(), it);
+  /// @brief Make a measurement of a given size
+  /// @param size The size of the measurement
+  /// @return The variable-size measurement proxy
+  VariableProxy makeMeasurement(std::uint8_t size);
+  /// @brief Make a fixed-size measurement
+  /// @tparam Size The size of the measurement
+  /// @return The fixed-size measurement proxy
+  template <std::size_t Size>
+  FixedProxy<Size> makeMeasurement() {
+    return getMeasurement<Size>(addMeasurement(Size));
   }
 
-  /// The measurement indices
-  const SubspaceIndices& subspaceIndices() const { return m_subspaceIndices; }
+  template <typename... Args>
+  VariableProxy emplaceMeasurement(std::uint8_t size, Args&&... args);
 
-  template <std::size_t dim>
-  Acts::SubspaceIndices<dim> subspaceIndices() const {
-    assert(dim == size());
-    Acts::SubspaceIndices<dim> result;
-    std::copy(m_subspaceIndices.begin(), m_subspaceIndices.end(),
-              result.begin());
-    return result;
-  }
+  template <std::size_t Size, typename... Args>
+  FixedProxy<Size> emplaceMeasurement(Args&&... args);
 
-  Acts::BoundSubspaceIndices boundSubsetIndices() const
-    requires(std::is_same_v<indices_t, Acts::BoundIndices>)
-  {
-    Acts::BoundSubspaceIndices result = Acts::kBoundSubspaceIndicesInvalid;
-    std::copy(m_subspaceIndices.begin(), m_subspaceIndices.end(),
-              result.begin());
-    return result;
-  }
+  template <bool Const>
+  class IteratorImpl {
+   public:
+    using value_type =
+        std::conditional_t<Const, ConstVariableProxy, VariableProxy>;
+    using reference = value_type;
+    using pointer = value_type*;
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::forward_iterator_tag;
 
-  template <std::size_t dim>
-  ConstParametersVectorMap<dim> parameters() const {
-    assert(dim == size());
-    return ConstParametersVectorMap<dim>{m_params.data()};
-  }
-  template <std::size_t dim>
-  ParametersVectorMap<dim> parameters() {
-    assert(dim == size());
-    return ParametersVectorMap<dim>{m_params.data()};
-  }
-  ConstEffectiveParametersVectorMap parameters() const {
-    return ConstEffectiveParametersVectorMap{m_params.data(),
-                                             static_cast<Eigen::Index>(size())};
-  }
-  EffectiveParametersVectorMap parameters() {
-    return EffectiveParametersVectorMap{m_params.data(),
-                                        static_cast<Eigen::Index>(size())};
-  }
+    using Container = std::conditional_t<Const, const MeasurementContainer,
+                                         MeasurementContainer>;
 
-  template <std::size_t dim>
-  ConstCovarianceMatrixMap<dim> covariance() const {
-    assert(dim == size());
-    return ConstCovarianceMatrixMap<dim>{m_cov.data()};
-  }
-  template <std::size_t dim>
-  CovarianceMatrixMap<dim> covariance() {
-    assert(dim == size());
-    return CovarianceMatrixMap<dim>{m_cov.data()};
-  }
-  ConstEffectiveCovarianceMatrixMap covariance() const {
-    return ConstEffectiveCovarianceMatrixMap{m_cov.data(),
-                                             static_cast<Eigen::Index>(size()),
-                                             static_cast<Eigen::Index>(size())};
-  }
-  EffectiveCovarianceMatrixMap covariance() {
-    return EffectiveCovarianceMatrixMap{m_cov.data(),
-                                        static_cast<Eigen::Index>(size()),
-                                        static_cast<Eigen::Index>(size())};
-  }
+    IteratorImpl(Container& container, std::size_t index)
+        : m_container(container), m_index(index) {}
 
-  FullParametersVector fullParameters() const {
-    FullParametersVector result = FullParametersVector::Zero();
-    for (std::size_t i = 0; i < size(); ++i) {
-      result[m_subspaceIndices[i]] = parameters()[i];
+    reference operator*() const { return m_container.getMeasurement(m_index); }
+
+    pointer operator->() const { return &operator*(); }
+
+    IteratorImpl& operator++() {
+      ++m_index;
+      return *this;
     }
-    return result;
-  }
 
-  FullCovarianceMatrix fullCovariance() const {
-    FullCovarianceMatrix result = FullCovarianceMatrix::Zero();
-    for (std::size_t i = 0; i < size(); ++i) {
-      for (std::size_t j = 0; j < size(); ++j) {
-        result(m_subspaceIndices[i], m_subspaceIndices[j]) = covariance()(i, j);
-      }
+    IteratorImpl operator++(int) {
+      auto copy = *this;
+      ++*this;
+      return copy;
     }
-    return result;
-  }
 
- private:
-  Acts::SourceLink m_source;
-  SubspaceIndices m_subspaceIndices;
-  std::array<Scalar, kFullSize> m_params{};
-  std::array<Scalar, kFullSize * kFullSize> m_cov{};
+    bool operator==(const IteratorImpl& other) const {
+      return m_index == other.m_index;
+    }
+
+   private:
+    Container& m_container;
+    Index m_index;
+  };
+
+  using iterator = IteratorImpl<false>;
+  using const_iterator = IteratorImpl<true>;
+
+  iterator begin();
+  iterator end();
+  const_iterator begin() const;
+  const_iterator end() const;
+  const_iterator cbegin() const;
+  const_iterator cend() const;
+
+ public:
+  struct MeasurementEntry {
+    std::size_t subspaceIndexOffset{};
+    std::size_t parameterOffset{};
+    std::size_t covarianceOffset{};
+    std::uint8_t size{};
+  };
+
+  std::vector<MeasurementEntry> m_entries;
+
+  std::vector<std::optional<Acts::SourceLink>> m_sourceLinks;
+  std::vector<std::uint8_t> m_subspaceIndices;
+  std::vector<double> m_parameters;
+  std::vector<double> m_covariances;
 };
 
-/// Construct a variable-size measurement for the given indices.
+/// @brief Base class for measurement proxies
 ///
-/// @tparam parameters_t Input parameters vector type
-/// @tparam covariance_t Input covariance matrix type
-/// @tparam indices_t Parameter index type, determines the full parameter space
-/// @tparam tail_indices_t Helper types required to support variadic arguments;
-///   all types must be convertibale to `indices_t`.
-/// @param source The link that connects to the underlying detector readout
-/// @param params Measured parameters values
-/// @param cov Measured parameters covariance
-/// @param index0 Required parameter index, measurement must be at least 1d
-/// @param tailIndices Additional parameter indices for larger measurements
-/// @return Variable-size measurement w/ the correct type and given inputs
+/// This class provides common functionality for fixed-size and variable-size
+/// measurement proxies.
 ///
-/// @note The indices must be ordered and must be consistent with the content of
-/// parameters and covariance.
-template <typename parameters_t, typename covariance_t, typename indices_t,
-          typename... tail_indices_t>
-VariableSizeMeasurement<indices_t> makeVariableSizeMeasurement(
-    Acts::SourceLink source, const Eigen::MatrixBase<parameters_t>& params,
-    const Eigen::MatrixBase<covariance_t>& cov, indices_t index0,
-    tail_indices_t... tailIndices) {
-  using IndexContainer = std::array<indices_t, 1u + sizeof...(tail_indices_t)>;
-  return {std::move(source), IndexContainer{index0, tailIndices...}, params,
-          cov};
+/// @tparam Derived The derived measurement proxy class
+/// @tparam FullSize The full size of the measurement
+/// @tparam ReadOnly Whether the proxy is read-only
+template <typename Derived, std::size_t FullSize, bool ReadOnly>
+class MeasurementProxyBase {
+ public:
+  using Index = MeasurementContainer::Index;
+  using SubspaceIndex = std::uint8_t;
+  using Scalar = double;
+
+  using FullVector = Acts::ActsVector<FullSize>;
+  using FullSquareMatrix = Acts::ActsSquareMatrix<FullSize>;
+
+  using Container = std::conditional_t<ReadOnly, const MeasurementContainer,
+                                       MeasurementContainer>;
+
+  MeasurementProxyBase(Container& container_, Index index_)
+      : m_container(&container_), m_index(index_) {}
+  template <typename OtherDerived, bool OtherReadOnly>
+  MeasurementProxyBase(
+      const MeasurementProxyBase<OtherDerived, FullSize, OtherReadOnly>& other)
+    requires(ReadOnly == OtherReadOnly || ReadOnly)
+      : m_container(&other.container()), m_index(other.index()) {}
+
+  /// @brief Get the container of the measurement
+  /// @return The container of the measurement
+  Container& container() const { return *m_container; }
+  /// @brief Get the index of the measurement
+  /// @return The index of the measurement
+  Index index() const { return m_index; }
+
+  /// @brief Get the size of the measurement
+  /// @return The size of the measurement
+  std::size_t size() const { return container().m_entries.at(m_index).size; }
+
+  /// @brief Check if the measurement contains a subspace index
+  /// @param i The subspace index
+  /// @return True if the measurement contains the subspace index
+  template <typename indices_t>
+  bool contains(indices_t i) const {
+    return self().subspaceHelper().contains(i);
+  }
+
+  /// @brief Get the index of a subspace index in the measurement
+  /// @param i The subspace index
+  /// @return The index of the subspace index in the measurement
+  template <typename indices_t>
+  std::size_t indexOf(indices_t i) const {
+    return self().subspaceHelper().indexOf(i);
+  }
+
+  /// @brief Set the source link of the measurement
+  /// @param sourceLink The source link
+  void setSourceLink(const Acts::SourceLink& sourceLink)
+    requires(!ReadOnly)
+  {
+    container().m_sourceLinks.at(m_index) = sourceLink;
+  }
+
+  /// @brief Get the source link of the measurement
+  /// @return The source link
+  const Acts::SourceLink& sourceLink() const {
+    return container().m_sourceLinks.at(m_index).value();
+  }
+
+  /// @brief Set the subspace indices of the measurement
+  /// @param indices The subspace indices
+  template <typename IndexContainer>
+  void setSubspaceIndices(const IndexContainer& indices)
+    requires(!ReadOnly)
+  {
+    assert(Acts::checkSubspaceIndices(indices, FullSize, size()) &&
+           "Invalid indices");
+    std::transform(indices.begin(), indices.end(),
+                   self().subspaceIndexVector().begin(),
+                   [](auto index) { return static_cast<Index>(index); });
+  }
+
+  /// @brief Get the measurement as a full-size vector
+  /// @return The full-size measurement vector
+  FullVector fullParameters() const {
+    return self().subspaceHelper().expandVector(self().parameters());
+  }
+
+  /// @brief Get the covariance as a full-size square matrix
+  /// @return The full-size covariance matrix
+  FullSquareMatrix fullCovariance() const {
+    return self().subspaceHelper().expandMatrix(self().covariance());
+  }
+
+  /// @brief Construct the measurement from a sourcelink, subspace vector,
+  /// parameters, and covariance.
+  ///
+  template <typename Subspace, typename ParameterDerived,
+            typename CovarianceDerived>
+  void fill(const Acts::SourceLink& source_link, Subspace&& subspace,
+            const Eigen::DenseBase<ParameterDerived>& parameters,
+            const Eigen::DenseBase<CovarianceDerived>& covariance)
+    requires(!ReadOnly)
+  {
+    setSourceLink(source_link);
+    self().setSubspaceIndices(std::forward<Subspace>(subspace));
+    self().parameters() = parameters;
+    self().covariance() = covariance;
+  }
+
+  /// @brief Construct the measurement from a sourcelink, subspace vector,
+  /// parameters, and covariance.
+  ///
+  template <MeasurementConcept OtherDerived>
+  void fill(const OtherDerived& other)
+    requires(!ReadOnly)
+  {
+    assert(size() == other.size() && "Size mismatch");
+    fill(other.sourceLink(), other.subspaceIndexVector(), other.parameters(),
+         other.covariance());
+  }
+
+  /// @brief Copy the data from another measurement
+  /// @tparam OtherDerived The derived measurement proxy class of the other
+  ///         measurement
+  /// @param other The other measurement proxy
+  template <typename OtherDerived>
+  void copyFrom(const OtherDerived& other)
+    requires(!ReadOnly) && requires {
+      { this->fill(other) };
+    }
+  {
+    fill(other);
+  }
+
+ protected:
+  Derived& self() { return static_cast<Derived&>(*this); }
+  const Derived& self() const { return static_cast<const Derived&>(*this); }
+
+  Container* m_container;
+  Index m_index;
+};
+
+/// @brief Fixed-size measurement proxy
+///
+/// This class provides access to a fixed-size measurement in a measurement
+/// container.
+///
+/// @tparam FullSize The full size of the measurement
+/// @tparam Size The size of the measurement
+/// @tparam ReadOnly Whether the proxy is read-only
+template <std::size_t FullSize, std::size_t Size, bool ReadOnly>
+class FixedMeasurementProxy
+    : public MeasurementProxyBase<
+          FixedMeasurementProxy<FullSize, Size, ReadOnly>, FullSize, ReadOnly> {
+ public:
+  using Base =
+      MeasurementProxyBase<FixedMeasurementProxy<FullSize, Size, ReadOnly>,
+                           FullSize, ReadOnly>;
+  using Index = typename Base::Index;
+  using SubspaceIndex = typename Base::SubspaceIndex;
+  using Scalar = typename Base::Scalar;
+  using Container = typename Base::Container;
+
+  using SubspaceHelper = Acts::FixedSubspaceHelper<FullSize, Size>;
+
+  using SubspaceVector = Eigen::Matrix<SubspaceIndex, Size, 1>;
+  using SubspaceVectorMap =
+      std::conditional_t<ReadOnly, Eigen::Map<const SubspaceVector>,
+                         Eigen::Map<SubspaceVector>>;
+
+  using ParametersVector = Eigen::Matrix<Scalar, Size, 1>;
+  using ParametersVectorMap =
+      std::conditional_t<ReadOnly, Eigen::Map<const ParametersVector>,
+                         Eigen::Map<ParametersVector>>;
+
+  using CovarianceMatrix = Eigen::Matrix<Scalar, Size, Size>;
+  using CovarianceMatrixMap =
+      std::conditional_t<ReadOnly, Eigen::Map<const CovarianceMatrix>,
+                         Eigen::Map<CovarianceMatrix>>;
+
+  FixedMeasurementProxy(Container& container_, Index index_)
+      : Base(container_, index_) {
+    assert(container().m_entries.at(index()).size == Size && "Size mismatch");
+  }
+  template <typename OtherDerived, bool OtherReadOnly>
+  FixedMeasurementProxy(
+      const MeasurementProxyBase<OtherDerived, FullSize, OtherReadOnly>& other)
+    requires(ReadOnly == OtherReadOnly || ReadOnly)
+      : Base(other) {
+    assert(container().m_entries.at(index()).size == Size && "Size mismatch");
+  }
+
+  using Base::container;
+  using Base::index;
+
+  /// @brief Get the size of the measurement
+  /// @return The size of the measurement
+  static constexpr std::size_t size() { return Size; }
+
+  /// @brief Get the subspace helper for the measurement
+  /// @return The subspace helper
+  SubspaceHelper subspaceHelper() const {
+    return SubspaceHelper{subspaceIndexVector()};
+  }
+
+  /// @brief Get the subspace indices of the measurement
+  /// @return The subspace indices
+  Acts::SubspaceIndices<Size> subspaceIndices() const {
+    return subspaceHelper().indices();
+  }
+
+  /// @brief Get the subspace index vector of the measurement
+  /// @return The subspace index vector
+  SubspaceVectorMap subspaceIndexVector() const {
+    return SubspaceVectorMap{
+        container().m_subspaceIndices.data() +
+        container().m_entries.at(index()).subspaceIndexOffset};
+  }
+
+  /// @brief Get the parameters of the measurement
+  /// @return The parameters
+  ParametersVectorMap parameters() const {
+    return ParametersVectorMap{
+        container().m_parameters.data() +
+        container().m_entries.at(index()).parameterOffset};
+  }
+
+  /// @brief Get the covariance of the measurement
+  /// @return The covariance
+  CovarianceMatrixMap covariance() const {
+    return CovarianceMatrixMap{
+        container().m_covariances.data() +
+        container().m_entries.at(index()).covarianceOffset};
+  }
+};
+
+/// @brief Variable-size measurement proxy
+///
+/// This class provides access to a variable-size measurement in a measurement
+/// container.
+///
+/// @tparam FullSize The full size of the measurement
+/// @tparam ReadOnly Whether the proxy is read-only
+template <std::size_t FullSize, bool ReadOnly>
+class VariableMeasurementProxy
+    : public MeasurementProxyBase<VariableMeasurementProxy<FullSize, ReadOnly>,
+                                  FullSize, ReadOnly> {
+ public:
+  using Base =
+      MeasurementProxyBase<VariableMeasurementProxy<FullSize, ReadOnly>,
+                           FullSize, ReadOnly>;
+  using Index = typename Base::Index;
+  using SubspaceIndex = typename Base::SubspaceIndex;
+  using Scalar = typename Base::Scalar;
+  using Container = typename Base::Container;
+
+  using SubspaceHelper = Acts::VariableSubspaceHelper<FullSize>;
+
+  using SubspaceVector = Eigen::Matrix<SubspaceIndex, Eigen::Dynamic, 1>;
+  using SubspaceVectorMap =
+      std::conditional_t<ReadOnly, Eigen::Map<const SubspaceVector>,
+                         Eigen::Map<SubspaceVector>>;
+
+  using ParametersVector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+  using ParametersVectorMap =
+      std::conditional_t<ReadOnly, Eigen::Map<const ParametersVector>,
+                         Eigen::Map<ParametersVector>>;
+
+  using CovarianceMatrix =
+      Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+  using CovarianceMatrixMap =
+      std::conditional_t<ReadOnly, Eigen::Map<const CovarianceMatrix>,
+                         Eigen::Map<CovarianceMatrix>>;
+
+  VariableMeasurementProxy(Container& container_, Index index_)
+      : Base(container_, index_) {}
+  template <typename OtherDerived, bool OtherReadOnly>
+  VariableMeasurementProxy(
+      const MeasurementProxyBase<OtherDerived, FullSize, OtherReadOnly>& other)
+    requires(ReadOnly == OtherReadOnly || ReadOnly)
+      : Base(other) {}
+
+  using Base::container;
+  using Base::index;
+
+  /// @brief Get the subspace helper for the measurement
+  /// @return The subspace helper
+  SubspaceHelper subspaceHelper() const {
+    return SubspaceHelper{subspaceIndexVector()};
+  }
+
+  /// @brief Get the subspace indices of the measurement
+  /// @return The subspace indices
+  SubspaceVectorMap subspaceIndexVector() const {
+    const auto size = static_cast<Eigen::Index>(this->size());
+    return SubspaceVectorMap{
+        container().m_subspaceIndices.data() +
+            container().m_entries.at(index()).subspaceIndexOffset,
+        size};
+  }
+
+  /// @brief Get the parameters of the measurement
+  /// @return The parameters
+  ParametersVectorMap parameters() const {
+    const auto size = static_cast<Eigen::Index>(this->size());
+    return ParametersVectorMap{
+        container().m_parameters.data() +
+            container().m_entries.at(index()).parameterOffset,
+        size};
+  }
+
+  /// @brief Get the covariance of the measurement
+  /// @return The covariance
+  CovarianceMatrixMap covariance() const {
+    const auto size = static_cast<Eigen::Index>(this->size());
+    return CovarianceMatrixMap{
+        container().m_covariances.data() +
+            container().m_entries.at(index()).covarianceOffset,
+        size, size};
+  }
+};
+
+template <typename... Args>
+MeasurementContainer::VariableProxy MeasurementContainer::emplaceMeasurement(
+    std::uint8_t size, Args&&... args) {
+  VariableProxy meas = makeMeasurement(size);
+
+  meas.fill(std::forward<Args>(args)...);
+
+  return meas;
 }
 
-/// Type that can hold all possible bound measurements.
-using BoundVariableMeasurement = VariableSizeMeasurement<Acts::BoundIndices>;
+template <std::size_t Size, typename... Args>
+MeasurementContainer::FixedProxy<Size> MeasurementContainer::emplaceMeasurement(
+    Args&&... args) {
+  FixedProxy<Size> meas = makeMeasurement<Size>();
 
-/// Variable measurement type that can contain all possible combinations.
-using Measurement = BoundVariableMeasurement;
+  meas.fill(std::forward<Args>(args)...);
 
-/// Container of measurements.
-///
-/// In contrast to the source links, the measurements themself must not be
-/// orderable. The source links stored in the measurements are treated
-/// as opaque here and no ordering is enforced on the stored measurements.
-using MeasurementContainer = std::vector<Measurement>;
+  return meas;
+}
 
 }  // namespace ActsExamples

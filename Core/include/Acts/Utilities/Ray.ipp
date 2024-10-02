@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Definitions/Algebra.hpp"
 template <typename value_t, std::size_t DIM>
@@ -38,9 +38,10 @@ Acts::Ray<value_t, DIM> Acts::Ray<value_t, DIM>::transformed(
 }
 
 template <typename value_t, std::size_t DIM>
-template <std::size_t D, std::enable_if_t<D == 3, int>>
 void Acts::Ray<value_t, DIM>::draw(IVisualization3D& helper,
-                                   value_type far_distance) const {
+                                   value_type far_distance) const
+  requires(DIM == 3)
+{
   static_assert(DIM == 3, "OBJ is only supported in 3D");
 
   helper.line(m_origin, (m_origin + m_dir * far_distance).eval());

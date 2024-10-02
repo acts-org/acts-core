@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -26,5 +26,6 @@ using SubspaceIndices = std::array<std::uint8_t, measdim>;
 using BoundSubspaceIndices = SubspaceIndices<eBoundSize>;
 static constexpr BoundSubspaceIndices kBoundSubspaceIndicesInvalid = {
     eBoundSize, eBoundSize, eBoundSize, eBoundSize, eBoundSize, eBoundSize};
+using SerializedSubspaceIndices = std::uint64_t;
 
 }  // namespace Acts

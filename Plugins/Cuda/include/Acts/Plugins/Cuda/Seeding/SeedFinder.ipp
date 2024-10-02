@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Seeding/CandidatesForMiddleSp.hpp"
 
@@ -306,9 +306,9 @@ SeedFinder<external_spacepoint_t, Acts::Cuda>::createSeedsForGroup(
                                 false);
       }
 
-      std::sort(candidates.begin(), candidates.end(),
-                CandidatesForMiddleSp<const InternalSpacePoint<
-                    external_spacepoint_t>>::descendingByQuality);
+      std::ranges::sort(candidates,
+                        CandidatesForMiddleSp<const InternalSpacePoint<
+                            external_spacepoint_t>>::descendingByQuality);
       std::size_t numQualitySeeds = 0;  // not used but needs to be fixed
       m_config.seedFilter->filterSeeds_1SpFixed(spacePointData, candidates,
                                                 numQualitySeeds,

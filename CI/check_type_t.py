@@ -48,7 +48,7 @@ def handle_file(file: Path, fix: bool, c_type: str) -> list[tuple[int, str]]:
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("input")
+    p.add_argument("input", nargs="+")
     p.add_argument("--fix", action="store_true", help="Attempt to fix C-style types.")
     p.add_argument("--exclude", "-e", action="append", default=[])
 
@@ -56,40 +56,49 @@ def main():
 
     exit_code = 0
 
-    # walk over all files
-    for root, _, files in os.walk("."):
-        root = Path(root)
-        for filename in files:
-            # get the full path of the file
-            filepath = root / filename
-            if filepath.suffix not in (
-                ".hpp",
-                ".cpp",
-                ".ipp",
-                ".h",
-                ".C",
-                ".c",
-                ".cu",
-                ".cuh",
-            ):
-                continue
+    inputs = []
 
-            if any([fnmatch(str(filepath), e) for e in args.exclude]):
-                continue
+    if len(args.input) == 1 and os.path.isdir(args.input[0]):
+        # walk over all files
+        for root, _, files in os.walk(args.input[0]):
+            root = Path(root)
+            for filename in files:
+                # get the full path of the file
+                filepath = root / filename
+                if filepath.suffix not in (
+                    ".hpp",
+                    ".cpp",
+                    ".ipp",
+                    ".h",
+                    ".C",
+                    ".c",
+                    ".cu",
+                    ".cuh",
+                ):
+                    continue
 
-            for c_type in type_list:
-                changed_lines = handle_file(file=filepath, fix=args.fix, c_type=c_type)
-                if len(changed_lines) > 0:
-                    exit_code = 1
-                    print()
-                    print(filepath)
-                    for i, oline in changed_lines:
-                        print(f"{i}: {oline}")
+                if any([fnmatch(str(filepath), e) for e in args.exclude]):
+                    continue
 
-                        if github:
-                            print(
-                                f"::error file={filepath},line={i+1},title=Do not use C-style {c_type}::Replace {c_type} with std::{c_type}"
-                            )
+                inputs.append(filepath)
+    else:
+        for file in args.input:
+            inputs.append(Path(file))
+
+    for filepath in inputs:
+        for c_type in type_list:
+            changed_lines = handle_file(file=filepath, fix=args.fix, c_type=c_type)
+            if len(changed_lines) > 0:
+                exit_code = 1
+                print()
+                print(filepath)
+                for i, oline in changed_lines:
+                    print(f"{i}: {oline}")
+
+                    if github:
+                        print(
+                            f"::error file={filepath},line={i+1},title=Do not use C-style {c_type}::Replace {c_type} with std::{c_type}"
+                        )
 
     return exit_code
 

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -12,7 +12,7 @@
 #if defined(__GNUC__) && !defined(__clang__) && !defined(__INTEL_COMPILER)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
-#if __GNUC__ == 13
+#if __GNUC__ >= 12
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 #include <Eigen/Core>
@@ -99,5 +99,7 @@ using AngleAxis3 = Eigen::AngleAxis<ActsScalar>;
 // - 3d affine stored as 4x4 matrix
 using Transform2 = Eigen::Transform<ActsScalar, 2, Eigen::AffineCompact>;
 using Transform3 = Eigen::Transform<ActsScalar, 3, Eigen::Affine>;
+
+constexpr ActsScalar s_transformEquivalentTolerance = 1e-9;
 
 }  // namespace Acts

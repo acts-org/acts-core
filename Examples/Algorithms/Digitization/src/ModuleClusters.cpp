@@ -1,14 +1,15 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Digitization/ModuleClusters.hpp"
 
 #include "Acts/Clusterization/Clusterization.hpp"
+#include "Acts/Utilities/Helpers.hpp"
 #include "ActsExamples/Digitization/MeasurementCreation.hpp"
 #include "ActsFatras/Digitization/Channelizer.hpp"
 
@@ -139,8 +140,7 @@ std::vector<std::size_t> ModuleClusters::nonGeoEntries(
   std::vector<std::size_t> retv;
   for (std::size_t i = 0; i < indices.size(); i++) {
     auto idx = indices.at(i);
-    if (std::find(m_geoIndices.begin(), m_geoIndices.end(), idx) ==
-        m_geoIndices.end()) {
+    if (!rangeContainsValue(m_geoIndices, idx)) {
       retv.push_back(i);
     }
   }
@@ -245,10 +245,8 @@ ModuleValue ModuleClusters::squash(std::vector<ModuleValue>& values) {
     ModuleValue& other = values.at(i);
     for (std::size_t j = 0; j < other.paramIndices.size(); j++) {
       auto idx = other.paramIndices.at(j);
-      if (std::find(m_geoIndices.begin(), m_geoIndices.end(), idx) ==
-          m_geoIndices.end()) {
-        if (std::find(mval.paramIndices.begin(), mval.paramIndices.end(),
-                      idx) == mval.paramIndices.end()) {
+      if (!rangeContainsValue(m_geoIndices, idx)) {
+        if (!rangeContainsValue(mval.paramIndices, idx)) {
           mval.paramIndices.push_back(idx);
         }
         if (mval.paramValues.size() < (j + 1)) {

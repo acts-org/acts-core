@@ -1,13 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
+#include "Acts/Utilities/Concepts.hpp"
 #include "Acts/Utilities/Grid.hpp"
 #include "Acts/Utilities/Holders.hpp"
 #include "Acts/Utilities/detail/grid_helper.hpp"
@@ -29,6 +30,7 @@ namespace Acts {
 template <std::size_t DIM>
 class GridBinFinder {
  public:
+  static constexpr std::size_t dimCubed = Acts::detail::ipow(3, DIM);
   /// @brief Constructor
   /// @tparam args ... Input parameters provided by the user
   ///
@@ -37,15 +39,14 @@ class GridBinFinder {
   /// @pre The provided paramers must be of type 'int', 'std::pair<int, int>' or 'std::vector<std::pair<int, int>>'
   /// no other type is allowed. The order of these parameters must correspond to
   /// the same ordering of the axes in the grid
-  template <typename... args,
-            typename = std::enable_if_t<
-                sizeof...(args) == DIM &&
-                std::conjunction_v<std::disjunction<
-                    std::is_same<int, std::decay_t<args>>,
-                    std::is_same<std::pair<int, int>, std::decay_t<args>>,
-                    std::is_same<std::vector<std::pair<int, int>>,
-                                 std::decay_t<args>>>...>>>
-  explicit GridBinFinder(args&&... vals) {
+  template <typename... args>
+  explicit GridBinFinder(args&&... vals)
+    requires(
+        sizeof...(args) == DIM &&
+        (Concepts::same_as_any_of<std::decay_t<args>, int, std::pair<int, int>,
+                                  std::vector<std::pair<int, int>>> &&
+         ...))
+  {
     storeValue(std::forward<args>(vals)...);
   }
 
@@ -63,9 +64,9 @@ class GridBinFinder {
   ///
   /// @pre The provided local position must be a valid local bins configuration in the grid
   template <typename stored_t, class... Axes>
-  boost::container::small_vector<std::size_t, Acts::detail::ipow(3, DIM)>
-  findBins(const std::array<std::size_t, DIM>& locPosition,
-           const Acts::Grid<stored_t, Axes...>& grid) const;
+  boost::container::small_vector<std::size_t, dimCubed> findBins(
+      const std::array<std::size_t, DIM>& locPosition,
+      const Acts::Grid<stored_t, Axes...>& grid) const;
 
  private:
   /// @brief Store the values provided by the user for each axis in the grid

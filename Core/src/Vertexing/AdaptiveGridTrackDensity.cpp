@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Vertexing/AdaptiveGridTrackDensity.hpp"
 
@@ -286,7 +286,7 @@ Result<double> AdaptiveGridTrackDensity::estimateSeedWidth(
   bool binFilled = true;
   while (gridValue > maxValue / 2) {
     // Check if we are still operating on continuous z values
-    if (densityMap.count({rhmBin + 1, tMaxBin}) == 0) {
+    if (!densityMap.contains({rhmBin + 1, tMaxBin})) {
       binFilled = false;
       break;
     }
@@ -308,7 +308,7 @@ Result<double> AdaptiveGridTrackDensity::estimateSeedWidth(
   binFilled = true;
   while (gridValue > maxValue / 2) {
     // Check if we are still operating on continuous z values
-    if (densityMap.count({lhmBin - 1, tMaxBin}) == 0) {
+    if (!densityMap.contains({lhmBin - 1, tMaxBin})) {
       binFilled = false;
       break;
     }

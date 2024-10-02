@@ -22,11 +22,7 @@ $ CI/check_format $SOURCE_DIR
 In some cases, different `clang-format` versions will result in slightly
 different outputs. In many cases, this is accepted by the CI. However, it is
 recommended to use the same major version of `clang-format` to perform local
-formatting. If you are comfortable with Docker, you can use the [docker image
-used by the
-CI](https://github.com/acts-project/machines/blob/master/format14/Dockerfile).
-You can use the script located in `CI/check_format_local` similar to the
-description above. Other options to obtain a compatible `clang-format` version
+formatting. Options to obtain a compatible `clang-format` version
 are to use your package manager (e.g. Ubuntu distributions usually offer a set of
 versions to install), or to use statically linked binaries from
 [here](https://github.com/muttleyxd/clang-tools-static-binaries)[^1] and use them with:

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/test_tools.hpp>
 #include <boost/test/unit_test.hpp>
@@ -27,6 +27,7 @@
 #include "Acts/Propagator/AtlasStepper.hpp"
 #include "Acts/Propagator/ConstrainedStep.hpp"
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
+#include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/DiscSurface.hpp"
 #include "Acts/Surfaces/PerigeeSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
@@ -183,7 +184,7 @@ BOOST_AUTO_TEST_CASE(UpdateFromBound) {
   auto newAbsMom = 0.9 * absMom;
 
   // example surface and bound parameters at the updated position
-  auto plane = Surface::makeShared<PlaneSurface>(newPos, newUnitDir);
+  auto plane = CurvilinearSurface(newPos, newUnitDir).planeSurface();
   auto params =
       BoundTrackParameters::create(plane, geoCtx, newPos4, newUnitDir,
                                    charge / absMom, cov, particleHypothesis)
@@ -242,7 +243,7 @@ BOOST_AUTO_TEST_CASE(BuildBound) {
                                  particleHypothesis),
       stepSize, tolerance);
   // example surface at the current state position
-  auto plane = Surface::makeShared<PlaneSurface>(pos, unitDir);
+  auto plane = CurvilinearSurface(pos, unitDir).planeSurface();
 
   auto&& [pars, jac, pathLength] = stepper.boundState(state, *plane).value();
   // check parameters
@@ -578,8 +579,8 @@ BOOST_AUTO_TEST_CASE(StepSizeSurface) {
       stepSize, tolerance);
 
   auto distance = 10_mm;
-  auto target = Surface::makeShared<PlaneSurface>(
-      pos + navDir * distance * unitDir, unitDir);
+  auto target = CurvilinearSurface(pos + navDir * distance * unitDir, unitDir)
+                    .planeSurface();
 
   stepper.updateSurfaceStatus(state, *target, 0, navDir,
                               BoundaryTolerance::Infinite());

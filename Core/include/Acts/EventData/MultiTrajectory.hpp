@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -21,7 +21,6 @@
 #include "Acts/Utilities/HashedString.hpp"
 #include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/ThrowAssert.hpp"
-#include "Acts/Utilities/TypeTraits.hpp"
 
 #include <bitset>
 #include <cstddef>
@@ -88,6 +87,12 @@ class TrackStateRange {
       }
     }
 
+    Iterator operator++(int) {
+      Iterator tmp(*this);
+      operator++();
+      return tmp;
+    }
+
     bool operator==(const Iterator& other) const {
       if (!proxy && !other.proxy) {
         return true;
@@ -97,8 +102,6 @@ class TrackStateRange {
       }
       return false;
     }
-
-    bool operator!=(const Iterator& other) const { return !(*this == other); }
 
     ProxyType operator*() const { return *proxy; }
     ProxyType operator*() { return *proxy; }
@@ -110,18 +113,18 @@ class TrackStateRange {
   Iterator begin() { return m_begin; }
   Iterator end() { return Iterator{std::nullopt}; }
 
+  Iterator cbegin() const { return m_begin; }
+  Iterator cend() const { return Iterator{std::nullopt}; }
+
  private:
   Iterator m_begin;
 };
 
 // implement track state visitor concept
 template <typename T, typename TS>
-using call_operator_t = decltype(std::declval<T>()(std::declval<TS>()));
-
-template <typename T, typename TS>
-constexpr bool VisitorConcept = Concepts ::require<
-    Concepts ::either<Concepts ::identical_to<bool, call_operator_t, T, TS>,
-                      Concepts ::identical_to<void, call_operator_t, T, TS>>>;
+concept VisitorConcept = requires(T& t, TS& ts) {
+  { t(ts) } -> Concepts::same_as_any_of<void, bool>;
+};
 
 }  // namespace detail_lt
 
@@ -269,7 +272,8 @@ class MultiTrajectory {
   /// @param iendpoint  index of the last state
   /// @param callable   non-modifying functor to be called with each point
   template <typename F>
-  void visitBackwards(IndexType iendpoint, F&& callable) const;
+  void visitBackwards(IndexType iendpoint, F&& callable) const
+    requires detail_lt::VisitorConcept<F, ConstTrackStateProxy>;
 
   /// Apply a function to all previous states starting at a given endpoint.
   ///
@@ -281,11 +285,8 @@ class MultiTrajectory {
   /// @note Only available if the MultiTrajectory is not read-only
   template <typename F>
   void applyBackwards(IndexType iendpoint, F&& callable)
-    requires(!ReadOnly)
+    requires(!ReadOnly) && detail_lt::VisitorConcept<F, TrackStateProxy>
   {
-    static_assert(detail_lt::VisitorConcept<F, TrackStateProxy>,
-                  "Callable needs to satisfy VisitorConcept");
-
     if (iendpoint == MultiTrajectoryTraits::kInvalid) {
       throw std::runtime_error(
           "Cannot apply backwards with kInvalid as endpoint");
@@ -695,13 +696,10 @@ class MultiTrajectory {
     self().allocateCalibrated_impl(istate, measdim);
   }
 
-  // This function will move to an rvalue reference in the next major version
-  template <typename source_link_t>
-  void setUncalibratedSourceLink(IndexType istate, source_link_t&& sourceLink)
+  void setUncalibratedSourceLink(IndexType istate, SourceLink&& sourceLink)
     requires(!ReadOnly)
   {
-    self().setUncalibratedSourceLink_impl(
-        istate, std::forward<source_link_t>(sourceLink));
+    self().setUncalibratedSourceLink_impl(istate, std::move(sourceLink));
   }
 
   SourceLink getUncalibratedSourceLink(IndexType istate) const {

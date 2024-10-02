@@ -1,13 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
+#include "Acts/EventData/TrackProxyConcept.hpp"
 #include "Acts/EventData/TrackStateType.hpp"
 #include "Acts/Geometry/GeometryHierarchyMap.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
@@ -37,7 +38,7 @@ class TrackSelector {
 
     boost::container::small_vector<CounterElement, 4> counters;
 
-    template <typename track_proxy_t>
+    template <TrackProxyConcept track_proxy_t>
     bool isValidTrack(const track_proxy_t& track) const;
 
     void addCounter(const std::vector<GeometryIdentifier>& identifiers,
@@ -75,6 +76,7 @@ class TrackSelector {
     std::size_t minMeasurements = 0;
     std::size_t maxHoles = std::numeric_limits<std::size_t>::max();
     std::size_t maxOutliers = std::numeric_limits<std::size_t>::max();
+    std::size_t maxHolesAndOutliers = std::numeric_limits<std::size_t>::max();
     std::size_t maxSharedHits = std::numeric_limits<std::size_t>::max();
     double maxChi2 = inf;
 
@@ -226,7 +228,7 @@ class TrackSelector {
   /// @tparam track_proxy_t is the type of the track proxy
   /// @param track is the track proxy
   /// @return true if the track is valid
-  template <typename track_proxy_t>
+  template <TrackProxyConcept track_proxy_t>
   bool isValidTrack(const track_proxy_t& track) const;
 
   /// Get readonly access to the config parameters
@@ -311,6 +313,7 @@ inline std::ostream& operator<<(std::ostream& os,
   print("pt", cuts.ptMin, cuts.ptMax);
   print("nHoles", 0, cuts.maxHoles);
   print("nOutliers", 0, cuts.maxOutliers);
+  print("nHoles + nOutliers", 0, cuts.maxHolesAndOutliers);
   print("nSharedHits", 0, cuts.maxSharedHits);
   print("chi2", 0.0, cuts.maxChi2);
   os << " - " << cuts.minMeasurements << " <= nMeasurements\n";
@@ -387,7 +390,7 @@ void TrackSelector::selectTracks(const input_tracks_t& inputTracks,
   }
 }
 
-template <typename track_proxy_t>
+template <TrackProxyConcept track_proxy_t>
 bool TrackSelector::isValidTrack(const track_proxy_t& track) const {
   auto checkMin = [](auto x, auto min) { return min <= x; };
   auto checkMax = [](auto x, auto max) { return x <= max; };
@@ -434,6 +437,8 @@ bool TrackSelector::isValidTrack(const track_proxy_t& track) const {
          checkMin(track.nMeasurements(), cuts.minMeasurements) &&
          checkMax(track.nHoles(), cuts.maxHoles) &&
          checkMax(track.nOutliers(), cuts.maxOutliers) &&
+         checkMax(track.nHoles() + track.nOutliers(),
+                  cuts.maxHolesAndOutliers) &&
          checkMax(track.nSharedHits(), cuts.maxSharedHits) &&
          checkMax(track.chi2(), cuts.maxChi2) &&
          cuts.measurementCounter.isValidTrack(track);
@@ -474,7 +479,7 @@ inline TrackSelector::TrackSelector(
 inline TrackSelector::TrackSelector(const Config& config)
     : TrackSelector{EtaBinnedConfig{config}} {}
 
-template <typename track_proxy_t>
+template <TrackProxyConcept track_proxy_t>
 bool TrackSelector::MeasurementCounter::isValidTrack(
     const track_proxy_t& track) const {
   // No hit cuts, accept everything

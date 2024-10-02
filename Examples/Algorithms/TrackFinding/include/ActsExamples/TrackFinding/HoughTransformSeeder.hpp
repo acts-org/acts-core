@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 // @file HoughTransformSeeder.hpp
 // @author Riley Xu then modified to ACTS by Jahred Adelman
@@ -72,6 +72,7 @@
 
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Utilities/Delegate.hpp"
+#include "Acts/Utilities/Grid.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/Result.hpp"
 #include "ActsExamples/EventData/Index.hpp"
@@ -82,7 +83,6 @@
 #include "ActsExamples/Framework/DataHandle.hpp"
 #include "ActsExamples/Framework/IAlgorithm.hpp"
 #include "ActsExamples/Framework/ProcessCode.hpp"
-#include "ActsExamples/TrackFinding/HoughVectors.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -128,8 +128,10 @@ namespace ActsExamples {
 /// each bin. Size m_houghHistSize_y * m_houghHistSize_x. (NOTE y is row
 /// coordinate) For now, what is stored is actually the index of the object in
 /// the vectors, so we can get the Index layer
+using Axis =
+    Acts::Axis<Acts::AxisType::Equidistant, Acts::AxisBoundaryType::Bound>;
 using HoughHist =
-    MultiIndexedVector2D<std::pair<int, std::unordered_set<unsigned>>>;
+    Acts::Grid<std::pair<int, std::unordered_set<unsigned>>, Axis, Axis>;
 
 enum HoughHitType { SP = 0, MEASUREMENT = 1 };
 

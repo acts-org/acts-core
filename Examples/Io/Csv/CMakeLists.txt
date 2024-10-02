@@ -21,6 +21,7 @@ add_library(
     src/CsvSpacePointWriter.cpp
     src/CsvExaTrkXGraphWriter.cpp
     src/CsvExaTrkXGraphReader.cpp
+    src/CsvSpacePointsBucketWriter.cpp
     src/CsvBFieldWriter.cpp
 )
 target_include_directories(

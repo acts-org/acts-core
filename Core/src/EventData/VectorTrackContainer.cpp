@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/EventData/VectorTrackContainer.hpp"
 
@@ -115,7 +115,7 @@ void VectorTrackContainer::copyDynamicFrom_impl(IndexType dstIdx,
 void VectorTrackContainer::ensureDynamicColumns_impl(
     const detail_vtc::VectorTrackContainerBase& other) {
   for (auto& [key, value] : other.m_dynamic) {
-    if (m_dynamic.find(key) == m_dynamic.end()) {
+    if (!m_dynamic.contains(key)) {
       m_dynamic[key] = value->clone(true);
     }
   }

@@ -141,6 +141,9 @@ def run_ckf_tracking(label, seeding):
                 maxOutliers=2,
             ),
             CkfConfig(
+                chi2CutOffMeasurement=15.0,
+                chi2CutOffOutlier=25.0,
+                numMeasurementsCutOff=10,
                 seedDeduplication=(
                     True if seeding != SeedingAlgorithm.TruthSmeared else False
                 ),

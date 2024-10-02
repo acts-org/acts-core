@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -28,34 +28,37 @@ class Surface;
 
 namespace ActsExamples {
 
-// Helper struct to find the sensitive surface candidates
-struct SensitiveCandidates {
-  std::shared_ptr<const Acts::TrackingGeometry> trackingGeometry = nullptr;
-  /// Find the sensitive surfaces for a given position
-  ///
-  /// This fulfills the concept of a SensitiveCandidates
+struct SensitiveCandidatesBase {
+  /// Get the sensitive surfaces for a given position
   ///
   /// @param gctx the geometry context
   /// @param position the position to look for sensitive surfaces
   ///
   /// @return a vector of sensitive surfaces
-  std::vector<const Acts::Surface*> operator()(
-      const Acts::GeometryContext& gctx, const Acts::Vector3& position) const {
-    std::vector<const Acts::Surface*> surfaces;
+  virtual std::vector<const Acts::Surface*> queryPosition(
+      const Acts::GeometryContext& gctx,
+      const Acts::Vector3& position) const = 0;
 
-    if (trackingGeometry != nullptr) {
-      auto layer = trackingGeometry->associatedLayer(gctx, position);
+  /// Get all sensitive surfaces
+  ///
+  /// @param gctx the geometry context
+  /// @param position the position to look for sensitive surfaces
+  ///
+  /// @return a vector of sensitive surfaces
+  virtual std::vector<const Acts::Surface*> queryAll() const = 0;
 
-      if (layer->surfaceArray() != nullptr) {
-        for (const auto& surface : layer->surfaceArray()->surfaces()) {
-          if (surface->associatedDetectorElement() != nullptr) {
-            surfaces.push_back(surface);
-          }
-        }
-      }
-    }
-    return surfaces;
-  }
+  virtual ~SensitiveCandidatesBase() = default;
+};
+
+/// Implementation of the SensitiveCandidates for Gen1 geometry
+struct SensitiveCandidates : public SensitiveCandidatesBase {
+  std::shared_ptr<const Acts::TrackingGeometry> trackingGeometry = nullptr;
+
+  std::vector<const Acts::Surface*> queryPosition(
+      const Acts::GeometryContext& gctx,
+      const Acts::Vector3& position) const override;
+
+  std::vector<const Acts::Surface*> queryAll() const override;
 };
 
 /// This Mapper takes a (non-const) Geant4 geometry and maps
@@ -72,9 +75,6 @@ class SensitiveSurfaceMapper {
   /// This prefix is used to indicate a sensitive volume that is matched
   constexpr static std::string_view mappingPrefix = "ActsSensitive#";
 
-  using SensitiveCandidates = std::function<std::vector<const Acts::Surface*>(
-      const Acts::GeometryContext&, const Acts::Vector3&)>;
-
   /// Configuration struct for the surface mapper
   struct Config {
     /// For which G4 material names we try to find a mapping
@@ -84,7 +84,7 @@ class SensitiveSurfaceMapper {
     std::vector<std::string> volumeMappings;
 
     /// The sensitive surfaces that are being mapped to
-    SensitiveCandidates candidateSurfaces;
+    std::shared_ptr<SensitiveCandidatesBase> candidateSurfaces;
   };
 
   /// State object that coutns the assignments and makes
@@ -94,6 +94,10 @@ class SensitiveSurfaceMapper {
     /// there can be replicas)
     std::multimap<const G4VPhysicalVolume*, const Acts::Surface*>
         g4VolumeToSurfaces;
+
+    /// Record of the missing volumes
+    std::vector<std::pair<const G4VPhysicalVolume*, Acts::Transform3>>
+        missingVolumes;
   };
 
   /// Constructor with:
@@ -117,6 +121,20 @@ class SensitiveSurfaceMapper {
   void remapSensitiveNames(State& state, const Acts::GeometryContext& gctx,
                            G4VPhysicalVolume* g4PhysicalVolume,
                            const Acts::Transform3& motherTransform) const;
+
+  /// Function that checks the success of the mapping, and exposes
+  /// some additional information for debugging
+  ///
+  /// @param state state object after a call to remapSensitiveNames
+  /// @param gctx the geometry context
+  /// @param writeMissingG4VolsAsObj write the Geant4 volumes that are
+  /// not mapped to 'missing_g4_volumes.obj' in the working directory
+  /// @param writeMissingSurfacesAsObj write the sensitive surfaces that
+  /// where not mapped to 'missing_acts_surfaces.obj' in the working directory
+  /// @return Returns true only if all sensitive surfaces where mapped
+  bool checkMapping(const State& state, const Acts::GeometryContext& gctx,
+                    bool writeMissingG4VolsAsObj = false,
+                    bool writeMissingSurfacesAsObj = false) const;
 
  protected:
   /// Configuration object

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Io/Root/RootMeasurementWriter.hpp"
 
@@ -13,6 +13,7 @@
 #include "ActsExamples/EventData/AverageSimHits.hpp"
 #include "ActsExamples/EventData/Index.hpp"
 #include "ActsExamples/EventData/IndexSourceLink.hpp"
+#include "ActsExamples/EventData/Measurement.hpp"
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Utilities/Range.hpp"
 
@@ -152,9 +153,9 @@ struct RootMeasurementWriter::DigitizationTree {
   /// Convenience function to fill bound parameters
   ///
   /// @param m The measurement
-  void fillBoundMeasurement(const Measurement& m) {
+  void fillBoundMeasurement(const ConstVariableBoundMeasurementProxy& m) {
     for (unsigned int i = 0; i < m.size(); ++i) {
-      auto ib = m.subspaceIndices()[i];
+      auto ib = m.subspaceIndexVector()[i];
 
       recBound[ib] = m.parameters()[i];
       varBound[ib] = m.covariance()(i, i);
@@ -266,7 +267,8 @@ ProcessCode RootMeasurementWriter::writeT(
   std::lock_guard<std::mutex> lock(m_writeMutex);
 
   for (Index hitIdx = 0u; hitIdx < measurements.size(); ++hitIdx) {
-    const auto& meas = measurements[hitIdx];
+    const ConstVariableBoundMeasurementProxy meas =
+        measurements.getMeasurement(hitIdx);
 
     Acts::GeometryIdentifier geoId =
         meas.sourceLink().template get<IndexSourceLink>().geometryId();

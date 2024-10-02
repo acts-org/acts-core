@@ -1,14 +1,15 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Clusterization/Clusterization.hpp"
+#include "Acts/Utilities/Helpers.hpp"
 
 #include <algorithm>
 #include <array>
@@ -113,7 +114,7 @@ void clusterAddCell(Cluster2D& cl, const Cell2D& cell) {
 }
 
 void hash(Cluster2D& cl) {
-  std::sort(cl.cells.begin(), cl.cells.end(), cellComp);
+  std::ranges::sort(cl.cells, cellComp);
   cl.hash = 0;
   for (const Cell2D& c : cl.cells) {
     boost::hash_combine(cl.hash, c.col);
@@ -133,7 +134,7 @@ void genclusterw(int x, int y, int x0, int y0, int x1, int y1,
   auto maybe_add = [&](int x_, int y_) {
     Cell2D c(x_, y_);
     if (std::uniform_real_distribution<double>()(rng) < startp &&
-        std::find(cells.begin(), cells.end(), c) == cells.end()) {
+        !rangeContainsValue(cells, c)) {
       cells.push_back(c);
       add.push_back(c);
     }
@@ -236,8 +237,8 @@ BOOST_AUTO_TEST_CASE(Grid_2D_rand) {
       hash(cl);
     }
 
-    std::sort(cls.begin(), cls.end(), clHashComp);
-    std::sort(newCls.begin(), newCls.end(), clHashComp);
+    std::ranges::sort(cls, clHashComp);
+    std::ranges::sort(newCls, clHashComp);
 
     BOOST_CHECK_EQUAL(cls.size(), newCls.size());
     for (std::size_t i = 0; i < cls.size(); i++) {

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -37,8 +37,7 @@ class Volume : public GeometryObject {
   ///
   /// @param transform is the transform to position the volume in 3D space
   /// @param volbounds is the volume boundary definitions
-  Volume(const Transform3& transform,
-         std::shared_ptr<const VolumeBounds> volbounds);
+  Volume(const Transform3& transform, std::shared_ptr<VolumeBounds> volbounds);
 
   /// Copy Constructor - with optional shift
   ///
@@ -65,20 +64,26 @@ class Volume : public GeometryObject {
   /// returns the center of the volume
   const Vector3& center() const;
 
-  /// Returns const reference to the volume bounds
+  /// Returns a const reference to the volume bounds
   const VolumeBounds& volumeBounds() const;
+
+  /// Returns a mutable reference to the volume bounds
+  VolumeBounds& volumeBounds();
 
   /// Returns shared pointer to the volume bounds
   std::shared_ptr<const VolumeBounds> volumeBoundsPtr() const;
 
+  /// Returns shared pointer to the volume bounds
+  std::shared_ptr<VolumeBounds> volumeBoundsPtr();
+
   /// Set volume bounds and update volume bounding boxes implicitly
   /// @param volbounds The volume bounds to be assigned
-  void assignVolumeBounds(std::shared_ptr<const VolumeBounds> volbounds);
+  void assignVolumeBounds(std::shared_ptr<VolumeBounds> volbounds);
 
   /// Set the volume bounds and optionally also update the volume transform
   /// @param volbounds The volume bounds to be assigned
   /// @param transform The transform to be assigned, can be optional
-  virtual void update(std::shared_ptr<const VolumeBounds> volbounds,
+  virtual void update(std::shared_ptr<VolumeBounds> volbounds,
                       std::optional<Transform3> transform = std::nullopt);
 
   /// Construct bounding box for this shape
@@ -111,13 +116,21 @@ class Volume : public GeometryObject {
                           BinningValue bValue) const override;
 
   bool operator==(const Volume& other) const;
-  bool operator!=(const Volume& other) const;
+
+  /// Produces a 3D visualization of this volume
+  /// @param helper The visualization helper describing the output format
+  /// @param gctx The geometry context
+  /// @param viewConfig The view configuration
+  void visualize(IVisualization3D& helper, const GeometryContext& gctx,
+                 const ViewConfig& viewConfig = {}) const;
 
  protected:
   Transform3 m_transform;
   Transform3 m_itransform;
   Vector3 m_center;
-  std::shared_ptr<const VolumeBounds> m_volumeBounds;
+
+ private:
+  std::shared_ptr<VolumeBounds> m_volumeBounds;
 };
 
 /**Overload of << operator for std::ostream for debug output*/

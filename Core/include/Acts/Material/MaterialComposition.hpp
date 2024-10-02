@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -100,10 +100,10 @@ class MaterialComposition {
   /// Rescales the fractions so they all add up to unity within the accuracy.
   MaterialComposition(std::vector<ElementFraction> elements)
       : m_elements(std::move(elements)) {
-    std::sort(m_elements.begin(), m_elements.end());
+    std::ranges::sort(m_elements, std::less<ElementFraction>{});
     // compute the total weight first
     unsigned total = 0u;
-    for (auto element : m_elements) {
+    for (const auto& element : m_elements) {
       total += element.m_fraction;
     }
     // compute scale factor into the [0, 256) range

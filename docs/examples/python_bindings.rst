@@ -40,7 +40,7 @@ sets up the particle propagation and runs a few events.
        randomNumberSvc=rnd,
        ntests=1000,
        sterileLogger=False,
-       propagationStepCollection="propagation-steps",
+       outputSummaryCollection="propagation_summary",
    )
 
    s.addAlgorithm(alg)
@@ -53,7 +53,7 @@ sets up the particle propagation and runs a few events.
    s.addWriter(
        acts.examples.ObjPropagationStepsWriter(
            level=acts.logging.INFO,
-           collection="propagation-steps",
+           collection="propagation_summary",
            outputDir=objDir,
        )
    )
@@ -61,7 +61,7 @@ sets up the particle propagation and runs a few events.
    s.addWriter(
        acts.examples.RootPropagationStepsWriter(
            level=acts.logging.INFO,
-           collection="propagation-steps",
+           collection="propagation_summary",
            filePath=outputDir + "/propagation_steps.root",
        )
    )

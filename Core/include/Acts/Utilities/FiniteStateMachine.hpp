@@ -1,14 +1,12 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
-
-#include "Acts/Utilities/TypeTraits.hpp"
 
 #include <optional>
 #include <string_view>
@@ -121,8 +119,7 @@ class FiniteStateMachine {
   /// Default constructor. The default state is taken to be the first in the
   /// `States` template arguments
   FiniteStateMachine()
-      : m_state(typename std::tuple_element<0, std::tuple<States...>>::type{}) {
-  }
+      : m_state(typename std::tuple_element_t<0, std::tuple<States...>>{}) {}
 
   /// Constructor from an explicit state. The FSM is initialized to this state.
   /// @param state Initial state for the FSM.

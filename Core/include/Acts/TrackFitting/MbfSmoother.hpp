@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -51,21 +51,21 @@ class MbfSmoother {
 
     using TrackStateProxy = typename traj_t::TrackStateProxy;
 
-    TrackStateProxy start_ts = trajectory.getTrackState(entryIndex);
+    TrackStateProxy startTs = trajectory.getTrackState(entryIndex);
 
     // Notation consistent with the Wikipedia article
     // https://en.wikipedia.org/wiki/Kalman_filter
-    BoundMatrix big_lambda_hat = BoundMatrix::Zero();
-    BoundVector small_lambda_hat = BoundVector::Zero();
+    BoundMatrix bigLambdaHat = BoundMatrix::Zero();
+    BoundVector smallLambdaHat = BoundVector::Zero();
 
-    trajectory.applyBackwards(start_ts.index(), [&](TrackStateProxy ts) {
+    trajectory.applyBackwards(startTs.index(), [&](TrackStateProxy ts) {
       // ensure the track state has a smoothed component
       ts.addComponents(TrackStatePropMask::Smoothed);
 
       InternalTrackState internalTrackState(ts);
 
       // Smoothe the current state
-      calculateSmoothed(internalTrackState, big_lambda_hat, small_lambda_hat);
+      calculateSmoothed(internalTrackState, bigLambdaHat, smallLambdaHat);
 
       // We smoothed the last state - no need to update the lambdas
       if (!ts.hasPrevious()) {
@@ -74,10 +74,9 @@ class MbfSmoother {
 
       // Update the lambdas depending on the type of track state
       if (ts.typeFlags().test(TrackStateFlag::MeasurementFlag)) {
-        visitMeasurement(internalTrackState, big_lambda_hat, small_lambda_hat);
+        visitMeasurement(internalTrackState, bigLambdaHat, smallLambdaHat);
       } else {
-        visitNonMeasurement(internalTrackState, big_lambda_hat,
-                            small_lambda_hat);
+        visitNonMeasurement(internalTrackState, bigLambdaHat, smallLambdaHat);
       }
     });
 
@@ -143,18 +142,17 @@ class MbfSmoother {
 
   /// Calculate the smoothed parameters and covariance.
   void calculateSmoothed(InternalTrackState& ts,
-                         const BoundMatrix& big_lambda_hat,
-                         const BoundVector& small_lambda_hat) const;
+                         const BoundMatrix& bigLambdaHat,
+                         const BoundVector& smallLambdaHat) const;
 
   /// Visit a non-measurement track state and update the lambdas.
   void visitNonMeasurement(const InternalTrackState& ts,
-                           BoundMatrix& big_lambda_hat,
-                           BoundVector& small_lambda_hat) const;
+                           BoundMatrix& bigLambdaHat,
+                           BoundVector& smallLambdaHat) const;
 
   /// Visit a measurement track state and update the lambdas.
-  void visitMeasurement(const InternalTrackState& ts,
-                        BoundMatrix& big_lambda_hat,
-                        BoundVector& small_lambda_hat) const;
+  void visitMeasurement(const InternalTrackState& ts, BoundMatrix& bigLambdaHat,
+                        BoundVector& smallLambdaHat) const;
 };
 
 }  // namespace Acts

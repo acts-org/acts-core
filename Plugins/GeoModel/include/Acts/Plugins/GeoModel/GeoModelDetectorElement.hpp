@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -15,7 +15,9 @@
 
 #include <memory>
 
-class GeoFullPhysVol;
+#include <GeoModelKernel/GeoFullPhysVol.h>
+
+class GeoVPhysVol;
 
 namespace Acts {
 
@@ -48,9 +50,8 @@ class GeoModelDetectorElement : public DetectorElementBase {
   /// @return a shared pointer to an instance of the detector element
   template <typename SurfaceType, typename BoundsType>
   static std::shared_ptr<GeoModelDetectorElement> createDetectorElement(
-      const GeoFullPhysVol& geoPhysVol,
-      const std::shared_ptr<BoundsType> bounds, const Transform3& sfTransform,
-      ActsScalar thickness) {
+      const PVConstLink& geoPhysVol, const std::shared_ptr<BoundsType> bounds,
+      const Transform3& sfTransform, ActsScalar thickness) {
     // First create the detector element with a nullptr
     auto detElement = std::make_shared<GeoModelDetectorElement>(
         geoPhysVol, nullptr, sfTransform, thickness);
@@ -65,7 +66,7 @@ class GeoModelDetectorElement : public DetectorElementBase {
   /// @param surface the representing surface
   /// @param sfTransform the surface transform
   /// @param thickness the thickness of the detector element
-  GeoModelDetectorElement(const GeoFullPhysVol& geoPhysVol,
+  GeoModelDetectorElement(PVConstLink geoPhysVol,
                           std::shared_ptr<Surface> surface,
                           const Transform3& sfTransform, ActsScalar thickness);
 
@@ -84,7 +85,7 @@ class GeoModelDetectorElement : public DetectorElementBase {
   ActsScalar thickness() const override;
 
   /// @return to the Geant4 physical volume
-  const GeoFullPhysVol& physicalVolume() const;
+  PVConstLink physicalVolume() const;
 
  private:
   /// Attach a surface
@@ -95,7 +96,7 @@ class GeoModelDetectorElement : public DetectorElementBase {
   }
 
   /// The GeoModel full physical volume
-  const GeoFullPhysVol* m_geoPhysVol{nullptr};
+  PVConstLink m_geoPhysVol{nullptr};
   /// The surface
   std::shared_ptr<Surface> m_surface;
   /// The global transformation before the volume

@@ -121,5 +121,7 @@ for pr in plotRecords:
 
     # Set the range of x-axis
     plt.xlabel(pr.x_label)
-    plt.show()
     fig.savefig(pr.saveAs)
+
+
+plt.show()

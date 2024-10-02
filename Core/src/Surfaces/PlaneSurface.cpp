@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/PlaneSurface.hpp"
 
@@ -36,12 +36,6 @@ Acts::PlaneSurface::PlaneSurface(const GeometryContext& gctx,
     : GeometryObject(),
       RegularSurface(gctx, other, transform),
       m_bounds(other.m_bounds) {}
-
-Acts::PlaneSurface::PlaneSurface(const Vector3& center, const Vector3& normal)
-    : RegularSurface(), m_bounds(nullptr) {
-  m_transform = std::make_unique<Transform3>(
-      CurvilinearSurface(center, normal).transform());
-}
 
 Acts::PlaneSurface::PlaneSurface(std::shared_ptr<const PlanarBounds> pbounds,
                                  const Acts::DetectorElementBase& detelement)

@@ -1,15 +1,16 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Plugins/ExaTrkX/BoostTrackBuilding.hpp"
 #include "Acts/Plugins/ExaTrkX/detail/TensorVectorConversion.hpp"
+#include "Acts/Utilities/Helpers.hpp"
 
 #include <algorithm>
 
@@ -50,13 +51,12 @@ BOOST_AUTO_TEST_CASE(test_track_building) {
 
   // Sort tracks, so we can find them
   std::for_each(testTracks.begin(), testTracks.end(),
-                [](auto &t) { std::sort(t.begin(), t.end()); });
+                [](auto &t) { std::ranges::sort(t); });
   std::for_each(refTracks.begin(), refTracks.end(),
-                [](auto &t) { std::sort(t.begin(), t.end()); });
+                [](auto &t) { std::ranges::sort(t); });
 
   // Check what we have here
   for (const auto &refTrack : refTracks) {
-    auto found = std::find(testTracks.begin(), testTracks.end(), refTrack);
-    BOOST_CHECK(found != testTracks.end());
+    BOOST_CHECK(Acts::rangeContainsValue(testTracks, refTrack));
   }
 }

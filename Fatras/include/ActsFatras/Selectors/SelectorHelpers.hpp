@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -53,12 +53,12 @@ struct Range {
   }
 };
 
-/// Select objects that fullfil all selectors.
+/// Select objects that fulfill all selectors.
 template <typename... selectors_t>
 using CombineAnd =
     detail::CombineSelectors<true, std::logical_and<bool>, selectors_t...>;
 
-/// Select objects that fullfil at least one selector.
+/// Select objects that fulfill at least one selector.
 template <typename... selectors_t>
 using CombineOr =
     detail::CombineSelectors<false, std::logical_or<bool>, selectors_t...>;

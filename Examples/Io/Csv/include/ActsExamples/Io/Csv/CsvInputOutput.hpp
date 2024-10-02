@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -34,6 +34,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+#include "Acts/Utilities/Concepts.hpp"
+#include "Acts/Utilities/Helpers.hpp"
 
 #include <array>
 #include <cassert>
@@ -210,12 +213,10 @@ class DsvWriter {
   std::ofstream m_file;
   std::size_t m_num_columns;
 
-  // enable_if to prevent this overload to be used for std::vector<T> as well
   template <typename T>
-  static std::enable_if_t<std::is_arithmetic<std::decay_t<T>>::value ||
-                              std::is_convertible<T, std::string>::value,
-                          unsigned>
-  write(T&& x, std::ostream& os);
+  unsigned write(T&& x, std::ostream& os)
+    requires(Acts::Concepts::arithmetic<std::decay_t<T>> ||
+             std::convertible_to<T, std::string>);
   template <typename T, typename Allocator>
   static unsigned write(const std::vector<T, Allocator>& xs, std::ostream& os);
 };
@@ -272,9 +273,8 @@ class NamedTupleDsvWriter {
 
   /// Append a record to the file.
   void append(const NamedTuple& record) {
-    append_impl(record,
-                std::make_index_sequence<
-                    std::tuple_size<typename NamedTuple::Tuple>::value>{});
+    append_impl(record, std::make_index_sequence<
+                            std::tuple_size_v<typename NamedTuple::Tuple>>{});
   }
 
  private:
@@ -445,10 +445,10 @@ inline void DsvWriter<Delimiter>::append(Arg0&& arg0, Args&&... args) {
 
 template <char Delimiter>
 template <typename T>
-inline std::enable_if_t<std::is_arithmetic<std::decay_t<T>>::value ||
-                            std::is_convertible<T, std::string>::value,
-                        unsigned>
-DsvWriter<Delimiter>::write(T&& x, std::ostream& os) {
+inline unsigned DsvWriter<Delimiter>::write(T&& x, std::ostream& os)
+  requires(Acts::Concepts::arithmetic<std::decay_t<T>> ||
+           std::convertible_to<T, std::string>)
+{
   os << x;
   return 1u;
 }
@@ -547,8 +547,7 @@ inline bool NamedTupleDsvReader<Delimiter, NamedTuple>::read(
                              std::to_string(m_reader.num_lines()));
   }
   // convert to tuple
-  parse_record(record,
-               std::make_index_sequence<std::tuple_size<Tuple>::value>{});
+  parse_record(record, std::make_index_sequence<std::tuple_size_v<Tuple>>{});
   return true;
 }
 
@@ -571,7 +570,7 @@ inline bool NamedTupleDsvReader<Delimiter, NamedTuple>::read(
 template <char Delimiter, typename NamedTuple>
 inline void NamedTupleDsvReader<Delimiter, NamedTuple>::use_default_columns() {
   // assume row content is identical in content and order to the tuple
-  m_num_columns = std::tuple_size<Tuple>::value;
+  m_num_columns = std::tuple_size_v<Tuple>;
   for (std::size_t i = 0; i < m_tuple_column_map.size(); ++i) {
     m_tuple_column_map[i] = i;
   }
@@ -590,13 +589,11 @@ inline void NamedTupleDsvReader<Delimiter, NamedTuple>::parse_header(
   // check that all non-optional columns are available
   for (const auto& name : names) {
     // no need to for availability if the column is optional
-    auto o = std::find(optional_columns.begin(), optional_columns.end(), name);
-    if (o != optional_columns.end()) {
+    if (Acts::rangeContainsValue(optional_columns, name)) {
       continue;
     }
     // missing, non-optional column mean we can not continue
-    auto c = std::find(m_columns.begin(), m_columns.end(), name);
-    if (c == m_columns.end()) {
+    if (!Acts::rangeContainsValue(m_columns, name)) {
       throw std::runtime_error("Missing header column '" + name + "'");
     }
   }

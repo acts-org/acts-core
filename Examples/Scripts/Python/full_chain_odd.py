@@ -273,7 +273,7 @@ else:
             outputDirRoot=outputDir if args.output_root else None,
             outputDirCsv=outputDir if args.output_csv else None,
             rnd=rnd,
-            killVolume=trackingGeometry.worldVolume,
+            killVolume=trackingGeometry.highestTrackingVolume,
             killAfterTime=25 * u.ns,
         )
     else:
@@ -358,7 +358,8 @@ if args.reco:
             maxOutliers=2,
         ),
         CkfConfig(
-            chi2CutOff=15,
+            chi2CutOffMeasurement=15.0,
+            chi2CutOffOutlier=25.0,
             numMeasurementsCutOff=10,
             seedDeduplication=True,
             stayOnSeed=True,

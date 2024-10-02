@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Detector/detail/CuboidalDetectorHelper.hpp"
 
@@ -19,6 +19,7 @@
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
+#include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/StringHelpers.hpp"
 
 #include <algorithm>
@@ -190,9 +191,7 @@ Acts::Experimental::detail::CuboidalDetectorHelper::connect(
 
     for (auto [is, index] : enumerate(portalSets[toUnderlying(mergeValue)])) {
       // Check if you need to skip due to selections
-      if (!selectedOnly.empty() &&
-          std::find(selectedOnly.begin(), selectedOnly.end(), index) ==
-              selectedOnly.end()) {
+      if (!selectedOnly.empty() && !rangeContainsValue(selectedOnly, index)) {
         continue;
       }
 
@@ -271,12 +270,12 @@ Acts::Experimental::detail::CuboidalDetectorHelper::connect(
     auto& formerContainer = containers[ic - 1];
     auto& currentContainer = containers[ic];
     // Check and throw exception
-    if (formerContainer.find(startIndex) == formerContainer.end()) {
+    if (!formerContainer.contains(startIndex)) {
       throw std::invalid_argument(
           "CuboidalDetectorHelper: proto container has no fuse portal at index "
           "of former container.");
     }
-    if (currentContainer.find(endIndex) == currentContainer.end()) {
+    if (!currentContainer.contains(endIndex)) {
       throw std::invalid_argument(
           "CuboidalDetectorHelper: proto container has no fuse portal at index "
           "of current container.");
@@ -344,11 +343,8 @@ Acts::Experimental::detail::CuboidalDetectorHelper::xyzBoundaries(
   auto fillMap = [&](std::map<ActsScalar, std::size_t>& map,
                      const std::array<ActsScalar, 2u>& values) {
     for (auto v : values) {
-      if (map.find(v) != map.end()) {
-        ++map[v];
-      } else {
-        map[v] = 1u;
-      }
+      // This will insert v with a value of 0 if it doesn't exist
+      ++map[v];
     }
   };
 
@@ -380,7 +376,7 @@ Acts::Experimental::detail::CuboidalDetectorHelper::xyzBoundaries(
     for (auto [key, value] : map) {
       boundaries[im].push_back(key);
     }
-    std::sort(boundaries[im].begin(), boundaries[im].end());
+    std::ranges::sort(boundaries[im]);
   }
 
   ACTS_VERBOSE("- did yield " << boundaries[0u].size() << " boundaries in X.");

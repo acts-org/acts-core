@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -33,11 +33,11 @@ BOOST_AUTO_TEST_CASE(jacobian_engine_to_bound) {
   double qop = 0.125;
 
   // Build a surface
-  auto pSurface = Surface::makeShared<PlaneSurface>(position, direction);
+  auto pSurface = CurvilinearSurface(position, direction).planeSurface();
 
   // Other rotated surface
   Vector3 odirection = Vector3(6., 2., 8.).normalized();
-  auto oSurface = Surface::makeShared<PlaneSurface>(position, odirection);
+  auto oSurface = CurvilinearSurface(position, odirection).planeSurface();
 
   // The free parameter vector
   FreeVector freeParameters;
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(jacobian_engine_to_curvilinear) {
   Vector3 direction = Vector3(5., 2., 7.).normalized();
 
   // Build a surface, starting surface for curvilinear
-  auto pSurface = Surface::makeShared<PlaneSurface>(position, direction);
+  auto pSurface = CurvilinearSurface(position, direction).planeSurface();
 
   // Build covariance matrices for bound and free case
   BoundSquareMatrix boundCovariance = 0.025 * BoundSquareMatrix::Identity();
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(jacobian_engine_to_free) {
   Vector3 direction = Vector3(5., 2., 7.).normalized();
 
   // Build a surface, starting surface for curvilinear
-  auto pSurface = Surface::makeShared<PlaneSurface>(position, direction);
+  auto pSurface = CurvilinearSurface(position, direction).planeSurface();
 
   // Build covariance matrices for bound and free case
   BoundSquareMatrix boundCovariance = 0.025 * BoundSquareMatrix::Identity();

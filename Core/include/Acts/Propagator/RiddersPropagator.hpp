@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -36,20 +36,20 @@ class RiddersPropagator {
   using Covariance = BoundSquareMatrix;
 
   ///
-  /// @note The result_type_helper struct and the action_list_t_result_t are
+  /// @note The result_type_helper struct and the actor_list_t_result_t are
   /// here to allow a look'n'feel of this class like the Propagator itself
   ///
 
   /// @brief Helper struct determining the result's type
   ///
   /// @tparam parameters_t Type of final track parameters
-  /// @tparam action_list_t    List of propagation action types
+  /// @tparam actor_list_t    List of propagation action types
   ///
   /// This helper struct provides type definitions to extract the correct
   /// propagation result type from a given TrackParameter type and an
-  /// ActionList.
+  /// ActorList.
   ///
-  template <typename parameters_t, typename action_list_t>
+  template <typename parameters_t, typename actor_list_t>
   struct result_type_helper {
     /// @brief Propagation result type for an arbitrary list of additional
     ///        propagation results
@@ -60,18 +60,18 @@ class RiddersPropagator {
     using this_result_type = PropagatorResult<parameters_t, args...>;
 
     /// @brief Propagation result type derived from a given action list
-    using type = typename action_list_t::template result_type<this_result_type>;
+    using type = typename actor_list_t::template result_type<this_result_type>;
   };
 
   /// @brief Short-hand type definition for propagation result derived from
   ///        an action list
   ///
   /// @tparam parameters_t Type of the final track parameters
-  /// @tparam action_list_t List of propagation action types
+  /// @tparam actor_list_t List of propagation action types
   ///
-  template <typename parameters_t, typename action_list_t>
-  using action_list_t_result_t =
-      typename result_type_helper<parameters_t, action_list_t>::type;
+  template <typename parameters_t, typename actor_list_t>
+  using actor_list_t_result_t =
+      typename result_type_helper<parameters_t, actor_list_t>::type;
 
  public:
   struct Config {
@@ -81,10 +81,8 @@ class RiddersPropagator {
     std::vector<double> deviationsDisc = {-3e-5, -1e-5, 1e-5, 3e-5};
   };
 
-  template <typename action_list_t = ActionList<>,
-            typename aborter_list_t = AbortList<>>
-  using Options =
-      typename propagator_t::template Options<action_list_t, aborter_list_t>;
+  template <typename actor_list_t = ActorList<>>
+  using Options = typename propagator_t::template Options<actor_list_t>;
 
   /// @brief Constructor using a propagator
   ///
@@ -117,9 +115,8 @@ class RiddersPropagator {
   ///
   /// @return Result of the propagation
   template <typename parameters_t, typename propagator_options_t>
-  Result<
-      action_list_t_result_t<CurvilinearTrackParameters,
-                             typename propagator_options_t::action_list_type>>
+  Result<actor_list_t_result_t<CurvilinearTrackParameters,
+                               typename propagator_options_t::actor_list_type>>
   propagate(const parameters_t& start,
             const propagator_options_t& options) const;
 
@@ -136,8 +133,8 @@ class RiddersPropagator {
   /// @note If the target surface is a disc, the resulting covariance may be
   /// inconsistent. In this case a zero matrix is returned.
   template <typename parameters_t, typename propagator_options_t>
-  Result<action_list_t_result_t<
-      BoundTrackParameters, typename propagator_options_t::action_list_type>>
+  Result<actor_list_t_result_t<BoundTrackParameters,
+                               typename propagator_options_t::actor_list_type>>
   propagate(const parameters_t& start, const Surface& target,
             const propagator_options_t& options) const;
 

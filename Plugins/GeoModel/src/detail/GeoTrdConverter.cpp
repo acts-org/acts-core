@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/GeoModel/detail/GeoTrdConverter.hpp"
 
@@ -24,7 +24,7 @@
 #include <GeoModelKernel/Units.h>
 
 Acts::Result<Acts::GeoModelSensitiveSurface>
-Acts::detail::GeoTrdConverter::operator()(const GeoFullPhysVol& geoFPV,
+Acts::detail::GeoTrdConverter::operator()(const PVConstLink& geoPV,
                                           const GeoTrd& geoTrd,
                                           const Transform3& absTransform,
                                           bool sensitive) const {
@@ -36,8 +36,8 @@ Acts::detail::GeoTrdConverter::operator()(const GeoFullPhysVol& geoFPV,
   Transform3 transform = Transform3::Identity();
   transform.translation() = unitLength * absTransform.translation();
 
-  // GeoTrd is defined that halfZ needs to map onto surface halfY
-  // Create the surface
+  // GeoTrd coordinates: x is the extrusion direction, y is orthogonal to the
+  // symmetry axis and z is along the symmetry axis
   ActsScalar halfX1 = geoTrd.getXHalfLength1();
   ActsScalar halfX2 = geoTrd.getXHalfLength2();
   ActsScalar halfY1 = geoTrd.getYHalfLength1();
@@ -84,8 +84,7 @@ Acts::detail::GeoTrdConverter::operator()(const GeoFullPhysVol& geoFPV,
 
   auto trapezoidBounds =
       std::make_shared<TrapezoidBounds>(minHalfX, maxHalfX, halfZ);
-  // std::cout << "     TrapezoidBounds: minHalfX=" << minHalfX << ", maxHalfX="
-  // << maxHalfX << ", halfz=" << halfZ << std::endl;
+
   if (!sensitive) {
     auto surface =
         Surface::makeShared<PlaneSurface>(transform, trapezoidBounds);
@@ -93,9 +92,10 @@ Acts::detail::GeoTrdConverter::operator()(const GeoFullPhysVol& geoFPV,
   }
 
   // Create the element and the surface
+
   auto detectorElement =
       GeoModelDetectorElement::createDetectorElement<PlaneSurface>(
-          geoFPV, trapezoidBounds, transform, thickness);
+          geoPV, trapezoidBounds, transform, thickness);
   auto surface = detectorElement->surface().getSharedPtr();
   return std::make_tuple(detectorElement, surface);
 }

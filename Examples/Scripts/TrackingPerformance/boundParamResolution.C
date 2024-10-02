@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <array>
 #include <iostream>
@@ -141,7 +141,7 @@ int boundParamResolution(const std::string& inFile, const std::string& treeName,
   for (int volID = 1; volID <= volBins; ++volID) {
     for (int layID = 1; layID <= layBins; ++layID) {
       if (h2_volID_layID->GetBinContent(volID, layID) != 0.) {
-        if (volLayIds.find(volID) == volLayIds.end()) {
+        if (!volLayIds.contains(volID)) {
           // First occurrence of this layer, add -1 for volume plots
           volLayIds[volID] = {-1, layID};
         } else {

@@ -232,10 +232,8 @@ def basic_prop_seq(rng):
             level=acts.logging.WARNING,
             propagatorImpl=prop,
             sterileLogger=False,
-            recordMaterialInteractions=True,
             inputTrackParameters="start_parameters",
-            outputPropagationSteps="propagation-steps",
-            outputMaterialTracks="material-tracks",
+            outputSummaryCollection="propagation_summary",
         )
 
         s.addAlgorithm(alg)

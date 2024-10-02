@@ -1,16 +1,17 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
 #include <boost/test/data/test_case.hpp>
 
 #include "Acts/Definitions/Units.hpp"
+#include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/Surfaces/DiscSurface.hpp"
 #include "Acts/Surfaces/PerigeeSurface.hpp"
@@ -34,9 +35,9 @@ const auto surfaces =
             Transform3::Identity(), 10 /* radius */, 100 /* half-length z */),
         // TODO perigee roundtrip local->global->local does not seem to work
         // Surface::makeShared<PerigeeSurface>(Vector3(0, 0, -1.5)),
-        Surface::makeShared<PlaneSurface>(Vector3::Zero(), Vector3::UnitX()),
-        Surface::makeShared<PlaneSurface>(Vector3::Zero(), Vector3::UnitY()),
-        Surface::makeShared<PlaneSurface>(Vector3::Zero(), Vector3::UnitZ()),
+        CurvilinearSurface(Vector3::Zero(), Vector3::UnitX()).planeSurface(),
+        CurvilinearSurface(Vector3::Zero(), Vector3::UnitY()).planeSurface(),
+        CurvilinearSurface(Vector3::Zero(), Vector3::UnitZ()).planeSurface(),
     });
 // positions
 const auto posAngle = bdata::xrange(-M_PI, M_PI, 0.50);

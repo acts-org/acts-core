@@ -1,11 +1,12 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+#include "Acts/EventData/SpacePointContainer.hpp"
 #include "Acts/Geometry/GeometryHierarchyMap.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Plugins/Python/Utilities.hpp"
@@ -17,7 +18,7 @@
 #include "Acts/Seeding/SpacePointGrid.hpp"
 #include "Acts/TrackFinding/MeasurementSelector.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "Acts/Utilities/TypeTraits.hpp"
+#include "ActsExamples/EventData/SpacePointContainer.hpp"
 #include "ActsExamples/EventData/Track.hpp"
 #include "ActsExamples/TrackFinding/GbtsSeedingAlgorithm.hpp"
 #include "ActsExamples/TrackFinding/HoughTransformSeeder.hpp"
@@ -86,7 +87,9 @@ void addTrackFinding(Context& ctx) {
   }
 
   {
-    using Config = Acts::SeedFinderConfig<SimSpacePoint>;
+    using Config = Acts::SeedFinderConfig<typename Acts::SpacePointContainer<
+        ActsExamples::SpacePointContainer<std::vector<const SimSpacePoint*>>,
+        Acts::detail::RefHolder>::SpacePointProxyType>;
     auto c = py::class_<Config>(m, "SeedFinderConfig").def(py::init<>());
     ACTS_PYTHON_STRUCT_BEGIN(c, Config);
     ACTS_PYTHON_MEMBER(minPt);
@@ -145,7 +148,11 @@ void addTrackFinding(Context& ctx) {
     patchKwargsConstructor(c);
   }
   {
-    using Config = Acts::SeedFinderOrthogonalConfig<SimSpacePoint>;
+    using Config =
+        Acts::SeedFinderOrthogonalConfig<typename Acts::SpacePointContainer<
+            ActsExamples::SpacePointContainer<
+                std::vector<const SimSpacePoint*>>,
+            Acts::detail::RefHolder>::SpacePointProxyType>;
     auto c =
         py::class_<Config>(m, "SeedFinderOrthogonalConfig").def(py::init<>());
     ACTS_PYTHON_STRUCT_BEGIN(c, Config);
@@ -304,7 +311,8 @@ void addTrackFinding(Context& ctx) {
                                magneticField,
                            Logging::Level level) {
                           return Alg::makeTrackFinderFunction(
-                              trackingGeometry, magneticField,
+                              std::move(trackingGeometry),
+                              std::move(magneticField),
                               *Acts::getDefaultLogger("TrackFinding", level));
                         });
 
@@ -333,22 +341,25 @@ void addTrackFinding(Context& ctx) {
     ACTS_PYTHON_MEMBER(stripVolumes);
     ACTS_PYTHON_MEMBER(maxPixelHoles);
     ACTS_PYTHON_MEMBER(maxStripHoles);
+    ACTS_PYTHON_MEMBER(trimTracks);
     ACTS_PYTHON_STRUCT_END();
   }
 
   {
     auto constructor =
-        [](const std::vector<
-            std::pair<GeometryIdentifier,
-                      std::tuple<std::vector<double>, std::vector<double>,
-                                 std::vector<std::size_t>>>>& input) {
+        [](const std::vector<std::pair<
+               GeometryIdentifier,
+               std::tuple<std::vector<double>, std::vector<double>,
+                          std::vector<double>, std::vector<std::size_t>>>>&
+               input) {
           std::vector<std::pair<GeometryIdentifier, MeasurementSelectorCuts>>
               converted;
           converted.reserve(input.size());
           for (const auto& [id, cuts] : input) {
-            const auto& [bins, chi2, num] = cuts;
-            converted.emplace_back(id,
-                                   MeasurementSelectorCuts{bins, chi2, num});
+            const auto& [bins, chi2Measurement, chi2Outlier, num] = cuts;
+            converted.emplace_back(
+                id, MeasurementSelectorCuts{bins, chi2Measurement, num,
+                                            chi2Outlier});
           }
           return std::make_unique<MeasurementSelector::Config>(converted);
         };
@@ -356,9 +367,12 @@ void addTrackFinding(Context& ctx) {
     py::class_<MeasurementSelectorCuts>(m, "MeasurementSelectorCuts")
         .def(py::init<>())
         .def(py::init<std::vector<double>, std::vector<double>,
-                      std::vector<std::size_t>>())
+                      std::vector<std::size_t>, std::vector<double>>())
         .def_readwrite("etaBins", &MeasurementSelectorCuts::etaBins)
-        .def_readwrite("chi2CutOff", &MeasurementSelectorCuts::chi2CutOff)
+        .def_readwrite("chi2CutOffMeasurement",
+                       &MeasurementSelectorCuts::chi2CutOff)
+        .def_readwrite("chi2CutOffOutlier",
+                       &MeasurementSelectorCuts::chi2CutOffOutlier)
         .def_readwrite("numMeasurementsCutOff",
                        &MeasurementSelectorCuts::numMeasurementsCutOff);
 

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Vertexing/AdaptiveMultiVertexFinderAlgorithm.hpp"
 
@@ -31,6 +31,7 @@
 #include "ActsExamples/Framework/ProcessCode.hpp"
 #include "ActsExamples/TruthTracking/TruthVertexFinder.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <optional>
 #include <ostream>
@@ -256,12 +257,10 @@ ProcessCode AdaptiveMultiVertexFinderAlgorithm::execute(
     }
 
     // sort by number of particles
-    std::sort(vertexSeederState.truthVertices.begin(),
-              vertexSeederState.truthVertices.end(),
-              [&vertexParticleCount](const auto& lhs, const auto& rhs) {
-                return vertexParticleCount[lhs.vertexId()] >
-                       vertexParticleCount[rhs.vertexId()];
-              });
+    std::ranges::sort(vertexSeederState.truthVertices, {},
+                      [&vertexParticleCount](const auto& v) {
+                        return vertexParticleCount[v.vertexId()];
+                      });
 
     ACTS_INFO("Got " << truthVertices.size() << " truth vertices and selected "
                      << vertexSeederState.truthVertices.size() << " in event");

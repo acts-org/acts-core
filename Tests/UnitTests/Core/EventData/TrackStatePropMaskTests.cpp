@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(BitmaskOperators) {
   BOOST_CHECK(!ACTS_CHECK_BIT(bs4, PM::Filtered));
 
   auto cnv = [](auto a) -> std::bitset<8> {
-    return static_cast<std::underlying_type<PM>::type>(a);
+    return static_cast<std::underlying_type_t<PM>>(a);
   };
 
   BOOST_CHECK(cnv(PM::All).all());    // all ones

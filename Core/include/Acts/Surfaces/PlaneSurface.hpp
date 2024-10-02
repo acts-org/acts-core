@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -57,15 +57,6 @@ class PlaneSurface : public RegularSurface {
   /// @param transform is the additional transform applied after copying
   PlaneSurface(const GeometryContext& gctx, const PlaneSurface& other,
                const Transform3& transform);
-
-  /// @deprecated Use `CurvilinearSurface` instead
-  ///
-  /// Dedicated Constructor with normal vector
-  /// This is for curvilinear surfaces which are by definition boundless
-  ///
-  /// @param center is the center position of the surface
-  /// @param normal is thenormal vector of the plane surface
-  PlaneSurface(const Vector3& center, const Vector3& normal);
 
   /// Constructor from DetectorElementBase : Element proxy
   ///

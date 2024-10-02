@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/GeoModel/detail/GeoIntersectionAnnulusConverter.hpp"
 
@@ -16,6 +16,8 @@
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Surfaces/detail/AnnulusBoundsHelper.hpp"
 
+#include <algorithm>
+
 #include <GeoModelKernel/GeoFullPhysVol.h>
 #include <GeoModelKernel/GeoGenericTrap.h>
 #include <GeoModelKernel/GeoLogVol.h>
@@ -26,7 +28,7 @@
 
 Acts::Result<Acts::GeoModelSensitiveSurface>
 Acts::detail::GeoIntersectionAnnulusConverter::operator()(
-    const GeoFullPhysVol& geoFPV, const GeoShapeIntersection& geoIntersection,
+    const PVConstLink& geoPV, const GeoShapeIntersection& geoIntersection,
     const Transform3& absTransform, bool sensitive) const {
   /// auto-calculate the unit length conversion
   static constexpr ActsScalar unitLength =
@@ -56,10 +58,9 @@ Acts::detail::GeoIntersectionAnnulusConverter::operator()(
         std::vector<Vector2> faceVertices(trapVertices.begin(),
                                           trapVertices.begin() + 4u);
         // to make sure they are in the right order
-        std::sort(faceVertices.begin(), faceVertices.end(),
-                  [](const auto& a, const auto& b) {
-                    return (VectorHelpers::phi(a) > VectorHelpers::phi(b));
-                  });
+        std::ranges::sort(faceVertices, std::greater{}, [](const auto& f) {
+          return (VectorHelpers::phi(f));
+        });
 
         // Turn them into global
         std::vector<Vector3> faceVertices3D;
@@ -85,7 +86,7 @@ Acts::detail::GeoIntersectionAnnulusConverter::operator()(
         // Create the detector element
         auto detectorElement =
             GeoModelDetectorElement::createDetectorElement<DiscSurface>(
-                geoFPV, annulusBounds, annulusTransform, thickness);
+                geoPV, annulusBounds, annulusTransform, thickness);
         auto surface = detectorElement->surface().getSharedPtr();
         return std::make_tuple(detectorElement, surface);
       }

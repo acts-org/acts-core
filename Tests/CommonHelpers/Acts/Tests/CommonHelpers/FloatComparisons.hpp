@@ -1,17 +1,16 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Utilities/TypeTraits.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -155,25 +154,23 @@ predicate_result matrixCompare(const Eigen::DenseBase<Derived1>& val,
 }
 
 template <typename T>
-using has_begin_t = decltype(std::declval<T>().cbegin());
-template <typename T>
-using has_end_t = decltype(std::declval<T>().cend());
-template <typename T>
-using has_eval_t = decltype(std::declval<T>().eval());
+concept is_eigen_type = requires(const T& t) {
+  { t.eval() };
+};
 
 // STL container frontend
 //
 // FIXME: The algorithm only supports ordered containers, so the API should
 //        only accept them. Does someone know a clean way to do that in C++?
 //
-template <typename Container,
-          typename = std::enable_if_t<
-              !Acts::Concepts::exists<has_eval_t, Container> &&
-                  Acts::Concepts::exists<has_begin_t, Container> &&
-                  Acts::Concepts::exists<has_end_t, Container>,
-              int>>
+template <typename Container>
 predicate_result compare(const Container& val, const Container& ref,
-                         ScalarComparison&& compareImpl) {
+                         ScalarComparison&& compareImpl)
+  requires(!is_eigen_type<Container>) && requires(const Container& t) {
+    { t.cbegin() };
+    { t.cend() };
+  }
+{
   // Make sure that the two input containers have the same number of items
   // (in order to provide better error reporting when they don't)
   std::size_t numVals = std::distance(std::cbegin(val), std::cend(val));

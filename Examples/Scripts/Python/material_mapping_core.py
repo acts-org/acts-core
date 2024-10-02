@@ -26,13 +26,6 @@ from acts.examples import (
     JsonFormat,
 )
 
-from acts.examples.dd4hep import (
-    DD4hepDetector,
-    DD4hepDetectorOptions,
-    DD4hepGeometryService,
-)
-
-from acts import geomodel as gm
 from acts.examples.odd import getOpenDataDetector, getOpenDataDetectorDirectory
 
 
@@ -191,6 +184,8 @@ if "__main__" == __name__:
 
     if args.experimental:
         if len(args.geomodel_input) > 0:
+            from acts import geomodel as gm
+
             # Read the geometry model from the database
             gmTree = acts.geomodel.readFromDb(args.geomodel_input)
 
@@ -251,6 +246,12 @@ if "__main__" == __name__:
 
             materialSurfaces = detector.extractMaterialSurfaces()
         else:
+            from acts.examples.dd4hep import (
+                DD4hepDetector,
+                DD4hepDetectorOptions,
+                DD4hepGeometryService,
+            )
+
             odd_xml = getOpenDataDetectorDirectory() / "xml" / "OpenDataDetector.xml"
 
             # Create the dd4hep geometry service and detector

@@ -1,14 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
-#include "Acts/Utilities/TypeTraits.hpp"
+#include "Acts/Utilities/Concepts.hpp"
 
 #include <cassert>
 #include <functional>
@@ -16,7 +16,6 @@
 #include <type_traits>
 
 namespace Acts {
-
 /// Ownership enum for @c Delegate
 enum class DelegateType { Owning, NonOwning };
 
@@ -65,11 +64,12 @@ class Delegate<R(Args...), H, O> {
       Delegate<R(Args...), holder_type, DelegateType::Owning>;
   using NonOwningDelegate =
       Delegate<R(Args...), holder_type, DelegateType::NonOwning>;
+
   template <typename T>
-  using isNoFunPtr =
-      std::enable_if_t<!std::is_convertible_v<std::decay_t<T>, function_type> &&
-                       !std::is_same_v<std::decay_t<T>, OwningDelegate> &&
-                       !std::is_same_v<std::decay_t<T>, NonOwningDelegate>>;
+  using isNoFunPtr = std::conjunction<
+      std::negation<std::is_convertible<std::decay_t<T>, function_type>>,
+      std::negation<std::is_same<std::decay_t<T>, OwningDelegate>>,
+      std::negation<std::is_same<std::decay_t<T>, NonOwningDelegate>>>;
 
  public:
   Delegate() = default;
@@ -91,8 +91,10 @@ class Delegate<R(Args...), H, O> {
   /// @param callable The callable (function object or lambda)
   /// @note @c Delegate does not assume owner ship over @p callable. You need to ensure
   ///       it's lifetime is longer than that of @c Delegate.
-  template <typename Callable, typename = isNoFunPtr<Callable>>
-  explicit Delegate(Callable &callable) {
+  template <typename Callable>
+  explicit Delegate(Callable &callable)
+    requires(isNoFunPtr<Callable>::value)
+  {
     connect(callable);
   }
 
@@ -110,16 +112,20 @@ class Delegate<R(Args...), H, O> {
   /// @param instance The instance on which the member function pointer should be called on
   /// @note @c Delegate does not assume owner ship over @p instance.
   /// @note @c DelegateFuncTag is used to communicate the callable type
-  template <auto Callable, typename Type, DelegateType T = kOwnership,
-            typename = std::enable_if_t<T == DelegateType::NonOwning>>
-  Delegate(DelegateFuncTag<Callable> /*tag*/, const Type *instance) {
+  template <auto Callable, typename Type>
+
+  Delegate(DelegateFuncTag<Callable> /*tag*/, const Type *instance)
+    requires(kOwnership == DelegateType::NonOwning)
+  {
     connect<Callable>(instance);
   }
 
   /// Constructor from rvalue reference is deleted, should catch construction
   /// with temporary objects and thus invalid pointers
-  template <typename Callable, typename = isNoFunPtr<Callable>>
-  Delegate(Callable &&) = delete;
+  template <typename Callable>
+  Delegate(Callable &&)
+    requires(isNoFunPtr<Callable>::value)
+  = delete;
 
   /// Assignment operator with an explicit runtime callable
   /// @param callable The runtime value of the callable
@@ -133,15 +139,19 @@ class Delegate<R(Args...), H, O> {
   /// @param callable The callable (function object or lambda)
   /// @note @c Delegate does not assume owner ship over @p callable. You need to ensure
   ///       it's lifetime is longer than that of @c Delegate.
-  template <typename Callable, typename = isNoFunPtr<Callable>>
-  void operator=(Callable &callable) {
+  template <typename Callable>
+  void operator=(Callable &callable)
+    requires(isNoFunPtr<Callable>::value)
+  {
     connect(callable);
   }
 
   /// Assignment operator from rvalue reference is deleted, should catch
   /// assignment from temporary objects and thus invalid pointers
-  template <typename Callable, typename = isNoFunPtr<Callable>>
-  void operator=(Callable &&) = delete;
+  template <typename Callable>
+  void operator=(Callable &&)
+    requires(isNoFunPtr<Callable>::value)
+  = delete;
 
   /// Connect a free function pointer.
   /// @note The function pointer must be ``constexpr`` for @c Delegate to accept it
@@ -151,8 +161,7 @@ class Delegate<R(Args...), H, O> {
     m_payload.payload = nullptr;
 
     static_assert(
-        Concepts::is_detected<isSignatureCompatible, function_ptr_type,
-                              decltype(Callable)>::value,
+        Concepts::invocable_and_returns<Callable, return_type, Args &&...>,
         "Callable given does not correspond exactly to required call "
         "signature");
 
@@ -167,15 +176,19 @@ class Delegate<R(Args...), H, O> {
   /// @param callable The callable (function object or lambda)
   /// @note @c Delegate does not assume owner ship over @p callable. You need to ensure
   ///       it's lifetime is longer than that of @c Delegate.
-  template <typename Callable, typename = isNoFunPtr<Callable>>
-  void connect(Callable &callable) {
+  template <typename Callable>
+  void connect(Callable &callable)
+    requires(isNoFunPtr<Callable>::value)
+  {
     connect<&Callable::operator(), Callable>(&callable);
   }
 
   /// Connection with rvalue reference is deleted, should catch assignment
   /// from temporary objects and thus invalid pointers
-  template <typename Callable, typename = isNoFunPtr<Callable>>
-  void connect(Callable &&) = delete;
+  template <typename Callable>
+  void connect(Callable &&)
+    requires(isNoFunPtr<Callable>::value)
+  = delete;
 
   /// Connect anything that is assignable to the function pointer
   /// @param callable The runtime value of the callable
@@ -195,13 +208,12 @@ class Delegate<R(Args...), H, O> {
   /// @param instance The instance on which the member function pointer should be called on
   /// @note @c Delegate does not assume owner ship over @p instance. You need to ensure
   ///       it's lifetime is longer than that of @c Delegate.
-  template <auto Callable, typename Type, DelegateType T = kOwnership,
-            typename = std::enable_if_t<T == DelegateType::NonOwning>>
-  void connect(const Type *instance) {
-    using member_ptr_type = return_type (Type::*)(Args...) const;
-
-    static_assert(Concepts::is_detected<isSignatureCompatible, member_ptr_type,
-                                        decltype(Callable)>::value,
+  template <auto Callable, typename Type>
+  void connect(const Type *instance)
+    requires(kOwnership == DelegateType::NonOwning)
+  {
+    static_assert(Concepts::invocable_and_returns<Callable, return_type, Type,
+                                                  Args &&...>,
                   "Callable given does not correspond exactly to required call "
                   "signature");
 
@@ -220,12 +232,12 @@ class Delegate<R(Args...), H, O> {
   /// @tparam Type The type of the instance the member function should be called on
   /// @param instance The instance on which the member function pointer should be called on
   /// @note @c Delegate assumes owner ship over @p instance.
-  template <auto Callable, typename Type, DelegateType T = kOwnership,
-            typename = std::enable_if_t<T == DelegateType::Owning>>
-  void connect(std::unique_ptr<const Type> instance) {
-    using member_ptr_type = return_type (Type::*)(Args &&...) const;
-    static_assert(Concepts::is_detected<isSignatureCompatible, member_ptr_type,
-                                        decltype(Callable)>::value,
+  template <auto Callable, typename Type>
+  void connect(std::unique_ptr<const Type> instance)
+    requires(kOwnership == DelegateType::Owning)
+  {
+    static_assert(Concepts::invocable_and_returns<Callable, return_type, Type,
+                                                  Args &&...>,
                   "Callable given does not correspond exactly to required call "
                   "signature");
 
@@ -266,9 +278,9 @@ class Delegate<R(Args...), H, O> {
     m_function = nullptr;
   }
 
-  template <typename holder_t = holder_type,
-            typename = std::enable_if_t<!std::is_same_v<holder_t, void>>>
-  const holder_type *instance() const {
+  const holder_type *instance() const
+    requires(!std::same_as<holder_type, void>)
+  {
     return m_payload.ptr();
   }
 

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Propagator/SympyStepper.hpp"
 
@@ -116,9 +116,8 @@ Result<double> SympyStepper::stepImpl(
   double m = particleHypothesis(state).mass();
   double p_abs = absoluteMomentum(state);
 
-  auto getB = [&](const double* p) -> Vector3 {
-    auto fieldRes = getField(state, {p[0], p[1], p[2]});
-    return *fieldRes;
+  auto getB = [&](const double* p) -> Result<Vector3> {
+    return getField(state, {p[0], p[1], p[2]});
   };
 
   const auto calcStepSizeScaling = [&](const double errorEstimate_) -> double {
@@ -155,17 +154,20 @@ Result<double> SympyStepper::stepImpl(
     nStepTrials++;
 
     // For details about the factor 4 see ATL-SOFT-PUB-2009-001
-    bool ok =
+    Result<bool> res =
         rk4(pos.data(), dir.data(), t, h, qop, m, p_abs, getB, &errorEstimate,
             4 * stepTolerance, state.pars.template segment<3>(eFreePos0).data(),
             state.pars.template segment<3>(eFreeDir0).data(),
             state.pars.template segment<1>(eFreeTime).data(),
             state.derivative.data(),
             state.covTransport ? state.jacTransport.data() : nullptr);
+    if (!res.ok()) {
+      return res.error();
+    }
     // Protect against division by zero
     errorEstimate = std::max(1e-20, errorEstimate);
 
-    if (ok) {
+    if (*res) {
       break;
     }
 

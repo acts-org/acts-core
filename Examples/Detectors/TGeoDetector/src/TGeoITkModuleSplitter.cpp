@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/TGeoDetector/TGeoITkModuleSplitter.hpp"
 
@@ -33,11 +33,9 @@ void ActsExamples::TGeoITkModuleSplitter::initSplitCategories() {
        m_cfg.splitPatterns) {
     // mark pattern for disc or barrel module splits:
     bool is_disk = false;
-    if (m_cfg.discMap.find(pattern_split_category.second) !=
-        m_cfg.discMap.end()) {
+    if (m_cfg.discMap.contains(pattern_split_category.second)) {
       is_disk = true;
-    } else if (m_cfg.barrelMap.find(pattern_split_category.second) ==
-               m_cfg.barrelMap.end()) {
+    } else if (!m_cfg.barrelMap.contains(pattern_split_category.second)) {
       ACTS_ERROR(
           pattern_split_category.second +
           " is neither a category name for barrel or disk module splits.");

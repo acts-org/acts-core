@@ -1,14 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
-#include "Acts/Seeding/InternalSeed.hpp"
+#include "Acts/EventData/SpacePointContainer.hpp"
 #include "Acts/Seeding/SeedFilterConfig.hpp"
 #include "Acts/Seeding/SeedFinderConfig.hpp"
 #include "Acts/Seeding/SeedFinderOrthogonal.hpp"
@@ -17,6 +17,7 @@
 #include "Acts/Utilities/Logger.hpp"
 #include "ActsExamples/EventData/SimSeed.hpp"
 #include "ActsExamples/EventData/SimSpacePoint.hpp"
+#include "ActsExamples/EventData/SpacePointContainer.hpp"
 #include "ActsExamples/Framework/DataHandle.hpp"
 #include "ActsExamples/Framework/IAlgorithm.hpp"
 #include "ActsExamples/Framework/ProcessCode.hpp"
@@ -32,6 +33,10 @@ struct AlgorithmContext;
 /// Construct track seeds from space points.
 class SeedingOrthogonalAlgorithm final : public IAlgorithm {
  public:
+  using proxy_type = typename Acts::SpacePointContainer<
+      ActsExamples::SpacePointContainer<std::vector<const SimSpacePoint*>>,
+      Acts::detail::RefHolder>::SpacePointProxyType;
+
   struct Config {
     /// Input space point collections.
     ///
@@ -44,7 +49,7 @@ class SeedingOrthogonalAlgorithm final : public IAlgorithm {
     std::string outputSeeds;
 
     Acts::SeedFilterConfig seedFilterConfig;
-    Acts::SeedFinderOrthogonalConfig<SimSpacePoint> seedFinderConfig;
+    Acts::SeedFinderOrthogonalConfig<proxy_type> seedFinderConfig;
     Acts::SeedFinderOptions seedFinderOptions;
   };
 
@@ -65,7 +70,7 @@ class SeedingOrthogonalAlgorithm final : public IAlgorithm {
 
  private:
   Config m_cfg;
-  Acts::SeedFinderOrthogonal<SimSpacePoint> m_finder;
+  Acts::SeedFinderOrthogonal<proxy_type> m_finder;
 
   std::vector<std::unique_ptr<ReadDataHandle<SimSpacePointContainer>>>
       m_inputSpacePoints{};

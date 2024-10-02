@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -45,7 +45,7 @@ class MaterialSlab {
   /// Construct vacuum without thickness.
   MaterialSlab() = default;
   /// Construct vacuum with thickness.
-  MaterialSlab(float thickness);
+  explicit MaterialSlab(float thickness);
   /// Construct from material description.
   ///
   /// @param material  is the material description
@@ -62,7 +62,7 @@ class MaterialSlab {
   void scaleThickness(float scale);
 
   /// Check if the material is valid, i.e. it is finite and not vacuum.
-  constexpr operator bool() const { return m_material && (0.0f < m_thickness); }
+  bool isValid() const { return m_material.isValid() && (0.0f < m_thickness); }
 
   /// Access the (average) material parameters.
   constexpr const Material& material() const { return m_material; }
@@ -84,10 +84,6 @@ class MaterialSlab {
     // t/X0 and t/L0 are dependent variables and need not be checked
     return (lhs.m_material == rhs.m_material) &&
            (lhs.m_thickness == rhs.m_thickness);
-  }
-  friend constexpr bool operator!=(const MaterialSlab& lhs,
-                                   const MaterialSlab& rhs) {
-    return !(lhs == rhs);
   }
 };
 

@@ -1,15 +1,16 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/ExaTrkX/BoostTrackBuilding.hpp"
 
 #include "Acts/Utilities/Zip.hpp"
 
+#include <algorithm>
 #include <map>
 
 #include <boost/beast/core/span.hpp>
@@ -82,7 +83,7 @@ std::vector<std::vector<int>> BoostTrackBuilding::operator()(
   ACTS_VERBOSE("Number of track labels: " << trackLabels.size());
   ACTS_VERBOSE("Number of unique track labels: " << [&]() {
     std::vector<vertex_t> sorted(trackLabels);
-    std::sort(sorted.begin(), sorted.end());
+    std::ranges::sort(sorted);
     sorted.erase(std::unique(sorted.begin(), sorted.end()), sorted.end());
     return sorted.size();
   }());

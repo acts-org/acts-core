@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -12,7 +12,6 @@
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/TrackFitting/GsfOptions.hpp"
-#include "Acts/Utilities/Identity.hpp"
 #include "Acts/Utilities/detail/periodic.hpp"
 
 #include <cmath>
@@ -123,7 +122,7 @@ auto gaussianMixtureCov(const components_t components,
 /// std::tuple< weight, mean, std::optional< cov > >
 /// @tparam angle_desc_t A angle description object which defines the cyclic
 /// angles in the bound parameters
-template <typename components_t, typename projector_t = Identity,
+template <typename components_t, typename projector_t = std::identity,
           typename angle_desc_t = AngleDescription<Surface::Plane>::Desc>
 auto gaussianMixtureMeanCov(const components_t components,
                             projector_t &&projector = projector_t{},
@@ -212,7 +211,7 @@ auto gaussianMixtureMeanCov(const components_t components,
 /// like a std::tuple< double, BoundVector, BoundMatrix >
 ///
 /// @return parameters and covariance as std::tuple< BoundVector, BoundMatrix >
-template <typename mixture_t, typename projector_t = Acts::Identity>
+template <typename mixture_t, typename projector_t = std::identity>
 auto mergeGaussianMixture(const mixture_t &mixture, const Surface &surface,
                           ComponentMergeMethod method,
                           projector_t &&projector = projector_t{}) {

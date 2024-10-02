@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/MagneticField/BFieldMapUtils.hpp"
 
@@ -39,8 +39,8 @@ Acts::fieldMapRZ(
     bool firstQuadrant) {
   // [1] Create Grid
   // sort the values
-  std::sort(rPos.begin(), rPos.end());
-  std::sort(zPos.begin(), zPos.end());
+  std::ranges::sort(rPos);
+  std::ranges::sort(zPos);
   // Get unique values
   rPos.erase(std::unique(rPos.begin(), rPos.end()), rPos.end());
   zPos.erase(std::unique(zPos.begin(), zPos.end()), zPos.end());
@@ -145,9 +145,9 @@ Acts::fieldMapXYZ(
     double lengthUnit, double BFieldUnit, bool firstOctant) {
   // [1] Create Grid
   // Sort the values
-  std::sort(xPos.begin(), xPos.end());
-  std::sort(yPos.begin(), yPos.end());
-  std::sort(zPos.begin(), zPos.end());
+  std::ranges::sort(xPos);
+  std::ranges::sort(yPos);
+  std::ranges::sort(zPos);
   // Get unique values
   xPos.erase(std::unique(xPos.begin(), xPos.end()), xPos.end());
   yPos.erase(std::unique(yPos.begin(), yPos.end()), yPos.end());

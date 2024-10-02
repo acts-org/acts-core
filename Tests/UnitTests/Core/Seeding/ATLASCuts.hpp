@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -21,35 +21,31 @@ class ATLASCuts : public IExperimentCuts<SpacePoint> {
   /// @param middle middle space point of the current seed
   /// @param top top space point of the current seed
   /// @return seed weight to be added to the seed's weight
-  float seedWeight(const InternalSpacePoint<SpacePoint>& bottom,
-                   const InternalSpacePoint<SpacePoint>& middle,
-                   const InternalSpacePoint<SpacePoint>& top) const override;
+  float seedWeight(const SpacePoint& bottom, const SpacePoint& middle,
+                   const SpacePoint& top) const override;
   /// @param weight the current seed weight
   /// @param bottom bottom space point of the current seed
   /// @param middle middle space point of the current seed
   /// @param top top space point of the current seed
   /// @return true if the seed should be kept, false if the seed should be
   /// discarded
-  bool singleSeedCut(
-      float weight, const InternalSpacePoint<SpacePoint>& bottom,
-      const InternalSpacePoint<SpacePoint>& /*middle*/,
-      const InternalSpacePoint<SpacePoint>& /*top*/) const override;
+  bool singleSeedCut(float weight, const SpacePoint& bottom,
+                     const SpacePoint& /*middle*/,
+                     const SpacePoint& /*top*/) const override;
 
   /// @param seedCandidates contains collection of seed candidates created for one middle
   /// space point in a std::tuple format
   /// @return vector of seeds that pass the cut
-  std::vector<typename CandidatesForMiddleSp<
-      const InternalSpacePoint<SpacePoint>>::value_type>
-  cutPerMiddleSP(std::vector<typename CandidatesForMiddleSp<
-                     const InternalSpacePoint<SpacePoint>>::value_type>
-                     seedCandidates) const override;
+  std::vector<typename CandidatesForMiddleSp<const SpacePoint>::value_type>
+  cutPerMiddleSP(
+      std::vector<typename CandidatesForMiddleSp<const SpacePoint>::value_type>
+          seedCandidates) const override;
 };
 
 template <typename SpacePoint>
-float ATLASCuts<SpacePoint>::seedWeight(
-    const InternalSpacePoint<SpacePoint>& bottom,
-    const InternalSpacePoint<SpacePoint>& /*middle*/,
-    const InternalSpacePoint<SpacePoint>& top) const {
+float ATLASCuts<SpacePoint>::seedWeight(const SpacePoint& bottom,
+                                        const SpacePoint& /*middle*/,
+                                        const SpacePoint& top) const {
   float weight = 0;
   if (bottom.radius() > 150) {
     weight = 400;
@@ -61,22 +57,18 @@ float ATLASCuts<SpacePoint>::seedWeight(
 }
 
 template <typename SpacePoint>
-bool ATLASCuts<SpacePoint>::singleSeedCut(
-    float weight, const InternalSpacePoint<SpacePoint>& b,
-    const InternalSpacePoint<SpacePoint>& /*m*/,
-    const InternalSpacePoint<SpacePoint>& /*t*/) const {
+bool ATLASCuts<SpacePoint>::singleSeedCut(float weight, const SpacePoint& b,
+                                          const SpacePoint& /*m*/,
+                                          const SpacePoint& /*t*/) const {
   return !(b.radius() > 150. && weight < 380.);
 }
 
 template <typename SpacePoint>
-std::vector<typename CandidatesForMiddleSp<
-    const InternalSpacePoint<SpacePoint>>::value_type>
+std::vector<typename CandidatesForMiddleSp<const SpacePoint>::value_type>
 ATLASCuts<SpacePoint>::cutPerMiddleSP(
-    std::vector<typename CandidatesForMiddleSp<
-        const InternalSpacePoint<SpacePoint>>::value_type>
+    std::vector<typename CandidatesForMiddleSp<const SpacePoint>::value_type>
         seedCandidates) const {
-  std::vector<typename CandidatesForMiddleSp<
-      const InternalSpacePoint<SpacePoint>>::value_type>
+  std::vector<typename CandidatesForMiddleSp<const SpacePoint>::value_type>
       newSeedsVector;
   if (seedCandidates.size() <= 1) {
     return seedCandidates;

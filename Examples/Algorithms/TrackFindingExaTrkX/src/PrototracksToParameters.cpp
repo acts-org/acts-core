@@ -1,16 +1,15 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/TrackFindingExaTrkX/PrototracksToParameters.hpp"
 
 #include "Acts/Seeding/BinnedGroup.hpp"
 #include "Acts/Seeding/EstimateTrackParamsFromSeed.hpp"
-#include "Acts/Seeding/InternalSpacePoint.hpp"
 #include "Acts/Seeding/SeedFilter.hpp"
 #include "Acts/Seeding/SeedFinder.hpp"
 #include "Acts/Seeding/SeedFinderConfig.hpp"
@@ -22,6 +21,7 @@
 #include "ActsExamples/Utilities/EventDataTransforms.hpp"
 
 #include <algorithm>
+#include <tuple>
 
 using namespace ActsExamples;
 using namespace Acts::UnitLiterals;
@@ -96,11 +96,8 @@ ProcessCode PrototracksToParameters::execute(
     // layer-volume spacepoints has 3 or more hits. However, if this is the
     // case, we want to keep the whole prototrack. Therefore, we operate on a
     // tmpTrack.
-    std::sort(track.begin(), track.end(), [&](auto a, auto b) {
-      if (indexToGeoId[a].volume() != indexToGeoId[b].volume()) {
-        return indexToGeoId[a].volume() < indexToGeoId[b].volume();
-      }
-      return indexToGeoId[a].layer() < indexToGeoId[b].layer();
+    std::ranges::sort(track, {}, [&](const auto &t) {
+      return std::make_tuple(indexToGeoId[t].volume(), indexToGeoId[t].layer());
     });
 
     tmpTrack.clear();
@@ -134,8 +131,7 @@ ProcessCode PrototracksToParameters::execute(
       continue;
     }
 
-    std::sort(tmpSps.begin(), tmpSps.end(),
-              [](const auto &a, const auto &b) { return a->r() < b->r(); });
+    std::ranges::sort(tmpSps, {}, [](const auto &t) { return t->r(); });
 
     // Simply use r = m*z + t and solve for r=0 to find z vertex position...
     // Probably not the textbook way to do
@@ -145,10 +141,10 @@ ProcessCode PrototracksToParameters::execute(
     const auto z_vertex = -t / m;
     const auto s = tmpSps.size();
 
-    SimSeed seed =
-        m_cfg.buildTightSeeds
-            ? SimSeed(*tmpSps[0], *tmpSps[1], *tmpSps[2], z_vertex)
-            : SimSeed(*tmpSps[0], *tmpSps[s / 2], *tmpSps[s - 1], z_vertex);
+    SimSeed seed = m_cfg.buildTightSeeds
+                       ? SimSeed(*tmpSps[0], *tmpSps[1], *tmpSps[2])
+                       : SimSeed(*tmpSps[0], *tmpSps[s / 2], *tmpSps[s - 1]);
+    seed.setVertexZ(z_vertex);
 
     // Compute parameters
     const auto &bottomSP = seed.sp().front();

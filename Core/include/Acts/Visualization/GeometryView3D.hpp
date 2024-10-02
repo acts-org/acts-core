@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -14,6 +14,7 @@
 #include "Acts/Visualization/IVisualization3D.hpp"
 #include "Acts/Visualization/ViewConfig.hpp"
 
+#include <filesystem>
 #include <string>
 
 namespace Acts {
@@ -75,7 +76,7 @@ struct GeometryView3D {
       const ViewConfig& sensitiveConfig = s_viewSensitive,
       const ViewConfig& passiveConfig = s_viewPassive,
       const ViewConfig& gridConfig = s_viewGrid,
-      const std::string& outputDir = ".");
+      const std::filesystem::path& outputDir = std::filesystem::path("."));
 
   /// Helper method to draw Volume objects
   ///
@@ -101,9 +102,9 @@ struct GeometryView3D {
                          const Experimental::Portal& portal,
                          const GeometryContext& gctx,
                          const Transform3& transform = Transform3::Identity(),
-                         const ViewConfig& connected = ViewConfig({0, 255, 0}),
-                         const ViewConfig& disconnected = ViewConfig({255, 0,
-                                                                      0}));
+                         const ViewConfig& connected = {.color = {0, 255, 0}},
+                         const ViewConfig& disconnected = {
+                             .color = {255, 0, 0}});
 
   /// Helper method to draw DetectorVolume objects
   ///
@@ -119,8 +120,8 @@ struct GeometryView3D {
       const Acts::Experimental::DetectorVolume& volume,
       const GeometryContext& gctx,
       const Transform3& transform = Transform3::Identity(),
-      const ViewConfig& connected = ViewConfig({0, 255, 0}),
-      const ViewConfig& unconnected = ViewConfig({255, 0, 0}),
+      const ViewConfig& connected = {.color = {0, 255, 0}},
+      const ViewConfig& unconnected = {.color = {255, 0, 0}},
       const ViewConfig& viewConfig = s_viewSensitive);
 
   /// Helper method to draw Layer objects
@@ -132,12 +133,12 @@ struct GeometryView3D {
   /// @param sensitiveConfig The drawing configuration for sensitive surfaces
   /// @param gridConfig The drawing configuration for grid display
   /// @param outputDir Directory to write to
-  static void drawLayer(IVisualization3D& helper, const Layer& layer,
-                        const GeometryContext& gctx,
-                        const ViewConfig& layerConfig = s_viewPassive,
-                        const ViewConfig& sensitiveConfig = s_viewSensitive,
-                        const ViewConfig& gridConfig = s_viewGrid,
-                        const std::string& outputDir = ".");
+  static void drawLayer(
+      IVisualization3D& helper, const Layer& layer, const GeometryContext& gctx,
+      const ViewConfig& layerConfig = s_viewPassive,
+      const ViewConfig& sensitiveConfig = s_viewSensitive,
+      const ViewConfig& gridConfig = s_viewGrid,
+      const std::filesystem::path& outputDir = std::filesystem::path("."));
 
   /// Helper method to draw TrackingVolume objects
   ///
@@ -161,7 +162,8 @@ struct GeometryView3D {
       const ViewConfig& layerView = s_viewPassive,
       const ViewConfig& sensitiveView = s_viewSensitive,
       const ViewConfig& gridView = s_viewGrid, bool writeIt = true,
-      const std::string& tag = "", const std::string& outputDir = ".");
+      const std::string& tag = "",
+      const std::filesystem::path& outputDir = std::filesystem::path("."));
 
   /// Helper method to draw lines - base for all lines
   ///

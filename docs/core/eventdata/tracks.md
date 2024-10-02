@@ -442,7 +442,7 @@ std::cout << extraConst(track) << std::endl; // prints 42.2
 For both const and mutable proxy accessors you do not actually need a mutable reference, as the internal accessor state is not mutated after construction. You can safely use a static instance of these accessors to avoid constructing them over and over again:
 
 ```cpp
-template<typename track_proxy_t>
+template<TrackProxyConcept track_proxy_t>
 void doSomething(track_proxy_t track, float value) {
     // only created once, never changed
     static const Acts::ProxyAccessor<float> extra("extra");

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 // This file contains systematic tests to verify the local->global->local
 // transformation roundtrip for all available surfaces with a large range of
@@ -17,6 +17,7 @@
 #include "Acts/Definitions/Common.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Surfaces/ConeSurface.hpp"
+#include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/Surfaces/DiscSurface.hpp"
 #include "Acts/Surfaces/PerigeeSurface.hpp"
@@ -102,9 +103,9 @@ const auto perigees = bdata::make({
     Surface::makeShared<PerigeeSurface>(Vector3(0, 0, -1.5)),
 });
 const auto planes = bdata::make({
-    Surface::makeShared<PlaneSurface>(Vector3(1, 2, 3), Vector3::UnitX()),
-    Surface::makeShared<PlaneSurface>(Vector3(-2, -3, -4), Vector3::UnitY()),
-    Surface::makeShared<PlaneSurface>(Vector3(3, -4, 5), Vector3::UnitZ()),
+    CurvilinearSurface(Vector3(1, 2, 3), Vector3::UnitX()).planeSurface(),
+    CurvilinearSurface(Vector3(-2, -3, -4), Vector3::UnitY()).planeSurface(),
+    CurvilinearSurface(Vector3(3, -4, 5), Vector3::UnitZ()).planeSurface(),
 });
 const auto straws = bdata::make({
     Surface::makeShared<StrawSurface>(Transform3::Identity(), 2.0 /* radius */,

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Io/Performance/TrackFitterPerformanceWriter.hpp"
 
@@ -161,10 +161,8 @@ ActsExamples::ProcessCode ActsExamples::TrackFitterPerformanceWriter::writeT(
   // one truth track)
   for (const auto& particle : particles) {
     bool isReconstructed = false;
-    // Find if the particle has been reconstructed
-    auto it = std::find(reconParticleIds.begin(), reconParticleIds.end(),
-                        particle.particleId());
-    if (it != reconParticleIds.end()) {
+    // Check if the particle has been reconstructed
+    if (rangeContainsValue(reconParticleIds, particle.particleId())) {
       isReconstructed = true;
     }
     // Loop over all the other truth particle and find the distance to the

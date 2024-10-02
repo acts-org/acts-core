@@ -83,11 +83,12 @@ elif [ "$(uname)" == "Linux" ]; then
         rec=$?
         # in kbytes
         max_rss=$(grep "Maximum resident set size (kbytes):" "$tmp" | awk '{printf $(NF)}')
-        max_rss=$(( 1000*max_rss ))
+        max_rss=$(( 1024 * max_rss ))
+        echo "Maximum resident set size: $(printf "%'d" $max_rss) bytes"
+
         wall_time=$(grep "Elapsed (wall clock)" "$tmp" | awk '{printf $(NF)}')
-        echo $max_rss
         wall_time=$(python3 -c "i='${wall_time}';p=i.split(':');p = p if len(p) == 3 else ['0', *p];t=float(p[0])*60*60 + float(p[1])*60 + float(p[2]);print(t)")
-        echo $wall_time
+        echo "Elapsed (wall clock) time: ${wall_time} seconds"
 
         of="${memory_dir}/mem_${slug}.csv"
         {

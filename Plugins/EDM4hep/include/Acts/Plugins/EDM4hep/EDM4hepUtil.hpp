@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
@@ -14,6 +14,7 @@
 #include "Acts/EventData/MultiTrajectory.hpp"
 #include "Acts/EventData/TrackContainer.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
+#include "Acts/EventData/TrackProxyConcept.hpp"
 #include "Acts/EventData/TrackStatePropMask.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Surfaces/PerigeeSurface.hpp"
@@ -60,14 +61,10 @@ BoundTrackParameters convertTrackParametersFromEdm4hep(
 
 }  // namespace detail
 
-template <typename track_container_t, typename track_state_container_t,
-          template <typename> class holder_t>
-void writeTrack(
-    const Acts::GeometryContext& gctx,
-    Acts::TrackProxy<track_container_t, track_state_container_t, holder_t, true>
-        track,
-    edm4hep::MutableTrack to, double Bz,
-    const Logger& logger = getDummyLogger()) {
+template <TrackProxyConcept track_proxy_t>
+void writeTrack(const Acts::GeometryContext& gctx, track_proxy_t track,
+                edm4hep::MutableTrack to, double Bz,
+                const Logger& logger = getDummyLogger()) {
   ACTS_VERBOSE("Converting track to EDM4hep");
   to.setChi2(track.chi2());
   to.setNdf(track.nDoF());
@@ -164,13 +161,9 @@ void writeTrack(
   }
 }
 
-template <typename track_container_t, typename track_state_container_t,
-          template <typename> class holder_t>
-void readTrack(const edm4hep::Track& from,
-               Acts::TrackProxy<track_container_t, track_state_container_t,
-                                holder_t, false>
-                   track,
-               double Bz, const Logger& logger = getDummyLogger()) {
+template <TrackProxyConcept track_proxy_t>
+void readTrack(const edm4hep::Track& from, track_proxy_t track, double Bz,
+               const Logger& logger = getDummyLogger()) {
   ACTS_VERBOSE("Reading track from EDM4hep");
   TrackStatePropMask mask = TrackStatePropMask::Smoothed;
 

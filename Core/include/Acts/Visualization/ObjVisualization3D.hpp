@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -13,6 +13,7 @@
 #include "Acts/Visualization/ViewConfig.hpp"
 
 #include <array>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <map>
@@ -47,22 +48,23 @@ class ObjVisualization3D : public IVisualization3D {
       : m_outputPrecision(prec), m_outputScalor(scale) {}
 
   /// @copydoc Acts::IVisualization3D::vertex()
-  void vertex(const Vector3& vtx, ColorRGB color = {0, 0, 0}) final;
+  void vertex(const Vector3& vtx, Color color = s_defaultColor) final;
 
   /// @copydoc Acts::IVisualization3D::line()
   void line(const Vector3& a, const Vector3& b,
-            ColorRGB color = {0, 0, 0}) final;
+            Color color = s_defaultColor) final;
 
   /// @copydoc Acts::IVisualization3D::face()
-  void face(const std::vector<Vector3>& vtxs, ColorRGB color = {0, 0, 0}) final;
+  void face(const std::vector<Vector3>& vtxs,
+            Color color = s_defaultColor) final;
 
   /// @copydoc Acts::IVisualization3D::faces()
   void faces(const std::vector<Vector3>& vtxs,
              const std::vector<FaceType>& faces,
-             ColorRGB color = {0, 0, 0}) final;
+             Color color = s_defaultColor) final;
 
-  /// @copydoc Acts::IVisualization3D::write(const std::string&) const
-  void write(const std::string& path) const final;
+  /// @copydoc Acts::IVisualization3D::write(const std::filesystem::path&) const
+  void write(const std::filesystem::path& path) const final;
 
   /// @copydoc Acts::IVisualization3D::write(std::ostream&) const
   void write(std::ostream& os) const final;
@@ -84,9 +86,9 @@ class ObjVisualization3D : public IVisualization3D {
   std::vector<FaceType> m_faces;
   std::vector<LineType> m_lines;
   /// Map of colors to be written at given index position
-  std::map<std::size_t, ColorRGB> m_lineColors;
-  std::map<std::size_t, ColorRGB> m_vertexColors;
-  std::map<std::size_t, ColorRGB> m_faceColors;
+  std::map<std::size_t, Color> m_lineColors;
+  std::map<std::size_t, Color> m_vertexColors;
+  std::map<std::size_t, Color> m_faceColors;
 };
 
 #ifndef DOXYGEN

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/TrackFinding/HoughTransformSeeder.hpp"
 
@@ -121,10 +121,11 @@ ActsExamples::HoughTransformSeeder::HoughTransformSeeder(
     // within the same volume hierarchy only consider layers
     return (ref.layer() == cmp.layer());
   };
+  // sort geometry selection so the unique filtering works
+  std::ranges::sort(m_cfg.geometrySelection,
+                    std::less<Acts::GeometryIdentifier>{});
   auto geoSelBeg = m_cfg.geometrySelection.begin();
   auto geoSelEnd = m_cfg.geometrySelection.end();
-  // sort geometry selection so the unique filtering works
-  std::sort(geoSelBeg, geoSelEnd);
   auto geoSelLastUnique = std::unique(geoSelBeg, geoSelEnd, isDuplicate);
   if (geoSelLastUnique != geoSelEnd) {
     ACTS_WARNING("Removed " << std::distance(geoSelLastUnique, geoSelEnd)
@@ -185,7 +186,7 @@ ActsExamples::ProcessCode ActsExamples::HoughTransformSeeder::execute(
           std::vector<std::vector<std::vector<Index>>> hitIndicesAll(
               m_cfg.nLayers);  // [layer,vector<Index]
           std::vector<std::size_t> nHitsPerLayer(m_cfg.nLayers);
-          for (auto measurementIndex : m_houghHist(y, x).second) {
+          for (auto measurementIndex : m_houghHist.atLocalBins({y, x}).second) {
             HoughMeasurementStruct* meas =
                 houghMeasurementStructs[measurementIndex].get();
             hitIndicesAll[meas->layer].push_back(meas->indices);
@@ -221,9 +222,9 @@ ActsExamples::ProcessCode ActsExamples::HoughTransformSeeder::execute(
 ActsExamples::HoughHist
 ActsExamples::HoughTransformSeeder::createLayerHoughHist(unsigned layer,
                                                          int subregion) const {
-  ActsExamples::HoughHist houghHist(m_cfg.houghHistSize_y,
-                                    m_cfg.houghHistSize_x);
-
+  ActsExamples::HoughHist houghHist(
+      Axis(0, m_cfg.houghHistSize_y, m_cfg.houghHistSize_y),
+      Axis(0, m_cfg.houghHistSize_x, m_cfg.houghHistSize_x));
   for (unsigned index = 0; index < houghMeasurementStructs.size(); index++) {
     HoughMeasurementStruct* meas = houghMeasurementStructs[index].get();
     if (meas->layer != layer) {
@@ -244,8 +245,8 @@ ActsExamples::HoughTransformSeeder::createLayerHoughHist(unsigned layer,
       // Update the houghHist
       for (unsigned y = y_bin_min; y < y_bin_max; y++) {
         for (unsigned x = xBins.first; x < xBins.second; x++) {
-          houghHist(y, x).first++;
-          houghHist(y, x).second.insert(index);
+          houghHist.atLocalBins({y, x}).first++;
+          houghHist.atLocalBins({y, x}).second.insert(index);
         }
       }
     }
@@ -256,17 +257,19 @@ ActsExamples::HoughTransformSeeder::createLayerHoughHist(unsigned layer,
 
 ActsExamples::HoughHist ActsExamples::HoughTransformSeeder::createHoughHist(
     int subregion) const {
-  ActsExamples::HoughHist houghHist(m_cfg.houghHistSize_y,
-                                    m_cfg.houghHistSize_x);
+  ActsExamples::HoughHist houghHist(
+      Axis(0, m_cfg.houghHistSize_y, m_cfg.houghHistSize_y),
+      Axis(0, m_cfg.houghHistSize_x, m_cfg.houghHistSize_x));
 
   for (unsigned i = 0; i < m_cfg.nLayers; i++) {
     HoughHist layerHoughHist = createLayerHoughHist(i, subregion);
     for (unsigned x = 0; x < m_cfg.houghHistSize_x; ++x) {
       for (unsigned y = 0; y < m_cfg.houghHistSize_y; ++y) {
-        if (layerHoughHist(y, x).first > 0) {
-          houghHist(y, x).first++;
-          houghHist(y, x).second.insert(layerHoughHist(y, x).second.begin(),
-                                        layerHoughHist(y, x).second.end());
+        if (layerHoughHist.atLocalBins({y, x}).first > 0) {
+          houghHist.atLocalBins({y, x}).first++;
+          houghHist.atLocalBins({y, x}).second.insert(
+              layerHoughHist.atLocalBins({y, x}).second.begin(),
+              layerHoughHist.atLocalBins({y, x}).second.end());
         }
       }
     }
@@ -279,11 +282,11 @@ bool ActsExamples::HoughTransformSeeder::passThreshold(
     HoughHist const& houghHist, unsigned x, unsigned y) const {
   // Pass window threshold
   unsigned width = m_cfg.threshold.size() / 2;
-  if (x < width || (houghHist.size(1) - x) < width) {
+  if (x < width || m_cfg.houghHistSize_x - x < width) {
     return false;
   }
   for (unsigned i = 0; i < m_cfg.threshold.size(); i++) {
-    if (houghHist(y, x - width + i).first < m_cfg.threshold[i]) {
+    if (houghHist.atLocalBins({y, x - width + i}).first < m_cfg.threshold[i]) {
       return false;
     }
   }
@@ -297,17 +300,19 @@ bool ActsExamples::HoughTransformSeeder::passThreshold(
         if (i == 0 && j == 0) {
           continue;
         }
-        if (y + j < houghHist.size(0) && x + i < houghHist.size(1)) {
-          if (houghHist(y + j, x + i).first > houghHist(y, x).first) {
+        if (y + j < m_cfg.houghHistSize_y && x + i < m_cfg.houghHistSize_x) {
+          if (houghHist.atLocalBins({y + j, x + i}).first >
+              houghHist.atLocalBins({y, x}).first) {
             return false;
           }
-          if (houghHist(y + j, x + i).first == houghHist(y, x).first) {
-            if (houghHist(y + j, x + i).second.size() >
-                houghHist(y, x).second.size()) {
+          if (houghHist.atLocalBins({y + j, x + i}).first ==
+              houghHist.atLocalBins({y, x}).first) {
+            if (houghHist.atLocalBins({y + j, x + i}).second.size() >
+                houghHist.atLocalBins({y, x}).second.size()) {
               return false;
             }
-            if (houghHist(y + j, x + i).second.size() ==
-                    houghHist(y, x).second.size() &&
+            if (houghHist.atLocalBins({y + j, x + i}).second.size() ==
+                    houghHist.atLocalBins({y, x}).second.size() &&
                 j <= 0 && i <= 0) {
               return false;  // favor bottom-left (low phi, low neg q/pt)
             }
@@ -525,7 +530,8 @@ void ActsExamples::HoughTransformSeeder::addMeasurements(
         // are transformed to the bound space where we do know their location.
         // if the local parameters are not measured, this results in a
         // zero location, which is a reasonable default fall-back.
-        const auto& measurement = measurements[sourceLink.index()];
+        const ConstVariableBoundMeasurementProxy measurement =
+            measurements.getMeasurement(sourceLink.index());
 
         assert(measurement.contains(Acts::eBoundLoc0) &&
                "Measurement does not contain the required bound loc0");

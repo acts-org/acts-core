@@ -56,32 +56,19 @@ def runPropagation(trackingGeometry, field, outputDir, s=None, decorators=[]):
     propagationAlgorithm = acts.examples.PropagationAlgorithm(
         propagatorImpl=propagator,
         level=acts.logging.INFO,
-        sterileLogger=False,
-        covarianceTransport=False,
+        sterileLogger=True,
         inputTrackParameters="start_parameters",
-        outputPropagationSteps="propagation_steps",
+        outputSummaryCollection="propagation_summary",
     )
     s.addAlgorithm(propagationAlgorithm)
 
-    # if not os.path.exists(outputDir + "/obj"):
-    #    os.makedirs(outputDir + "/obj")
-
-    # s.addWriter(
-    #    acts.examples.ObjPropagationStepsWriter(
-    #        level=acts.logging.INFO,
-    #        collection="propagation_steps",
-    #        outputDir=outputDir + "/obj",
-    #    )
-    # )
-
-    if not propagationAlgorithm.config.sterileLogger:
-        s.addWriter(
-            acts.examples.RootPropagationStepsWriter(
-                level=acts.logging.INFO,
-                collection="propagation_steps",
-                filePath=outputDir + "/propagation_steps.root",
-            )
+    s.addWriter(
+        acts.examples.RootPropagationSummaryWriter(
+            level=acts.logging.INFO,
+            inputSummaryCollection="propagation_summary",
+            filePath=outputDir + "/propagation_summary.root",
         )
+    )
 
     return s
 
@@ -137,6 +124,11 @@ if "__main__" == __name__:
     #     field=solenoid
     # )
 
+    os.makedirs(os.getcwd() + "/propagation", exist_ok=True)
+
     runPropagation(
-        trackingGeometry, field, os.getcwd(), decorators=contextDecorators
+        trackingGeometry,
+        field,
+        os.getcwd() + "/propagation",
+        decorators=contextDecorators,
     ).run()

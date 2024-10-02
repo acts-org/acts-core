@@ -1,14 +1,12 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
-
-#include "Acts/Utilities/TypeTraits.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -235,7 +233,7 @@ struct MicroBenchmarkResult {
   // Sorted benchmark run times, used for computing outlier-robust statistics
   std::vector<Duration> sortedRunTimes() const {
     std::vector<Duration> sorted_timings = run_timings;
-    std::sort(sorted_timings.begin(), sorted_timings.end());
+    std::ranges::sort(sorted_timings);
     return sorted_timings;
   }
 
@@ -392,14 +390,11 @@ using call_without_input_t = decltype(std::declval<T>()());
 // this specialization will be selected...
 template <typename Callable, typename Input = void>
 struct MicroBenchmarkIter {
-  constexpr static bool is_callable =
-      Concepts ::exists<call_with_input_t, Callable, Input>;
-  static inline void iter(const Callable& iteration, const Input* input) {
-    static_assert(is_callable, "Gave callable that is not callable with input");
-    if constexpr (is_callable) {
-      using Result = std::invoke_result_t<Callable, const Input&>;
-      MicroBenchmarkIterImpl<Callable, Input, Result>::iter(iteration, *input);
-    }
+  static inline void iter(const Callable& iteration, const Input* input)
+    requires std::invocable<Callable, Input>
+  {
+    using Result = std::invoke_result_t<Callable, const Input&>;
+    MicroBenchmarkIterImpl<Callable, Input, Result>::iter(iteration, *input);
   }
 };
 
@@ -407,17 +402,12 @@ struct MicroBenchmarkIter {
 // picked instead of the one above...
 template <typename Callable>
 struct MicroBenchmarkIter<Callable, void> {
-  constexpr static bool is_callable =
-      Concepts ::exists<call_without_input_t, Callable>;
-
   static inline void iter(const Callable& iteration,
-                          const void* /*input*/ = nullptr) {
-    static_assert(is_callable,
-                  "Gave callable that is not callable without input");
-    if constexpr (is_callable) {
-      using Result = std::invoke_result_t<Callable>;
-      MicroBenchmarkIterImpl<Callable, void, Result>::iter(iteration);
-    }
+                          const void* /*input*/ = nullptr)
+    requires std::invocable<Callable>
+  {
+    using Result = std::invoke_result_t<Callable>;
+    MicroBenchmarkIterImpl<Callable, void, Result>::iter(iteration);
   }
 };
 

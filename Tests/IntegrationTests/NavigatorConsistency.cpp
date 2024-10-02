@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/unit_test.hpp>
@@ -22,6 +22,8 @@
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Tests/CommonHelpers/CylindricalTrackingGeometry.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
+
+#include <algorithm>
 
 namespace bdata = boost::unit_test::data;
 using namespace Acts::UnitLiterals;
@@ -69,11 +71,9 @@ template <typename propagator_t>
 void runSelfConsistencyTest(const propagator_t& prop,
                             const CurvilinearTrackParameters& start,
                             const Acts::Logger& logger) {
-  // Action list and abort list
-  using ActionListType = ActionList<SurfaceCollector>;
-  using AbortListType = AbortList<>;
-  using Options =
-      typename propagator_t::template Options<ActionListType, AbortListType>;
+  // Actor list
+  using ActorList = ActorList<SurfaceCollector>;
+  using Options = typename propagator_t::template Options<ActorList>;
 
   // forward surface test
   Options fwdOptions(tgContext, mfContext);
@@ -81,7 +81,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
 
   // get the surface collector and configure it
   auto& fwdSurfaceCollector =
-      fwdOptions.actionList.template get<SurfaceCollector>();
+      fwdOptions.actorList.template get<SurfaceCollector>();
   fwdSurfaceCollector.selector.selectSensitive = true;
   fwdSurfaceCollector.selector.selectMaterial = true;
   fwdSurfaceCollector.selector.selectPassive = true;
@@ -106,7 +106,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
 
   // get the surface collector and configure it
   auto& bwdMSurfaceCollector =
-      bwdOptions.actionList.template get<SurfaceCollector>();
+      bwdOptions.actorList.template get<SurfaceCollector>();
   bwdMSurfaceCollector.selector.selectSensitive = true;
   bwdMSurfaceCollector.selector.selectMaterial = true;
   bwdMSurfaceCollector.selector.selectPassive = true;
@@ -130,7 +130,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
 
   // forward-backward compatibility test
   {
-    std::reverse(bwdSurfaces.begin(), bwdSurfaces.end());
+    std::ranges::reverse(bwdSurfaces);
     BOOST_CHECK_EQUAL_COLLECTIONS(bwdSurfaces.begin(), bwdSurfaces.end(),
                                   fwdSurfaces.begin(), fwdSurfaces.end());
   }
@@ -141,7 +141,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
 
   // get the surface collector and configure it
   auto& fwdStepSurfaceCollector =
-      fwdOptions.actionList.template get<SurfaceCollector>();
+      fwdOptions.actorList.template get<SurfaceCollector>();
   fwdStepSurfaceCollector.selector.selectSensitive = true;
   fwdStepSurfaceCollector.selector.selectMaterial = true;
   fwdStepSurfaceCollector.selector.selectPassive = true;
@@ -192,7 +192,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
 
   // get the surface collector and configure it
   auto& bwdStepSurfaceCollector =
-      bwdOptions.actionList.template get<SurfaceCollector>();
+      bwdOptions.actorList.template get<SurfaceCollector>();
   bwdStepSurfaceCollector.selector.selectSensitive = true;
   bwdStepSurfaceCollector.selector.selectMaterial = true;
   bwdStepSurfaceCollector.selector.selectPassive = true;
@@ -235,7 +235,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
 
   // TODO backward-backward step compatibility test
 
-  std::reverse(bwdStepSurfaces.begin(), bwdStepSurfaces.end());
+  std::ranges::reverse(bwdStepSurfaces);
   BOOST_CHECK_EQUAL_COLLECTIONS(bwdStepSurfaces.begin(), bwdStepSurfaces.end(),
                                 fwdStepSurfaces.begin(), fwdStepSurfaces.end());
 }
@@ -256,13 +256,11 @@ void runConsistencyTest(const propagator_probe_t& propProbe,
                         const CurvilinearTrackParameters& start,
                         const Acts::Logger& logger) {
   // Action list and abort list
-  using ActionListType = ActionList<SurfaceCollector>;
-  using AbortListType = AbortList<>;
+  using ActorList = ActorList<SurfaceCollector>;
 
   auto run = [&](const auto& prop) {
     using propagator_t = std::decay_t<decltype(prop)>;
-    using Options =
-        typename propagator_t::template Options<ActionListType, AbortListType>;
+    using Options = typename propagator_t::template Options<ActorList>;
 
     // forward surface test
     Options fwdOptions(tgContext, mfContext);
@@ -271,7 +269,7 @@ void runConsistencyTest(const propagator_probe_t& propProbe,
 
     // get the surface collector and configure it
     auto& fwdSurfaceCollector =
-        fwdOptions.actionList.template get<SurfaceCollector>();
+        fwdOptions.actorList.template get<SurfaceCollector>();
     fwdSurfaceCollector.selector.selectSensitive = true;
     fwdSurfaceCollector.selector.selectMaterial = true;
     fwdSurfaceCollector.selector.selectPassive = true;

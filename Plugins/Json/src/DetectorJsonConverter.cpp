@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/Json/DetectorJsonConverter.hpp"
 
@@ -27,6 +27,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
 
 nlohmann::json Acts::DetectorJsonConverter::toJson(
     const GeometryContext& gctx, const Experimental::Detector& detector,
@@ -44,7 +45,7 @@ nlohmann::json Acts::DetectorJsonConverter::toJson(
   for (const auto* volume : detector.volumes()) {
     nSurfaces += volume->surfaces().size();
     for (const auto& portal : volume->portals()) {
-      if (std::find(portals.begin(), portals.end(), portal) == portals.end()) {
+      if (!rangeContainsValue(portals, portal)) {
         portals.push_back(portal);
       }
     }
@@ -81,7 +82,9 @@ nlohmann::json Acts::DetectorJsonConverter::toJson(
   nlohmann::json jHeader;
   jHeader["detector"] = detector.name();
   jHeader["type"] = "acts";
-  jHeader["date"] = std::asctime(ti);
+  char buffer[100];
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", ti);
+  jHeader["date"] = std::string(buffer);
   jHeader["surface_count"] = nSurfaces;
   jHeader["portal_count"] = portals.size();
   jHeader["volume_count"] = detector.volumes().size();
@@ -102,7 +105,9 @@ nlohmann::json Acts::DetectorJsonConverter::toJsonDetray(
 
   nlohmann::json jCommonHeader;
   jCommonHeader["detector"] = detector.name();
-  jCommonHeader["date"] = std::asctime(ti);
+  char buffer[100];
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", ti);
+  jCommonHeader["date"] = std::string(buffer);
   jCommonHeader["version"] = "detray - 0.44.0";
   jCommonHeader["tag"] = "geometry";
 

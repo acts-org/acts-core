@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -14,6 +14,7 @@
 #include "Acts/EventData/ParticleHypothesis.hpp"
 #include "Acts/EventData/TrackContainerBackendConcept.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
+#include "Acts/EventData/TrackProxyConcept.hpp"
 #include "Acts/EventData/TrackStatePropMask.hpp"
 #include "Acts/Utilities/HashedString.hpp"
 #include "Acts/Utilities/UnitVectors.hpp"
@@ -67,24 +68,8 @@ class TrackProxyIterator {
     return m_container == other.m_container && m_itrack == other.m_itrack;
   }
 
-  bool operator!=(const TrackProxyIterator& other) const {
-    return !(*this == other);
-  }
-
-  bool operator<(const TrackProxyIterator& other) const {
-    return m_itrack < other.m_itrack;
-  }
-
-  bool operator>(const TrackProxyIterator& other) const {
-    return m_itrack > other.m_itrack;
-  }
-
-  bool operator<=(const TrackProxyIterator& other) const {
-    return m_itrack <= other.m_itrack;
-  }
-
-  bool operator>=(const TrackProxyIterator& other) const {
-    return m_itrack >= other.m_itrack;
+  auto operator<=>(const TrackProxyIterator& other) const {
+    return m_itrack <=> other.m_itrack;
   }
 
   ProxyType operator*() const { return m_container->getTrack(m_itrack); }
@@ -682,7 +667,7 @@ class TrackProxy {
   /// @tparam track_proxy_t the other track proxy's type
   /// @param other The track proxy
   /// @param copyTrackStates Copy the track state sequence from @p other
-  template <typename track_proxy_t>
+  template <TrackProxyConcept track_proxy_t>
   void copyFrom(const track_proxy_t& other, bool copyTrackStates = true)
     requires(!ReadOnly)
   {
@@ -710,6 +695,8 @@ class TrackProxy {
       setReferenceSurface(other.referenceSurface().getSharedPtr());
       parameters() = other.parameters();
       covariance() = other.covariance();
+    } else {
+      setReferenceSurface(nullptr);
     }
 
     nMeasurements() = other.nMeasurements();

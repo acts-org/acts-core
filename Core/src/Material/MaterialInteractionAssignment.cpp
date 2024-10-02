@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Material/MaterialInteractionAssignment.hpp"
 
@@ -73,7 +73,7 @@ Acts::MaterialInteractionAssignment::assign(
 
     // A local veta veto kicked in
     GeometryIdentifier intersectionID = surface->geometryId();
-    if (options.localVetos.find(intersectionID) != options.localVetos.end()) {
+    if (options.localVetos.contains(intersectionID)) {
       const auto& localVeto = *options.localVetos.find(intersectionID);
       if (localVeto(materialInteraction, intersectedSurfaces[is])) {
         unassignedMaterialInteractions.push_back(materialInteraction);
@@ -91,8 +91,7 @@ Acts::MaterialInteractionAssignment::assign(
     assignedMaterialInteraction.intersectionID = intersectionID;
     // Check for possible reassignment
     if (is + 1u < intersectedSurfaces.size() &&
-        options.reAssignments.find(intersectionID) !=
-            options.reAssignments.end()) {
+        options.reAssignments.contains(intersectionID)) {
       auto reAssignment = (*options.reAssignments.find(intersectionID));
       reAssignment(assignedMaterialInteraction, intersectedSurfaces[is],
                    intersectedSurfaces[is + 1]);
@@ -110,8 +109,7 @@ Acts::MaterialInteractionAssignment::assign(
   // (empty bin correction can use this information)
   std::vector<IAssignmentFinder::SurfaceAssignment> surfacesWithoutAssignments;
   for (const auto& intersectedSurface : intersectedSurfaces) {
-    if (assignedSurfaces.find(intersectedSurface.surface) ==
-        assignedSurfaces.end()) {
+    if (!assignedSurfaces.contains(intersectedSurface.surface)) {
       surfacesWithoutAssignments.push_back(intersectedSurface);
     }
   }

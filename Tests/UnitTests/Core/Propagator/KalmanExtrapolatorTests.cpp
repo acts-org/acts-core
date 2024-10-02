@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -17,8 +17,7 @@
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
-#include "Acts/Propagator/AbortList.hpp"
-#include "Acts/Propagator/ActionList.hpp"
+#include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
@@ -78,9 +77,9 @@ struct StepWiseActor {
   /// @param result is the mutable result state object
   template <typename propagator_state_t, typename stepper_t,
             typename navigator_t>
-  void operator()(propagator_state_t& state, const stepper_t& stepper,
-                  const navigator_t& navigator, result_type& result,
-                  const Logger& /*logger*/) const {
+  void act(propagator_state_t& state, const stepper_t& stepper,
+           const navigator_t& navigator, result_type& result,
+           const Logger& /*logger*/) const {
     // Listen to the surface and create bound state where necessary
     auto surface = navigator.currentSurface(state.navigation);
     if (surface && surface->associatedDetectorElement()) {
@@ -135,15 +134,14 @@ BOOST_AUTO_TEST_CASE(kalman_extrapolator) {
 
   // Create the ActionList and AbortList
   using StepWiseResult = StepWiseActor::result_type;
-  using StepWiseActors = ActionList<StepWiseActor>;
-  using Aborters = AbortList<EndOfWorldReached>;
+  using StepWiseActors = ActorList<StepWiseActor, EndOfWorldReached>;
 
   // Create some options
-  using StepWiseOptions = Propagator::Options<StepWiseActors, Aborters>;
+  using StepWiseOptions = Propagator::Options<StepWiseActors>;
   StepWiseOptions swOptions(tgContext, mfContext);
 
-  using PlainActors = ActionList<>;
-  using PlainOptions = Propagator::Options<PlainActors, Aborters>;
+  using PlainActors = ActorList<EndOfWorldReached>;
+  using PlainOptions = Propagator::Options<PlainActors>;
   PlainOptions pOptions(tgContext, mfContext);
 
   // Run the standard propagation

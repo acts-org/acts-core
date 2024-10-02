@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -38,7 +38,10 @@ BOOST_AUTO_TEST_CASE(GeoTrfToSensitiveConversion) {
   auto logYZ = new GeoLogVol("LogVolumeYZ", trapYZ, material);
   auto fphysYZ = make_intrusive<GeoFullPhysVol>(logYZ);
 
-  auto converted = Acts::GeoTrdConverter{}.toSensitiveSurface(*fphysYZ);
+  PVConstLink physYZ{make_intrusive<GeoFullPhysVol>(logYZ)};
+
+  auto converted =
+      Acts::GeoTrdConverter{}.toSensitiveSurface(physYZ, idTransform);
 
   BOOST_CHECK(converted.ok());
 
@@ -74,7 +77,7 @@ BOOST_AUTO_TEST_CASE(GeoTrfToSensitiveConversion) {
   auto logYZs = new GeoLogVol("LogVolumeYZs", trapYZs, material);
   auto fphysYZs = make_intrusive<GeoFullPhysVol>(logYZs);
 
-  converted = Acts::GeoTrdConverter{}.toSensitiveSurface(*fphysYZs);
+  converted = Acts::GeoTrdConverter{}.toSensitiveSurface(fphysYZs, idTransform);
 
   BOOST_CHECK(converted.ok());
 
@@ -108,7 +111,7 @@ BOOST_AUTO_TEST_CASE(GeoTrfToSensitiveConversion) {
   auto logXZ = new GeoLogVol("LogVolumeXZ", trapXZ, material);
   auto fphysXZ = make_intrusive<GeoFullPhysVol>(logXZ);
 
-  converted = Acts::GeoTrdConverter{}.toSensitiveSurface(*fphysXZ);
+  converted = Acts::GeoTrdConverter{}.toSensitiveSurface(fphysXZ, idTransform);
 
   BOOST_CHECK(converted.ok());
 
@@ -142,7 +145,9 @@ BOOST_AUTO_TEST_CASE(GeoTrfToSensitiveConversion) {
   auto logXZs = new GeoLogVol("LogVolumeXZs", trapXZs, material);
   auto fphysXZs = make_intrusive<GeoFullPhysVol>(logXZs);
 
-  converted = Acts::GeoTrdConverter{}.toSensitiveSurface(*fphysXZs);
+  PVConstLink physXZs{make_intrusive<GeoFullPhysVol>(logXZs)};
+
+  converted = Acts::GeoTrdConverter{}.toSensitiveSurface(physXZs, idTransform);
 
   BOOST_CHECK(converted.ok());
 
@@ -176,8 +181,9 @@ BOOST_AUTO_TEST_CASE(GeoTrfToSensitiveConversion) {
   auto logDouble = new GeoLogVol("LogVolumeDouble", trapDouble, material);
   auto fphysDouble = make_intrusive<GeoFullPhysVol>(logDouble);
 
-  BOOST_CHECK_THROW(Acts::GeoTrdConverter{}.toSensitiveSurface(*fphysDouble),
-                    std::invalid_argument);
+  BOOST_CHECK_THROW(
+      Acts::GeoTrdConverter{}.toSensitiveSurface(fphysDouble, idTransform),
+      std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Io/EDM4hep/EDM4hepMeasurementReader.hpp"
 
@@ -66,11 +66,10 @@ ProcessCode EDM4hepMeasurementReader::read(const AlgorithmContext& ctx) {
 
   for (const auto& trackerHitPlane : trackerHitPlaneCollection) {
     Cluster cluster;
-    auto measurement = EDM4hepUtil::readMeasurement(
-        trackerHitPlane, &trackerHitRawCollection, &cluster,
+    EDM4hepUtil::readMeasurement(
+        measurements, trackerHitPlane, &trackerHitRawCollection, &cluster,
         [](std::uint64_t cellId) { return Acts::GeometryIdentifier(cellId); });
 
-    measurements.push_back(std::move(measurement));
     clusters.push_back(std::move(cluster));
   }
 

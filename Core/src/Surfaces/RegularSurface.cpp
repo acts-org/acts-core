@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/RegularSurface.hpp"
 
@@ -31,11 +31,12 @@ Vector3 RegularSurface::localToGlobal(const GeometryContext& gctx,
   return localToGlobal(gctx, lposition);
 }
 
-bool RegularSurface::isOnSurface(
-    const GeometryContext& gctx, const Vector3& position,
-    const BoundaryTolerance& boundaryTolerance) const {
+bool RegularSurface::isOnSurface(const GeometryContext& gctx,
+                                 const Vector3& position,
+                                 const BoundaryTolerance& boundaryTolerance,
+                                 double tolerance) const {
   // global to local transformation
-  auto lpResult = globalToLocal(gctx, position);
+  auto lpResult = globalToLocal(gctx, position, tolerance);
   if (!lpResult.ok()) {
     return false;
   }

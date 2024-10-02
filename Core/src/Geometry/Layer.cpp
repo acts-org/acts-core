@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Geometry/Layer.hpp"
 
@@ -14,6 +14,7 @@
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/Surface.hpp"
+#include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 
 #include <algorithm>
@@ -124,36 +125,6 @@ Acts::Layer::compatibleSurfaces(
   double nearLimit = options.nearLimit;
   double farLimit = options.farLimit;
 
-  // TODO this looks like a major hack; is this really needed?
-  // (0) End surface check
-  // @todo: - we might be able to skip this by use of options.pathLimit
-  // check if you have to stop at the endSurface
-  if (options.endObject != nullptr) {
-    // intersect the end surface
-    // - it is the final one don't use the boundary check at all
-    SurfaceIntersection endInter =
-        options.endObject
-            ->intersect(gctx, position, direction, BoundaryTolerance::None())
-            .closest();
-    // non-valid intersection with the end surface provided at this layer
-    // indicates wrong direction or faulty setup
-    // -> do not return compatible surfaces since they may lead you on a wrong
-    // navigation path
-    if (endInter.isValid()) {
-      farLimit = endInter.pathLength();
-    } else {
-      return sIntersections;
-    }
-  } else {
-    // compatibleSurfaces() should only be called when on the layer,
-    // i.e. the maximum path limit is given by the layer thickness times
-    // path correction, we take a safety factor of 1.5
-    // -> this avoids punch through for cylinders
-    double pCorrection =
-        surfaceRepresentation().pathCorrection(gctx, position, direction);
-    farLimit = 1.5 * thickness() * pCorrection;
-  }
-
   auto isUnique = [&](const SurfaceIntersection& b) {
     auto find_it = std::find_if(
         sIntersections.begin(), sIntersections.end(), [&b](const auto& a) {
@@ -189,9 +160,7 @@ Acts::Layer::compatibleSurfaces(
       return;
     }
     BoundaryTolerance boundaryTolerance = options.boundaryTolerance;
-    if (std::find(options.externalSurfaces.begin(),
-                  options.externalSurfaces.end(),
-                  sf.geometryId()) != options.externalSurfaces.end()) {
+    if (rangeContainsValue(options.externalSurfaces, sf.geometryId())) {
       boundaryTolerance = BoundaryTolerance::Infinite();
     }
     // the surface intersection

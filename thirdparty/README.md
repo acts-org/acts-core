@@ -57,3 +57,7 @@ CMake instruction to build [detray](https://github.com/acts-project/detray), whi
 ## Traccc
 
 CMake instruction to build [traccc](https://github.com/acts-project/traccc), which is used by the traccc plugin.
+
+## Annoy
+
+CMake instructions to build [Annoy](https://github.com/spotify/annoy) which is used by the Hashing plugin.

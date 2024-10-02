@@ -17,16 +17,30 @@ def main():
     p.add_argument("-i", "--input", type=str, default="", help="Input SQL file")
 
     p.add_argument(
-        "-o", "--output", type=str, default="GeoModel", help="Output file(s) base name"
-    )
-
-    p.add_argument(
         "-q",
         "--queries",
         type=str,
         nargs="+",
         default="GeoModelXML",
         help="List of Queries for Published full phys volumes",
+    )
+
+    p.add_argument(
+        "-n",
+        "--name-list",
+        type=str,
+        nargs="+",
+        default=[],
+        help="List of Name List for the Surface Factory",
+    )
+
+    p.add_argument(
+        "-ml",
+        "--material-list",
+        type=str,
+        nargs="+",
+        default=[],
+        help="List of Material List for the Surface Factory",
     )
 
     p.add_argument(
@@ -57,29 +71,15 @@ def main():
     )
 
     p.add_argument(
-        "--output-svg",
-        help="Write the surfaces to SVG files",
+        "--convert-subvols",
+        help="Convert the children of the top level full phys vol",
         action="store_true",
         default=False,
     )
 
     p.add_argument(
-        "--output-internals-svg",
-        help="Write the internal navigation to SVG files",
-        action="store_true",
-        default=False,
-    )
-
-    p.add_argument(
-        "--output-obj",
-        help="Write the surfaces to OBJ files",
-        action="store_true",
-        default=False,
-    )
-
-    p.add_argument(
-        "--output-json",
-        help="Write the surfaces to OBJ files",
+        "--enable-blueprint",
+        help="Enable the usage of the blueprint",
         action="store_true",
         default=False,
     )
@@ -97,18 +97,16 @@ def main():
     # Read the geometry model from the database
     gmTree = acts.geomodel.readFromDb(args.input)
 
-    gmFactoryConfig = gm.GeoModelDetectorSurfaceFactory.Config()
-    gmFactoryConfig.shapeConverters = [
-        gm.GeoBoxConverter(),
-        gm.GeoTrdConverter(),
-        gm.GeoIntersectionAnnulusConverter(),
-    ]
-    gmFactory = gm.GeoModelDetectorSurfaceFactory(gmFactoryConfig, logLevel)
+    gmFactoryConfig = gm.GeoModelDetectorObjectFactory.Config()
+    gmFactoryConfig.materialList = args.material_list
+    gmFactoryConfig.nameList = args.name_list
+    gmFactoryConfig.convertSubVolumes = args.convert_subvols
+    gmFactory = gm.GeoModelDetectorObjectFactory(gmFactoryConfig, logLevel)
     # The options
-    gmFactoryOptions = gm.GeoModelDetectorSurfaceFactory.Options()
+    gmFactoryOptions = gm.GeoModelDetectorObjectFactory.Options()
     gmFactoryOptions.queries = args.queries
     # The Cache & construct call
-    gmFactoryCache = gm.GeoModelDetectorSurfaceFactory.Cache()
+    gmFactoryCache = gm.GeoModelDetectorObjectFactory.Cache()
     gmFactory.construct(gmFactoryCache, gContext, gmTree, gmFactoryOptions)
 
     # All surfaces from GeoModel
@@ -148,56 +146,6 @@ def main():
 
     gmDetectorBuilder = DetectorBuilder(gmDetectorConfig, args.top_node, logLevel)
     detector = gmDetectorBuilder.construct(gContext)
-
-    # Output the detector to SVG
-    if args.output_svg:
-        surfaceStyle = acts.svg.Style()
-        surfaceStyle.fillColor = [5, 150, 245]
-        surfaceStyle.fillOpacity = 0.5
-
-        surfaceOptions = acts.svg.SurfaceOptions()
-        surfaceOptions.style = surfaceStyle
-
-        viewRange = acts.Extent([])
-        volumeOptions = acts.svg.DetectorVolumeOptions()
-        volumeOptions.surfaceOptions = surfaceOptions
-
-        xyRange = acts.Extent([[acts.Binning.z, [-50, 50]]])
-        zrRange = acts.Extent([[acts.Binning.phi, [-0.8, 0.8]]])
-
-        acts.svg.viewDetector(
-            gContext,
-            detector,
-            args.top_node,
-            [[ivol, volumeOptions] for ivol in range(detector.numberVolumes())],
-            [
-                ["xy", ["sensitives", "portals"], xyRange],
-                ["zr", ["sensitives", "portals", "materials"], zrRange],
-            ],
-            args.output + "_detector",
-        )
-
-        # Output the internal navigation to SVG
-        if args.output_internals_svg:
-            for vol in detector.volumes():
-                acts.svg.viewInternalNavigation(
-                    gContext, vol, [66, 111, 245, 245, 203, 66, 0.8], "/;:"
-                )
-
-    # Output the surface to an OBJ file
-    if args.output_obj:
-        segments = 720
-        ssurfaces = [ss[1] for ss in gmFactoryCache.sensitiveSurfaces]
-        acts.examples.writeSurfacesObj(
-            ssurfaces,
-            gContext,
-            [75, 220, 100],
-            segments,
-            args.output + "_sensitives.obj",
-        )
-    # Output to a JSON file
-    if args.output_json:
-        acts.examples.writeDetectorToJsonDetray(gContext, detector, args.output)
 
     return
 

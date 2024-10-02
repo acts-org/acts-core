@@ -9,13 +9,27 @@ if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting default build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
-set(cxx_flags "-Wall -Wextra -Wpedantic -Wshadow -Wno-unused-local-typedefs")
+set(cxx_flags
+    "-Wall -Wextra -Wpedantic -Wshadow -Wzero-as-null-pointer-constant -Wold-style-cast"
+)
 
 # This adds some useful conversion checks like float-to-bool, float-to-int, etc.
 # However, at the moment this is only added to clang builds, since GCC's -Wfloat-conversion
 # is much more aggressive and also triggers on e.g., double-to-float
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(cxx_flags "${cxx_flags} -Wfloat-conversion")
+endif()
+
+# -Wnull-dereference gets applied to -isystem includes in GCC13,
+# which causes lots of warnings in code we have no control over
+if(
+    CMAKE_CXX_COMPILER_ID MATCHES "Clang"
+    OR (
+        CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS_EQUAL 12
+    )
+)
+    set(cxx_flags "${cxx_flags} -Wnull-dereference")
 endif()
 
 set(ACTS_CXX_STANDARD 20)

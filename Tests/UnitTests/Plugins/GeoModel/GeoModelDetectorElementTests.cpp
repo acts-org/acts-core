@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -29,9 +29,11 @@ BOOST_AUTO_TEST_CASE(GeoModelDetectorElementConstruction) {
   auto logXY = new GeoLogVol("LogVolumeXY", boxXY, material);
   auto fphysXY = new GeoFullPhysVol(logXY);
   auto rBounds = std::make_shared<Acts::RectangleBounds>(100, 200);
+
+  PVConstLink physXY{fphysXY};
   auto elementXY =
       Acts::GeoModelDetectorElement::createDetectorElement<Acts::PlaneSurface>(
-          *fphysXY, rBounds, Acts::Transform3::Identity(), 2.0);
+          physXY, rBounds, Acts::Transform3::Identity(), 2.0);
 
   const Acts::Surface& surface = elementXY->surface();
   BOOST_CHECK(surface.type() == Acts::Surface::SurfaceType::Plane);

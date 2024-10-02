@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -12,6 +12,7 @@
 #include "Acts/Plugins/ExaTrkX/detail/TensorVectorConversion.hpp"
 #include "Acts/Plugins/ExaTrkX/detail/buildEdges.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 
@@ -83,8 +84,8 @@ void test_random_graph(int emb_dim, int n_nodes, float r, int knn,
     edges_test_cantor.push_back(a < b ? CantorPair(a, b) : CantorPair(b, a));
   }
 
-  std::sort(edges_ref_cantor.begin(), edges_ref_cantor.end());
-  std::sort(edges_test_cantor.begin(), edges_test_cantor.end());
+  std::ranges::sort(edges_ref_cantor, std::less<CantorPair>{});
+  std::ranges::sort(edges_test_cantor, std::less<CantorPair>{});
 
 #if PRINT
   std::cout << "test size " << edges_test_cantor.size() << std::endl;

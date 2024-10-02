@@ -5,6 +5,7 @@ set(ActsExamplesFramework_SOURCES)
 add_library(
     ActsExamplesFramework
     SHARED
+    src/EventData/Measurement.cpp
     src/EventData/MeasurementCalibration.cpp
     src/EventData/ScalingCalibrator.cpp
     src/Framework/IAlgorithm.cpp

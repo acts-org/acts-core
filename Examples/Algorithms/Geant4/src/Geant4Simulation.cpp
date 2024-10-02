@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Geant4/Geant4Simulation.hpp"
 
@@ -50,6 +50,7 @@
 #include <G4VUserPhysicsList.hh>
 #include <G4Version.hh>
 #include <Randomize.hh>
+#include <boost/version.hpp>
 
 ActsExamples::Geant4SimulationBase::Geant4SimulationBase(
     const Config& cfg, std::string name, Acts::Logging::Level level)
@@ -89,6 +90,8 @@ void ActsExamples::Geant4SimulationBase::commonInitialization() {
     runManager().SetUserInitialization(m_detectorConstruction);
     runManager().InitializeGeometry();
   }
+
+  m_geant4Instance->tweakLogging(m_geant4Level);
 }
 
 G4RunManager& ActsExamples::Geant4SimulationBase::runManager() const {
@@ -174,10 +177,10 @@ ActsExamples::Geant4SimulationBase::geant4Handle() const {
 ActsExamples::Geant4Simulation::Geant4Simulation(const Config& cfg,
                                                  Acts::Logging::Level level)
     : Geant4SimulationBase(cfg, "Geant4Simulation", level), m_cfg(cfg) {
-  m_geant4Instance = m_cfg.geant4Handle
-                         ? m_cfg.geant4Handle
-                         : Geant4Manager::instance().createHandle(
-                               m_geant4Level, m_cfg.physicsList);
+  m_geant4Instance =
+      m_cfg.geant4Handle
+          ? m_cfg.geant4Handle
+          : Geant4Manager::instance().createHandle(m_cfg.physicsList);
   if (m_geant4Instance->physicsListName != m_cfg.physicsList) {
     throw std::runtime_error("inconsistent physics list");
   }
@@ -231,7 +234,7 @@ ActsExamples::Geant4Simulation::Geant4Simulation(const Config& cfg,
     SensitiveSteppingAction::Config stepCfg;
     stepCfg.eventStore = m_eventStore;
     stepCfg.charged = true;
-    stepCfg.neutral = false;
+    stepCfg.neutral = cfg.recordHitsOfNeutrals;
     stepCfg.primary = true;
     stepCfg.secondary = cfg.recordHitsOfSecondaries;
 
@@ -281,8 +284,13 @@ ActsExamples::Geant4Simulation::Geant4Simulation(const Config& cfg,
         "Remapping selected volumes from Geant4 to Acts::Surface::GeometryID");
     cfg.sensitiveSurfaceMapper->remapSensitiveNames(
         sState, Acts::GeometryContext{}, g4World, Acts::Transform3::Identity());
-    ACTS_INFO("Remapping successful for " << sState.g4VolumeToSurfaces.size()
-                                          << " selected volumes.");
+
+    auto allSurfacesMapped = cfg.sensitiveSurfaceMapper->checkMapping(
+        sState, Acts::GeometryContext{}, false, false);
+    if (!allSurfacesMapped) {
+      ACTS_WARNING(
+          "Not all sensitive surfaces have been mapped to Geant4 volumes!");
+    }
 
     sensitiveSteppingActionAccess->assignSurfaceMapping(
         sState.g4VolumeToSurfaces);
@@ -298,7 +306,10 @@ ActsExamples::Geant4Simulation::~Geant4Simulation() = default;
 
 ActsExamples::ProcessCode ActsExamples::Geant4Simulation::execute(
     const ActsExamples::AlgorithmContext& ctx) const {
-  Geant4SimulationBase::execute(ctx);
+  auto ret = Geant4SimulationBase::execute(ctx);
+  if (ret != ProcessCode::SUCCESS) {
+    return ret;
+  }
 
   // Output handling: Simulation
   m_outputParticlesInitial(
@@ -321,7 +332,6 @@ ActsExamples::Geant4MaterialRecording::Geant4MaterialRecording(
       m_cfg.geant4Handle
           ? m_cfg.geant4Handle
           : Geant4Manager::instance().createHandle(
-                m_geant4Level,
                 std::make_unique<MaterialPhysicsList>(
                     m_logger->cloneWithSuffix("MaterialPhysicsList")),
                 physicsListName);
@@ -391,7 +401,10 @@ ActsExamples::Geant4MaterialRecording::~Geant4MaterialRecording() = default;
 
 ActsExamples::ProcessCode ActsExamples::Geant4MaterialRecording::execute(
     const ActsExamples::AlgorithmContext& ctx) const {
-  Geant4SimulationBase::execute(ctx);
+  const auto ret = Geant4SimulationBase::execute(ctx);
+  if (ret != ProcessCode::SUCCESS) {
+    return ret;
+  }
 
   // Output handling: Material tracks
   m_outputMaterialTracks(

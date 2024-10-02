@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Detector/detail/BlueprintHelper.hpp"
 
@@ -12,6 +12,7 @@
 #include "Acts/Definitions/Tolerance.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
 
+#include <algorithm>
 #include <array>
 
 namespace {
@@ -55,19 +56,14 @@ void Acts::Experimental::detail::BlueprintHelper::sort(Blueprint::Node& node,
         bVal == BinningValue::binZ) {
       Vector3 nodeCenter = node.transform.translation();
       Vector3 nodeSortAxis = node.transform.rotation().col(toUnderlying(bVal));
-      std::sort(
-          node.children.begin(), node.children.end(),
-          [&](const auto& a, const auto& b) {
-            return (a->transform.translation() - nodeCenter).dot(nodeSortAxis) <
-                   (b->transform.translation() - nodeCenter).dot(nodeSortAxis);
-          });
+      std::ranges::sort(node.children, {}, [&](const auto& c) {
+        return (c->transform.translation() - nodeCenter).dot(nodeSortAxis);
+      });
     } else if (bVal == BinningValue::binR &&
                node.boundsType == VolumeBounds::eCylinder) {
-      std::sort(node.children.begin(), node.children.end(),
-                [](const auto& a, const auto& b) {
-                  return 0.5 * (a->boundaryValues[0] + a->boundaryValues[1]) <
-                         0.5 * (b->boundaryValues[0] + b->boundaryValues[1]);
-                });
+      std::ranges::sort(node.children, {}, [](const auto& c) {
+        return c->boundaryValues[0] + c->boundaryValues[1];
+      });
     }
   }
 

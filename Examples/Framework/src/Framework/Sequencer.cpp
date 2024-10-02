@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Framework/Sequencer.hpp"
 
@@ -171,10 +171,6 @@ void Sequencer::addElement(const std::shared_ptr<SequenceElement>& element) {
   std::string elementTypeCapitalized = elementType;
   elementTypeCapitalized[0] = std::toupper(elementTypeCapitalized[0]);
   ACTS_INFO("Add " << elementType << " '" << element->name() << "'");
-
-  if (!m_cfg.runDataFlowChecks) {
-    return;
-  }
 
   auto symbol = [&](const char* in) {
     std::string s = demangleAndShorten(in);
@@ -622,9 +618,8 @@ void Sequencer::fpeReport() const {
     std::transform(merged.stackTraces().begin(), merged.stackTraces().end(),
                    std::back_inserter(sorted),
                    [](const auto& f) -> const auto& { return f; });
-    std::sort(sorted.begin(), sorted.end(), [](const auto& a, const auto& b) {
-      return a.get().count > b.get().count;
-    });
+    std::ranges::sort(sorted, std::greater{},
+                      [](const auto& s) { return s.get().count; });
 
     std::vector<std::reference_wrapper<const Acts::FpeMonitor::Result::FpeInfo>>
         remaining;

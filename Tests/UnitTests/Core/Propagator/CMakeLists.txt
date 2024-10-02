@@ -1,5 +1,4 @@
 add_unittest(AtlasStepper AtlasStepperTests.cpp)
-add_unittest(Auctioneer AuctioneerTests.cpp)
 add_unittest(ConstrainedStep ConstrainedStepTests.cpp)
 add_unittest(CovarianceEngine CovarianceEngineTests.cpp)
 add_unittest(DirectNavigator DirectNavigatorTests.cpp)

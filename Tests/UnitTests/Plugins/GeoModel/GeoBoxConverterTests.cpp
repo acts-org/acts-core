@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_SUITE(GeoModelPlugin)
 
 // GeoBox conversion test case
 BOOST_AUTO_TEST_CASE(GeoBoxToSensitiveConversion) {
-  auto material = new GeoMaterial("Material", 1.0);
+  auto material = make_intrusive<GeoMaterial>("Material", 1.0);
   // Let's create a GeoFullPhysVol object
 
   // (BOX object) - XY
@@ -40,7 +40,10 @@ BOOST_AUTO_TEST_CASE(GeoBoxToSensitiveConversion) {
   auto logXY = new GeoLogVol("LogVolumeXY", boxXY, material);
   auto fphysXY = make_intrusive<GeoFullPhysVol>(logXY);
 
-  auto converted = Acts::GeoBoxConverter{}.toSensitiveSurface(*fphysXY);
+  PVConstLink physXY{make_intrusive<GeoFullPhysVol>(logXY)};
+
+  auto converted = Acts::GeoBoxConverter{}.toSensitiveSurface(
+      physXY, Acts::Transform3::Identity());
 
   BOOST_CHECK(converted.ok());
 
@@ -64,7 +67,8 @@ BOOST_AUTO_TEST_CASE(GeoBoxToSensitiveConversion) {
   auto logYZ = new GeoLogVol("LogVolumeYZ", boxYZ, material);
   auto fphysYZ = make_intrusive<GeoFullPhysVol>(logYZ);
 
-  converted = Acts::GeoBoxConverter{}.toSensitiveSurface(*fphysYZ);
+  converted = Acts::GeoBoxConverter{}.toSensitiveSurface(
+      fphysYZ, Acts::Transform3::Identity());
 
   BOOST_CHECK(converted.ok());
 
@@ -90,7 +94,8 @@ BOOST_AUTO_TEST_CASE(GeoBoxToSensitiveConversion) {
   auto logXZ = new GeoLogVol("LogVolumeXZ", boxXZ, material);
   auto fphysXZ = make_intrusive<GeoFullPhysVol>(logXZ);
 
-  converted = Acts::GeoBoxConverter{}.toSensitiveSurface(*fphysXZ);
+  converted = Acts::GeoBoxConverter{}.toSensitiveSurface(
+      fphysXZ, Acts::Transform3::Identity());
 
   BOOST_CHECK(converted.ok());
 

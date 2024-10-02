@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Validation/TrackClassification.hpp"
 
@@ -40,11 +40,8 @@ inline void increaseHitCount(
 /// Sort hit counts by decreasing values, i.e. majority particle comes first.
 inline void sortHitCount(
     std::vector<ActsExamples::ParticleHitCount>& particleHitCounts) {
-  std::sort(particleHitCounts.begin(), particleHitCounts.end(),
-            [](const ActsExamples::ParticleHitCount& lhs,
-               const ActsExamples::ParticleHitCount& rhs) {
-              return (lhs.hitCount > rhs.hitCount);
-            });
+  std::ranges::sort(particleHitCounts, std::greater{},
+                    [](const auto& p) { return p.hitCount; });
 }
 
 }  // namespace

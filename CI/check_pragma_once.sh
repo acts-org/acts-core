@@ -2,7 +2,13 @@
 
 ec=0
 
-for file in $(find Core Examples Tests Plugins -name "*.hpp"); do
+files="$@"
+
+if [ -z "$files" ]; then
+    files=$(find Core Examples Tests Plugins -name "*.hpp")
+fi
+
+for file in $files; do
     res=$(grep -e "^[[:space:]]*#pragma once" $file)
     if [[ "$res" != "#pragma once" ]]; then
         ec=1

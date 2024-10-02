@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -481,7 +481,7 @@ class BinningData {
         }
       }
       // sort the total boundary vector
-      std::sort(m_totalBoundaries.begin(), m_totalBoundaries.end());
+      std::ranges::sort(m_totalBoundaries);
     }
   }
 
@@ -531,9 +531,9 @@ class BinningData {
   /// String screen output method
   /// @param indent the current indentation
   /// @return a string containing the screen information
-  std::string toString(const std::string& indent) const {
+  std::string toString(const std::string& indent = "") const {
     std::stringstream sl;
-    sl << indent << "BinngingData object:" << '\n';
+    sl << indent << "BinningData object:" << '\n';
     sl << indent << "  - type       : " << static_cast<std::size_t>(type)
        << '\n';
     sl << indent << "  - option     : " << static_cast<std::size_t>(option)

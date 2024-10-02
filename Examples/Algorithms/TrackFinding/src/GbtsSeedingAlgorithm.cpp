@@ -1,15 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/TrackFinding/GbtsSeedingAlgorithm.hpp"
 
 #include "Acts/Geometry/GeometryIdentifier.hpp"
-#include "Acts/Seeding/Seed.hpp"
 #include "Acts/Seeding/SeedFilter.hpp"
 #include "ActsExamples/EventData/IndexSourceLink.hpp"
 #include "ActsExamples/EventData/Measurement.hpp"
@@ -66,10 +65,6 @@ ActsExamples::GbtsSeedingAlgorithm::GbtsSeedingAlgorithm(
 
   m_inputClusters.initialize(m_cfg.inputClusters);
 
-  m_cfg.seedFinderConfig.seedFilter =
-      std::make_unique<Acts::SeedFilter<SimSpacePoint>>(
-          Acts::SeedFilter<SimSpacePoint>(m_cfg.seedFilterConfig));
-
   // map
   m_cfg.ActsGbtsMap = makeActsGbtsMap();
   // input trig vector
@@ -94,17 +89,6 @@ ActsExamples::ProcessCode ActsExamples::GbtsSeedingAlgorithm::execute(
   std::vector<Acts::GbtsSP<SimSpacePoint>> GbtsSpacePoints =
       MakeGbtsSpacePoints(ctx, m_cfg.ActsGbtsMap);
 
-  // cluster width
-  //  const ClusterContainer* clusters = &m_inputClusters(ctx) ;
-
-  // for (const auto& sp : GbtsSpacePoints){
-  //   const auto& sl = sp.SP->sourceLinks().front().get<IndexSourceLink>() ;
-  //   const auto& cluster = clusters->at(sl.index()) ;
-  //   std::cout << "testing 0: " << cluster.sizeLoc0 << " 1: " <<
-  //   cluster.sizeLoc1 << std::endl ;
-
-  // }
-
   for (auto sp : GbtsSpacePoints) {
     ACTS_DEBUG("Gbts space points: " << " Gbts_id: " << sp.gbtsID << " z: "
                                      << sp.SP->z() << " r: " << sp.SP->r()
@@ -121,14 +105,6 @@ ActsExamples::ProcessCode ActsExamples::GbtsSeedingAlgorithm::execute(
   Acts::SeedFinderGbts<SimSpacePoint> finder(m_cfg.seedFinderConfig,
                                              *m_gbtsGeo);
 
-  // need this function as create_coords is needed for seeds
-  std::function<std::pair<Acts::Vector3, Acts::Vector2>(
-      const SimSpacePoint *sp)>
-      create_coordinates = [](const SimSpacePoint *sp) {
-        Acts::Vector3 position(sp->x(), sp->y(), sp->z());
-        Acts::Vector2 variance(sp->varianceR(), sp->varianceZ());
-        return std::make_pair(position, variance);
-      };
   // output of function needed for seed
 
   finder.loadSpacePoints(GbtsSpacePoints);
@@ -184,7 +160,6 @@ ActsExamples::GbtsSeedingAlgorithm::MakeGbtsSpacePoints(
     const AlgorithmContext &ctx,
     std::map<std::pair<int, int>, std::pair<int, int>> map) const {
   // create space point vectors
-  std::vector<const ActsExamples::SimSpacePoint *> spacePoints;
   std::vector<Acts::GbtsSP<ActsExamples::SimSpacePoint>> gbtsSpacePoints;
   gbtsSpacePoints.reserve(
       m_inputSpacePoints.size());  // not sure if this is enough
@@ -192,24 +167,20 @@ ActsExamples::GbtsSeedingAlgorithm::MakeGbtsSpacePoints(
   // for loop filling space
   for (const auto &isp : m_inputSpacePoints) {
     for (const auto &spacePoint : (*isp)(ctx)) {
-      // fill original space point vector
-      spacePoints.push_back(&spacePoint);
-
       // Gbts space point vector
       // loop over space points, call on map
-      const auto &source_link = spacePoint.sourceLinks();
-      const auto &index_source_link =
-          source_link.front().get<IndexSourceLink>();
+      const auto &sourceLink = spacePoint.sourceLinks();
+      const auto &indexSourceLink = sourceLink.front().get<IndexSourceLink>();
 
       // warning if source link empty
-      if (source_link.empty()) {
+      if (sourceLink.empty()) {
         // warning in officaial acts format
         ACTS_WARNING("warning source link vector is empty");
         continue;
       }
-      int ACTS_vol_id = index_source_link.geometryId().volume();
-      int ACTS_lay_id = index_source_link.geometryId().layer();
-      int ACTS_mod_id = index_source_link.geometryId().sensitive();
+      int ACTS_vol_id = indexSourceLink.geometryId().volume();
+      int ACTS_lay_id = indexSourceLink.geometryId().layer();
+      int ACTS_mod_id = indexSourceLink.geometryId().sensitive();
 
       // dont want strips or HGTD
       if (ACTS_vol_id == 2 || ACTS_vol_id == 22 || ACTS_vol_id == 23 ||

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -87,7 +87,7 @@ class CylinderVolumeStack : public Volume {
   /// @param transform is the new transform
   /// @pre The volume bounds need to be of type
   ///      @c CylinderVolumeBounds.
-  void update(std::shared_ptr<const VolumeBounds> volbounds,
+  void update(std::shared_ptr<VolumeBounds> volbounds,
               std::optional<Transform3> transform = std::nullopt) override;
 
   /// Update the volume bounds and transform. This
@@ -100,7 +100,7 @@ class CylinderVolumeStack : public Volume {
   /// @param logger is the logger
   /// @pre The volume bounds need to be of type
   ///      @c CylinderVolumeBounds.
-  void update(std::shared_ptr<const CylinderVolumeBounds> newBounds,
+  void update(std::shared_ptr<CylinderVolumeBounds> newBounds,
               std::optional<Transform3> transform, const Logger& logger);
 
   /// Access the gap volume that were created during attachment or resizing.

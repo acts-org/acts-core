@@ -74,14 +74,14 @@ build_exatrkx_cpu:
     - git checkout $HEAD_SHA
     - cd ..
     - mkdir build
-    # Here we only do a minimal build without examples to save ressources
+    # Here we only do a minimal build without examples to save resources
     - >
       cmake -B build -S src
       --preset=gitlab-ci-exatrkx
       -DACTS_EXATRKX_ENABLE_CUDA=OFF
 
     - ccache -z
-    - cmake --build build -- -j2
+    - cmake --build build -- -j6
     - ccache -s
 
 build_exatrkx:
@@ -119,7 +119,7 @@ build_exatrkx:
       -DCMAKE_CUDA_ARCHITECTURES="75;86"
 
     - ccache -z
-    - cmake --build build -- -j2
+    - cmake --build build -- -j6
     - ccache -s
 
 # test_exatrkx_unittests:
@@ -186,7 +186,7 @@ build_linux_ubuntu:
       -DACTS_BUILD_PLUGIN_ONNX=ON
 
     - ccache -z
-    - cmake --build build -- -j2
+    - cmake --build build -- -j6
     - ccache -s
 
 linux_test_examples:
@@ -271,7 +271,7 @@ linux_physmon:
       -DCMAKE_CXX_STANDARD=${CXXSTD}
 
     - ccache -z
-    - cmake --build build -- -j2
+    - cmake --build build -- -j6
     - ccache -s
 
     - ctest --test-dir build -j$(nproc)
@@ -367,7 +367,7 @@ linux_ubuntu_2204_clang:
       -DACTS_BUILD_PLUGIN_GEOMODEL=OFF # GeoModel is not in LCG at this point
 
     - ccache -z
-    - cmake --build build -- -j2
+    - cmake --build build -- -j6
     - ccache -s
 
     - ctest --test-dir build -j$(nproc)

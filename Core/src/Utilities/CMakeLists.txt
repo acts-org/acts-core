@@ -8,4 +8,5 @@ target_sources(
         TrackHelpers.cpp
         BinningType.cpp
         Intersection.cpp
+        GraphViz.cpp
 )

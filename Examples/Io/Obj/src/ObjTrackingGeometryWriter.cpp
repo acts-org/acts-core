@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Plugins/Obj/ObjTrackingGeometryWriter.hpp"
 
@@ -13,6 +13,8 @@
 #include <Acts/Geometry/TrackingGeometry.hpp>
 #include <Acts/Visualization/GeometryView3D.hpp>
 #include <Acts/Visualization/ObjVisualization3D.hpp>
+
+#include <filesystem>
 
 ActsExamples::ObjTrackingGeometryWriter::ObjTrackingGeometryWriter(
     const ActsExamples::ObjTrackingGeometryWriter::Config& config,
@@ -43,5 +45,5 @@ void ActsExamples::ObjTrackingGeometryWriter::write(
   Acts::GeometryView3D::drawTrackingVolume(
       objVis, tVolume, context.geoContext, m_cfg.containerView,
       m_cfg.volumeView, m_cfg.passiveView, m_cfg.sensitiveView, m_cfg.gridView,
-      true, "", m_cfg.outputDir);
+      true, "", std::filesystem::path(m_cfg.outputDir));
 }

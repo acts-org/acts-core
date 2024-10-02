@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/EventData/VectorMultiTrajectory.hpp"
 #include "Acts/EventData/VectorTrackContainer.hpp"
@@ -15,7 +15,7 @@ template <typename source_link_t, typename start_parameters_t,
 Acts::Result<ActsAlignment::detail::TrackAlignmentState>
 ActsAlignment::Alignment<fitter_t>::evaluateTrackAlignmentState(
     const Acts::GeometryContext& gctx,
-    const std::vector<source_link_t>& sourcelinks,
+    const std::vector<source_link_t>& sourceLinks,
     const start_parameters_t& sParameters, const fit_options_t& fitOptions,
     const std::unordered_map<const Acts::Surface*, std::size_t>&
         idxedAlignSurfaces,
@@ -24,8 +24,8 @@ ActsAlignment::Alignment<fitter_t>::evaluateTrackAlignmentState(
                               Acts::VectorMultiTrajectory{}};
 
   // Convert to Acts::SourceLink during iteration
-  Acts::SourceLinkAdapterIterator begin{sourcelinks.begin()};
-  Acts::SourceLinkAdapterIterator end{sourcelinks.end()};
+  Acts::SourceLinkAdapterIterator begin{sourceLinks.begin()};
+  Acts::SourceLinkAdapterIterator end{sourceLinks.end()};
 
   // Perform the fit
   auto fitRes = m_fitter.fit(begin, end, sParameters, fitOptions, tracks);
@@ -82,13 +82,13 @@ void ActsAlignment::Alignment<fitter_t>::calculateAlignmentParameters(
   alignResult.numTracks = trajectoryCollection.size();
   double sumChi2ONdf = 0;
   for (unsigned int iTraj = 0; iTraj < trajectoryCollection.size(); iTraj++) {
-    const auto& sourcelinks = trajectoryCollection.at(iTraj);
+    const auto& sourceLinks = trajectoryCollection.at(iTraj);
     const auto& sParameters = startParametersCollection.at(iTraj);
     // Set the target surface
     fitOptionsWithRefSurface.referenceSurface = &sParameters.referenceSurface();
     // The result for one single track
     auto evaluateRes = evaluateTrackAlignmentState(
-        fitOptions.geoContext, sourcelinks, sParameters,
+        fitOptions.geoContext, sourceLinks, sParameters,
         fitOptionsWithRefSurface, alignResult.idxedAlignSurfaces, alignMask);
     if (!evaluateRes.ok()) {
       ACTS_DEBUG("Evaluation of alignment state for track " << iTraj

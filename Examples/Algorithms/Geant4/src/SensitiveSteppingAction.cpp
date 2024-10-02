@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Geant4/SensitiveSteppingAction.hpp"
 
@@ -127,6 +127,9 @@ void ActsExamples::SensitiveSteppingAction::UserSteppingAction(
 
   // Get the physical volume & check if it has the sensitive string name
   const G4VPhysicalVolume* volume = track->GetVolume();
+  if (volume == nullptr) {
+    throw std::runtime_error("No volume found, terminate simulation");
+  }
   std::string volumeName = volume->GetName();
 
   if (volumeName.find(SensitiveSurfaceMapper::mappingPrefix) ==
@@ -175,8 +178,7 @@ void ActsExamples::SensitiveSteppingAction::UserSteppingAction(
   }
 
   // This is not the case if we have a particle-ID collision
-  if (eventStore().trackIdMapping.find(track->GetTrackID()) ==
-      eventStore().trackIdMapping.end()) {
+  if (!eventStore().trackIdMapping.contains(track->GetTrackID())) {
     return;
   }
 
@@ -185,8 +187,7 @@ void ActsExamples::SensitiveSteppingAction::UserSteppingAction(
   ACTS_VERBOSE("Step of " << particleId << " in sensitive volume " << geoId);
 
   // Set particle hit count to zero, so we have this entry in the map later
-  if (eventStore().particleHitCount.find(particleId) ==
-      eventStore().particleHitCount.end()) {
+  if (!eventStore().particleHitCount.contains(particleId)) {
     eventStore().particleHitCount[particleId] = 0;
   }
 

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsFatras/Digitization/PlanarSurfaceMask.hpp"
 
@@ -58,8 +58,7 @@ void checkIntersection(std::vector<Acts::Intersection2D>& intersections,
 Acts::Result<ActsFatras::PlanarSurfaceMask::Segment2D> maskAndReturn(
     std::vector<Acts::Intersection2D>& intersections,
     const ActsFatras::PlanarSurfaceMask::Segment2D& segment, bool firstInside) {
-  std::sort(intersections.begin(), intersections.end(),
-            Acts::Intersection2D::pathLengthOrder);
+  std::ranges::sort(intersections, Acts::Intersection2D::pathLengthOrder);
   if (intersections.size() >= 2) {
     return ActsFatras::PlanarSurfaceMask::Segment2D{
         intersections[0].position(), intersections[1].position()};

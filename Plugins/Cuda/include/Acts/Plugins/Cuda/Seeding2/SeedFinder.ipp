@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -23,11 +23,11 @@
 #include "Acts/Seeding/InternalSpacePoint.hpp"
 
 // System include(s).
+#include <algorithm>
 #include <cstring>
 #include <vector>
 
-namespace Acts {
-namespace Cuda {
+namespace Acts::Cuda {
 
 template <typename external_spacepoint_t>
 SeedFinder<external_spacepoint_t>::SeedFinder(
@@ -226,8 +226,8 @@ SeedFinder<external_spacepoint_t>::createSeedsForGroup(
       candidates.emplace_back(bottomSP, middleSP, topSP, triplet.weight, 0,
                               false);
     }
-    std::sort(
-        candidates.begin(), candidates.end(),
+    std::ranges::sort(
+        candidates,
         CandidatesForMiddleSp<const InternalSpacePoint<external_spacepoint_t>>::
             descendingByQuality);
     std::size_t numQualitySeeds = 0;  // not used but needs to be fixed
@@ -249,5 +249,4 @@ void SeedFinder<external_spacepoint_t>::setLogger(
   return m_logger.swap(newLogger);
 }
 
-}  // namespace Cuda
-}  // namespace Acts
+}  // namespace Acts::Cuda

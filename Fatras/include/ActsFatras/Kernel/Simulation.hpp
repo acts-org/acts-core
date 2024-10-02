@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -13,8 +13,7 @@
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
-#include "Acts/Propagator/AbortList.hpp"
-#include "Acts/Propagator/ActionList.hpp"
+#include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StandardAborters.hpp"
 #include "Acts/Utilities/Logger.hpp"
@@ -79,19 +78,17 @@ struct SingleParticleSimulation {
     // propagator-related additional types
     using Actor = detail::SimulationActor<generator_t, decay_t, interactions_t,
                                           hit_surface_selector_t>;
-    using Aborter = typename Actor::ParticleNotAlive;
     using Result = typename Actor::result_type;
-    using Actions = Acts::ActionList<Actor>;
-    using Abort = Acts::AbortList<Aborter, Acts::EndOfWorldReached>;
+    using ActorList = Acts::ActorList<Actor>;
     using PropagatorOptions =
-        typename propagator_t::template Options<Actions, Abort>;
+        typename propagator_t::template Options<ActorList>;
 
     // Construct per-call options.
     PropagatorOptions options(geoCtx, magCtx);
     options.stepping.maxStepSize = maxStepSize;
     options.pathLimit = pathLimit;
     // setup the interactor as part of the propagator options
-    auto &actor = options.actionList.template get<Actor>();
+    auto &actor = options.actorList.template get<Actor>();
     actor.generator = &generator;
     actor.decay = decay;
     actor.interactions = interactions;
@@ -259,7 +256,7 @@ struct Simulation {
       }
     }
 
-    // the overall function call succeeded, i.e. no fatal errors occured.
+    // the overall function call succeeded, i.e. no fatal errors occurred.
     // yet, there might have been some particle for which the propagation
     // failed. thus, the successful result contains a list of failed particles.
     // sounds a bit weird, but that is the way it is.

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -26,6 +26,7 @@
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 
+#include <algorithm>
 #include <fstream>
 
 class SurfaceBuilder : public Acts::Experimental::IInternalStructureBuilder {
@@ -363,7 +364,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
     portals.insert(portals.end(), volume->portals().begin(),
                    volume->portals().end());
   }
-  std::sort(portals.begin(), portals.end());
+  std::ranges::sort(portals);
   auto last = std::unique(portals.begin(), portals.end());
   portals.erase(last, portals.end());
   BOOST_CHECK_EQUAL(portals.size(), 19u);

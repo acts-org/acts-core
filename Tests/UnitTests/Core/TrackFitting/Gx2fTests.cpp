@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -14,12 +14,10 @@
 #include "Acts/EventData/VectorTrackContainer.hpp"
 #include "Acts/EventData/detail/TestSourceLink.hpp"
 #include "Acts/Geometry/CuboidVolumeBuilder.hpp"
-#include "Acts/Geometry/Layer.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Geometry/TrackingGeometryBuilder.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/Material/HomogeneousSurfaceMaterial.hpp"
-#include "Acts/Material/HomogeneousVolumeMaterial.hpp"
 #include "Acts/Material/MaterialSlab.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/Navigator.hpp"
@@ -149,7 +147,7 @@ std::shared_ptr<const TrackingGeometry> makeToyDetector(
         RectangleBounds(halfSizeSurface, halfSizeSurface));
 
     // Add material only for selected surfaces
-    if (surfaceIndexWithMaterial.count(surfPos) != 0) {
+    if (surfaceIndexWithMaterial.contains(surfPos)) {
       // Material of the surfaces
       MaterialSlab matProp(makeSilicon(), 5_mm);
       cfg.surMat = std::make_shared<HomogeneousSurfaceMaterial>(matProp);
@@ -193,117 +191,6 @@ std::shared_ptr<const TrackingGeometry> makeToyDetector(
                    2 * halfSizeSurface};
   config.position = {volumeConfig.length.x() / 2, 0., 0.};
   config.volumeCfg = {volumeConfig};
-
-  cvb.setConfig(config);
-
-  TrackingGeometryBuilder::Config tgbCfg;
-
-  tgbCfg.trackingVolumeBuilders.push_back(
-      [=](const auto& context, const auto& inner, const auto&) {
-        return cvb.trackingVolume(context, inner, nullptr);
-      });
-
-  TrackingGeometryBuilder tgb(tgbCfg);
-
-  std::unique_ptr<const TrackingGeometry> detector =
-      tgb.trackingGeometry(geoCtx);
-  return detector;
-}
-
-/// @brief Create a simple telescope detector in the Y direction.
-///
-/// We cannot reuse the previous detector, since the cuboid volume builder only
-/// allows merging of YZ-faces.
-///
-/// @param geoCtx
-/// @param nSurfaces Number of surfaces
-std::shared_ptr<const TrackingGeometry> makeToyDetectorYdirection(
-    const Acts::GeometryContext& geoCtx, const std::size_t nSurfaces = 5) {
-  if (nSurfaces < 1) {
-    throw std::invalid_argument("At least 1 surfaces needs to be created.");
-  }
-
-  // Define the dimensions of the square surfaces
-  const double halfSizeSurface = 1_m;
-
-  // Rotation of the surfaces around the x-axis
-  const double rotationAngle = M_PI * 0.5;
-  const Vector3 xPos(1., 0., 0.);
-  const Vector3 yPos(0., cos(rotationAngle), sin(rotationAngle));
-  const Vector3 zPos(0., -sin(rotationAngle), cos(rotationAngle));
-
-  // Construct builder
-  CuboidVolumeBuilder cvb;
-
-  // Create configurations for surfaces
-  std::vector<CuboidVolumeBuilder::SurfaceConfig> surfaceConfig;
-  for (std::size_t surfPos = 1; surfPos <= nSurfaces; surfPos++) {
-    // Position of the surfaces
-    CuboidVolumeBuilder::SurfaceConfig cfg;
-    cfg.position = {0., surfPos * UnitConstants::m, 0.};
-
-    // Rotation of the surfaces
-    cfg.rotation.col(0) = xPos;
-    cfg.rotation.col(1) = yPos;
-    cfg.rotation.col(2) = zPos;
-
-    // Boundaries of the surfaces (shape)
-    cfg.rBounds = std::make_shared<const RectangleBounds>(
-        RectangleBounds(halfSizeSurface, halfSizeSurface));
-
-    // Thickness of the detector element
-    cfg.thickness = 1_um;
-
-    cfg.detElementConstructor =
-        [](const Transform3& trans,
-           const std::shared_ptr<const RectangleBounds>& bounds,
-           double thickness) {
-          return new DetectorElementStub(trans, bounds, thickness);
-        };
-    surfaceConfig.push_back(cfg);
-  }
-
-  // Build layer configurations
-  std::vector<CuboidVolumeBuilder::LayerConfig> layerConfig;
-  for (auto& sCfg : surfaceConfig) {
-    CuboidVolumeBuilder::LayerConfig cfg;
-    cfg.surfaceCfg = {sCfg};
-    cfg.active = true;
-    cfg.envelopeX = {-0.1_mm, 0.1_mm};
-    cfg.envelopeY = {-0.1_mm, 0.1_mm};
-    cfg.envelopeZ = {-0.1_mm, 0.1_mm};
-    cfg.binningDimension = Acts::BinningValue::binY;
-    layerConfig.push_back(cfg);
-  }
-
-  // Inner Volume - Build volume configuration
-  CuboidVolumeBuilder::VolumeConfig volumeConfig;
-  volumeConfig.length = {2 * halfSizeSurface, (nSurfaces + 1) * 1_m,
-                         2 * halfSizeSurface};
-  volumeConfig.position = {0., volumeConfig.length.y() / 2, 0.};
-  volumeConfig.layerCfg = layerConfig;
-  volumeConfig.name = "TestVolume";
-  volumeConfig.binningDimension = Acts::BinningValue::binY;
-
-  // This basically adds an empty volume in y-direction
-  // Second inner Volume - Build volume configuration
-  CuboidVolumeBuilder::VolumeConfig volumeConfig2;
-  //    volumeConfig2.length = volumeConfig.length;
-  volumeConfig2.length = {2 * halfSizeSurface, (nSurfaces + 1) * 1_m,
-                          2 * halfSizeSurface};
-  ;
-  volumeConfig2.position = {volumeConfig2.length.x(),
-                            volumeConfig2.length.y() / 2, 0.};
-  volumeConfig2.name = "AdditionalVolume";
-  volumeConfig2.binningDimension = Acts::BinningValue::binY;
-
-  // Outer volume - Build TrackingGeometry configuration and fill
-  CuboidVolumeBuilder::Config config;
-  config.length = {4 * halfSizeSurface, (nSurfaces + 1) * 1_m,
-                   2 * halfSizeSurface};
-  config.position = {volumeConfig.length.x() / 2, volumeConfig.length.y() / 2,
-                     0.};
-  config.volumeCfg = {volumeConfig, volumeConfig2};
 
   cvb.setConfig(config);
 
@@ -518,123 +405,9 @@ BOOST_AUTO_TEST_CASE(Fit5Iterations) {
       (track.template component<
           std::uint32_t,
           hashString(Experimental::Gx2fConstants::gx2fnUpdateColumn)>()),
-      5);
+      4);
 
   ACTS_INFO("*** Test: Fit5Iterations -- Finish");
-}
-
-BOOST_AUTO_TEST_CASE(UpdatePushedToNewVolume) {
-  ACTS_INFO("*** Test: UpdatePushedToNewVolume -- Start");
-
-  std::default_random_engine rng(42);
-
-  ACTS_DEBUG("Create the detector");
-  const std::size_t nSurfaces = 5;
-  Detector detector;
-  detector.geometry = makeToyDetectorYdirection(geoCtx, nSurfaces);
-
-  ACTS_DEBUG("Set the start parameters for measurement creation and fit");
-  const auto parametersMeasurements =
-      makeParameters(0_mm, 0_mm, 0_mm, 42_ns, 90_degree, 90_degree, 1_GeV, 1_e);
-  const auto startParametersFit = makeParameters(
-      1500_mm, 0_mm, 0_mm, 42_ns, -45_degree, -90_degree, 1_GeV, 1_e);
-
-  ACTS_DEBUG("Create the measurements");
-  using SimPropagator =
-      Acts::Propagator<Acts::StraightLineStepper, Acts::Navigator>;
-  const SimPropagator simPropagator = makeStraightPropagator(detector.geometry);
-  const auto measurements =
-      createMeasurements(simPropagator, geoCtx, magCtx, parametersMeasurements,
-                         resMapAllPixel, rng);
-  const auto sourceLinks = prepareSourceLinks(measurements.sourceLinks);
-  ACTS_VERBOSE("sourceLinks.size() = " << sourceLinks.size());
-
-  BOOST_REQUIRE_EQUAL(sourceLinks.size(), nSurfaces);
-
-  ACTS_DEBUG("Set up the fitter");
-  const Surface* rSurface = &parametersMeasurements.referenceSurface();
-
-  using RecoStepper = EigenStepper<>;
-  const auto recoPropagator =
-      makeConstantFieldPropagator<RecoStepper>(detector.geometry, 0_T);
-
-  using RecoPropagator = decltype(recoPropagator);
-  using Gx2Fitter =
-      Experimental::Gx2Fitter<RecoPropagator, VectorMultiTrajectory>;
-  const Gx2Fitter fitter(recoPropagator, gx2fLogger->clone());
-
-  Experimental::Gx2FitterExtensions<VectorMultiTrajectory> extensions;
-  extensions.calibrator
-      .connect<&testSourceLinkCalibrator<VectorMultiTrajectory>>();
-  TestSourceLink::SurfaceAccessor surfaceAccessor{*detector.geometry};
-  extensions.surfaceAccessor
-      .connect<&TestSourceLink::SurfaceAccessor::operator()>(&surfaceAccessor);
-
-  const Experimental::Gx2FitterOptions gx2fOptions(
-      geoCtx, magCtx, calCtx, extensions,
-      PropagatorPlainOptions(geoCtx, magCtx), rSurface, false, false,
-      FreeToBoundCorrection(false), 5, 0);
-
-  Acts::TrackContainer tracks{Acts::VectorTrackContainer{},
-                              Acts::VectorMultiTrajectory{}};
-
-  ACTS_DEBUG("Fit the track");
-  ACTS_VERBOSE("startParameter unsmeared:\n" << parametersMeasurements);
-  ACTS_VERBOSE("startParameter fit:\n" << startParametersFit);
-  const auto res = fitter.fit(sourceLinks.begin(), sourceLinks.end(),
-                              startParametersFit, gx2fOptions, tracks);
-
-  // Helper to visualise the detector
-  {
-    std::cout << "\n*** Create .obj of Detector ***\n" << std::endl;
-    // Only need for obj
-    ObjVisualization3D obj;
-
-    bool triangulate = true;
-    ViewConfig viewSensitive = ViewConfig({0, 180, 240});
-    viewSensitive.triangulate = triangulate;
-    ViewConfig viewPassive = ViewConfig({240, 280, 0});
-    viewPassive.triangulate = triangulate;
-    ViewConfig viewVolume = ViewConfig({220, 220, 0});
-    viewVolume.triangulate = triangulate;
-    ViewConfig viewContainer = ViewConfig({220, 220, 0});
-    viewContainer.triangulate = triangulate;
-    ViewConfig viewGrid = ViewConfig({220, 0, 0});
-    viewGrid.nSegments = 8;
-    viewGrid.offset = 3.;
-    viewGrid.triangulate = triangulate;
-
-    std::string tag = "gx2f_toydet";
-
-    const Acts::TrackingVolume& tgVolume =
-        *(detector.geometry->highestTrackingVolume());
-
-    GeometryView3D::drawTrackingVolume(obj, tgVolume, geoCtx, viewContainer,
-                                       viewVolume, viewPassive, viewSensitive,
-                                       viewGrid, true, tag);
-  }
-  // Helper to visualise the measurements
-  {
-    std::cout << "\n*** Create .obj of measurements ***\n" << std::endl;
-    ObjVisualization3D obj;
-
-    double localErrorScale = 10000000.;
-    ViewConfig mcolor({255, 145, 48});
-    mcolor.offset = 2;
-    //  mcolor.visible = true;
-
-    drawMeasurements(obj, measurements, detector.geometry, geoCtx,
-                     localErrorScale, mcolor);
-
-    obj.write("meas");
-  }
-
-  BOOST_REQUIRE(!res.ok());
-  BOOST_CHECK_EQUAL(
-      res.error(),
-      Acts::Experimental::GlobalChiSquareFitterError::UpdatePushedToNewVolume);
-
-  ACTS_INFO("*** Test: UpdatePushedToNewVolume -- Finish");
 }
 
 BOOST_AUTO_TEST_CASE(MixedDetector) {
@@ -737,7 +510,7 @@ BOOST_AUTO_TEST_CASE(MixedDetector) {
       (track.template component<
           std::uint32_t,
           hashString(Experimental::Gx2fConstants::gx2fnUpdateColumn)>()),
-      5);
+      4);
 
   ACTS_INFO("*** Test: MixedDetector -- Finish");
 }
@@ -834,7 +607,7 @@ BOOST_AUTO_TEST_CASE(FitWithBfield) {
       (track.template component<
           std::uint32_t,
           hashString(Experimental::Gx2fConstants::gx2fnUpdateColumn)>()),
-      5);
+      4);
 
   ACTS_INFO("*** Test: FitWithBfield -- Finish");
 }
@@ -1253,7 +1026,7 @@ BOOST_AUTO_TEST_CASE(Material) {
 
   const Experimental::Gx2FitterOptions gx2fOptions(
       geoCtx, magCtx, calCtx, extensions,
-      PropagatorPlainOptions(geoCtx, magCtx), rSurface, false, false,
+      PropagatorPlainOptions(geoCtx, magCtx), rSurface, true, false,
       FreeToBoundCorrection(false), 5, 0);
 
   Acts::TrackContainer tracks{Acts::VectorTrackContainer{},
@@ -1264,6 +1037,51 @@ BOOST_AUTO_TEST_CASE(Material) {
   ACTS_VERBOSE("startParameter fit:\n" << startParametersFit);
   const auto res = fitter.fit(sourceLinks.begin(), sourceLinks.end(),
                               startParametersFit, gx2fOptions, tracks);
+
+  // Helper to visualise the detector
+  {
+    std::cout << "\n*** Create .obj of Detector ***\n" << std::endl;
+    // Only need for obj
+    ObjVisualization3D obj;
+
+    bool triangulate = true;
+    ViewConfig viewSensitive = {.color = {0, 180, 240}};
+    viewSensitive.triangulate = triangulate;
+    ViewConfig viewPassive = {.color = {240, 280, 0}};
+    viewPassive.triangulate = triangulate;
+    ViewConfig viewVolume = {.color = {220, 220, 0}};
+    viewVolume.triangulate = triangulate;
+    ViewConfig viewContainer = {.color = {220, 220, 0}};
+    viewContainer.triangulate = triangulate;
+    ViewConfig viewGrid = {.color = {220, 0, 0}};
+    viewGrid.nSegments = 8;
+    viewGrid.offset = 3.;
+    viewGrid.triangulate = triangulate;
+
+    std::string tag = "gx2f_toydet";
+
+    const Acts::TrackingVolume& tgVolume =
+        *(detector.geometry->highestTrackingVolume());
+
+    GeometryView3D::drawTrackingVolume(obj, tgVolume, geoCtx, viewContainer,
+                                       viewVolume, viewPassive, viewSensitive,
+                                       viewGrid, true, tag);
+  }
+  // Helper to visualise the measurements
+  {
+    std::cout << "\n*** Create .obj of measurements ***\n" << std::endl;
+    ObjVisualization3D obj;
+
+    double localErrorScale = 10000000.;
+    ViewConfig mcolor{.color = {255, 145, 48}};
+    mcolor.offset = 2;
+    //  mcolor.visible = true;
+
+    drawMeasurements(obj, measurements, detector.geometry, geoCtx,
+                     localErrorScale, mcolor);
+
+    obj.write("meas");
+  }
 
   BOOST_REQUIRE(res.ok());
 
@@ -1284,10 +1102,10 @@ BOOST_AUTO_TEST_CASE(Material) {
   // Parameters
   // We need quite coarse checks here, since on different builds
   // the created measurements differ in the randomness
-  //  BOOST_CHECK_CLOSE(track.parameters()[eBoundLoc0], -11., 7e0);
-  //  BOOST_CHECK_CLOSE(track.parameters()[eBoundLoc1], -15., 6e0);
-  //  BOOST_CHECK_CLOSE(track.parameters()[eBoundPhi], 1e-5, 1e3);
-  //  BOOST_CHECK_CLOSE(track.parameters()[eBoundTheta], M_PI / 2, 1e-3);
+  BOOST_CHECK_CLOSE(track.parameters()[eBoundLoc0], -11., 7e0);
+  BOOST_CHECK_CLOSE(track.parameters()[eBoundLoc1], -15., 6e0);
+  BOOST_CHECK_CLOSE(track.parameters()[eBoundPhi], 1e-5, 1e3);
+  BOOST_CHECK_CLOSE(track.parameters()[eBoundTheta], M_PI / 2, 1e-3);
   BOOST_CHECK_EQUAL(track.parameters()[eBoundQOverP], 1);
   BOOST_CHECK_CLOSE(track.parameters()[eBoundTime],
                     startParametersFit.parameters()[eBoundTime], 1e-6);
@@ -1298,7 +1116,7 @@ BOOST_AUTO_TEST_CASE(Material) {
       (track.template component<
           std::uint32_t,
           hashString(Experimental::Gx2fConstants::gx2fnUpdateColumn)>()),
-      5);
+      4);
 
   ACTS_INFO("*** Test: Material -- Finish");
 }

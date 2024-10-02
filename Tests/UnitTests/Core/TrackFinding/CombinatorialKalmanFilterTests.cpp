@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -31,6 +31,7 @@
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
+#include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Tests/CommonHelpers/CubicTrackingGeometry.hpp"
@@ -132,8 +133,6 @@ struct TestContainerAccessor {
     bool operator==(const Iterator& other) const {
       return m_iterator == other.m_iterator;
     }
-
-    bool operator!=(const Iterator& other) const { return !(*this == other); }
 
     Acts::SourceLink operator*() const {
       const auto& sl = m_iterator->second;
@@ -307,12 +306,13 @@ BOOST_AUTO_TEST_CASE(ZeroFieldForward) {
   // this is the default option. set anyway for consistency
   options.propagatorPlainOptions.direction = Acts::Direction::Forward;
   // Construct a plane surface as the target surface
-  auto pSurface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Acts::Vector3{-3_m, 0., 0.}, Acts::Vector3{1., 0., 0});
+  auto pSurface = Acts::CurvilinearSurface(Acts::Vector3{-3_m, 0., 0.},
+                                           Acts::Vector3{1., 0., 0})
+                      .planeSurface();
 
   Fixture::TestSourceLinkAccessor slAccessor;
   slAccessor.container = &f.sourceLinks;
-  options.sourcelinkAccessor.connect<&Fixture::TestSourceLinkAccessor::range>(
+  options.sourceLinkAccessor.connect<&Fixture::TestSourceLinkAccessor::range>(
       &slAccessor);
 
   TrackContainer tc{Acts::VectorTrackContainer{},
@@ -364,12 +364,13 @@ BOOST_AUTO_TEST_CASE(ZeroFieldBackward) {
   auto options = f.makeCkfOptions();
   options.propagatorPlainOptions.direction = Acts::Direction::Backward;
   // Construct a plane surface as the target surface
-  auto pSurface = Acts::Surface::makeShared<Acts::PlaneSurface>(
-      Acts::Vector3{3_m, 0., 0.}, Acts::Vector3{1., 0., 0});
+  auto pSurface = Acts::CurvilinearSurface(Acts::Vector3{3_m, 0., 0.},
+                                           Acts::Vector3{1., 0., 0})
+                      .planeSurface();
 
   Fixture::TestSourceLinkAccessor slAccessor;
   slAccessor.container = &f.sourceLinks;
-  options.sourcelinkAccessor.connect<&Fixture::TestSourceLinkAccessor::range>(
+  options.sourceLinkAccessor.connect<&Fixture::TestSourceLinkAccessor::range>(
       &slAccessor);
 
   TrackContainer tc{Acts::VectorTrackContainer{},

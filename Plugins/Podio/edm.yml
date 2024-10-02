@@ -58,7 +58,7 @@ components:
         - uint32_t measdim;
 
         - uint32_t ijacobian
-        - std::array<char, 6> projector
+        - uint64_t projector
         - bool hasProjector
 
         - float chi2

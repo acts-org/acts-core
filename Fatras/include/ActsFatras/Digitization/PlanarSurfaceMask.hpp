@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -30,7 +30,7 @@ struct PlanarSurfaceMask {
   using Segment2D = std::array<Acts::Vector2, 2>;
 
   /// Apply the mask on the segment
-  /// - If the semgent is full inside the surface, return unchanged
+  /// - If the segment is fully inside the surface, return unchanged
   /// - Otherwise mask/clip the segment to fit into the bounds
   ///
   /// @note Only PlaneSurface/DiscSurface are supported
@@ -64,7 +64,7 @@ struct PlanarSurfaceMask {
   ///
   /// @param rBounds The radial disc for the masking
   /// @param segment The track segment (on surface)
-  /// @param polarSegment The track segmetn (on surface, in polar)
+  /// @param polarSegment The track segment (on surface, in polar)
   /// @param firstInside The indicator if the first is inside
   ///
   /// @return a result wrapping a segment

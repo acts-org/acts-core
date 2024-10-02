@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Io/Csv/CsvMeasurementWriter.hpp"
 
@@ -14,6 +14,7 @@
 #include "ActsExamples/EventData/Cluster.hpp"
 #include "ActsExamples/EventData/Index.hpp"
 #include "ActsExamples/EventData/IndexSourceLink.hpp"
+#include "ActsExamples/EventData/Measurement.hpp"
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Io/Csv/CsvInputOutput.hpp"
 #include "ActsExamples/Utilities/Paths.hpp"
@@ -92,7 +93,8 @@ ActsExamples::ProcessCode ActsExamples::CsvMeasurementWriter::writeT(
                           << " measurements in this event.");
 
   for (Index measIdx = 0u; measIdx < measurements.size(); ++measIdx) {
-    const auto& measurement = measurements[measIdx];
+    const ConstVariableBoundMeasurementProxy measurement =
+        measurements.getMeasurement(measIdx);
 
     auto simHitIndices = makeRange(measurementSimHitsMap.equal_range(measIdx));
     for (auto [_, simHitIdx] : simHitIndices) {

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -538,9 +538,7 @@ BOOST_AUTO_TEST_CASE(grid_iteration_test_3d_local_norepetitions) {
       for (std::size_t z : navigation[2ul]) {
         std::array<std::size_t, 3ul> locPos({x, y, z});
         std::size_t globPos = grid.globalBinFromLocalBins(locPos);
-        BOOST_CHECK_EQUAL(
-            allowed_global_bins.find(globPos) != allowed_global_bins.end(),
-            false);
+        BOOST_CHECK(!allowed_global_bins.contains(globPos));
         allowed_global_bins.insert(globPos);
       }
     }
@@ -559,10 +557,8 @@ BOOST_AUTO_TEST_CASE(grid_iteration_test_3d_local_norepetitions) {
     ++numIterations;
     std::array<std::size_t, 3ul> locPos = gridStart.localBinsIndices();
     std::size_t globPos = grid.globalBinFromLocalBins(locPos);
-    BOOST_CHECK_EQUAL(
-        visited_global_bins.find(globPos) != visited_global_bins.end(), false);
-    BOOST_CHECK_EQUAL(
-        allowed_global_bins.find(globPos) != allowed_global_bins.end(), true);
+    BOOST_CHECK(!visited_global_bins.contains(globPos));
+    BOOST_CHECK(allowed_global_bins.contains(globPos));
     visited_global_bins.insert(globPos);
   }
 

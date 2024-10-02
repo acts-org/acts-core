@@ -1,14 +1,15 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Propagator/detail/SympyCovarianceEngine.hpp"
 
 #include "Acts/Propagator/detail/JacobianEngine.hpp"
+#include "Acts/Propagator/detail/SympyJacobianEngine.hpp"
 
 #include "codegen/sympy_cov_math.hpp"
 
@@ -97,9 +98,9 @@ void sympy::transportCovarianceToBound(
     const FreeToBoundCorrection& freeToBoundCorrection) {
   // Calculate the full jacobian from local parameters at the start surface to
   // current bound parameters
-  boundToBoundTransportJacobian(geoContext, surface, freeParameters,
-                                boundToFreeJacobian, freeTransportJacobian,
-                                freeToPathDerivatives, fullTransportJacobian);
+  sympy::boundToBoundTransportJacobian(
+      geoContext, surface, freeParameters, boundToFreeJacobian,
+      freeTransportJacobian, freeToPathDerivatives, fullTransportJacobian);
 
   bool correction = false;
   if (freeToBoundCorrection) {
@@ -153,7 +154,7 @@ void sympy::transportCovarianceToCurvilinear(
     BoundToFreeMatrix& boundToFreeJacobian, const Vector3& direction) {
   // Calculate the full jacobian from local parameters at the start surface to
   // current curvilinear parameters
-  boundToCurvilinearTransportJacobian(
+  sympy::boundToCurvilinearTransportJacobian(
       direction, boundToFreeJacobian, freeTransportJacobian,
       freeToPathDerivatives, fullTransportJacobian);
 

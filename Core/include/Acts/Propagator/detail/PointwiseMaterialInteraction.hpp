@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -50,7 +50,7 @@ struct PointwiseMaterialInteraction {
   const Direction navDir;
 
   /// The effective, passed material properties including the path correction.
-  MaterialSlab slab;
+  MaterialSlab slab = MaterialSlab(0.);
   /// The path correction factor due to non-zero incidence on the surface.
   double pathCorrection = 0.;
   /// Expected phi variance due to the interactions.
@@ -89,6 +89,7 @@ struct PointwiseMaterialInteraction {
         navDir(state.options.direction) {}
 
   /// @brief This function evaluates the material properties to interact with
+  /// This updates the slab and then returns, if the resulting slab is valid
   ///
   /// @tparam propagator_state_t Type of the propagator state
   /// @tparam navigator_t Type of the navigator
@@ -119,8 +120,8 @@ struct PointwiseMaterialInteraction {
     pathCorrection = surface->pathCorrection(state.geoContext, pos, dir);
     slab.scaleThickness(pathCorrection);
 
-    // Get the surface material & properties from them
-    return slab;
+    // Check if the evaluated material is valid
+    return slab.isValid();
   }
 
   /// @brief This function evaluate the material effects

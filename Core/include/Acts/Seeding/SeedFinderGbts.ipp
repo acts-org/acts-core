@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 // SeedFinderGbts.ipp
 // TODO: update to C++17 style
@@ -17,6 +17,7 @@
 #include "Acts/Seeding/SeedFinderUtils.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <functional>
@@ -352,8 +353,8 @@ void SeedFinderGbts<external_spacepoint_t>::runGbts_TrackFinder(
       out_sort[outIdx].first = pS->m_p[0];
     }
 
-    std::sort(in_sort.begin(), in_sort.end());
-    std::sort(out_sort.begin(), out_sort.end());
+    std::ranges::sort(in_sort);
+    std::ranges::sort(out_sort);
 
     unsigned int last_out = 0;
 
@@ -495,8 +496,8 @@ void SeedFinderGbts<external_spacepoint_t>::runGbts_TrackFinder(
 
   m_triplets.clear();
 
-  std::sort(vSeeds.begin(), vSeeds.end(),
-            typename Acts::GbtsEdge<external_spacepoint_t>::CompareLevel());
+  std::ranges::sort(
+      vSeeds, typename Acts::GbtsEdge<external_spacepoint_t>::CompareLevel());
 
   if (vSeeds.empty()) {
     return;
@@ -700,7 +701,9 @@ void SeedFinderGbts<external_spacepoint_t>::createSeeds(
     float Vertex = 0;
     float Quality = triplet.Q();
     // make a new seed, add to vector of seeds
-    out_cont.emplace_back(*S1, *S2, *S3, Vertex, Quality);
+    out_cont.emplace_back(*S1, *S2, *S3);
+    out_cont.back().setVertexZ(Vertex);
+    out_cont.back().setQuality(Quality);
   }
 }
 

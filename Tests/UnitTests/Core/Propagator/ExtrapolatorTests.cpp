@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/unit_test.hpp>
@@ -18,7 +18,7 @@
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
-#include "Acts/Propagator/ActionList.hpp"
+#include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/MaterialInteractor.hpp"
 #include "Acts/Propagator/Navigator.hpp"
@@ -157,8 +157,8 @@ BOOST_DATA_TEST_CASE(
   // A PlaneSelector for the SurfaceCollector
   using PlaneCollector = SurfaceCollector<PlaneSelector>;
 
-  EigenPropagatorType::Options<ActionList<PlaneCollector>> options(tgContext,
-                                                                   mfContext);
+  EigenPropagatorType::Options<ActorList<PlaneCollector>> options(tgContext,
+                                                                  mfContext);
 
   options.stepping.maxStepSize = 10_cm;
   options.pathLimit = 25_cm;
@@ -220,7 +220,7 @@ BOOST_DATA_TEST_CASE(
   CurvilinearTrackParameters start(Vector4(0, 0, 0, 0), phi, theta, q / p, cov,
                                    ParticleHypothesis::pion());
 
-  EigenPropagatorType::Options<ActionList<MaterialInteractor>> options(
+  EigenPropagatorType::Options<ActorList<MaterialInteractor>> options(
       tgContext, mfContext);
   options.stepping.maxStepSize = 25_cm;
   options.pathLimit = 25_cm;
@@ -268,7 +268,7 @@ BOOST_DATA_TEST_CASE(
                                    ParticleHypothesis::pion());
 
   // Action list and abort list
-  EigenPropagatorType::Options<ActionList<MaterialInteractor>> options(
+  EigenPropagatorType::Options<ActorList<MaterialInteractor>> options(
       tgContext, mfContext);
   options.stepping.maxStepSize = 25_cm;
   options.pathLimit = 1500_mm;

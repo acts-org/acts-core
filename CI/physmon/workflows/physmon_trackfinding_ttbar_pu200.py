@@ -9,6 +9,7 @@ from acts.examples.simulation import (
     addPythia8,
     addFatras,
     addDigitization,
+    ParticleSelectorConfig,
 )
 from acts.examples.reconstruction import (
     addSeeding,
@@ -63,6 +64,10 @@ with tempfile.TemporaryDirectory() as temp:
         setup.trackingGeometry,
         setup.field,
         rnd=rnd,
+        preSelectParticles=ParticleSelectorConfig(
+            rho=(0.0, 24 * u.mm),
+            absZ=(0.0, 1.0 * u.m),
+        ),
     )
 
     addDigitization(
@@ -117,6 +122,9 @@ with tempfile.TemporaryDirectory() as temp:
             maxOutliers=2,
         ),
         CkfConfig(
+            chi2CutOffMeasurement=15.0,
+            chi2CutOffOutlier=25.0,
+            numMeasurementsCutOff=10,
             seedDeduplication=True,
             stayOnSeed=True,
         ),

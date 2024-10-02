@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/DD4hep/DD4hepLayerBuilder.hpp"
 
@@ -102,7 +102,7 @@ const Acts::LayerVector Acts::DD4hepLayerBuilder::endcapLayers(
                        std::back_inserter(rvalues), [&](const auto& surface) {
                          return VectorHelpers::perp(surface->center(gctx));
                        });
-        std::sort(rvalues.begin(), rvalues.end());
+        std::ranges::sort(rvalues);
         std::vector<std::string> locs;
         std::transform(rvalues.begin(),
                        std::unique(rvalues.begin(), rvalues.end()),
@@ -128,6 +128,8 @@ const Acts::LayerVector Acts::DD4hepLayerBuilder::endcapLayers(
         TGeoTubeSeg* tube = dynamic_cast<TGeoTubeSeg*>(geoShape);
         if (tube == nullptr) {
           ACTS_ERROR(" Disc layer has wrong shape - needs to be TGeoTubeSeg!");
+          throw std::logic_error{
+              "Disc layer has wrong shape - needs to be TGeoTubeSeg!"};
         }
         // extract the boundaries
         double rMin = tube->GetRmin() * UnitConstants::cm;
@@ -273,7 +275,7 @@ const Acts::LayerVector Acts::DD4hepLayerBuilder::centralLayers(
                        std::back_inserter(zvalues), [&](const auto& surface) {
                          return surface->center(gctx)[eZ];
                        });
-        std::sort(zvalues.begin(), zvalues.end());
+        std::ranges::sort(zvalues);
         std::vector<std::string> locs;
         std::transform(zvalues.begin(),
                        std::unique(zvalues.begin(), zvalues.end()),
@@ -299,6 +301,8 @@ const Acts::LayerVector Acts::DD4hepLayerBuilder::centralLayers(
         if (tube == nullptr) {
           ACTS_ERROR(
               " Cylinder layer has wrong shape - needs to be TGeoTubeSeg!");
+          throw std::logic_error{
+              " Cylinder layer has wrong shape - needs to be TGeoTubeSeg!"};
         }
 
         // extract the boundaries

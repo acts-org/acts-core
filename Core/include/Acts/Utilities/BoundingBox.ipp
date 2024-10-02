@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 template <typename entity_t, typename value_t, std::size_t DIM>
 Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::AxisAlignedBoundingBox(
@@ -275,12 +275,13 @@ std::ostream& Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::toStream(
 }
 
 template <typename entity_t, typename value_t, std::size_t DIM>
-template <std::size_t D, std::enable_if_t<D == 3, int>>
 std::pair<
     typename Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::VertexType,
     typename Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::VertexType>
 Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::transformVertices(
-    const transform_type& trf) const {
+    const transform_type& trf) const
+  requires(DIM == 3)
+{
   // we need to enumerate all the vertices, transform,
   // and then recalculate min and max
 
@@ -308,12 +309,13 @@ Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::transformVertices(
 }
 
 template <typename entity_t, typename value_t, std::size_t DIM>
-template <std::size_t D, std::enable_if_t<D == 2, int>>
 std::pair<
     typename Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::VertexType,
     typename Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::VertexType>
 Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::transformVertices(
-    const transform_type& trf) const {
+    const transform_type& trf) const
+  requires(DIM == 2)
+{
   // we need to enumerate all the vertices, transform,
   // and then recalculate min and max
 
@@ -350,10 +352,10 @@ Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::transformed(
 }
 
 template <typename entity_t, typename value_t, std::size_t DIM>
-template <std::size_t D, std::enable_if_t<D == 3, int>>
 void Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::draw(
-    IVisualization3D& helper, std::array<int, 3> color,
-    const transform_type& trf) const {
+    IVisualization3D& helper, Color color, const transform_type& trf) const
+  requires(DIM == 3)
+{
   static_assert(DIM == 3, "PLY output only supported in 3D");
 
   const VertexType& vmin = m_vmin;
@@ -385,10 +387,11 @@ void Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::draw(
 }
 
 template <typename entity_t, typename value_t, std::size_t DIM>
-template <std::size_t D, std::enable_if_t<D == 2, int>>
 std::ostream& Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::svg(
     std::ostream& os, value_type w, value_type h, value_type unit,
-    const std::string& label, const std::string& fillcolor) const {
+    const std::string& label, const std::string& fillcolor) const
+  requires(DIM == 2)
+{
   static_assert(DIM == 2, "SVG is only supported in 2D");
 
   VertexType mid(w / 2., h / 2.);

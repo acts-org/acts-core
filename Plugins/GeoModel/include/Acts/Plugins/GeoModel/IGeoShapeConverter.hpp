@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -35,7 +35,7 @@ class IGeoShapeConverter {
   ///
   /// @return The detector element and surface
   virtual Result<GeoModelSensitiveSurface> toSensitiveSurface(
-      const GeoFullPhysVol& geoFPV) const = 0;
+      PVConstLink geoPV, const Transform3& transform) const = 0;
 
   /// @brief Convert a GeoShape to a detector element and passive surface
   ///
@@ -43,7 +43,7 @@ class IGeoShapeConverter {
   ///
   /// @return The representing surface
   virtual Result<std::shared_ptr<Surface>> toPassiveSurface(
-      const GeoFullPhysVol& geoFPV) const = 0;
+      PVConstLink geoPV, const Transform3& transform) const = 0;
 };
 
 }  // namespace Acts

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -75,6 +75,8 @@ class IAxis {
             case Variable:
               return callable(
                   dynamic_cast<const Axis<AxisType::Variable, bdt>&>(*this));
+            default:
+              throw std::logic_error("Unknown axis type");
           }
         };
 
@@ -86,6 +88,8 @@ class IAxis {
         return switchOnType(AxisBound);
       case Closed:
         return switchOnType(AxisClosed);
+      default:
+        throw std::logic_error("Unknown axis type");
     }
   }
 

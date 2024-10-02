@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -18,7 +18,6 @@
 #include "Acts/TrackFinding/CombinatorialKalmanFilterError.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/Result.hpp"
-#include "Acts/Utilities/TypeTraits.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -37,10 +36,12 @@ namespace Acts {
 struct MeasurementSelectorCuts {
   /// bins in |eta| to specify variable selections
   std::vector<double> etaBins{};
-  /// Maximum local chi2 contribution.
+  /// Maximum local chi2 contribution to classify as measurement.
   std::vector<double> chi2CutOff{15};
   /// Maximum number of associated measurements on a single surface.
   std::vector<std::size_t> numMeasurementsCutOff{1};
+  /// Maximum local chi2 contribution to classify as outlier.
+  std::vector<double> chi2CutOffOutlier{};
 };
 
 /// @brief Measurement selection struct selecting those measurements compatible
@@ -74,7 +75,7 @@ class MeasurementSelector {
   /// @brief Constructor with config
   ///
   /// @param config a config instance
-  explicit MeasurementSelector(Config config);
+  explicit MeasurementSelector(const Config& config);
 
   /// @brief Function that select the measurements compatible with
   /// the given track parameter on a surface
@@ -94,11 +95,25 @@ class MeasurementSelector {
          bool& isOutlier, const Logger& logger) const;
 
  private:
-  template <typename traj_t, typename cut_value_t>
-  static cut_value_t getCut(
-      const typename traj_t::TrackStateProxy& trackState,
-      const Acts::MeasurementSelector::Config::Iterator selector,
-      const std::vector<cut_value_t>& cuts, const Logger& logger);
+  struct InternalCutBin {
+    double maxTheta{};
+    std::size_t maxNumMeasurements{};
+    double maxChi2Measurement{};
+    double maxChi2Outlier{};
+  };
+  using InternalCutBins = std::vector<InternalCutBin>;
+  using InternalConfig = Acts::GeometryHierarchyMap<InternalCutBins>;
+
+  struct Cuts {
+    std::size_t numMeasurements{};
+    double chi2Measurement{};
+    double chi2Outlier{};
+  };
+
+  static InternalCutBins convertCutBins(const MeasurementSelectorCuts& config);
+
+  static Cuts getCutsByTheta(const InternalCutBins& config, double theta);
+  Result<Cuts> getCuts(const GeometryIdentifier& geoID, double theta) const;
 
   double calculateChi2(
       const double* fullCalibrated, const double* fullCalibratedCovariance,
@@ -108,7 +123,7 @@ class MeasurementSelector {
                        false>::Covariance predictedCovariance,
       BoundSubspaceIndices projector, unsigned int calibratedSize) const;
 
-  Config m_config;
+  InternalConfig m_config;
 };
 
 }  // namespace Acts

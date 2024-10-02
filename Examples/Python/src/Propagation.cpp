@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Definitions/Direction.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
@@ -19,6 +19,7 @@
 #include "Acts/Utilities/Logger.hpp"
 #include "ActsExamples/Propagation/PropagationAlgorithm.hpp"
 #include "ActsExamples/Propagation/PropagatorInterface.hpp"
+#include "ActsExamples/Propagation/SimHitToSummaryConversion.hpp"
 
 #include <algorithm>
 #include <array>
@@ -116,8 +117,13 @@ void addPropagation(Context& ctx) {
       ActsExamples::PropagationAlgorithm, mex, "PropagationAlgorithm",
       propagatorImpl, sterileLogger, debugOutput, energyLoss,
       multipleScattering, recordMaterialInteractions, ptLoopers, maxStepSize,
-      covarianceTransport, inputTrackParameters, outputPropagationSteps,
-      outputMaterialTracks);
+      covarianceTransport, inputTrackParameters, outputSummaryCollection,
+      outputMaterialCollection);
+
+  ACTS_PYTHON_DECLARE_ALGORITHM(ActsExamples::SimHitToSummaryConversion, mex,
+                                "SimHitToSummaryConversion", inputSimHits,
+                                inputParticles, outputSummaryCollection,
+                                surfaceByIdentifier);
 
   py::class_<ActsExamples::PropagatorInterface,
              std::shared_ptr<ActsExamples::PropagatorInterface>>(
