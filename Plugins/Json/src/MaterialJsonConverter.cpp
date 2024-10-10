@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/Json/MaterialJsonConverter.hpp"
 
@@ -726,7 +726,7 @@ nlohmann::json Acts::MaterialJsonConverter::toJsonDetray(
     nlohmann::json jGridLink;
     jGridLink["type"] = gridIndexType;
     std::size_t gridIndex = 0;
-    if (gridLink.find(gridIndexType) != gridLink.end()) {
+    if (gridLink.contains(gridIndexType)) {
       std::size_t& fGridIndex = gridLink[gridIndex];
       gridIndex = fGridIndex;
       fGridIndex++;

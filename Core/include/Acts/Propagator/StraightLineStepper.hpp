@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -28,6 +28,7 @@
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 #include "Acts/Utilities/Logger.hpp"
+#include "Acts/Utilities/MathHelpers.hpp"
 #include "Acts/Utilities/Result.hpp"
 
 #include <algorithm>
@@ -336,8 +337,8 @@ class StraightLineStepper {
           direction(prop_state.stepping);
       // dt / ds
       prop_state.stepping.derivative(eFreeTime) =
-          std::hypot(1., prop_state.stepping.particleHypothesis.mass() /
-                             absoluteMomentum(prop_state.stepping));
+          fastHypot(1., prop_state.stepping.particleHypothesis.mass() /
+                            absoluteMomentum(prop_state.stepping));
       // d (dr/ds) / ds : == 0
       prop_state.stepping.derivative.template segment<3>(4) =
           Acts::Vector3::Zero().transpose();
@@ -424,7 +425,7 @@ class StraightLineStepper {
     const auto m = state.stepping.particleHypothesis.mass();
     const auto p = absoluteMomentum(state.stepping);
     // time propagates along distance as 1/b = sqrt(1 + m²/p²)
-    const auto dtds = std::hypot(1., m / p);
+    const auto dtds = fastHypot(1., m / p);
     // Update the track parameters according to the equations of motion
     Vector3 dir = direction(state.stepping);
     state.stepping.pars.template segment<3>(eFreePos0) += h * dir;

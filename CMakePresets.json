@@ -96,7 +96,6 @@
             "displayName": "GitLab-CI",
             "inherits": "ci-common",
             "cacheVariables": {
-                "ACTS_BUILD_PLUGIN_ACTSVG": "OFF",
                 "ACTS_BUILD_ODD": "OFF",
                 "ACTS_BUILD_EXAMPLES_PYTHON_BINDINGS": "OFF",
                 "ACTS_RUN_CLANG_TIDY": "ON"

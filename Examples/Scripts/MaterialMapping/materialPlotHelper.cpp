@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "materialPlotHelper.hpp"
 
@@ -36,7 +36,7 @@ std::ostream& Acts::operator<<(std::ostream& os, Acts::GeometryIdentifier id) {
 /// Initialise the information on each surface.
 
 void Initialise_info(sinfo& surface_info,
-                     const std::map<std::string, std::string>& surface_name,
+                     const std::map<std::string, std::string>& surfaceName,
                      const std::uint64_t& id, const int& type, const float& pos,
                      const float& range_min, const float& range_max) {
   Acts::GeometryIdentifier ID(id);
@@ -67,10 +67,11 @@ void Initialise_info(sinfo& surface_info,
                         Ids[3] + "_s" + Ids[4];
   surface_info.type = type;
 
-  if (surface_name.find(surface_id) != surface_name.end()) {
-    surface_info.name = surface_name.at(surface_id);
-  } else
+  if (surfaceName.contains(surface_id)) {
+    surface_info.name = surfaceName.at(surface_id);
+  } else {
     surface_info.name = "";
+  }
 
   surface_info.id = surface_id;
   surface_info.pos = pos;

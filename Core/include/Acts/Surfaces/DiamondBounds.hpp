@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -90,15 +90,13 @@ class DiamondBounds : public PlanarBounds {
   bool inside(const Vector2& lposition,
               const BoundaryTolerance& boundaryTolerance) const final;
 
-  /// Return the vertices
+  /// Return the vertices that describe this shape
   ///
-  /// @param lseg the number of segments used to approximate
-  /// and eventually curved line
-  ///
-  /// @note the number of segments is ignored for this representation
+  /// @param ignoredSegments is an ignored parameter only used for
+  /// curved bound segments
   ///
   /// @return vector for vertices in 2D
-  std::vector<Vector2> vertices(unsigned int lseg = 1) const final;
+  std::vector<Vector2> vertices(unsigned int ignoredSegments = 0u) const final;
 
   // Bounding box representation
   const RectangleBounds& boundingBox() const final;
@@ -128,8 +126,7 @@ inline std::vector<double> DiamondBounds::values() const {
 }
 
 inline void DiamondBounds::checkConsistency() noexcept(false) {
-  if (std::any_of(m_values.begin(), m_values.end(),
-                  [](auto v) { return v <= 0.; })) {
+  if (std::ranges::any_of(m_values, [](auto v) { return v <= 0.; })) {
     throw std::invalid_argument("DiamondBounds: negative half length.");
   }
   if (get(eHalfLengthXnegY) > get(eHalfLengthXzeroY) ||

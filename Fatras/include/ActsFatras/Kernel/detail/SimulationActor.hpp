@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -41,24 +41,6 @@ template <typename generator_t, typename decay_t, typename interactions_t,
 struct SimulationActor {
   using result_type = SimulationResult;
 
-  /// Abort if the particle was killed during a previous interaction.
-  struct ParticleNotAlive {
-    // This references the SimulationActor to automatically access its result
-    // type.
-    using action_type = SimulationActor;
-
-    template <typename propagator_state_t, typename stepper_t,
-              typename navigator_t>
-    constexpr bool operator()(propagator_state_t & /*state*/,
-                              const stepper_t & /*stepper*/,
-                              const navigator_t & /*navigator*/,
-                              const result_type &result,
-                              const Acts::Logger & /*logger*/) const {
-      // must return true if the propagation should abort
-      return !result.isAlive;
-    }
-  };
-
   /// Random number generator used for the simulation.
   generator_t *generator = nullptr;
   /// Decay module.
@@ -84,9 +66,9 @@ struct SimulationActor {
   /// @param logger a logger instance
   template <typename propagator_state_t, typename stepper_t,
             typename navigator_t>
-  void operator()(propagator_state_t &state, stepper_t &stepper,
-                  navigator_t &navigator, result_type &result,
-                  const Acts::Logger &logger) const {
+  void act(propagator_state_t &state, stepper_t &stepper,
+           navigator_t &navigator, result_type &result,
+           const Acts::Logger &logger) const {
     assert(generator && "The generator pointer must be valid");
 
     // actors are called once more after the propagation terminated
@@ -94,7 +76,8 @@ struct SimulationActor {
       return;
     }
 
-    if (Acts::EndOfWorldReached{}(state, stepper, navigator, logger)) {
+    if (Acts::EndOfWorldReached{}.checkAbort(state, stepper, navigator,
+                                             logger)) {
       result.isAlive = false;
       return;
     }
@@ -218,6 +201,15 @@ struct SimulationActor {
     // continue the propagation with the modified parameters
     stepper.update(state.stepping, after.position(), after.direction(),
                    after.qOverP(), after.time());
+  }
+
+  template <typename propagator_state_t, typename stepper_t,
+            typename navigator_t>
+  bool checkAbort(propagator_state_t & /*state*/, const stepper_t & /*stepper*/,
+                  const navigator_t & /*navigator*/, const result_type &result,
+                  const Acts::Logger & /*logger*/) const {
+    // must return true if the propagation should abort
+    return !result.isAlive;
   }
 
   /// Construct the current particle state from the propagation state.

@@ -1,2 +1,3 @@
 add_unittest(Clusterization1D ClusterizationTests1D.cpp)
 add_unittest(Clusterization2D ClusterizationTests2D.cpp)
+add_unittest(TimedClusterization TimedClusterizationTests.cpp)

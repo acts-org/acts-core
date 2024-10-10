@@ -24,7 +24,7 @@ target_sources(
         SurfaceArray.cpp
         SurfaceError.cpp
         TrapezoidBounds.cpp
-        VerticesHelper.cpp
+        detail/VerticesHelper.cpp
         RegularSurface.cpp
         CurvilinearSurface.cpp
         detail/AlignmentHelper.cpp

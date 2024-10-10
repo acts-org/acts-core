@@ -41,7 +41,7 @@ assert ret == 0, "gcovr not installed. Use 'pip install gcovr'."
 
 ret, gcovr_version_text = check_output(["gcovr", "--version"])
 gcovr_version = tuple(
-    map(int, re.match("gcovr (\d+\.\d+)", gcovr_version_text).group(1).split("."))
+    map(int, re.match(r"gcovr (\d+\.\d+)", gcovr_version_text).group(1).split("."))
 )
 
 extra_flags = []
@@ -63,7 +63,7 @@ coverage_dir = os.path.abspath("coverage")
 if not os.path.exists(coverage_dir):
     os.makedirs(coverage_dir)
 
-excludes = ["-e", "../Tests/", "-e", ".*json\.hpp"]
+excludes = ["-e", "../Tests/", "-e", r".*json\.hpp"]
 
 # create the html report
 call(

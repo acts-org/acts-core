@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -101,6 +101,10 @@ BOOST_AUTO_TEST_CASE(ConvexPolygonBoundsRecreation) {
   std::copy_n(valvector.begin(), poly<4>::eSize, values.begin());
   poly<4> recreated(values);
   BOOST_CHECK_EQUAL(original, recreated);
+
+  // Get the vertices back
+  auto rvertices = original.vertices();
+  BOOST_CHECK_EQUAL(rvertices.size(), 4u);
 }
 
 BOOST_AUTO_TEST_CASE(ConvexPolygonBoundsDynamicTest) {

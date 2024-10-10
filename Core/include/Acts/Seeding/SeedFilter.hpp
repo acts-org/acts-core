@@ -1,18 +1,17 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
-#include "Acts/EventData/SpacePointData.hpp"
+#include "Acts/EventData/Seed.hpp"
+#include "Acts/EventData/SpacePointMutableData.hpp"
 #include "Acts/Seeding/CandidatesForMiddleSp.hpp"
 #include "Acts/Seeding/IExperimentCuts.hpp"
-#include "Acts/Seeding/InternalSeed.hpp"
-#include "Acts/Seeding/Seed.hpp"
 #include "Acts/Seeding/SeedFilterConfig.hpp"
 
 #include <memory>
@@ -44,9 +43,9 @@ class SeedFilter final {
   SeedFilter() = delete;
   ~SeedFilter() = default;
 
-  /// Create InternalSeeds for the all seeds with the same bottom and middle
+  /// Create Seeds for the all seeds with the same bottom and middle
   /// space point and discard all others.
-  /// @param spacePointData Auxiliary variables used by the seeding
+  /// @param mutableData Container for mutable variables used in the seeding
   /// @param bottomSP fixed bottom space point
   /// @param middleSP fixed middle space point
   /// @param topSpVec vector containing all space points that may be compatible
@@ -56,41 +55,38 @@ class SeedFilter final {
   /// @param seedFilterState holds quantities used in seed filter
   /// @param candidates_collector container for the seed candidates
   void filterSeeds_2SpFixed(
-      Acts::SpacePointData& spacePointData,
-      const InternalSpacePoint<external_spacepoint_t>& bottomSP,
-      const InternalSpacePoint<external_spacepoint_t>& middleSP,
-      const std::vector<const InternalSpacePoint<external_spacepoint_t>*>&
-          topSpVec,
+      const Acts::SpacePointMutableData& mutableData,
+      const external_spacepoint_t& bottomSP,
+      const external_spacepoint_t& middleSP,
+      const std::vector<const external_spacepoint_t*>& topSpVec,
       const std::vector<float>& invHelixDiameterVec,
       const std::vector<float>& impactParametersVec,
       SeedFilterState& seedFilterState,
-      CandidatesForMiddleSp<const InternalSpacePoint<external_spacepoint_t>>&
-          candidates_collector) const;
+      CandidatesForMiddleSp<const external_spacepoint_t>& candidates_collector)
+      const;
 
   /// Filter seeds once all seeds for one middle space point have been created
-  /// @param spacePointData Auxiliary variables used by the seeding
+  /// @param mutableData Container for mutable variables used in the seeding
   /// @param candidates_collector collection of seed candidates
   /// @param outputCollection Output container for the seeds
   /// for all seeds with the same middle space point
   template <typename collection_t>
   void filterSeeds_1SpFixed(
-      Acts::SpacePointData& spacePointData,
-      CandidatesForMiddleSp<const InternalSpacePoint<external_spacepoint_t>>&
-          candidates_collector,
+      Acts::SpacePointMutableData& mutableData,
+      CandidatesForMiddleSp<const external_spacepoint_t>& candidates_collector,
       collection_t& outputCollection) const;
 
   /// Filter seeds once all seeds for one middle space point have been created
-  /// @param spacePointData Auxiliary variables used by the seeding
+  /// @param mutableData Container for mutable variables used in the seeding
   /// @param candidates collection of seed candidates
   /// @param numQualitySeeds number of high quality seeds in seed confirmation
   /// @param outputCollection Output container for the seeds
   /// for all seeds with the same middle space point
   template <typename collection_t>
   void filterSeeds_1SpFixed(
-      Acts::SpacePointData& spacePointData,
+      Acts::SpacePointMutableData& mutableData,
       std::vector<typename CandidatesForMiddleSp<
-          const InternalSpacePoint<external_spacepoint_t>>::value_type>&
-          candidates,
+          const external_spacepoint_t>::value_type>& candidates,
       const std::size_t numQualitySeeds, collection_t& outputCollection) const;
 
   const SeedFilterConfig getSeedFilterConfig() const { return m_cfg; }

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/CylinderBounds.hpp"
 
@@ -104,45 +104,40 @@ std::ostream& Acts::CylinderBounds::toStream(std::ostream& sl) const {
   return sl;
 }
 
-std::vector<Acts::Vector3> Acts::CylinderBounds::createCircles(
-    const Transform3 ctrans, std::size_t lseg) const {
+std::vector<Acts::Vector3> Acts::CylinderBounds::circleVertices(
+    const Transform3 transform, unsigned int quarterSegments) const {
   std::vector<Vector3> vertices;
 
   double avgPhi = get(eAveragePhi);
   double halfPhi = get(eHalfPhiSector);
 
-  bool fullCylinder = coversFullAzimuth();
-
-  // Get the phi segments from the helper - ensures extra points
-  auto phiSegs = fullCylinder ? detail::VerticesHelper::phiSegments()
-                              : detail::VerticesHelper::phiSegments(
-                                    avgPhi - halfPhi, avgPhi + halfPhi,
-                                    {static_cast<ActsScalar>(avgPhi)});
+  std::vector<ActsScalar> phiRef = {};
+  if (bool fullCylinder = coversFullAzimuth(); fullCylinder) {
+    phiRef = {static_cast<ActsScalar>(avgPhi)};
+  }
 
   // Write the two bows/circles on either side
   std::vector<int> sides = {-1, 1};
   for (auto& side : sides) {
-    for (std::size_t iseg = 0; iseg < phiSegs.size() - 1; ++iseg) {
-      int addon = (iseg == phiSegs.size() - 2 && !fullCylinder) ? 1 : 0;
-      /// Helper method to create the segment
-      detail::VerticesHelper::createSegment(
-          vertices, {get(eR), get(eR)}, phiSegs[iseg], phiSegs[iseg + 1], lseg,
-          addon, Vector3(0., 0., side * get(eHalfLengthZ)), ctrans);
-    }
+    /// Helper method to create the segment
+    auto svertices = detail::VerticesHelper::segmentVertices(
+        {get(eR), get(eR)}, avgPhi - halfPhi, avgPhi + halfPhi, phiRef,
+        quarterSegments, Vector3(0., 0., side * get(eHalfLengthZ)), transform);
+    vertices.insert(vertices.end(), svertices.begin(), svertices.end());
   }
 
-  double bevelMinZ = get(eBevelMinZ);
-  double bevelMaxZ = get(eBevelMaxZ);
+  ActsScalar bevelMinZ = get(eBevelMinZ);
+  ActsScalar bevelMaxZ = get(eBevelMaxZ);
 
   // Modify the vertices position if bevel is defined
   if ((bevelMinZ != 0. || bevelMaxZ != 0.) && vertices.size() % 2 == 0) {
     auto halfWay = vertices.end() - vertices.size() / 2;
-    double mult{1};
-    auto invCtrans = ctrans.inverse();
-    auto func = [&mult, &ctrans, &invCtrans](Vector3& v) {
-      v = invCtrans * v;
+    ActsScalar mult{1};
+    auto invTransform = transform.inverse();
+    auto func = [&mult, &transform, &invTransform](Vector3& v) {
+      v = invTransform * v;
       v(2) += v(1) * mult;
-      v = ctrans * v;
+      v = transform * v;
     };
     if (bevelMinZ != 0.) {
       mult = std::tan(-bevelMinZ);

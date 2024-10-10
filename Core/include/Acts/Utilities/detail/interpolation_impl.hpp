@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -46,14 +46,14 @@ struct can_interpolate {
   static std::false_type point_type_test(...);
 
   static const bool value =
-      std::is_same<std::true_type,
-                   decltype(value_type_test<Value>(nullptr))>::value &&
-      std::is_same<std::true_type,
-                   decltype(point_type_test<Point1>(nullptr))>::value &&
-      std::is_same<std::true_type,
-                   decltype(point_type_test<Point2>(nullptr))>::value &&
-      std::is_same<std::true_type,
-                   decltype(point_type_test<Point3>(nullptr))>::value;
+      std::is_same_v<std::true_type,
+                     decltype(value_type_test<Value>(nullptr))> &&
+      std::is_same_v<std::true_type,
+                     decltype(point_type_test<Point1>(nullptr))> &&
+      std::is_same_v<std::true_type,
+                     decltype(point_type_test<Point2>(nullptr))> &&
+      std::is_same_v<std::true_type,
+                     decltype(point_type_test<Point3>(nullptr))>;
 };
 
 /// @brief concept equivalent to `can_interpolate`

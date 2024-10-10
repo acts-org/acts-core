@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/ActSVG/SurfaceSvgConverter.hpp"
 
@@ -21,7 +21,7 @@ Acts::Svg::ProtoSurface Acts::Svg::SurfaceConverter::convert(
   if (!cOptions.templateSurface) {
     // Polyhedron surface for vertices needed anyway
     Polyhedron surfaceHedron =
-        surface.polyhedronRepresentation(gctx, cOptions.style.nSegments);
+        surface.polyhedronRepresentation(gctx, cOptions.style.quarterSegments);
     auto vertices3D = surfaceHedron.vertices;
     pSurface._vertices = vertices3D;
   } else {
@@ -30,7 +30,7 @@ Acts::Svg::ProtoSurface Acts::Svg::SurfaceConverter::convert(
     auto planarBounds =
         dynamic_cast<const Acts::PlanarBounds*>(&(surface.bounds()));
     if (planarBounds != nullptr) {
-      auto vertices2D = planarBounds->vertices(cOptions.style.nSegments);
+      auto vertices2D = planarBounds->vertices(cOptions.style.quarterSegments);
       pSurface._vertices.reserve(vertices2D.size());
       for (const auto& v2 : vertices2D) {
         pSurface._vertices.push_back({v2[0], v2[1], 0.});
@@ -40,7 +40,8 @@ Acts::Svg::ProtoSurface Acts::Svg::SurfaceConverter::convert(
       auto annulusBounds =
           dynamic_cast<const Acts::AnnulusBounds*>(&(surface.bounds()));
       if (annulusBounds != nullptr) {
-        auto vertices2D = annulusBounds->vertices(cOptions.style.nSegments);
+        auto vertices2D =
+            annulusBounds->vertices(cOptions.style.quarterSegments);
         pSurface._vertices.reserve(vertices2D.size());
         for (const auto& v2 : vertices2D) {
           pSurface._vertices.push_back({v2[0], v2[1], 0.});
@@ -129,18 +130,9 @@ Acts::Svg::ProtoSurface Acts::Svg::SurfaceConverter::convert(
   geoId._id = std::to_string(surface.geometryId().value());
   pSurface._decorations["geo_id"] = geoId;
 
-  // Attach the style
-  pSurface._fill._fc = {
-      cOptions.style.fillColor,
-      static_cast<actsvg::scalar>(cOptions.style.fillOpacity)};
-
-  // Fill style
-  pSurface._fill._fc._hl_rgb = cOptions.style.highlightColor;
-  pSurface._fill._fc._highlight = cOptions.style.highlights;
-
-  // Stroke style
-  pSurface._stroke._sc = actsvg::style::color{cOptions.style.strokeColor};
-  pSurface._stroke._width = cOptions.style.strokeWidth;
+  auto [surfaceFill, surfaceStroke] = cOptions.style.fillAndStroke();
+  pSurface._fill = surfaceFill;
+  pSurface._stroke = surfaceStroke;
 
   return pSurface;
 }

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -87,13 +87,27 @@ class GeoModelDetectorElement : public DetectorElementBase {
   /// @return to the Geant4 physical volume
   PVConstLink physicalVolume() const;
 
- private:
+  /// Get the name of the logical volume
+  const std::string& logVolName() const;
+
+  /// Get the string identifier of the corresponding database entry
+  /// Note: This is not by defnitition a unique identifier, there can be
+  /// several detector elements created from a single database entry.
+  const std::string& databaseEntryName() const { return m_entryName; };
+
+  /// Set the corresponding database entry string
+  void setDatabaseEntryName(const std::string& n) { m_entryName = n; };
+
+ protected:
   /// Attach a surface
   ///
   /// @param surface The surface to attach
   void attachSurface(std::shared_ptr<Surface> surface) {
     m_surface = std::move(surface);
   }
+
+ private:
+  std::string m_entryName;
 
   /// The GeoModel full physical volume
   PVConstLink m_geoPhysVol{nullptr};

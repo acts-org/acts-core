@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -20,6 +20,7 @@
 #include <Acts/Surfaces/SurfaceBounds.hpp>
 #include <Acts/Surfaces/TrapezoidBounds.hpp>
 
+#include <algorithm>
 #include <fstream>
 #include <map>
 #include <mutex>
@@ -93,20 +94,16 @@ class MappingMaterialDecorator : public IMaterialDecorator {
   ///
   /// @param volume to be looped onto
   void volumeLoop(const Acts::TrackingVolume* tVolume) {
-    auto sameId =
-        [tVolume](
-            const std::pair<Acts::GeometryIdentifier,
-                            std::shared_ptr<const IVolumeMaterial>>& pair) {
-          return (tVolume->geometryId() == pair.first);
-        };
-    if (std::find_if(m_volumeMaterialMap.begin(), m_volumeMaterialMap.end(),
-                     sameId) != m_volumeMaterialMap.end()) {
+    auto sameId = [tVolume](const auto& pair) {
+      return (tVolume->geometryId() == pair.first);
+    };
+    if (std::ranges::any_of(m_volumeMaterialMap, sameId)) {
       // this volume was already visited
       return;
     }
     if (tVolume->volumeMaterial() != nullptr) {
       m_volumeMaterialMap.insert(
-          {tVolume->geometryId(), tVolume->volumeMaterialSharedPtr()});
+          {tVolume->geometryId(), tVolume->volumeMaterialPtr()});
     }
     // there are confined volumes
     if (tVolume->confinedVolumes() != nullptr) {

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -62,9 +62,9 @@ BOOST_AUTO_TEST_CASE(pushBackOrInsertAtEnd_set) {
   Acts::detail::pushBackOrInsertAtEnd(coll, val);
   BOOST_CHECK(coll.size() == 3ul);
 
-  BOOST_CHECK(coll.find(2ul) != coll.end());
-  BOOST_CHECK(coll.find(5ul) != coll.end());
-  BOOST_CHECK(coll.find(1ul) != coll.end());
+  BOOST_CHECK(coll.contains(2ul));
+  BOOST_CHECK(coll.contains(5ul));
+  BOOST_CHECK(coll.contains(1ul));
 }
 
 BOOST_AUTO_TEST_CASE(pushBackOrInsertAtEnd_unordered_set) {
@@ -77,9 +77,9 @@ BOOST_AUTO_TEST_CASE(pushBackOrInsertAtEnd_unordered_set) {
   Acts::detail::pushBackOrInsertAtEnd(coll, val);
   BOOST_CHECK(coll.size() == 3ul);
 
-  BOOST_CHECK(coll.find(2ul) != coll.end());
-  BOOST_CHECK(coll.find(5ul) != coll.end());
-  BOOST_CHECK(coll.find(1ul) != coll.end());
+  BOOST_CHECK(coll.contains(2ul));
+  BOOST_CHECK(coll.contains(5ul));
+  BOOST_CHECK(coll.contains(1ul));
 }
 
 }  // namespace Acts::Test

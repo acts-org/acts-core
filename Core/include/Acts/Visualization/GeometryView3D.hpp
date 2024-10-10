@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -30,12 +30,6 @@ namespace Experimental {
 class DetectorVolume;
 class Portal;
 }  // namespace Experimental
-
-static const ViewConfig s_viewSensitive;
-static const ViewConfig s_viewPassive;
-static const ViewConfig s_viewVolume;
-static const ViewConfig s_viewGrid;
-static const ViewConfig s_viewLine;
 
 struct GeometryView3D {
   /// Helper method to draw Polyhedron objects
@@ -102,9 +96,9 @@ struct GeometryView3D {
                          const Experimental::Portal& portal,
                          const GeometryContext& gctx,
                          const Transform3& transform = Transform3::Identity(),
-                         const ViewConfig& connected = ViewConfig({0, 255, 0}),
-                         const ViewConfig& disconnected = ViewConfig({255, 0,
-                                                                      0}));
+                         const ViewConfig& connected = {.color = {0, 255, 0}},
+                         const ViewConfig& disconnected = {
+                             .color = {255, 0, 0}});
 
   /// Helper method to draw DetectorVolume objects
   ///
@@ -120,8 +114,8 @@ struct GeometryView3D {
       const Acts::Experimental::DetectorVolume& volume,
       const GeometryContext& gctx,
       const Transform3& transform = Transform3::Identity(),
-      const ViewConfig& connected = ViewConfig({0, 255, 0}),
-      const ViewConfig& unconnected = ViewConfig({255, 0, 0}),
+      const ViewConfig& connected = {.color = {0, 255, 0}},
+      const ViewConfig& unconnected = {.color = {255, 0, 0}},
       const ViewConfig& viewConfig = s_viewSensitive);
 
   /// Helper method to draw Layer objects

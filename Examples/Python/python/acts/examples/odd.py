@@ -76,8 +76,9 @@ def getOpenDataDetector(
     }
 
     def geoid_hook(geoid, surface):
+        gctx = acts.GeometryContext()
         if geoid.volume() in volumeRadiusCutsMap:
-            r = math.sqrt(surface.center()[0] ** 2 + surface.center()[1] ** 2)
+            r = math.sqrt(surface.center(gctx)[0] ** 2 + surface.center(gctx)[1] ** 2)
 
             geoid.setExtra(1)
             for cut in volumeRadiusCutsMap[geoid.volume()]:

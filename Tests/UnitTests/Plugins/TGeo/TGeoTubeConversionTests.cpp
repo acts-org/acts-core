@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -40,9 +40,9 @@ namespace Acts::Test {
 
 GeometryContext tgContext = GeometryContext();
 
-ViewConfig red({200, 0, 0});
-ViewConfig green({0, 200, 0});
-ViewConfig blue({0, 0, 200});
+ViewConfig red{.color = {200, 0, 0}};
+ViewConfig green{.color = {0, 200, 0}};
+ViewConfig blue{.color = {0, 0, 200}};
 
 std::vector<std::string> allowedAxes = {"XY*", "Xy*", "xy*", "xY*",
                                         "YX*", "yx*", "yX*", "Yx*"};
@@ -99,7 +99,6 @@ BOOST_AUTO_TEST_CASE(TGeoTube_to_CylinderSurface) {
         objVis, center, center + 1.2 * bR * rotation.col(1), 4., 2.5, green);
     GeometryView3D::drawArrowForward(
         objVis, center, center + 1.2 * bhZ * rotation.col(2), 4., 2.5, blue);
-
     objVis.write("TGeoConversion_TGeoTube_CylinderSurface_" +
                  std::to_string(icyl));
     objVis.clear();

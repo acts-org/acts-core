@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Definitions/TrackParametrization.hpp"
 
@@ -12,12 +12,12 @@ template <typename propagator_t>
 template <typename parameters_t, typename propagator_options_t>
 auto Acts::RiddersPropagator<propagator_t>::propagate(
     const parameters_t& start, const propagator_options_t& options) const
-    -> Result<action_list_t_result_t<
-        CurvilinearTrackParameters,
-        typename propagator_options_t::action_list_type>> {
+    -> Result<
+        actor_list_t_result_t<CurvilinearTrackParameters,
+                              typename propagator_options_t::actor_list_type>> {
   using ThisResult = Result<
-      action_list_t_result_t<CurvilinearTrackParameters,
-                             typename propagator_options_t::action_list_type>>;
+      actor_list_t_result_t<CurvilinearTrackParameters,
+                            typename propagator_options_t::actor_list_type>>;
 
   // Remove the covariance from our start parameters in order to skip jacobian
   // transport for the nominal propagation
@@ -55,11 +55,10 @@ template <typename parameters_t, typename propagator_options_t>
 auto Acts::RiddersPropagator<propagator_t>::propagate(
     const parameters_t& start, const Surface& target,
     const propagator_options_t& options) const
-    -> Result<action_list_t_result_t<
-        BoundTrackParameters,
-        typename propagator_options_t::action_list_type>> {
-  using ThisResult = Result<action_list_t_result_t<
-      BoundTrackParameters, typename propagator_options_t::action_list_type>>;
+    -> Result<actor_list_t_result_t<
+        BoundTrackParameters, typename propagator_options_t::actor_list_type>> {
+  using ThisResult = Result<actor_list_t_result_t<
+      BoundTrackParameters, typename propagator_options_t::actor_list_type>>;
 
   // Remove the covariance from our start parameters in order to skip jacobian
   // transport for the nominal propagation

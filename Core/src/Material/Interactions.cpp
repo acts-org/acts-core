@@ -1,15 +1,16 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Material/Interactions.hpp"
 
 #include "Acts/Definitions/PdgParticle.hpp"
 #include "Acts/Material/Material.hpp"
+#include "Acts/Utilities/MathHelpers.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -51,7 +52,7 @@ struct RelativisticQuantities {
     betaGamma = pOverM;
     assert((betaGamma >= 0) && "Negative betaGamma");
     // gamma = sqrt(m² + p²)/m = sqrt(1 + (p/m)²)
-    gamma = std::sqrt(1.0f + pOverM * pOverM);
+    gamma = Acts::fastHypot(1.0f, pOverM);
   }
 };
 
@@ -395,7 +396,7 @@ float Acts::computeEnergyLossRadiative(const MaterialSlab& slab,
   // particle momentum and energy
   // do not need to care about the sign since it is only used squared
   const float momentum = absQ / qOverP;
-  const float energy = std::hypot(m, momentum);
+  const float energy = fastHypot(m, momentum);
 
   float dEdx = computeBremsstrahlungLossMean(m, energy);
 
@@ -424,7 +425,7 @@ float Acts::deriveEnergyLossRadiativeQOverP(const MaterialSlab& slab,
   // particle momentum and energy
   // do not need to care about the sign since it is only used squared
   const float momentum = absQ / qOverP;
-  const float energy = std::hypot(m, momentum);
+  const float energy = fastHypot(m, momentum);
 
   // compute derivative w/ respect to energy.
   float derE = deriveBremsstrahlungLossMeanE(m);

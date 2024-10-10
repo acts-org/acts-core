@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -15,6 +15,7 @@
 #include "Acts/Material/MaterialSlab.hpp"
 
 #include <memory>
+#include <sstream>
 #include <vector>
 
 namespace Acts {
@@ -116,6 +117,15 @@ class ISurfaceMaterial {
 
   /// Output Method for std::ostream, to be overloaded by child classes
   virtual std::ostream& toStream(std::ostream& sl) const = 0;
+
+  /// @brief output into a string
+  ///
+  /// @return the string representation
+  std::string toString() const {
+    std::stringstream sstrm;
+    toStream(sstrm);
+    return sstrm.str();
+  }
 
  protected:
   double m_splitFactor{1.};  //!< the split factor in favour of oppositePre

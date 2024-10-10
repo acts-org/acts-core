@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/PlaneSurface.hpp"
 
@@ -88,16 +88,14 @@ const Acts::SurfaceBounds& Acts::PlaneSurface::bounds() const {
 }
 
 Acts::Polyhedron Acts::PlaneSurface::polyhedronRepresentation(
-    const GeometryContext& gctx, std::size_t lseg) const {
+    const GeometryContext& gctx, unsigned int quarterSegments) const {
   // Prepare vertices and faces
   std::vector<Vector3> vertices;
-  std::vector<Polyhedron::FaceType> faces;
-  std::vector<Polyhedron::FaceType> triangularMesh;
   bool exactPolyhedron = true;
 
   // If you have bounds you can create a polyhedron representation
   if (m_bounds) {
-    auto vertices2D = m_bounds->vertices(lseg);
+    auto vertices2D = m_bounds->vertices(quarterSegments);
     vertices.reserve(vertices2D.size() + 1);
     for (const auto& v2D : vertices2D) {
       vertices.push_back(transform(gctx) * Vector3(v2D.x(), v2D.y(), 0.));
@@ -116,22 +114,20 @@ Acts::Polyhedron Acts::PlaneSurface::polyhedronRepresentation(
     // @todo same as for Discs: coversFull is not the right criterium
     // for triangulation
     if (!isEllipse || !innerExists || !coversFull) {
-      auto facesMesh = detail::FacesHelper::convexFaceMesh(vertices);
-      faces = facesMesh.first;
-      triangularMesh = facesMesh.second;
+      auto [faces, triangularMesh] =
+          detail::FacesHelper::convexFaceMesh(vertices);
+      return Polyhedron(vertices, faces, triangularMesh, exactPolyhedron);
     } else {
       // Two concentric rings, we use the pure concentric method momentarily,
       // but that creates too  many unneccesarry faces, when only two
       // are needed to describe the mesh, @todo investigate merging flag
-      auto facesMesh = detail::FacesHelper::cylindricalFaceMesh(vertices, true);
-      faces = facesMesh.first;
-      triangularMesh = facesMesh.second;
+      auto [faces, triangularMesh] =
+          detail::FacesHelper::cylindricalFaceMesh(vertices);
+      return Polyhedron(vertices, faces, triangularMesh, exactPolyhedron);
     }
-  } else {
-    throw std::domain_error(
-        "Polyhedron repr of boundless surface not possible.");
   }
-  return Polyhedron(vertices, faces, triangularMesh, exactPolyhedron);
+  throw std::domain_error(
+      "Polyhedron representation of boundless surface not possible.");
 }
 
 Acts::Vector3 Acts::PlaneSurface::normal(const GeometryContext& gctx,

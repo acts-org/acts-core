@@ -1,14 +1,16 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
 #include "Acts/Surfaces/detail/VerticesHelper.hpp"
+
+#include <span>
 
 namespace Acts::detail {
 
@@ -72,8 +74,7 @@ inline bool insideAlignedBox(const Vector2& lowerLeft,
 /// @param jacobianOpt The Jacobian to transform the distance to Cartesian
 ///
 /// @return True if the point is inside the polygon.
-template <typename Vector2Container>
-inline bool insidePolygon(const Vector2Container& vertices,
+inline bool insidePolygon(std::span<const Vector2> vertices,
                           const BoundaryTolerance& tolerance,
                           const Vector2& point,
                           const std::optional<SquareMatrix2>& jacobianOpt) {

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -91,8 +91,9 @@ class LayerStructureBuilder : public IInternalStructureBuilder {
     /// Minimum number of surfaces to build an internal structure
     /// - otherwise the tryAll options is used
     unsigned int nMinimalSurfaces = 4u;
-    /// Polyhedron approximations
-    unsigned int nSegments = 1u;
+    /// Polyhedron approximations: number of segments to be used
+    /// to approximate a quarter of a circle
+    unsigned int quarterSegments = 1u;
     /// Extra information, mainly for screen output
     std::string auxiliary = "";
   };

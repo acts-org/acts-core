@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/ActSVG/DetectorVolumeSvgConverter.hpp"
 
@@ -68,7 +68,8 @@ Acts::Svg::DetectorVolumeConverter::convert(
   // Make dedicated surface grid sheets
   const auto& internalNavigationDelegate = dVolume.internalNavigation();
 
-  IndexedSurfacesConverter::Options isOptions;
+  IndexedSurfacesConverter::Options isOptions =
+      volumeOptions.indexedSurfacesOptions;
   // Use or transfer the surface style
   if (isOptions.surfaceStyles.empty()) {
     std::pair<Acts::GeometryIdentifier, Acts::Svg::Style> style{

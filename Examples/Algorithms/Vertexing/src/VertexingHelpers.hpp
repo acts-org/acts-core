@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -15,6 +15,7 @@
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Framework/DataHandle.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -55,8 +56,7 @@ inline ProtoVertexContainer makeProtoVertices(
     protoVertex.reserve(vertex.tracks().size());
 
     for (const auto& track : vertex.tracks()) {
-      auto it = std::find(inputTracks.begin(), inputTracks.end(),
-                          track.originalParams);
+      auto it = std::ranges::find(inputTracks, track.originalParams);
       if (it != inputTracks.end()) {
         protoVertex.push_back(std::distance(inputTracks.begin(), it));
       } else {

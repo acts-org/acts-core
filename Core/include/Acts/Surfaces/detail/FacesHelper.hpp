@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -21,7 +21,7 @@ namespace Acts::detail {
 struct FacesHelper {
   using FaceVector = std::vector<Polyhedron::FaceType>;
 
-  /// @brief This method words for all convex type surface setups
+  /// @brief This method works for all convex type surface setups
   /// It includes:
   ///
   /// Rectangle / Triangle / Polygon
@@ -60,14 +60,12 @@ struct FacesHelper {
   /// vector is splittable in half into the two bows.
   ///
   /// @param vertices The vector of vertices
-  /// @param fullTwoPi The indicator if the concentric face is closed
   static std::pair<FaceVector, FaceVector> cylindricalFaceMesh(
-      const std::vector<Vector3>& vertices, bool fullTwoPi = true) {
+      const std::vector<Vector3>& vertices) {
     FaceVector faces;
     FaceVector triangularMesh;
     std::size_t nqfaces = static_cast<std::size_t>(0.5 * vertices.size());
-    std::size_t reduce = (!fullTwoPi) ? 1 : 0;
-    for (std::size_t iface = 0; iface < nqfaces - reduce; ++iface) {
+    for (std::size_t iface = 0; iface < nqfaces - 1; ++iface) {
       std::size_t p2 = (iface + 1 == nqfaces) ? 0 : iface + 1;
       std::vector<std::size_t> face = {iface, p2, p2 + nqfaces,
                                        nqfaces + iface};

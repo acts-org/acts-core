@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -47,7 +47,7 @@ class BinUtility {
   /// Constructor with only a Transform3
   ///
   /// @param tForm is the local to global transform
-  BinUtility(const Transform3& tForm)
+  explicit BinUtility(const Transform3& tForm)
       : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
     m_binningData.reserve(3);
   }
@@ -317,13 +317,15 @@ class BinUtility {
     return ss.str();
   }
 
+  /// Overload of << operator for std::ostream for debug output
+  friend std::ostream& operator<<(std::ostream& sl, const BinUtility& bgen) {
+    return bgen.toStream(sl);
+  }
+
  private:
   std::vector<BinningData> m_binningData;  /// vector of BinningData
   Transform3 m_transform;                  /// shared transform
   Transform3 m_itransform;                 /// unique inverse transform
 };
-
-/// Overload of << operator for std::ostream for debug output
-std::ostream& operator<<(std::ostream& sl, const BinUtility& bgen);
 
 }  // namespace Acts

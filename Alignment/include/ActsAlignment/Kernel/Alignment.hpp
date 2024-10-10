@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -149,7 +149,7 @@ struct Alignment {
   /// @tparam fit_options_t The fit options type
   ///
   /// @param gctx The current geometry context object
-  /// @param sourcelinks The fittable uncalibrated measurements
+  /// @param sourceLinks The fittable uncalibrated measurements
   /// @param sParameters The initial track parameters
   /// @param fitOptions The fit Options steering the fit
   /// @param idxedAlignSurfaces The idxed surfaces to be aligned
@@ -161,7 +161,7 @@ struct Alignment {
             typename fit_options_t>
   Acts::Result<detail::TrackAlignmentState> evaluateTrackAlignmentState(
       const Acts::GeometryContext& gctx,
-      const std::vector<source_link_t>& sourcelinks,
+      const std::vector<source_link_t>& sourceLinks,
       const start_parameters_t& sParameters, const fit_options_t& fitOptions,
       const std::unordered_map<const Acts::Surface*, std::size_t>&
           idxedAlignSurfaces,

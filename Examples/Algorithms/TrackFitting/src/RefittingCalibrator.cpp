@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/TrackFitting/RefittingCalibrator.hpp"
 
@@ -21,7 +21,7 @@ void RefittingCalibrator::calibrate(const Acts::GeometryContext& /*gctx*/,
                                     Proxy trackState) const {
   const auto sl = sourceLink.get<RefittingSourceLink>();
 
-  // Reset the original uncalibrated sourcelink on this track state
+  // Reset the original uncalibrated source link on this track state
   trackState.setUncalibratedSourceLink(sl.state.getUncalibratedSourceLink());
 
   // Here we construct a measurement by extracting the information available

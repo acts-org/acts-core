@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Geometry/TrackingGeometry.hpp"
 
@@ -22,8 +22,7 @@ Acts::TrackingGeometry::TrackingGeometry(
     const MutableTrackingVolumePtr& highestVolume,
     const IMaterialDecorator* materialDecorator,
     const GeometryIdentifierHook& hook, const Logger& logger)
-    : m_world(highestVolume),
-      m_beam(Surface::makeShared<PerigeeSurface>(Vector3::Zero())) {
+    : m_world(highestVolume) {
   // Close the geometry: assign geometryID and successively the material
   std::size_t volumeID = 0;
   highestVolume->closeGeometry(materialDecorator, m_volumesById, volumeID, hook,
@@ -50,8 +49,8 @@ const Acts::TrackingVolume* Acts::TrackingGeometry::highestTrackingVolume()
   return m_world.get();
 }
 
-const std::shared_ptr<const Acts::TrackingVolume>&
-Acts::TrackingGeometry::highestTrackingVolumeShared() const {
+std::shared_ptr<const Acts::TrackingVolume>
+Acts::TrackingGeometry::highestTrackingVolumePtr() const {
   return m_world;
 }
 
@@ -62,15 +61,6 @@ const Acts::Layer* Acts::TrackingGeometry::associatedLayer(
     return nullptr;
   }
   return lowestVol->associatedLayer(gctx, gp);
-}
-
-void Acts::TrackingGeometry::registerBeamTube(
-    std::shared_ptr<const PerigeeSurface> beam) {
-  m_beam = std::move(beam);
-}
-
-const Acts::Surface* Acts::TrackingGeometry::getBeamline() const {
-  return m_beam.get();
 }
 
 const Acts::TrackingVolume* Acts::TrackingGeometry::findVolume(
@@ -94,4 +84,12 @@ const Acts::Surface* Acts::TrackingGeometry::findSurface(
 const std::unordered_map<Acts::GeometryIdentifier, const Acts::Surface*>&
 Acts::TrackingGeometry::geoIdSurfaceMap() const {
   return m_surfacesById;
+}
+
+void Acts::TrackingGeometry::visualize(
+    IVisualization3D& helper, const GeometryContext& gctx,
+    const ViewConfig& viewConfig, const ViewConfig& portalViewConfig,
+    const ViewConfig& sensitiveViewConfig) const {
+  highestTrackingVolume()->visualize(helper, gctx, viewConfig, portalViewConfig,
+                                     sensitiveViewConfig);
 }

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -25,8 +25,7 @@
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Material/Interactions.hpp"
 #include "Acts/Material/MaterialSlab.hpp"
-#include "Acts/Propagator/AbortList.hpp"
-#include "Acts/Propagator/ActionList.hpp"
+#include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/ConstrainedStep.hpp"
 #include "Acts/Propagator/DirectNavigator.hpp"
 #include "Acts/Propagator/Navigator.hpp"
@@ -46,6 +45,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <unordered_map>
 
 namespace Acts::Experimental {
@@ -514,7 +514,7 @@ class Gx2Fitter {
 
   /// The navigator has DirectNavigator type or not
   static constexpr bool isDirectNavigator =
-      std::is_same<Gx2fNavigator, DirectNavigator>::value;
+      std::is_same_v<Gx2fNavigator, DirectNavigator>;
 
  public:
   Gx2Fitter(propagator_t pPropagator,
@@ -603,17 +603,17 @@ class Gx2Fitter {
     /// @param result is the mutable result state object
     template <typename propagator_state_t, typename stepper_t,
               typename navigator_t>
-    void operator()(propagator_state_t& state, const stepper_t& stepper,
-                    const navigator_t& navigator, result_type& result,
-                    const Logger& /*logger*/) const {
+    void act(propagator_state_t& state, const stepper_t& stepper,
+             const navigator_t& navigator, result_type& result,
+             const Logger& /*logger*/) const {
       assert(result.fittedStates && "No MultiTrajectory set");
 
       // Check if we can stop to propagate
       if (result.measurementStates == inputMeasurements->size()) {
-        ACTS_INFO("Actor: finish: All measurements have been found.");
+        ACTS_DEBUG("Actor: finish: All measurements have been found.");
         result.finished = true;
       } else if (state.navigation.navigationBreak) {
-        ACTS_INFO("Actor: finish: navigationBreak.");
+        ACTS_DEBUG("Actor: finish: navigationBreak.");
         result.finished = true;
       }
 
@@ -690,8 +690,8 @@ class Gx2Fitter {
       }
 
       // Here we handle all measurements
-      if (auto sourcelink_it = inputMeasurements->find(geoId);
-          sourcelink_it != inputMeasurements->end()) {
+      if (auto sourceLinkIt = inputMeasurements->find(geoId);
+          sourceLinkIt != inputMeasurements->end()) {
         ACTS_DEBUG("    The surface contains a measurement.");
 
         // Transport the covariance to the surface
@@ -756,7 +756,7 @@ class Gx2Fitter {
         // We have smoothed parameters, so calibrate the uncalibrated input
         // measurement
         extensions.calibrator(state.geoContext, *calibrationContext,
-                              sourcelink_it->second, trackStateProxy);
+                              sourceLinkIt->second, trackStateProxy);
 
         // Get and set the type flags
         auto typeFlags = trackStateProxy.typeFlags();
@@ -955,18 +955,10 @@ class Gx2Fitter {
       ACTS_DEBUG("    The surface contains no measurement/material/hole.");
       return;
     }
-  };
-
-  /// Aborter can stay like this probably
-  template <typename parameters_t>
-  class Aborter {
-   public:
-    /// Broadcast the result_type
-    using action_type = Actor<parameters_t>;
 
     template <typename propagator_state_t, typename stepper_t,
               typename navigator_t, typename result_t>
-    bool operator()(propagator_state_t& /*state*/, const stepper_t& /*stepper*/,
+    bool checkAbort(propagator_state_t& /*state*/, const stepper_t& /*stepper*/,
                     const navigator_t& /*navigator*/, const result_t& result,
                     const Logger& /*logger*/) const {
       if (!result.result.ok() || result.finished) {
@@ -1023,17 +1015,13 @@ class Gx2Fitter {
     // option to the Actor.
     const bool multipleScattering = gx2fOptions.multipleScattering;
 
-    /// Fully understand Aborter, Actor, Result later
-    // Create the ActionList and AbortList
-    using GX2FAborter = Aborter<parameters_t>;
+    // Create the ActorList
     using GX2FActor = Actor<parameters_t>;
 
     using GX2FResult = typename GX2FActor::result_type;
-    using Actors = Acts::ActionList<GX2FActor>;
-    using Aborters = Acts::AbortList<GX2FAborter>;
+    using Actors = Acts::ActorList<GX2FActor>;
 
-    using PropagatorOptions =
-        typename propagator_t::template Options<Actors, Aborters>;
+    using PropagatorOptions = typename propagator_t::template Options<Actors>;
 
     start_parameters_t params = sParameters;
     BoundVector deltaParams = BoundVector::Zero();
@@ -1096,7 +1084,7 @@ class Gx2Fitter {
         propagatorOptions.navigation.insertExternalSurface(surfaceId);
       }
 
-      auto& gx2fActor = propagatorOptions.actionList.template get<GX2FActor>();
+      auto& gx2fActor = propagatorOptions.actorList.template get<GX2FActor>();
       gx2fActor.inputMeasurements = &inputMeasurements;
       gx2fActor.multipleScattering = multipleScattering;
       gx2fActor.extensions = gx2fOptions.extensions;
@@ -1230,7 +1218,7 @@ class Gx2Fitter {
 
         // We only consider states with a measurement (and/or material)
         if (!stateHasMeasurement && !doMaterial) {
-          ACTS_INFO("    Skip state.");
+          ACTS_DEBUG("    Skip state.");
           continue;
         }
 
@@ -1400,6 +1388,9 @@ class Gx2Fitter {
 
     // Propagate again with the final covariance matrix. This is necessary to
     // obtain the propagated covariance for each state.
+    // We also need to recheck the result and find the tipIndex, because at this
+    // step, we will not ignore the boundary checks for measurement surfaces. We
+    // want to create trackstates only on surfaces, that we actually hit.
     if (gx2fOptions.nUpdateMax > 0) {
       ACTS_VERBOSE("final deltaParams:\n" << deltaParams);
       ACTS_VERBOSE("Propagate with the final covariance.");
@@ -1411,7 +1402,7 @@ class Gx2Fitter {
       Acts::MagneticFieldContext magCtx = gx2fOptions.magFieldContext;
       // Set options for propagator
       PropagatorOptions propagatorOptions(geoCtx, magCtx);
-      auto& gx2fActor = propagatorOptions.actionList.template get<GX2FActor>();
+      auto& gx2fActor = propagatorOptions.actorList.template get<GX2FActor>();
       gx2fActor.inputMeasurements = &inputMeasurements;
       gx2fActor.multipleScattering = multipleScattering;
       gx2fActor.extensions = gx2fOptions.extensions;
@@ -1425,7 +1416,33 @@ class Gx2Fitter {
       auto& r = propagatorState.template get<Gx2FitterResult<traj_t>>();
       r.fittedStates = &trackContainer.trackStateContainer();
 
-      m_propagator.template propagate(propagatorState);
+      auto propagationResult = m_propagator.template propagate(propagatorState);
+
+      // Run the fitter
+      auto result = m_propagator.template makeResult(std::move(propagatorState),
+                                                     propagationResult,
+                                                     propagatorOptions, false);
+
+      if (!result.ok()) {
+        ACTS_ERROR("Propagation failed: " << result.error());
+        return result.error();
+      }
+
+      auto& propRes = *result;
+      GX2FResult gx2fResult = std::move(propRes.template get<GX2FResult>());
+
+      if (!gx2fResult.result.ok()) {
+        ACTS_INFO("GlobalChiSquareFitter failed in actor: "
+                  << gx2fResult.result.error() << ", "
+                  << gx2fResult.result.error().message());
+        return gx2fResult.result.error();
+      }
+
+      if (tipIndex != gx2fResult.lastMeasurementIndex) {
+        ACTS_INFO("Final fit used unreachable measurements.");
+        return Experimental::GlobalChiSquareFitterError::
+            UsedUnreachableMeasurements;
+      }
     }
 
     if (!trackContainer.hasColumn(

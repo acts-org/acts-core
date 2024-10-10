@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -44,104 +44,6 @@
 namespace Acts {
 
 using namespace Acts::UnitLiterals;
-
-/// @brief Reducer struct for the Loop MultiEigenStepper which reduces the
-/// multicomponent state to simply by summing the weighted values
-///
-/// @note Usage is not encouraged, since it can lead to navigation failures
-/// as the global position might not be on surface, even if all components
-/// are on surface
-struct WeightedComponentReducerLoop {
-  template <typename component_range_t>
-  static Vector3 toVector3(const component_range_t& comps,
-                           const FreeIndices i) {
-    return std::accumulate(
-        comps.begin(), comps.end(), Vector3{Vector3::Zero()},
-        [i](const auto& sum, const auto& cmp) -> Vector3 {
-          return sum + cmp.weight * cmp.state.pars.template segment<3>(i);
-        });
-  }
-
-  template <typename stepper_state_t>
-  static Vector3 position(const stepper_state_t& s) {
-    return toVector3(s.components, eFreePos0);
-  }
-
-  template <typename stepper_state_t>
-  static Vector3 direction(const stepper_state_t& s) {
-    return toVector3(s.components, eFreeDir0).normalized();
-  }
-
-  // TODO: Maybe we can cache this value and only update it when the parameters
-  // change
-  template <typename stepper_state_t>
-  static ActsScalar qOverP(const stepper_state_t& s) {
-    return std::accumulate(
-        s.components.begin(), s.components.end(), ActsScalar{0.},
-        [](const auto& sum, const auto& cmp) -> ActsScalar {
-          return sum + cmp.weight * cmp.state.pars[eFreeQOverP];
-        });
-  }
-
-  template <typename stepper_state_t>
-  static ActsScalar absoluteMomentum(const stepper_state_t& s) {
-    return std::accumulate(
-        s.components.begin(), s.components.end(), ActsScalar{0.},
-        [&s](const auto& sum, const auto& cmp) -> ActsScalar {
-          return sum + cmp.weight * s.particleHypothesis.extractMomentum(
-                                        cmp.state.pars[eFreeQOverP]);
-        });
-  }
-
-  template <typename stepper_state_t>
-  static Vector3 momentum(const stepper_state_t& s) {
-    return std::accumulate(
-        s.components.begin(), s.components.end(), Vector3::Zero().eval(),
-        [&s](const auto& sum, const auto& cmp) -> Vector3 {
-          return sum + cmp.weight *
-                           s.particleHypothesis.extractMomentum(
-                               cmp.state.pars[eFreeQOverP]) *
-                           cmp.state.pars.template segment<3>(eFreeDir0);
-        });
-  }
-
-  template <typename stepper_state_t>
-  static ActsScalar charge(const stepper_state_t& s) {
-    return std::accumulate(
-        s.components.begin(), s.components.end(), ActsScalar{0.},
-        [&s](const auto& sum, const auto& cmp) -> ActsScalar {
-          return sum + cmp.weight * s.particleHypothesis.extractCharge(
-                                        cmp.state.pars[eFreeQOverP]);
-        });
-  }
-
-  template <typename stepper_state_t>
-  static ActsScalar time(const stepper_state_t& s) {
-    return std::accumulate(
-        s.components.begin(), s.components.end(), ActsScalar{0.},
-        [](const auto& sum, const auto& cmp) -> ActsScalar {
-          return sum + cmp.weight * cmp.state.pars[eFreeTime];
-        });
-  }
-
-  template <typename stepper_state_t>
-  static FreeVector pars(const stepper_state_t& s) {
-    return std::accumulate(s.components.begin(), s.components.end(),
-                           FreeVector{FreeVector::Zero()},
-                           [](const auto& sum, const auto& cmp) -> FreeVector {
-                             return sum + cmp.weight * cmp.state.pars;
-                           });
-  }
-
-  template <typename stepper_state_t>
-  static FreeVector cov(const stepper_state_t& s) {
-    return std::accumulate(s.components.begin(), s.components.end(),
-                           FreeMatrix{FreeMatrix::Zero()},
-                           [](const auto& sum, const auto& cmp) -> FreeMatrix {
-                             return sum + cmp.weight * cmp.state.cov;
-                           });
-  }
-};
 
 namespace detail {
 
@@ -240,7 +142,7 @@ using MaxWeightReducerLoop =
 /// @tparam small_vector_size A size-hint how much memory should be allocated
 /// by the small vector
 template <typename extension_t = EigenStepperDefaultExtension,
-          typename component_reducer_t = WeightedComponentReducerLoop>
+          typename component_reducer_t = MaxWeightReducerLoop>
 class MultiEigenStepperLoop : public EigenStepper<extension_t> {
   /// Limits the number of steps after at least one component reached the
   /// surface
@@ -428,7 +330,6 @@ class MultiEigenStepperLoop : public EigenStepper<extension_t> {
 
       // clang-format off
       auto& operator++() { ++it; return *this; }
-      auto operator!=(const Iterator& other) const { return it != other.it; }
       auto operator==(const Iterator& other) const { return it == other.it; }
       auto operator*() const { return ComponentProxy(*it, s); }
       // clang-format on
@@ -463,7 +364,6 @@ class MultiEigenStepperLoop : public EigenStepper<extension_t> {
 
       // clang-format off
       auto& operator++() { ++it; return *this; }
-      auto operator!=(const ConstIterator& other) const { return it != other.it; }
       auto operator==(const ConstIterator& other) const { return it == other.it; }
       auto operator*() const { return ConstComponentProxy{*it}; }
       // clang-format on

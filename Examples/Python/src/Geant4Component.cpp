@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Detector/Detector.hpp"
@@ -14,6 +14,7 @@
 #include "Acts/Plugins/Geant4/Geant4DetectorSurfaceFactory.hpp"
 #include "Acts/Plugins/Geant4/Geant4PhysicalVolumeSelectors.hpp"
 #include "Acts/Plugins/Python/Utilities.hpp"
+#include "Acts/Surfaces/SurfaceVisitorConcept.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Framework/IContextDecorator.hpp"
@@ -87,7 +88,13 @@ struct ExperimentalSensitiveCandidates : public SensitiveCandidatesBase {
   }
 
   std::vector<const Acts::Surface*> queryAll() const override {
-    throw std::runtime_error("not implemented");
+    std::vector<const Acts::Surface*> surfaces;
+    detector->visitSurfaces([&](const Acts::Surface* surface) {
+      if (surface->associatedDetectorElement() != nullptr) {
+        surfaces.push_back(surface);
+      }
+    });
+    return surfaces;
   }
 };
 
@@ -207,6 +214,7 @@ PYBIND11_MODULE(ActsPythonBindingsGeant4, mod) {
     ACTS_PYTHON_MEMBER(killVolume);
     ACTS_PYTHON_MEMBER(killAfterTime);
     ACTS_PYTHON_MEMBER(killSecondaries);
+    ACTS_PYTHON_MEMBER(recordHitsOfNeutrals);
     ACTS_PYTHON_MEMBER(recordHitsOfSecondaries);
     ACTS_PYTHON_MEMBER(keepParticlesWithoutHits);
     ACTS_PYTHON_STRUCT_END();
@@ -326,7 +334,8 @@ PYBIND11_MODULE(ActsPythonBindingsGeant4, mod) {
                                   const std::vector<std::string>&
                                       sensitiveMatches,
                                   const std::vector<std::string>&
-                                      passiveMatches) {
+                                      passiveMatches,
+                                  bool convertMaterial) {
       // Initiate the detector construction & retrieve world
       ActsExamples::GdmlDetectorConstruction gdmlContruction(gdmlFileName);
       const auto* world = gdmlContruction.Construct();
@@ -343,6 +352,7 @@ PYBIND11_MODULE(ActsPythonBindingsGeant4, mod) {
       Acts::Geant4DetectorSurfaceFactory::Options options;
       options.sensitiveSurfaceSelector = sensitiveSelectors;
       options.passiveSurfaceSelector = passiveSelectors;
+      options.convertMaterial = convertMaterial;
 
       G4Transform3D nominal;
       Acts::Geant4DetectorSurfaceFactory factory;

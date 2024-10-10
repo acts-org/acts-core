@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -137,6 +137,8 @@ class Geant4Simulation final : public Geant4SimulationBase {
     std::shared_ptr<const Acts::Volume> killVolume;
     double killAfterTime = std::numeric_limits<double>::infinity();
     bool killSecondaries = false;
+
+    bool recordHitsOfNeutrals = false;
 
     bool recordHitsOfSecondaries = true;
 

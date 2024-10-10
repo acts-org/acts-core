@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 template <typename entity_t, typename value_t, std::size_t DIM>
 Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::AxisAlignedBoundingBox(
@@ -353,8 +353,7 @@ Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::transformed(
 
 template <typename entity_t, typename value_t, std::size_t DIM>
 void Acts::AxisAlignedBoundingBox<entity_t, value_t, DIM>::draw(
-    IVisualization3D& helper, std::array<int, 3> color,
-    const transform_type& trf) const
+    IVisualization3D& helper, Color color, const transform_type& trf) const
   requires(DIM == 3)
 {
   static_assert(DIM == 3, "PLY output only supported in 3D");

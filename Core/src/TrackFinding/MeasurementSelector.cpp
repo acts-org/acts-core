@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/TrackFinding/MeasurementSelector.hpp"
 
@@ -118,10 +118,10 @@ MeasurementSelector::Cuts MeasurementSelector::getCutsByTheta(
   // look at the positive half of the Z axis
   const double constrainedTheta = std::min(theta, M_PI - theta);
 
-  auto it = std::find_if(config.begin(), config.end(),
-                         [constrainedTheta](const InternalCutBin& cuts) {
-                           return constrainedTheta < cuts.maxTheta;
-                         });
+  auto it = std::ranges::find_if(
+      config, [constrainedTheta](const InternalCutBin& cuts) {
+        return constrainedTheta < cuts.maxTheta;
+      });
   assert(it != config.end());
   return {it->maxNumMeasurements, it->maxChi2Measurement, it->maxChi2Outlier};
 }

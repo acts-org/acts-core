@@ -1,10 +1,10 @@
-# This file is part of the Acts project.
+# This file is part of the ACTS project.
 #
-# Copyright (C) 2021 CERN for the benefit of the Acts project
+# Copyright (C) 2016 CERN for the benefit of the ACTS project
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 # CMake include(s).
 include(FetchContent)
@@ -15,12 +15,7 @@ message(STATUS "Building traccc as part of the Acts project")
 set(TRACCC_VERSION "${_acts_traccc_version}")
 
 # Declare where to get traccc from.
-FetchContent_Declare(
-    traccc
-    ${ACTS_TRACCC_SOURCE}
-    # Needed until https://github.com/acts-project/traccc/pull/682 and https://github.com/acts-project/traccc/pull/683 are deployed
-    PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/warnings.diff
-)
+FetchContent_Declare(traccc ${ACTS_TRACCC_SOURCE})
 
 if(ACTS_CUSTOM_SCALARTYPE)
     set(ACTS_TRACCC_SCALARTYPE ${ACTS_CUSTOM_SCALARTYPE})

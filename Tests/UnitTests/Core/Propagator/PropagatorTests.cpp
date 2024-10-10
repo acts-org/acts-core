@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/unit_test.hpp>
@@ -20,8 +20,7 @@
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
-#include "Acts/Propagator/AbortList.hpp"
-#include "Acts/Propagator/ActionList.hpp"
+#include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/ConstrainedStep.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/EigenStepperDenseExtension.hpp"
@@ -106,9 +105,9 @@ struct SurfaceObserver {
 
   template <typename propagator_state_t, typename stepper_t,
             typename navigator_t>
-  void operator()(propagator_state_t& state, const stepper_t& stepper,
-                  const navigator_t& /*navigator*/, result_type& result,
-                  const Logger& /*logger*/) const {
+  void act(propagator_state_t& state, const stepper_t& stepper,
+           const navigator_t& /*navigator*/, result_type& result,
+           const Logger& /*logger*/) const {
     if (surface && !result.surfaces_passed) {
       // calculate the distance to the surface
       const double distance =
@@ -153,16 +152,12 @@ const int ntests = 5;
 
 // This tests the Options
 BOOST_AUTO_TEST_CASE(PropagatorOptions_) {
-  using null_optionsType = EigenPropagatorType::Options<>;
-  null_optionsType null_options(tgContext, mfContext);
-  // todo write null options test
+  using NullOptionsType = EigenPropagatorType::Options<>;
+  NullOptionsType null_options(tgContext, mfContext);
 
-  using ActionListType = ActionList<PerpendicularMeasure>;
-  using AbortConditionsType = AbortList<>;
-
-  using optionsType = PropagatorOptions<ActionListType, AbortConditionsType>;
-
-  optionsType options(tgContext, mfContext);
+  using ActorList = ActorList<PerpendicularMeasure>;
+  using OptionsType = EigenPropagatorType::Options<ActorList>;
+  OptionsType options(tgContext, mfContext);
 }
 
 BOOST_DATA_TEST_CASE(
@@ -191,18 +186,16 @@ BOOST_DATA_TEST_CASE(
   (void)index;
 
   using CylinderObserver = SurfaceObserver<CylinderSurface>;
-  using ActionListType = ActionList<CylinderObserver>;
-  using AbortConditionsType = AbortList<>;
+  using ActorList = ActorList<CylinderObserver>;
 
   // setup propagation options
-  EigenPropagatorType::Options<ActionListType, AbortConditionsType> options(
-      tgContext, mfContext);
+  EigenPropagatorType::Options<ActorList> options(tgContext, mfContext);
 
   options.pathLimit = 20_m;
   options.stepping.maxStepSize = 1_cm;
 
   // set the surface to be passed by
-  options.actionList.get<CylinderObserver>().surface = mSurface.get();
+  options.actorList.get<CylinderObserver>().surface = mSurface.get();
 
   using so_result = typename CylinderObserver::result_type;
 

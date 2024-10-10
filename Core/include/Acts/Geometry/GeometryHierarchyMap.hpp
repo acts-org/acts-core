@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -116,6 +116,17 @@ class GeometryHierarchyMap {
   /// @retval iterator to an existing value
   /// @retval `.end()` iterator if no matching element exists
   Iterator find(const GeometryIdentifier& id) const;
+
+  /// Check if the most specific value exists for a given geometry identifier.
+  ///
+  /// This function checks if there is an element matching exactly the given
+  /// geometry id, or from the element for the next available higher level
+  /// within the geometry hierarchy.
+  ///
+  /// @param id geometry identifier for which existence is being checked
+  /// @retval `true` if a matching element exists
+  /// @retval `false` if no matching element exists
+  bool contains(const GeometryIdentifier& id) const;
 
  private:
   // NOTE this class assumes that it knows the ordering of the levels within
@@ -301,6 +312,12 @@ inline auto GeometryHierarchyMap<value_t>::find(
 
   // all options are exhausted and no matching element was found.
   return end();
+}
+
+template <typename value_t>
+inline auto GeometryHierarchyMap<value_t>::contains(
+    const GeometryIdentifier& id) const -> bool {
+  return this->find(id) != this->end();
 }
 
 }  // namespace Acts

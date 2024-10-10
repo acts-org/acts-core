@@ -1,14 +1,12 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
-
-#include "Acts/Utilities/detail/MPL/all_of.hpp"
 
 #include <tuple>
 #include <type_traits>
@@ -26,11 +24,11 @@ namespace Acts::detail {
 template <typename... extensions_t>
 struct Extendable {
   // clang-format off
-    static_assert(detail::all_of_v<std::is_default_constructible<extensions_t>::value...>,
+    static_assert((std::is_default_constructible_v<extensions_t> && ...),
                   "all extensions must be default constructible");
-    static_assert(detail::all_of_v<std::is_copy_constructible<extensions_t>::value...>,
+    static_assert((std::is_copy_constructible_v<extensions_t> && ...),
                   "all extensions must be copy constructible");
-    static_assert(detail::all_of_v<std::is_move_constructible<extensions_t>::value...>,
+    static_assert((std::is_move_constructible_v<extensions_t> && ...),
                   "all extensions must be move constructible");
   // clang-format on
 

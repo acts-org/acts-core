@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -176,20 +176,7 @@ struct SeedFinderConfig {
   /// measurement from strips on back-to-back modules.
   /// Enables setting of the following delegates.
   bool useDetailedDoubleMeasurementInfo = false;
-  /// Returns half of the length of the top strip.
-  Delegate<float(const SpacePoint&)> getTopHalfStripLength;
-  /// Returns half of the length of the bottom strip.
-  Delegate<float(const SpacePoint&)> getBottomHalfStripLength;
-  /// Returns direction of the top strip.
-  Delegate<Acts::Vector3(const SpacePoint&)> getTopStripDirection;
-  /// Returns direction of the bottom strip.
-  Delegate<Acts::Vector3(const SpacePoint&)> getBottomStripDirection;
-  /// Returns distance between the centers of the two strips.
-  Delegate<Acts::Vector3(const SpacePoint&)> getStripCenterDistance;
-  /// Returns position of the center of the top strip.
-  Delegate<Acts::Vector3(const SpacePoint&)> getTopStripCenterPosition;
-  /// Delegate for specifying experiment specific cuts on space points
-  /// before filling the grid. Currently accepts three parameters
+
   Delegate<bool(const SpacePoint&)> spacePointSelector{
       DelegateFuncTag<voidSpacePointSelector>{}};
 

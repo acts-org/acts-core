@@ -1,13 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
+#include "Acts/EventData/SpacePointContainer.hpp"
 #include "Acts/Plugins/Hashing/HashingAlgorithm.hpp"
 #include "Acts/Plugins/Hashing/HashingAlgorithmConfig.hpp"
 #include "Acts/Plugins/Hashing/HashingTraining.hpp"
@@ -22,6 +23,7 @@
 #include "ActsExamples/EventData/ProtoTrack.hpp"
 #include "ActsExamples/EventData/SimSeed.hpp"
 #include "ActsExamples/EventData/SimSpacePoint.hpp"
+#include "ActsExamples/EventData/SpacePointContainer.hpp"
 #include "ActsExamples/Framework/DataHandle.hpp"
 #include "ActsExamples/Framework/IAlgorithm.hpp"
 #include "ActsExamples/Framework/ProcessCode.hpp"
@@ -35,9 +37,10 @@
 #include <vector>
 
 // Custom seed comparison function
+template <typename external_spacepoint_t>
 struct SeedComparison {
-  bool operator()(const ActsExamples::SimSeed& seed1,
-                  const ActsExamples::SimSeed& seed2) const {
+  bool operator()(const Acts::Seed<external_spacepoint_t>& seed1,
+                  const Acts::Seed<external_spacepoint_t>& seed2) const {
     const auto& sp1 = seed1.sp();
     const auto& sp2 = seed2.sp();
 
@@ -83,7 +86,11 @@ class SeedingAlgorithmHashing final : public IAlgorithm {
     std::string outputBuckets;
 
     Acts::SeedFilterConfig seedFilterConfig;
-    Acts::SeedFinderConfig<SimSpacePoint> seedFinderConfig;
+    Acts::SeedFinderConfig<typename Acts::SpacePointContainer<
+        ActsExamples::SpacePointContainer<std::vector<const SimSpacePoint*>>,
+        Acts::detail::RefHolder>::SpacePointProxyType>
+        seedFinderConfig;
+
     Acts::CylindricalSpacePointGridConfig gridConfig;
     Acts::CylindricalSpacePointGridOptions gridOptions;
     Acts::SeedFinderOptions seedFinderOptions;
@@ -121,11 +128,15 @@ class SeedingAlgorithmHashing final : public IAlgorithm {
   const Config& config() const { return m_cfg; }
 
  private:
-  Acts::SeedFinder<SimSpacePoint,
-                   Acts::CylindricalSpacePointGrid<SimSpacePoint>>
+  using SpacePointProxy_t = typename Acts::SpacePointContainer<
+      ActsExamples::SpacePointContainer<std::vector<const SimSpacePoint*>>,
+      Acts::detail::RefHolder>::SpacePointProxyType;
+
+  Acts::SeedFinder<SpacePointProxy_t,
+                   Acts::CylindricalSpacePointGrid<SpacePointProxy_t>>
       m_seedFinder;
-  std::unique_ptr<const Acts::GridBinFinder<2ul>> m_bottomBinFinder;
-  std::unique_ptr<const Acts::GridBinFinder<2ul>> m_topBinFinder;
+  std::unique_ptr<const Acts::GridBinFinder<3ul>> m_bottomBinFinder{nullptr};
+  std::unique_ptr<const Acts::GridBinFinder<3ul>> m_topBinFinder{nullptr};
 
   Config m_cfg;
 
@@ -142,8 +153,8 @@ class SeedingAlgorithmHashing final : public IAlgorithm {
       m_hashingTraining;
 
   static inline bool itkFastTrackingCuts(float bottomRadius, float cotTheta) {
-    float rMin = 50.;
-    float cotThetaMax = 1.5;
+    static float rMin = 50.;
+    static float cotThetaMax = 1.5;
 
     if (bottomRadius < rMin &&
         (cotTheta > cotThetaMax || cotTheta < -cotThetaMax)) {
@@ -152,9 +163,9 @@ class SeedingAlgorithmHashing final : public IAlgorithm {
     return true;
   }
 
-  static inline bool itkFastTrackingSPselect(const SimSpacePoint& sp) {
+  static inline bool itkFastTrackingSPselect(const SpacePointProxy_t& sp) {
     // At small r we remove points beyond |z| > 200.
-    float r = sp.r();
+    float r = sp.radius();
     float zabs = std::abs(sp.z());
     if (zabs > 200. && r < 50.) {
       return false;

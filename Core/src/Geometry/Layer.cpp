@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Geometry/Layer.hpp"
 
@@ -126,11 +126,9 @@ Acts::Layer::compatibleSurfaces(
   double farLimit = options.farLimit;
 
   auto isUnique = [&](const SurfaceIntersection& b) {
-    auto find_it = std::find_if(
-        sIntersections.begin(), sIntersections.end(), [&b](const auto& a) {
-          return a.object() == b.object() && a.index() == b.index();
-        });
-    return find_it == sIntersections.end();
+    return std::ranges::none_of(sIntersections, [&b](const auto& a) {
+      return a.object() == b.object() && a.index() == b.index();
+    });
   };
 
   // lemma 0 : accept the surface
@@ -140,7 +138,7 @@ Acts::Layer::compatibleSurfaces(
     if (sensitive && options.resolveSensitive) {
       return true;
     }
-    // next option: it's a material surface and you want to have it
+    // next option: it's a material surface, and you want to have it
     if (options.resolveMaterial && sf.surfaceMaterial() != nullptr) {
       return true;
     }

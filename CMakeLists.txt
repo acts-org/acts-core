@@ -170,6 +170,10 @@ set_option_if(
   ACTS_BUILD_PLUGIN_TRACCC
 )
 set_option_if(
+  ACTS_BUILD_PLUGIN_ACTSVG
+  ACTS_BUILD_PLUGIN_TRACCC
+)
+set_option_if(
   ACTS_BUILD_PLUGIN_HASHING
   ACTS_BUILD_EXAMPLES_HASHING
 )
@@ -222,8 +226,7 @@ endif()
 # minimal dependency versions. they are defined here in a single place so
 # they can be easily upgraded, although they might not be used if the
 # dependency is included via `add_subdirectory(...)`.
-set(_acts_actsvg_version 0.4.40)
-set(_acts_autodiff_version 0.6)
+set(_acts_actsvg_version 0.4.50)
 set(_acts_boost_version 1.71.0)
 set(_acts_dd4hep_version 1.21)
 set(_acts_edm4hep_version 0.7)
@@ -233,13 +236,14 @@ set(_acts_podio_version 1.0.1) # will try this first
 set(_acts_podio_fallback_version 0.16) # if not found, will try this one
 set(_acts_doxygen_version 1.9.4)
 set(_acts_hepmc3_version 3.2.1)
-set(_acts_nlohmanjson_version 3.2.0)
+set(_acts_nlohmanjson_version 3.10.5)
 set(_acts_onnxruntime_version 1.12.0)
 set(_acts_root_version 6.20)
 set(_acts_tbb_version 2020.1)
 set(_acts_pythia8_version 8.309)
-set(_acts_detray_version 0.72.0)
-set(_acts_traccc_version 0.13.0)
+set(_acts_pybind11_version 2.13.1)
+set(_acts_detray_version 0.75.3)
+set(_acts_traccc_version 0.16.0)
 set(_acts_covfie_version 0.10.0)
 set(_acts_vecmem_version 1.4.0)
 set(_acts_algebraplugins_version 0.22.0)

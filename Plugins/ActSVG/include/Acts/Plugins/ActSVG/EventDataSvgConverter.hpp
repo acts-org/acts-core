@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -13,11 +13,7 @@
 #include "Acts/Utilities/Logger.hpp"
 #include <actsvg/core.hpp>
 
-namespace Acts {
-
-namespace Svg {
-
-namespace EventDataConverter {
+namespace Acts::Svg::EventDataConverter {
 
 /// Write/create a 3D point in XY view
 ///
@@ -62,8 +58,4 @@ actsvg::svg::object point(const Vector3& pos, ActsScalar size,
   return circle;
 }
 
-}  // namespace EventDataConverter
-
-}  // namespace Svg
-
-}  // namespace Acts
+}  // namespace Acts::Svg::EventDataConverter

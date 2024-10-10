@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -92,10 +92,6 @@ class GroupBy {
                                      const GroupEndIterator& rhs) {
       return lhs.m_groupBegin == rhs;
     }
-    friend constexpr bool operator!=(const GroupIterator& lhs,
-                                     const GroupEndIterator& rhs) {
-      return !(lhs == rhs);
-    }
   };
 
   /// Construct the group-by proxy for an iterator range.
@@ -119,7 +115,7 @@ class GroupBy {
   /// complexity in the group size. It does not assume any ordering of the
   /// underlying container and is a cache-friendly access pattern.
   constexpr Iterator findEndOfGroup(Iterator start) const {
-    // check for end so we can safely dereference the start iterator.
+    // check for end that we can safely dereference the start iterator.
     if (start == m_end) {
       return start;
     }

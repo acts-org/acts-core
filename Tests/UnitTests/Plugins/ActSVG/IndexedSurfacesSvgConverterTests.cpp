@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -42,7 +42,7 @@ IndexedSurfacesConverter::Options generateDrawOptions() {
   sensitiveStyle.highlights = {"onmouseover", "onmouseout"};
   sensitiveStyle.strokeWidth = 0.5;
   sensitiveStyle.strokeColor = {0, 0, 0};
-  sensitiveStyle.nSegments = 72u;
+  sensitiveStyle.quarterSegments = 72u;
   std::pair<GeometryIdentifier, Style> allSensitives = {GeometryIdentifier(0u),
                                                         sensitiveStyle};
 

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/unit_test.hpp>
@@ -19,8 +19,7 @@
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
-#include "Acts/Propagator/AbortList.hpp"
-#include "Acts/Propagator/ActionList.hpp"
+#include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/MaterialInteractor.hpp"
 #include "Acts/Propagator/Navigator.hpp"
@@ -86,18 +85,16 @@ template <typename propagator_t>
 void runTest(const propagator_t& prop,
              const CurvilinearTrackParameters& start) {
   // Action list and abort list
-  using ActionListType = ActionList<MaterialInteractor>;
-  using AbortListType = AbortList<>;
+  using ActorList = ActorList<MaterialInteractor>;
 
-  using Options =
-      typename propagator_t::template Options<ActionListType, AbortListType>;
+  using Options = typename propagator_t::template Options<ActorList>;
   Options fwdOptions(tgContext, mfContext);
   fwdOptions.stepping.maxStepSize = 25_cm;
   fwdOptions.pathLimit = 25_cm;
 
   // get the material collector and configure it
   auto& fwdMaterialInteractor =
-      fwdOptions.actionList.template get<MaterialInteractor>();
+      fwdOptions.actorList.template get<MaterialInteractor>();
   fwdMaterialInteractor.recordInteractions = true;
   fwdMaterialInteractor.energyLoss = false;
   fwdMaterialInteractor.multipleScattering = false;
@@ -141,7 +138,7 @@ void runTest(const propagator_t& prop,
 
   // get the material collector and configure it
   auto& bwdMaterialInteractor =
-      bwdOptions.actionList.template get<MaterialInteractor>();
+      bwdOptions.actorList.template get<MaterialInteractor>();
   bwdMaterialInteractor.recordInteractions = true;
   bwdMaterialInteractor.energyLoss = false;
   bwdMaterialInteractor.multipleScattering = false;
@@ -198,7 +195,7 @@ void runTest(const propagator_t& prop,
 
   // get the material collector and configure it
   auto& fwdStepMaterialInteractor =
-      fwdStepOptions.actionList.template get<MaterialInteractor>();
+      fwdStepOptions.actorList.template get<MaterialInteractor>();
   fwdStepMaterialInteractor.recordInteractions = true;
   fwdStepMaterialInteractor.energyLoss = false;
   fwdStepMaterialInteractor.multipleScattering = false;
@@ -272,7 +269,7 @@ void runTest(const propagator_t& prop,
 
   // get the material collector and configure it
   auto& bwdStepMaterialInteractor =
-      bwdStepOptions.actionList.template get<MaterialInteractor>();
+      bwdStepOptions.actorList.template get<MaterialInteractor>();
   bwdStepMaterialInteractor.recordInteractions = true;
   bwdStepMaterialInteractor.multipleScattering = false;
   bwdStepMaterialInteractor.energyLoss = false;
@@ -338,7 +335,7 @@ void runTest(const propagator_t& prop,
   // Test the material affects the covariance into the right direction
   // get the material collector and configure it
   auto& covfwdMaterialInteractor =
-      fwdOptions.actionList.template get<MaterialInteractor>();
+      fwdOptions.actorList.template get<MaterialInteractor>();
   covfwdMaterialInteractor.recordInteractions = false;
   covfwdMaterialInteractor.energyLoss = true;
   covfwdMaterialInteractor.multipleScattering = true;

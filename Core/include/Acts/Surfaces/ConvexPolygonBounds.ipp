@@ -1,23 +1,22 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/detail/BoundaryCheckHelper.hpp"
 #include "Acts/Utilities/ThrowAssert.hpp"
 
+#include <concepts>
 #include <optional>
 
 template <typename coll_t>
+  requires std::same_as<typename coll_t::value_type, Acts::Vector2>
 void Acts::ConvexPolygonBoundsBase::convex_impl(
     const coll_t& vertices) noexcept(false) {
-  static_assert(std::is_same<typename coll_t::value_type, Vector2>::value,
-                "Must be collection of Vector2");
-
   const std::size_t N = vertices.size();
   for (std::size_t i = 0; i < N; i++) {
     std::size_t j = (i + 1) % N;
@@ -112,7 +111,7 @@ bool Acts::ConvexPolygonBounds<N>::inside(
 
 template <int N>
 std::vector<Acts::Vector2> Acts::ConvexPolygonBounds<N>::vertices(
-    unsigned int /*lseg*/) const {
+    unsigned int /*ignoredSegments*/) const {
   return {m_vertices.begin(), m_vertices.end()};
 }
 

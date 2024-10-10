@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -79,7 +79,7 @@ struct Trajectories final {
   /// @return Whether having fitted track parameters or not
   bool hasTrackParameters(
       Acts::MultiTrajectoryTraits::IndexType entryIndex) const {
-    return (0 < m_trackParameters.count(entryIndex));
+    return m_trackParameters.contains(entryIndex);
   }
 
   /// Access the fitted track parameters for the given index.

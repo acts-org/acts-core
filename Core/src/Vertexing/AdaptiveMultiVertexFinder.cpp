@@ -1,16 +1,18 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Vertexing/AdaptiveMultiVertexFinder.hpp"
 
 #include "Acts/Utilities/AlgebraHelpers.hpp"
 #include "Acts/Vertexing/IVertexFinder.hpp"
 #include "Acts/Vertexing/VertexingError.hpp"
+
+#include <algorithm>
 
 namespace Acts {
 
@@ -364,10 +366,7 @@ std::pair<int, bool> AdaptiveMultiVertexFinder::checkVertexAndCompatibleTracks(
          !m_cfg.useFastCompatibility)) {
       // TODO: Understand why looking for compatible tracks only in seed tracks
       // and not also in all tracks
-      auto foundIter =
-          std::find_if(seedTracks.begin(), seedTracks.end(),
-                       [&trk](auto seedTrk) { return trk == seedTrk; });
-      if (foundIter != seedTracks.end()) {
+      if (rangeContainsValue(seedTracks, trk)) {
         nCompatibleTracks++;
         ACTS_DEBUG("Compatible track found.");
 
@@ -399,9 +398,7 @@ auto AdaptiveMultiVertexFinder::removeCompatibleTracksFromSeedTracks(
          trkAtVtx.chi2Track < m_cfg.maxVertexChi2 &&
          !m_cfg.useFastCompatibility)) {
       // Find and remove track from seedTracks
-      auto foundSeedIter =
-          std::find_if(seedTracks.begin(), seedTracks.end(),
-                       [&trk](auto seedTrk) { return trk == seedTrk; });
+      auto foundSeedIter = std::ranges::find(seedTracks, trk);
       if (foundSeedIter != seedTracks.end()) {
         seedTracks.erase(foundSeedIter);
         removedSeedTracks.push_back(trk);
@@ -425,9 +422,7 @@ bool AdaptiveMultiVertexFinder::removeTrackIfIncompatible(
     double compatibility = trkAtVtx.vertexCompatibility;
     if (compatibility > maxCompatibility) {
       // Try to find track in seed tracks
-      auto foundSeedIter =
-          std::find_if(seedTracks.begin(), seedTracks.end(),
-                       [&trk](auto seedTrk) { return trk == seedTrk; });
+      auto foundSeedIter = std::ranges::find(seedTracks, trk);
       if (foundSeedIter != seedTracks.end()) {
         maxCompatibility = compatibility;
         maxCompSeedIt = foundSeedIter;

@@ -1,13 +1,15 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-template <typename SpacePoint>
-Acts::CylindricalSpacePointGrid<SpacePoint>
+#include <concepts>
+
+template <typename external_spacepoint_t>
+Acts::CylindricalSpacePointGrid<external_spacepoint_t>
 Acts::CylindricalSpacePointGridCreator::createGrid(
     const Acts::CylindricalSpacePointGridConfig& config,
     const Acts::CylindricalSpacePointGridOptions& options) {
@@ -101,7 +103,7 @@ Acts::CylindricalSpacePointGridCreator::createGrid(
       config.phiMin, config.phiMax, phiBins);
 
   // vector that will store the edges of the bins of z
-  std::vector<AxisScalar> zValues;
+  std::vector<AxisScalar> zValues{};
 
   // If zBinEdges is not defined, calculate the edges as zMin + bin * zBinSize
   if (config.zBinEdges.empty()) {
@@ -128,29 +130,29 @@ Acts::CylindricalSpacePointGridCreator::createGrid(
     }
   }
 
+  std::vector<AxisScalar> rValues{};
+  rValues.reserve(std::max(2ul, config.rBinEdges.size()));
+  if (config.rBinEdges.empty()) {
+    rValues = {config.rMin, config.rMax};
+  } else {
+    rValues.insert(rValues.end(), config.rBinEdges.begin(),
+                   config.rBinEdges.end());
+  }
+
   Axis<AxisType::Variable, AxisBoundaryType::Bound> zAxis(std::move(zValues));
-  return Acts::CylindricalSpacePointGrid<SpacePoint>(
-      std::make_tuple(std::move(phiAxis), std::move(zAxis)));
+  Axis<AxisType::Variable, AxisBoundaryType::Bound> rAxis(std::move(rValues));
+  return Acts::CylindricalSpacePointGrid<external_spacepoint_t>(
+      std::make_tuple(std::move(phiAxis), std::move(zAxis), std::move(rAxis)));
 }
 
 template <typename external_spacepoint_t,
-          typename external_spacepoint_iterator_t, typename callable_t>
+          typename external_spacepoint_iterator_t>
 void Acts::CylindricalSpacePointGridCreator::fillGrid(
     const Acts::SeedFinderConfig<external_spacepoint_t>& config,
     const Acts::SeedFinderOptions& options,
     Acts::CylindricalSpacePointGrid<external_spacepoint_t>& grid,
     external_spacepoint_iterator_t spBegin,
-    external_spacepoint_iterator_t spEnd, callable_t&& toGlobal,
-    Acts::Extent& rRangeSPExtent) {
-  using iterated_value_t =
-      typename std::iterator_traits<external_spacepoint_iterator_t>::value_type;
-  using iterated_t = typename std::remove_const<
-      typename std::remove_pointer<iterated_value_t>::type>::type;
-  static_assert(std::is_pointer<iterated_value_t>::value,
-                "Iterator must contain pointers to space points");
-  static_assert(std::is_same<iterated_t, external_spacepoint_t>::value,
-                "Iterator does not contain type this class was templated with");
-
+    external_spacepoint_iterator_t spEnd) {
   if (!config.isInInternalUnits) {
     throw std::runtime_error(
         "SeedFinderConfig not in ACTS internal units in BinnedSPGroup");
@@ -163,13 +165,15 @@ void Acts::CylindricalSpacePointGridCreator::fillGrid(
         "SeedFinderOptions not in ACTS internal units in BinnedSPGroup");
   }
 
-  // sort by radius
-  // add magnitude of beamPos to rMax to avoid excluding measurements
-  // create number of bins equal to number of millimeters rMax
-  // (worst case minR: configured minR + 1mm)
-  // binSizeR allows to increase or reduce numRBins if needed
-  std::size_t numRBins = static_cast<std::size_t>(
-      (config.rMax + options.beamPos.norm()) / config.binSizeR);
+  // Space points are assumed to be ALREADY CORRECTED for beamspot position
+  // phi, z and r space point selection comes naturally from the
+  // grid axis definition. Calling `isInside` will let us know if we are
+  // inside the grid range.
+  // If a space point is outside the validity range of these quantities
+  // it goes in an over- or under-flow bin. We want to avoid to consider those
+  // and skip some computations.
+  // Additional cuts can be applied by customizing the space point selector
+  // in the config object.
 
   // keep track of changed bins while sorting
   std::vector<bool> usedBinIndex(grid.size(), false);
@@ -179,51 +183,22 @@ void Acts::CylindricalSpacePointGridCreator::fillGrid(
   std::size_t counter = 0ul;
   for (external_spacepoint_iterator_t it = spBegin; it != spEnd;
        it++, ++counter) {
-    if (*it == nullptr) {
-      continue;
-    }
-    const external_spacepoint_t& sp = **it;
-    const auto& [spPosition, variance, spTime] =
-        toGlobal(sp, config.zAlign, config.rAlign, config.sigmaError);
-
-    float spX = spPosition[0];
-    float spY = spPosition[1];
-    float spZ = spPosition[2];
-
-    // store x,y,z values in extent
-    rRangeSPExtent.extend({spX, spY, spZ});
+    const external_spacepoint_t& sp = *it;
 
     // remove SPs according to experiment specific cuts
     if (!config.spacePointSelector(sp)) {
       continue;
     }
 
-    // remove SPs outside z and phi region
-    if (spZ > config.zMax || spZ < config.zMin) {
-      continue;
-    }
-
-    float spPhi = std::atan2(spY, spX);
-    if (spPhi > config.phiMax || spPhi < config.phiMin) {
-      continue;
-    }
-
-    auto isp = std::make_unique<InternalSpacePoint<external_spacepoint_t>>(
-        counter, sp, spPosition, options.beamPos, variance, spTime);
-    // calculate r-Bin index and protect against overflow (underflow not
-    // possible)
-    std::size_t rIndex =
-        static_cast<std::size_t>(isp->radius() / config.binSizeR);
-    // if index out of bounds, the SP is outside the region of interest
-    if (rIndex >= numRBins) {
-      continue;
-    }
-
     // fill rbins into grid
-    std::size_t globIndex =
-        grid.globalBinFromPosition(Acts::Vector2{isp->phi(), isp->z()});
+    Acts::Vector3 position(sp.phi(), sp.z(), sp.radius());
+    if (!grid.isInside(position)) {
+      continue;
+    }
+
+    std::size_t globIndex = grid.globalBinFromPosition(position);
     auto& rbin = grid.at(globIndex);
-    rbin.push_back(std::move(isp));
+    rbin.push_back(&sp);
 
     // keep track of the bins we modify so that we can later sort the SPs in
     // those bins only

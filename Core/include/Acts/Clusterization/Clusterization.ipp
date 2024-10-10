@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <algorithm>
 #include <array>
@@ -14,60 +14,6 @@
 
 namespace Acts::Ccl::internal {
 
-// Machinery for validating generic Cell/Cluster types at compile-time
-
-template <typename, std::size_t, typename T = void>
-struct cellTypeHasRequiredFunctions : std::false_type {};
-
-template <typename T>
-struct cellTypeHasRequiredFunctions<
-    T, 2,
-    std::void_t<decltype(getCellRow(std::declval<T>())),
-                decltype(getCellColumn(std::declval<T>())),
-                decltype(getCellLabel(std::declval<T&>()))>> : std::true_type {
-};
-
-template <typename T>
-struct cellTypeHasRequiredFunctions<
-    T, 1,
-    std::void_t<decltype(getCellColumn(std::declval<T>())),
-                decltype(getCellLabel(std::declval<T&>()))>> : std::true_type {
-};
-
-template <typename, typename, typename T = void>
-struct clusterTypeHasRequiredFunctions : std::false_type {};
-
-template <typename T, typename U>
-struct clusterTypeHasRequiredFunctions<
-    T, U,
-    std::void_t<decltype(clusterAddCell(std::declval<T>(), std::declval<U>()))>>
-    : std::true_type {};
-
-template <std::size_t GridDim>
-constexpr void staticCheckGridDim() {
-  static_assert(
-      GridDim == 1 || GridDim == 2,
-      "mergeClusters is only defined for grid dimensions of 1 or 2. ");
-}
-
-template <typename T, std::size_t GridDim>
-constexpr void staticCheckCellType() {
-  constexpr bool hasFns = cellTypeHasRequiredFunctions<T, GridDim>();
-  static_assert(hasFns,
-                "Cell type should have the following functions: "
-                "'int getCellRow(const Cell&)', "
-                "'int getCellColumn(const Cell&)', "
-                "'Label& getCellLabel(Cell&)'");
-}
-
-template <typename T, typename U>
-constexpr void staticCheckClusterType() {
-  constexpr bool hasFns = clusterTypeHasRequiredFunctions<T, U>();
-  static_assert(hasFns,
-                "Cluster type should have the following function: "
-                "'void clusterAddCell(Cluster&, const Cell&)'");
-}
-
 template <typename Cell, std::size_t GridDim>
 struct Compare {
   static_assert(GridDim != 1 && GridDim != 2,
@@ -75,8 +21,20 @@ struct Compare {
 };
 
 // Comparator function object for cells, column-wise ordering
+// Specialization for 1-D grids
+template <Acts::Ccl::HasRetrievableColumnInfo Cell>
+struct Compare<Cell, 1> {
+  bool operator()(const Cell& c0, const Cell& c1) const {
+    int col0 = getCellColumn(c0);
+    int col1 = getCellColumn(c1);
+    return col0 < col1;
+  }
+};
+
 // Specialization for 2-D grid
 template <typename Cell>
+  requires(Acts::Ccl::HasRetrievableColumnInfo<Cell> &&
+           Acts::Ccl::HasRetrievableRowInfo<Cell>)
 struct Compare<Cell, 2> {
   bool operator()(const Cell& c0, const Cell& c1) const {
     int row0 = getCellRow(c0);
@@ -84,16 +42,6 @@ struct Compare<Cell, 2> {
     int col0 = getCellColumn(c0);
     int col1 = getCellColumn(c1);
     return (col0 == col1) ? row0 < row1 : col0 < col1;
-  }
-};
-
-// Specialization for 1-D grids
-template <typename Cell>
-struct Compare<Cell, 1> {
-  bool operator()(const Cell& c0, const Cell& c1) const {
-    int col0 = getCellColumn(c0);
-    int col1 = getCellColumn(c1);
-    return col0 < col1;
   }
 };
 
@@ -184,6 +132,10 @@ Connections<GridDim> getConnections(typename std::vector<Cell>::iterator it,
 }
 
 template <typename CellCollection, typename ClusterCollection>
+  requires(
+      Acts::Ccl::HasRetrievableLabelInfo<typename CellCollection::value_type> &&
+      Acts::Ccl::CanAcceptCell<typename CellCollection::value_type,
+                               typename ClusterCollection::value_type>)
 ClusterCollection mergeClustersImpl(CellCollection& cells) {
   using Cluster = typename ClusterCollection::value_type;
 
@@ -215,6 +167,8 @@ ClusterCollection mergeClustersImpl(CellCollection& cells) {
 namespace Acts::Ccl {
 
 template <typename Cell>
+  requires(Acts::Ccl::HasRetrievableColumnInfo<Cell> &&
+           Acts::Ccl::HasRetrievableRowInfo<Cell>)
 ConnectResult Connect2D<Cell>::operator()(const Cell& ref,
                                           const Cell& iter) const {
   int deltaRow = std::abs(getCellRow(ref) - getCellRow(iter));
@@ -237,7 +191,7 @@ ConnectResult Connect2D<Cell>::operator()(const Cell& ref,
   return ConnectResult::eNoConn;
 }
 
-template <typename Cell>
+template <Acts::Ccl::HasRetrievableColumnInfo Cell>
 ConnectResult Connect1D<Cell>::operator()(const Cell& ref,
                                           const Cell& iter) const {
   int deltaCol = std::abs(getCellColumn(ref) - getCellColumn(iter));
@@ -267,9 +221,10 @@ void recordEquivalences(const internal::Connections<GridDim> seen,
 }
 
 template <typename CellCollection, std::size_t GridDim, typename Connect>
+  requires(
+      Acts::Ccl::HasRetrievableLabelInfo<typename CellCollection::value_type>)
 void labelClusters(CellCollection& cells, Connect connect) {
   using Cell = typename CellCollection::value_type;
-  internal::staticCheckCellType<Cell, GridDim>();
 
   internal::DisjointSets ds{};
 
@@ -277,7 +232,8 @@ void labelClusters(CellCollection& cells, Connect connect) {
   std::ranges::sort(cells, internal::Compare<Cell, GridDim>());
 
   // First pass: Allocate labels and record equivalences
-  for (auto it = cells.begin(); it != cells.end(); ++it) {
+  for (auto it = std::ranges::begin(cells); it != std::ranges::end(cells);
+       ++it) {
     const internal::Connections<GridDim> seen =
         internal::getConnections<Cell, Connect, GridDim>(it, cells, connect);
     if (seen.nconn == 0) {
@@ -299,13 +255,11 @@ void labelClusters(CellCollection& cells, Connect connect) {
 
 template <typename CellCollection, typename ClusterCollection,
           std::size_t GridDim = 2>
+  requires(GridDim == 1 || GridDim == 2) &&
+          Acts::Ccl::HasRetrievableLabelInfo<
+              typename CellCollection::value_type>
 ClusterCollection mergeClusters(CellCollection& cells) {
   using Cell = typename CellCollection::value_type;
-  using Cluster = typename ClusterCollection::value_type;
-  internal::staticCheckGridDim<GridDim>();
-  internal::staticCheckCellType<Cell, GridDim>();
-  internal::staticCheckClusterType<Cluster&, const Cell&>();
-
   if constexpr (GridDim > 1) {
     // Sort the cells by their cluster label, only needed if more than
     // one spatial dimension
@@ -318,10 +272,6 @@ ClusterCollection mergeClusters(CellCollection& cells) {
 template <typename CellCollection, typename ClusterCollection,
           std::size_t GridDim, typename Connect>
 ClusterCollection createClusters(CellCollection& cells, Connect connect) {
-  using Cell = typename CellCollection::value_type;
-  using Cluster = typename ClusterCollection::value_type;
-  internal::staticCheckCellType<Cell, GridDim>();
-  internal::staticCheckClusterType<Cluster&, const Cell&>();
   labelClusters<CellCollection, GridDim, Connect>(cells, connect);
   return mergeClusters<CellCollection, ClusterCollection, GridDim>(cells);
 }

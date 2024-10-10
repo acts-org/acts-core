@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -23,8 +23,7 @@
 #include "Acts/Navigation/DetectorNavigator.hpp"
 #include "Acts/Navigation/DetectorVolumeFinders.hpp"
 #include "Acts/Navigation/InternalNavigation.hpp"
-#include "Acts/Propagator/AbortList.hpp"
-#include "Acts/Propagator/ActionList.hpp"
+#include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
@@ -48,9 +47,9 @@ struct StateRecorder {
 
   template <typename propagator_state_t, typename stepper_t,
             typename navigator_t>
-  void operator()(propagator_state_t& state, const stepper_t& /*stepper*/,
-                  const navigator_t& /*navigator*/, result_type& result,
-                  const Acts::Logger& /*logger*/) const {
+  void act(propagator_state_t& state, const stepper_t& /*stepper*/,
+           const navigator_t& /*navigator*/, result_type& result,
+           const Acts::Logger& /*logger*/) const {
     result.push_back(state.navigation);
   }
 };
@@ -72,9 +71,8 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsInitialization) {
   using Stepper = Acts::StraightLineStepper;
   using Navigator = Acts::Experimental::DetectorNavigator;
   using Propagator = Acts::Propagator<Stepper, Navigator>;
-  using ActionList = Acts::ActionList<>;
-  using AbortList = Acts::AbortList<>;
-  using PropagatorOptions = Propagator::Options<ActionList, AbortList>;
+  using ActorList = Acts::ActorList<>;
+  using PropagatorOptions = Propagator::Options<ActorList>;
 
   PropagatorOptions options(geoContext, mfContext);
 
@@ -268,9 +266,8 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsForwardBackward) {
   using Stepper = Acts::StraightLineStepper;
   using Navigator = Acts::Experimental::DetectorNavigator;
   using Propagator = Acts::Propagator<Stepper, Navigator>;
-  using ActionList = Acts::ActionList<StateRecorder>;
-  using AbortList = Acts::AbortList<Acts::EndOfWorldReached>;
-  using PropagatorOptions = Propagator::Options<ActionList, AbortList>;
+  using ActorList = Acts::ActorList<StateRecorder, Acts::EndOfWorldReached>;
+  using PropagatorOptions = Propagator::Options<ActorList>;
 
   Navigator::Config navCfg;
   navCfg.detector = detector.get();
@@ -429,9 +426,8 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsAmbiguity) {
   using Stepper = Acts::StraightLineStepper;
   using Navigator = Acts::Experimental::DetectorNavigator;
   using Propagator = Acts::Propagator<Stepper, Navigator>;
-  using ActionList = Acts::ActionList<StateRecorder>;
-  using AbortList = Acts::AbortList<Acts::EndOfWorldReached>;
-  using PropagatorOptions = Propagator::Options<ActionList, AbortList>;
+  using ActorList = Acts::ActorList<StateRecorder, Acts::EndOfWorldReached>;
+  using PropagatorOptions = Propagator::Options<ActorList>;
 
   Navigator::Config navCfg;
   navCfg.detector = detector.get();
@@ -545,9 +541,8 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsMultipleIntersection) {
   using Stepper = Acts::StraightLineStepper;
   using Navigator = Acts::Experimental::DetectorNavigator;
   using Propagator = Acts::Propagator<Stepper, Navigator>;
-  using ActionList = Acts::ActionList<StateRecorder>;
-  using AbortList = Acts::AbortList<Acts::EndOfWorldReached>;
-  using PropagatorOptions = Propagator::Options<ActionList, AbortList>;
+  using ActorList = Acts::ActorList<StateRecorder, Acts::EndOfWorldReached>;
+  using PropagatorOptions = Propagator::Options<ActorList>;
 
   Navigator::Config navCfg;
   navCfg.detector = detector.get();

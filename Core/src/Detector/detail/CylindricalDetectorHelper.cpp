@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Detector/detail/CylindricalDetectorHelper.hpp"
 
@@ -860,16 +860,14 @@ Acts::Experimental::detail::CylindricalDetectorHelper::connectInR(
     auto& formerContainer = containers[ic - 1];
     auto& currentContainer = containers[ic];
     // Check and throw exception
-    if (formerContainer.find(2u) == formerContainer.end()) {
+    if (!formerContainer.contains(2u)) {
       throw std::invalid_argument(
-          "CylindricalDetectorHelper: proto container has no outer cover, "
-          "can "
+          "CylindricalDetectorHelper: proto container has no outer cover, can "
           "not be connected in R");
     }
-    if (currentContainer.find(3u) == currentContainer.end()) {
+    if (!currentContainer.contains(3u)) {
       throw std::invalid_argument(
-          "CylindricalDetectorHelper: proto container has no inner cover, "
-          "can "
+          "CylindricalDetectorHelper: proto container has no inner cover, can "
           "not be connected in R");
     }
 
@@ -897,7 +895,7 @@ Acts::Experimental::detail::CylindricalDetectorHelper::connectInR(
   }
 
   // Proto container refurbishment
-  if (containers[0u].find(3u) != containers[0u].end()) {
+  if (containers[0u].contains(3u)) {
     dShell[3u] = containers[0u].find(3u)->second;
   }
   dShell[2u] = containers[containers.size() - 1u].find(2u)->second;
@@ -907,7 +905,7 @@ Acts::Experimental::detail::CylindricalDetectorHelper::connectInR(
 
   for (auto [s, volumes] : sideVolumes) {
     auto pR = connectInR(gctx, volumes, {s});
-    if (pR.find(s) != pR.end()) {
+    if (pR.contains(s)) {
       dShell[s] = pR.find(s)->second;
     }
   }
@@ -934,12 +932,12 @@ Acts::Experimental::detail::CylindricalDetectorHelper::connectInZ(
     auto& formerContainer = containers[ic - 1];
     auto& currentContainer = containers[ic];
     // Check and throw exception
-    if (formerContainer.find(1u) == formerContainer.end()) {
+    if (!formerContainer.contains(1u)) {
       throw std::invalid_argument(
           "CylindricalDetectorHelper: proto container has no negative disc, "
           "can not be connected in Z");
     }
-    if (currentContainer.find(0u) == currentContainer.end()) {
+    if (!currentContainer.contains(0u)) {
       throw std::invalid_argument(
           "CylindricalDetectorHelper: proto container has no positive disc, "
           "can not be connected in Z");
@@ -972,7 +970,7 @@ Acts::Experimental::detail::CylindricalDetectorHelper::connectInZ(
 
   // Check if this is a tube or a cylinder container (check done on 1st)
   std::vector<unsigned int> nominalSides = {2u, 4u, 5u};
-  if (containers[0u].find(3u) != containers[0u].end()) {
+  if (containers[0u].contains(3u)) {
     nominalSides.push_back(3u);
   }
 
@@ -985,7 +983,7 @@ Acts::Experimental::detail::CylindricalDetectorHelper::connectInZ(
   for (auto [s, volumes] : sideVolumes) {
     ACTS_VERBOSE(" - connect " << volumes.size() << " at selected side " << s);
     auto pR = connectInZ(gctx, volumes, {s}, logLevel);
-    if (pR.find(s) != pR.end()) {
+    if (pR.contains(s)) {
       dShell[s] = pR.find(s)->second;
     }
   }

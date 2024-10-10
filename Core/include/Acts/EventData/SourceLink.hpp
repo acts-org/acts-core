@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -14,7 +14,6 @@
 
 #include <cassert>
 #include <concepts>
-#include <iostream>
 #include <type_traits>
 #include <utility>
 
@@ -34,7 +33,7 @@ class SourceLink final {
   SourceLink& operator=(const SourceLink& other) = default;
   SourceLink& operator=(SourceLink&& other) = default;
 
-  /// Constructor from concrete sourcelink
+  /// Constructor from concrete source link
   /// @tparam T The source link type
   /// @param upstream The upstream source link to store
   template <typename T>
@@ -84,10 +83,6 @@ struct SourceLinkAdapterIterator {
 
   bool operator==(const SourceLinkAdapterIterator& other) const {
     return m_iterator == other.m_iterator;
-  }
-
-  bool operator!=(const SourceLinkAdapterIterator& other) const {
-    return !(*this == other);
   }
 
   Acts::SourceLink operator*() const { return Acts::SourceLink{*m_iterator}; }

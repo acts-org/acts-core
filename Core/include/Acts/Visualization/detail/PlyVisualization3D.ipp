@@ -1,19 +1,19 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 template <typename T>
-void PlyVisualization3D<T>::vertex(const Vector3& vtx, ColorRGB color) {
+void PlyVisualization3D<T>::vertex(const Vector3& vtx, Color color) {
   m_vertices.emplace_back(vtx.template cast<ValueType>(), color);
 }
 
 template <typename T>
 void PlyVisualization3D<T>::face(const std::vector<Vector3>& vtxs,
-                                 ColorRGB color) {
+                                 Color color) {
   FaceType idxs;
   idxs.reserve(vtxs.size());
   for (const auto& vtx : vtxs) {
@@ -26,13 +26,13 @@ void PlyVisualization3D<T>::face(const std::vector<Vector3>& vtxs,
 template <typename T>
 void PlyVisualization3D<T>::faces(const std::vector<Vector3>& vtxs,
                                   const std::vector<FaceType>& /*faces*/,
-                                  ColorRGB color) {
+                                  Color color) {
   face(vtxs, color);
 }
 
 template <typename T>
 void PlyVisualization3D<T>::line(const Vector3& a, const Vector3& b,
-                                 ColorRGB color) {
+                                 Color color) {
   vertex(a, color);
   std::size_t idx_a = m_vertices.size() - 1;
   vertex(b, color);
@@ -73,7 +73,7 @@ void PlyVisualization3D<T>::write(std::ostream& os) const {
   os << "property uchar blue\n";
   os << "end_header\n";
 
-  for (const std::pair<VertexType, ColorRGB>& vtx : m_vertices) {
+  for (const std::pair<VertexType, Color>& vtx : m_vertices) {
     os << vtx.first.x() << " " << vtx.first.y() << " " << vtx.first.z() << " ";
     os << vtx.second[0] << " " << vtx.second[1] << " " << vtx.second[2] << "\n";
   }
@@ -86,7 +86,7 @@ void PlyVisualization3D<T>::write(std::ostream& os) const {
     os << "\n";
   }
 
-  for (const std::pair<std::pair<std::size_t, std::size_t>, ColorRGB>& edge :
+  for (const std::pair<std::pair<std::size_t, std::size_t>, Color>& edge :
        m_edges) {
     std::pair<std::size_t, std::size_t> idxs = edge.first;
     os << idxs.first << " " << idxs.second << " ";

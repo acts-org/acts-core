@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -112,12 +112,18 @@ class CylinderBounds : public SurfaceBounds {
   /// Returns true for full phi coverage
   bool coversFullAzimuth() const;
 
-  /// Create the bows/circles on either side of the cylinder
+  /// Create the bow/circle vertices on either side of the cylinder
   ///
-  /// @param trans is the global transform
-  /// @param lseg  are the numbero if phi segments
-  std::vector<Vector3> createCircles(const Transform3 trans,
-                                     std::size_t lseg) const;
+  /// @param transform is the global transform
+  /// @param quarterSegments is the number of segments to approximate a quarter
+  /// of a circle. In order to symmetrize fully closed and sectoral cylinders,
+  /// also in the first case the two end points are given (albeit they overlap)
+  /// in -pi / pi
+  ///
+  /// @return a singlevector containing the vertices from one side and then
+  /// from the other side consecutively
+  std::vector<Vector3> circleVertices(const Transform3 transform,
+                                      unsigned int quarterSegments) const;
 
   /// Output Method for std::ostream
   std::ostream& toStream(std::ostream& sl) const final;

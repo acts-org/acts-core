@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Geometry/Extent.hpp"
 
@@ -144,8 +144,7 @@ bool Acts::Extent::contains(const Extent& rhs,
 
   // Check all
   if (!bValue.has_value()) {
-    return std::all_of(allBinningValues().begin(), allBinningValues().end(),
-                       checkContainment);
+    return std::ranges::all_of(allBinningValues(), checkContainment);
   }
   // Check specific
   return checkContainment(bValue.value());
@@ -163,8 +162,7 @@ bool Acts::Extent::intersects(const Extent& rhs,
 
   // Check all
   if (!bValue.has_value()) {
-    return std::any_of(allBinningValues().begin(), allBinningValues().end(),
-                       checkIntersect);
+    return std::ranges::any_of(allBinningValues(), checkIntersect);
   }
   // Check specific
   return checkIntersect(bValue.value());

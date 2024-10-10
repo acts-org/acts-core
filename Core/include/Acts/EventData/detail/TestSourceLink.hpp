@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2020-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -72,12 +72,13 @@ struct TestSourceLink final {
   TestSourceLink(TestSourceLink&&) = default;
   TestSourceLink& operator=(const TestSourceLink&) = default;
   TestSourceLink& operator=(TestSourceLink&&) = default;
+
   bool operator==(const TestSourceLink& rhs) const {
     return (m_geometryId == rhs.m_geometryId) && (sourceId == rhs.sourceId) &&
            (indices == rhs.indices) && (parameters == rhs.parameters) &&
            (covariance == rhs.covariance);
   }
-  bool operator!=(const TestSourceLink& rhs) const { return !(*this == rhs); }
+
   std::ostream& print(std::ostream& os) const {
     os << "TestsSourceLink(geometryId=" << m_geometryId
        << ",sourceId=" << sourceId;

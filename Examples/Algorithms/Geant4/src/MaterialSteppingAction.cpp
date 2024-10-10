@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Geant4/MaterialSteppingAction.hpp"
 
@@ -97,7 +97,7 @@ void ActsExamples::MaterialSteppingAction::UserSteppingAction(
   G4Track* g4Track = step->GetTrack();
   std::size_t trackID = g4Track->GetTrackID();
   auto& materialTracks = eventStore().materialTracks;
-  if (materialTracks.find(trackID - 1) == materialTracks.end()) {
+  if (!materialTracks.contains(trackID - 1)) {
     Acts::RecordedMaterialTrack rmTrack;
     const auto& g4Vertex = g4Track->GetVertexPosition();
     Acts::Vector3 vertex(g4Vertex[0], g4Vertex[1], g4Vertex[2]);

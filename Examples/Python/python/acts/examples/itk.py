@@ -372,8 +372,8 @@ def itkSeedingAlgConfig(
     )
     zOriginWeightFactor = 1
     compatSeedWeight = 100
-    phiMin = 0
-    phiMax = 2 * math.pi
+    phiMin = -math.pi
+    phiMax = math.pi
     phiBinDeflectionCoverage = 3
     numPhiNeighbors = 1
     maxPhiBins = 200

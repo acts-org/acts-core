@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/TrapezoidBounds.hpp"
 
@@ -89,14 +89,14 @@ bool Acts::TrapezoidBounds::inside(
 
   // at this stage, the point can only be in the triangles
   // run slow-ish polygon check
-  std::vector<Acts::Vector2> vertices = {
+  Vector2 vertices[] = {
       {-hlXnY, -hlY}, {hlXnY, -hlY}, {hlXpY, hlY}, {-hlXpY, hlY}};
   return detail::insidePolygon(vertices, boundaryTolerance, extPosition,
                                std::nullopt);
 }
 
 std::vector<Acts::Vector2> Acts::TrapezoidBounds::vertices(
-    unsigned int /*lseg*/) const {
+    unsigned int /*ignoredSegments*/) const {
   const double hlXnY = get(TrapezoidBounds::eHalfLengthXnegY);
   const double hlXpY = get(TrapezoidBounds::eHalfLengthXposY);
   const double hlY = get(TrapezoidBounds::eHalfLengthY);

@@ -86,3 +86,10 @@ repos:
       language: system
       entry: docs/parse_cmake_options.py --write docs/getting_started.md
       files: ^CMakeLists.txt$
+
+  - repo: local
+    hooks:
+    - id: leftover_conflict_markers
+      name: Leftover conflict markers
+      language: system
+      entry: git diff --staged --check

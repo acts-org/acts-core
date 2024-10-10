@@ -1,30 +1,15 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 namespace Acts {
-template <typename external_spacepoint_t>
-inline LinCircle transformCoordinates(
-    const InternalSpacePoint<external_spacepoint_t>& sp,
-    const InternalSpacePoint<external_spacepoint_t>& spM, bool bottom) {
-  auto extractFunction =
-      [](const InternalSpacePoint<external_spacepoint_t>& obj)
-      -> std::array<float, 6> {
-    std::array<float, 6> output{obj.x(),      obj.y(),         obj.z(),
-                                obj.radius(), obj.varianceR(), obj.varianceZ()};
-    return output;
-  };
-
-  return transformCoordinates<InternalSpacePoint<external_spacepoint_t>>(
-      sp, spM, bottom, std::move(extractFunction));
-}
-
 template <typename external_spacepoint_t, typename callable_t>
-inline LinCircle transformCoordinates(const external_spacepoint_t& sp,
+inline LinCircle transformCoordinates(Acts::SpacePointMutableData& mutableData,
+                                      const external_spacepoint_t& sp,
                                       const external_spacepoint_t& spM,
                                       bool bottom,
                                       callable_t&& extractFunction) {
@@ -61,36 +46,22 @@ inline LinCircle transformCoordinates(const external_spacepoint_t& sp,
                     (cotTheta * cotTheta) * (varianceRM + varianceRSP)) *
                    iDeltaR2;
 
-  sp.setDeltaR(std::sqrt(deltaR2 + (deltaZ * deltaZ)));
+  mutableData.setDeltaR(sp.index(), std::sqrt(deltaR2 + (deltaZ * deltaZ)));
   return LinCircle(cotTheta, iDeltaR, Er, U, V, xNewFrame, yNewFrame);
 }
 
 template <typename external_spacepoint_t>
 inline void transformCoordinates(
-    Acts::SpacePointData& spacePointData,
-    const std::vector<InternalSpacePoint<external_spacepoint_t>*>& vec,
-    const InternalSpacePoint<external_spacepoint_t>& spM, bool bottom,
+    Acts::SpacePointMutableData& mutableData,
+    const std::vector<const external_spacepoint_t*>& vec,
+    const external_spacepoint_t& spM, bool bottom,
     std::vector<LinCircle>& linCircleVec) {
-  auto extractFunction =
-      [](const InternalSpacePoint<external_spacepoint_t>& obj)
-      -> std::array<float, 6> {
-    std::array<float, 6> output{obj.x(),      obj.y(),         obj.z(),
-                                obj.radius(), obj.varianceR(), obj.varianceZ()};
-    return output;
-  };
-
-  transformCoordinates<InternalSpacePoint<external_spacepoint_t>>(
-      spacePointData, vec, spM, bottom, linCircleVec,
-      std::move(extractFunction));
-}
-
-template <typename external_spacepoint_t, typename callable_t>
-inline void transformCoordinates(Acts::SpacePointData& spacePointData,
-                                 const std::vector<external_spacepoint_t*>& vec,
-                                 const external_spacepoint_t& spM, bool bottom,
-                                 std::vector<LinCircle>& linCircleVec,
-                                 callable_t&& extractFunction) {
-  auto [xM, yM, zM, rM, varianceRM, varianceZM] = extractFunction(spM);
+  const float xM = spM.x();
+  const float yM = spM.y();
+  const float zM = spM.z();
+  const float rM = spM.radius();
+  const float varianceRM = spM.varianceR();
+  const float varianceZM = spM.varianceZ();
 
   // resize + operator[] is faster than reserve and push_back
   linCircleVec.resize(vec.size());
@@ -101,37 +72,42 @@ inline void transformCoordinates(Acts::SpacePointData& spacePointData,
   int bottomFactor = bottom ? -1 : 1;
 
   for (std::size_t idx(0); idx < vec.size(); ++idx) {
-    auto& sp = vec[idx];
-    auto [xSP, ySP, zSP, rSP, varianceRSP, varianceZSP] = extractFunction(*sp);
+    const external_spacepoint_t* sp = vec[idx];
 
-    float deltaX = xSP - xM;
-    float deltaY = ySP - yM;
-    float deltaZ = zSP - zM;
+    const float xSP = sp->x();
+    const float ySP = sp->y();
+    const float zSP = sp->z();
+    const float varianceRSP = sp->varianceR();
+    const float varianceZSP = sp->varianceZ();
+
+    const float deltaX = xSP - xM;
+    const float deltaY = ySP - yM;
+    const float deltaZ = zSP - zM;
     // calculate projection fraction of spM->sp vector pointing in same
     // direction as
     // vector origin->spM (x) and projection fraction of spM->sp vector pointing
     // orthogonal to origin->spM (y)
-    float xNewFrame = deltaX * cosPhiM + deltaY * sinPhiM;
-    float yNewFrame = deltaY * cosPhiM - deltaX * sinPhiM;
+    const float xNewFrame = deltaX * cosPhiM + deltaY * sinPhiM;
+    const float yNewFrame = deltaY * cosPhiM - deltaX * sinPhiM;
     // 1/(length of M -> SP)
-    float deltaR2 = (xNewFrame * xNewFrame + yNewFrame * yNewFrame);
-    float iDeltaR2 = 1. / deltaR2;
-    float iDeltaR = std::sqrt(iDeltaR2);
+    const float deltaR2 = (xNewFrame * xNewFrame + yNewFrame * yNewFrame);
+    const float iDeltaR2 = 1. / deltaR2;
+    const float iDeltaR = std::sqrt(iDeltaR2);
     //
     // cot_theta = (deltaZ/deltaR)
-    float cotTheta = deltaZ * iDeltaR * bottomFactor;
+    const float cotTheta = deltaZ * iDeltaR * bottomFactor;
     // transformation of circle equation (x,y) into linear equation (u,v)
     // x^2 + y^2 - 2x_0*x - 2y_0*y = 0
     // is transformed into
     // 1 - 2x_0*u - 2y_0*v = 0
     // using the following m_U and m_V
     // (u = A + B*v); A and B are created later on
-    float U = xNewFrame * iDeltaR2;
-    float V = yNewFrame * iDeltaR2;
+    const float U = xNewFrame * iDeltaR2;
+    const float V = yNewFrame * iDeltaR2;
     // error term for sp-pair without correlation of middle space point
-    float Er = ((varianceZM + varianceZSP) +
-                (cotTheta * cotTheta) * (varianceRM + varianceRSP)) *
-               iDeltaR2;
+    const float Er = ((varianceZM + varianceZSP) +
+                      (cotTheta * cotTheta) * (varianceRM + varianceRSP)) *
+                     iDeltaR2;
 
     // Fill Line Circle
     linCircleVec[idx].cotTheta = cotTheta;
@@ -141,33 +117,22 @@ inline void transformCoordinates(Acts::SpacePointData& spacePointData,
     linCircleVec[idx].V = V;
     linCircleVec[idx].x = xNewFrame;
     linCircleVec[idx].y = yNewFrame;
-
-    spacePointData.setDeltaR(sp->index(),
-                             std::sqrt(deltaR2 + (deltaZ * deltaZ)));
+    mutableData.setDeltaR(sp->index(), std::sqrt(deltaR2 + (deltaZ * deltaZ)));
   }
 }
 
 template <typename external_spacepoint_t>
 inline bool xyzCoordinateCheck(
-    Acts::SpacePointData& spacePointData,
     const Acts::SeedFinderConfig<external_spacepoint_t>& m_config,
-    const Acts::InternalSpacePoint<external_spacepoint_t>& sp,
-    const double* spacepointPosition, double* outputCoordinates) {
+    const external_spacepoint_t& sp, const double* spacepointPosition,
+    double* outputCoordinates) {
   // check the compatibility of SPs coordinates in xyz assuming the
   // Bottom-Middle direction with the strip measurement details
-  bool hasValueStored = spacePointData.hasDynamicVariable();
-  if (!hasValueStored) {
-    return false;
-  }
 
-  std::size_t index = sp.index();
-
-  // prepare variables
-  const Acts::Vector3& topStripVector = spacePointData.getTopStripVector(index);
-  const Acts::Vector3& bottomStripVector =
-      spacePointData.getBottomStripVector(index);
-  const Acts::Vector3& stripCenterDistance =
-      spacePointData.getStripCenterDistance(index);
+  using namespace Acts::HashedStringLiteral;
+  const Acts::Vector3& topStripVector = sp.topStripVector();
+  const Acts::Vector3& bottomStripVector = sp.bottomStripVector();
+  const Acts::Vector3& stripCenterDistance = sp.stripCenterDistance();
 
   const double xTopStripVector = topStripVector[0];
   const double yTopStripVector = topStripVector[1];
@@ -215,8 +180,7 @@ inline bool xyzCoordinateCheck(
   // if arrive here spacepointPosition is compatible with strip directions and
   // detector elements
 
-  const Acts::Vector3& topStripCenterPosition =
-      spacePointData.getTopStripCenterPosition(index);
+  const Acts::Vector3& topStripCenterPosition = sp.topStripCenterPosition();
 
   // spacepointPosition corrected with respect to the top strip position and
   // direction and the distance between the strips

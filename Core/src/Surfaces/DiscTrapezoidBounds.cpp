@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/DiscTrapezoidBounds.hpp"
 
@@ -64,7 +64,7 @@ bool Acts::DiscTrapezoidBounds::inside(
 }
 
 std::vector<Acts::Vector2> Acts::DiscTrapezoidBounds::vertices(
-    unsigned int /*lseg*/) const {
+    unsigned int /*ignoredSegments*/) const {
   Vector2 cAxis(std::cos(get(eAveragePhi)), std::sin(get(eAveragePhi)));
   Vector2 nAxis(cAxis.y(), -cAxis.x());
   auto ymin = std::sqrt(get(eMinR) * get(eMinR) -

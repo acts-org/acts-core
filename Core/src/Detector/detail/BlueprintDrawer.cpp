@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Detector/detail/BlueprintDrawer.hpp"
 
@@ -84,9 +84,11 @@ void Acts::Experimental::detail::BlueprintDrawer::dotStream(
 
   // Shape
   Options::Node shape = node.isLeaf() ? options.shape : options.virtualShape;
+  std::stringstream bts;
+  bts << node.boundsType;
   ss << node.name + "_shape " << shapeStr(shape) << '\n';
   ss << node.name + "_shape "
-     << labelStr(shape, VolumeBounds::s_boundsTypeNames[node.boundsType],
+     << labelStr(shape, bts.str(),
                  {"t = " + toString(node.transform.translation(), 1),
                   "b = " + toString(node.boundaryValues, 1)})
      << '\n';

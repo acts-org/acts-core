@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -767,25 +767,12 @@ class TrackStateProxy {
   /// @return The uncalibrated measurement source link
   SourceLink getUncalibratedSourceLink() const;
 
-  // This function will move to an rvalue reference in the next major version
   /// Set an uncalibrated source link
   /// @param sourceLink The uncalibrated source link to set
-  template <typename source_link_t>
-  void setUncalibratedSourceLink(source_link_t&& sourceLink)
+  void setUncalibratedSourceLink(SourceLink&& sourceLink)
     requires(!ReadOnly)
   {
-    m_traj->setUncalibratedSourceLink(m_istate,
-                                      std::forward<source_link_t>(sourceLink));
-  }
-
-  /// Set an uncalibrated source link
-  /// @param sourceLink The uncalibrated source link to set
-  /// @note Use the overload with an rvalue reference, this
-  ///       overload will be removed ith the next major version
-  void setUncalibratedSourceLink(const SourceLink& sourceLink)
-    requires(!ReadOnly)
-  {
-    m_traj->setUncalibratedSourceLink(m_istate, SourceLink{sourceLink});
+    m_traj->setUncalibratedSourceLink(m_istate, std::move(sourceLink));
   }
 
   /// Check if the point has an associated uncalibrated measurement.
@@ -1056,8 +1043,9 @@ class TrackStateProxy {
         jacobian() = other.jacobian();
       }
 
+      // NOTE: we should not check hasCalibrated on this, since it
+      // may be not yet allocated
       if (ACTS_CHECK_BIT(mask, PM::Calibrated) &&
-          has<hashString("calibrated")>() &&
           other.template has<hashString("calibrated")>()) {
         allocateCalibrated(other.calibratedSize());
 

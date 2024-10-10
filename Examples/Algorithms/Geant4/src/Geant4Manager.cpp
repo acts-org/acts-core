@@ -1,13 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Geant4/Geant4Manager.hpp"
 
+#include "ActsExamples/Geant4/MaterialPhysicsList.hpp"
 #include "ActsExamples/Geant4/PhysicsListFactory.hpp"
 
 #include <memory>
@@ -109,7 +110,7 @@ std::shared_ptr<Geant4Handle> Geant4Manager::createHandle(
 
 void Geant4Manager::registerPhysicsListFactory(
     std::string name, std::shared_ptr<PhysicsListFactory> physicsListFactory) {
-  if (m_physicsListFactories.find(name) != m_physicsListFactories.end()) {
+  if (m_physicsListFactories.contains(name)) {
     throw std::invalid_argument("name already mapped");
   }
   m_physicsListFactories.emplace(std::move(name),
@@ -137,6 +138,10 @@ Geant4Manager::Geant4Manager() {
   registerPhysicsListFactory(
       "FTFP_BERT_ATL", std::make_shared<PhysicsListFactoryFunction>(
                            []() { return std::make_unique<FTFP_BERT_ATL>(); }));
+  registerPhysicsListFactory("MaterialPhysicsList",
+                             std::make_shared<PhysicsListFactoryFunction>([]() {
+                               return std::make_unique<MaterialPhysicsList>();
+                             }));
 }
 
 Geant4Manager::~Geant4Manager() = default;

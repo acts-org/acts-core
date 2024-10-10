@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/GeoModel/GeoModelDetectorObjectFactory.hpp"
 
@@ -19,6 +19,7 @@
 #include "Acts/Plugins/GeoModel/GeoModelConverters.hpp"
 #include "Acts/Plugins/GeoModel/IGeoShapeConverter.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <typeinfo>
 
@@ -141,15 +142,16 @@ Acts::GeoModelDetectorObjectFactory::findAllSubVolumes(const PVConstLink &vol) {
 }
 
 bool Acts::GeoModelDetectorObjectFactory::convertBox(std::string name) {
-  auto convB = std::any_of(
-      m_cfg.convertBox.begin(), m_cfg.convertBox.end(),
-      [&](const auto &n) { return name.find(n) != std::string::npos; });
+  auto convB = std::ranges::any_of(m_cfg.convertBox, [&](const auto &n) {
+    return name.find(n) != std::string::npos;
+  });
   return convB;
 }
 
 void Acts::GeoModelDetectorObjectFactory::convertFpv(
     const std::string &name, GeoFullPhysVol *fpv, Cache &cache,
     const GeometryContext &gctx) {
+  const auto prevSize = cache.sensitiveSurfaces.size();
   PVConstLink physVol{fpv};
 
   // get children
@@ -184,6 +186,12 @@ void Acts::GeoModelDetectorObjectFactory::convertFpv(
     const Transform3 &transform = fpv->getAbsoluteTransform();
     convertSensitive(fpv, transform, cache.sensitiveSurfaces);
   }
+
+  // Set the corresponding database entry name to all sensitive surfaces
+  for (auto i = prevSize; i < cache.sensitiveSurfaces.size(); ++i) {
+    auto &[detEl, _] = cache.sensitiveSurfaces[i];
+    detEl->setDatabaseEntryName(name);
+  }
 }
 // function to determine if object fits query
 bool Acts::GeoModelDetectorObjectFactory::matches(const std::string &name,
@@ -192,14 +200,14 @@ bool Acts::GeoModelDetectorObjectFactory::matches(const std::string &name,
     return true;
   }
 
-  auto matchName = std::any_of(
-      m_cfg.nameList.begin(), m_cfg.nameList.end(),
-      [&](const auto &n) { return name.find(n) != std::string::npos; });
+  auto matchName = std::ranges::any_of(m_cfg.nameList, [&](const auto &n) {
+    return name.find(n) != std::string::npos;
+  });
 
   std::string matStr = physvol->getLogVol()->getMaterial()->getName();
 
-  auto matchMaterial = std::any_of(
-      m_cfg.materialList.begin(), m_cfg.materialList.end(),
+  auto matchMaterial = std::ranges::any_of(
+      m_cfg.materialList,
       [&](const auto &m) { return matStr.find(m) != std::string::npos; });
 
   bool match = matchMaterial && matchName;

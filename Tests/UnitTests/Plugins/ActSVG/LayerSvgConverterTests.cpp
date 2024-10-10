@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -45,16 +45,17 @@ void setupTools() {
 
 std::shared_ptr<Acts::Layer> generateDiscLayer(Acts::ActsScalar rInner,
                                                Acts::ActsScalar rOuter,
-                                               unsigned int nSegments,
+                                               unsigned int quarterSegments,
                                                unsigned int nRings,
                                                bool useTrapezoids = false) {
   // Some preparations
   setupTools();
+  unsigned int fullSegments = 4 * quarterSegments;
   std::vector<std::shared_ptr<const Acts::Surface>> moduleSurfaces;
-  Acts::ActsScalar phiStep = 2 * M_PI / nSegments;
+  Acts::ActsScalar phiStep = 2 * M_PI / fullSegments;
   Acts::ActsScalar rStep = (rOuter - rInner) / nRings;
   // Reserve & fill
-  moduleSurfaces.reserve(nSegments * nRings);
+  moduleSurfaces.reserve(fullSegments * nRings);
   // Radial disc
   if (!useTrapezoids) {
     for (unsigned int ir = 0; ir < nRings; ++ir) {
@@ -62,7 +63,7 @@ std::shared_ptr<Acts::Layer> generateDiscLayer(Acts::ActsScalar rInner,
       rBounds = std::make_shared<Acts::RadialBounds>(
           rInner + ir * rStep - 0.025 * rInner,
           rInner + (ir + 1u) * rStep + 0.025 * rInner, 0.55 * phiStep, 0.);
-      for (unsigned int is = 0; is < nSegments; ++is) {
+      for (unsigned int is = 0; is < fullSegments; ++is) {
         // Place the module
         auto placement = Acts::Transform3::Identity();
         if ((is % 2) != 0u) {
@@ -82,14 +83,14 @@ std::shared_ptr<Acts::Layer> generateDiscLayer(Acts::ActsScalar rInner,
       Acts::ActsScalar yHalf = rStep * 0.5125;
 
       Acts::ActsScalar xHalfMin =
-          1.15 * (rInner + ir * rStep) * M_PI / nSegments;
+          1.15 * (rInner + ir * rStep) * M_PI / fullSegments;
       Acts::ActsScalar xHalfMax =
-          1.15 * (rInner + (ir + 1) * rStep) * M_PI / nSegments;
+          1.15 * (rInner + (ir + 1) * rStep) * M_PI / fullSegments;
 
       std::shared_ptr<const Acts::TrapezoidBounds> tBounds =
           std::make_shared<const Acts::TrapezoidBounds>(xHalfMin, xHalfMax,
                                                         yHalf);
-      for (unsigned int is = 0; is < nSegments; ++is) {
+      for (unsigned int is = 0; is < fullSegments; ++is) {
         // Setting the phi
         Acts::ActsScalar cphi = -M_PI + is * phiStep;
         Acts::Vector3 center(radius * std::cos(cphi), radius * std::sin(cphi),
@@ -111,7 +112,7 @@ std::shared_ptr<Acts::Layer> generateDiscLayer(Acts::ActsScalar rInner,
     }
   }
   // Let's create the disc layer
-  return lCreator->discLayer(tgContext, moduleSurfaces, nRings, nSegments);
+  return lCreator->discLayer(tgContext, moduleSurfaces, nRings, fullSegments);
 }
 
 }  // namespace
@@ -125,7 +126,7 @@ BOOST_AUTO_TEST_CASE(DiscLayerRadialSvg) {
   discLayerStyle.highlights = {"mouseover", "mouseout"};
   discLayerStyle.strokeColor = {25, 25, 25};
   discLayerStyle.strokeWidth = 0.5;
-  discLayerStyle.nSegments = 72u;
+  discLayerStyle.quarterSegments = 72u;
 
   Acts::GeometryIdentifier geoID{0};
 
@@ -155,7 +156,7 @@ BOOST_AUTO_TEST_CASE(DiscLayerTrapezoidSvg) {
   discLayerStyle.highlights = {"mouseover", "mouseout"};
   discLayerStyle.strokeColor = {25, 25, 25};
   discLayerStyle.strokeWidth = 0.5;
-  discLayerStyle.nSegments = 72u;
+  discLayerStyle.quarterSegments = 72u;
 
   Acts::GeometryIdentifier geoID{0};
 
@@ -185,7 +186,7 @@ BOOST_AUTO_TEST_CASE(CylinderLayerSvg) {
   cylinderLayerStyle.highlights = {"mouseover", "mouseout"};
   cylinderLayerStyle.strokeColor = {25, 25, 25};
   cylinderLayerStyle.strokeWidth = 0.5;
-  cylinderLayerStyle.nSegments = 72u;
+  cylinderLayerStyle.quarterSegments = 72u;
 
   Acts::GeometryIdentifier geoID{0};
 

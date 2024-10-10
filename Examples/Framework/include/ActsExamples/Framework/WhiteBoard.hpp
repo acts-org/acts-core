@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2019 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -108,7 +108,7 @@ inline void ActsExamples::WhiteBoard::add(const std::string& name, T&& object) {
   if (name.empty()) {
     throw std::invalid_argument("Object can not have an empty name");
   }
-  if (0 < m_store.count(name)) {
+  if (m_store.contains(name)) {
     throw std::invalid_argument("Object '" + name + "' already exists");
   }
   auto holder = std::make_shared<HolderT<T>>(std::forward<T>(object));
@@ -154,5 +154,6 @@ inline const T& ActsExamples::WhiteBoard::get(const std::string& name) const {
 }
 
 inline bool ActsExamples::WhiteBoard::exists(const std::string& name) const {
-  return m_store.find(name) != m_store.end();
+  // TODO remove this function?
+  return m_store.contains(name);
 }

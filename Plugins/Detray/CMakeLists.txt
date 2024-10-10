@@ -5,6 +5,7 @@ add_library(
     src/DetrayConverter.cpp
     src/DetrayGeometryConverter.cpp
     src/DetrayMaterialConverter.cpp
+    src/DetraySurfaceGridsConverter.cpp
 )
 
 add_dependencies(ActsPluginDetray detray::core covfie::core vecmem::core)
@@ -24,7 +25,8 @@ target_link_libraries(
         detray::core
         detray::core_array
         detray::io
-        detray::utils
+        detray::detectors
+        detray::test_utils
         vecmem::core
 )
 

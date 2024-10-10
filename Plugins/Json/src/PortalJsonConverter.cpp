@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/Json/PortalJsonConverter.hpp"
 
@@ -40,7 +40,7 @@ namespace {
 int findVolume(
     const Acts::Experimental::DetectorVolume* volume,
     const std::vector<const Acts::Experimental::DetectorVolume*>& volumes) {
-  auto candidate = std::find(volumes.begin(), volumes.end(), volume);
+  auto candidate = std::ranges::find(volumes, volume);
   if (candidate != volumes.end()) {
     return std::distance(volumes.begin(), candidate);
   }

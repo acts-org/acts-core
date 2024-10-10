@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/EventData/Measurement.hpp"
 
@@ -31,6 +31,16 @@ std::size_t MeasurementContainer::addMeasurement(std::uint8_t size) {
   m_parameters.resize(m_parameters.size() + size);
   m_covariances.resize(m_covariances.size() + size * size);
   return m_entries.size() - 1;
+}
+
+MeasurementContainer::VariableProxy MeasurementContainer::at(
+    std::size_t index) {
+  return VariableProxy{*this, index};
+}
+
+MeasurementContainer::ConstVariableProxy MeasurementContainer::at(
+    std::size_t index) const {
+  return ConstVariableProxy{*this, index};
 }
 
 MeasurementContainer::VariableProxy MeasurementContainer::getMeasurement(

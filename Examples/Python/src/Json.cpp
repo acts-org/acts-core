@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Detector/Detector.hpp"
@@ -163,7 +163,11 @@ void addJson(Context& ctx) {
     ACTS_PYTHON_MEMBER(jsonEntryPath);
     ACTS_PYTHON_STRUCT_END();
 
-    mex.def("readSurfaceFromJson", ActsExamples::JsonSurfacesReader::read);
+    mex.def("readSurfaceHierarchyMapFromJson",
+            ActsExamples::JsonSurfacesReader::readHierarchyMap);
+
+    mex.def("readSurfaceVectorFromJson",
+            ActsExamples::JsonSurfacesReader::readVector);
   }
 
   {

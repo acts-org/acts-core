@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(PlanarSurfaces) {
   planarStyle.highlightColor = {255, 153, 51};
   planarStyle.highlights = {"mouseover", "mouseout"};
   planarStyle.strokeWidth = 0.5;
-  planarStyle.nSegments = 0u;
+  planarStyle.quarterSegments = 0u;
 
   // Rectangle case
   auto rectangleBounds = std::make_shared<Acts::RectangleBounds>(36., 64.);
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(DiscSurfaces) {
   discStyle.highlightColor = {153, 204, 0};
   discStyle.highlights = {"mouseover", "mouseout"};
   discStyle.strokeWidth = 0.5;
-  discStyle.nSegments = 72u;
+  discStyle.quarterSegments = 72u;
 
   auto transform = Acts::Transform3::Identity();
   transform.pretranslate(Acts::Vector3{20., 20., 100.});

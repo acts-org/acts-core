@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2017-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -65,8 +65,6 @@ class NeighborHoodIndices {
     bool operator==(const iterator& it) const {
       return (m_current == it.m_current) && (m_wrapped == it.m_wrapped);
     }
-
-    bool operator!=(const iterator& it) const { return !(*this == it); }
 
    private:
     std::size_t m_current = 0, m_end1 = 0, m_begin2 = 0;

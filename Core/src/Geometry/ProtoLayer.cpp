@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Geometry/ProtoLayer.hpp"
 
@@ -13,26 +13,34 @@
 #include "Acts/Surfaces/RegularSurface.hpp"
 #include "Acts/Utilities/Helpers.hpp"
 
-#include <algorithm>
-#include <array>
-#include <string>
-#include <utility>
-
 using Acts::VectorHelpers::perp;
 using Acts::VectorHelpers::phi;
 
 namespace Acts {
 
 ProtoLayer::ProtoLayer(const GeometryContext& gctx,
-                       const std::vector<const Surface*>& surfaces)
-    : m_surfaces(surfaces) {
+                       const std::vector<const Surface*>& surfaces,
+                       const Transform3& transformIn)
+    : transform(transformIn), m_surfaces(surfaces) {
   measure(gctx, surfaces);
 }
 
 ProtoLayer::ProtoLayer(
     const GeometryContext& gctx,
-    const std::vector<std::shared_ptr<const Surface>>& surfaces)
-    : m_surfaces(unpack_shared_vector(surfaces)) {
+    const std::vector<std::shared_ptr<const Surface>>& surfaces,
+    const Transform3& transformIn)
+    : transform(transformIn), m_surfaces(unpack_shared_vector(surfaces)) {
+  measure(gctx, m_surfaces);
+}
+
+ProtoLayer::ProtoLayer(const GeometryContext& gctx,
+                       const std::vector<std::shared_ptr<Surface>>& surfaces,
+                       const Transform3& transformIn)
+    : transform(transformIn) {
+  m_surfaces.reserve(surfaces.size());
+  for (const auto& sf : surfaces) {
+    m_surfaces.push_back(sf.get());
+  }
   measure(gctx, m_surfaces);
 }
 
@@ -78,15 +86,13 @@ void ProtoLayer::measure(const GeometryContext& gctx,
       double thickness = element->thickness();
       // We need a translation along and opposite half thickness
       Vector3 sfNormal = regSurface->normal(gctx, sf->center(gctx));
-      std::vector<double> deltaT = {-0.5 * thickness, 0.5 * thickness};
-      for (const auto& dT : deltaT) {
-        Transform3 dtransform = Transform3::Identity();
-        dtransform.pretranslate(dT * sfNormal);
+      for (const auto& dT : {-0.5 * thickness, 0.5 * thickness}) {
+        Transform3 dtransform = transform * Translation3{dT * sfNormal};
         extent.extend(sfPolyhedron.extent(dtransform));
       }
       continue;
     }
-    extent.extend(sfPolyhedron.extent());
+    extent.extend(sfPolyhedron.extent(transform));
   }
 }
 

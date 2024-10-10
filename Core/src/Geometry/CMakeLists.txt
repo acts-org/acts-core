@@ -42,4 +42,5 @@ target_sources(
         CompositePortalLink.cpp
         PortalLinkBase.cpp
         PortalError.cpp
+        PortalShell.cpp
 )

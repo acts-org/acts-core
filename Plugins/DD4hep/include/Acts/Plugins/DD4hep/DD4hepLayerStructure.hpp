@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -65,8 +65,8 @@ class DD4hepLayerStructure {
     std::optional<Extent> extent = std::nullopt;
     /// The extent constraints - optionally
     std::vector<BinningValue> extentConstraints = {};
-    /// Approximation for the polyhedron binning nSegments
-    unsigned int nSegments = 1u;
+    /// Approximation for the polyhedron binning
+    unsigned int quarterSegments = 1u;
     /// Patch the binning with the extent if possible
     bool patchBinningWithExtent = true;
     /// Conversion options

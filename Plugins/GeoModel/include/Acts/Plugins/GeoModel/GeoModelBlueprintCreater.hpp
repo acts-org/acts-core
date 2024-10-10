@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -40,8 +40,8 @@ class GeoModelBlueprintCreater {
     std::vector<std::shared_ptr<Surface>> detectorSurfaces = {};
     /// The binning values for the KDTree sorting
     std::vector<BinningValue> kdtBinning = {};
-    /// Polyhedron approximations
-    unsigned int nSegments = 1u;
+    /// Polyhedron approximation: number of segments per circlequarter
+    unsigned int quarterSegments = 1u;
   };
 
   /// The cache struct

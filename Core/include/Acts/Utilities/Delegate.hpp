@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -44,6 +44,7 @@ class Delegate;
 ///
 template <typename R, typename H, DelegateType O, typename... Args>
 class Delegate<R(Args...), H, O> {
+ public:
   static constexpr DelegateType kOwnership = O;
 
   /// Alias of the return type
@@ -51,11 +52,12 @@ class Delegate<R(Args...), H, O> {
   using holder_type = H;
   /// Alias to the function pointer type this class will store
   using function_type = return_type (*)(const holder_type *, Args...);
-
   using function_ptr_type = return_type (*)(Args...);
+  using signature_type = R(Args...);
 
   using deleter_type = void (*)(const holder_type *);
 
+ private:
   template <typename T, typename C>
   using isSignatureCompatible =
       decltype(std::declval<T &>() = std::declval<C>());
@@ -157,7 +159,10 @@ class Delegate<R(Args...), H, O> {
   /// @note The function pointer must be ``constexpr`` for @c Delegate to accept it
   /// @tparam Callable The compile-time free function pointer
   template <auto Callable>
-  void connect() {
+  void connect()
+    requires(
+        Concepts::invocable_and_returns<Callable, return_type, Args && ...>)
+  {
     m_payload.payload = nullptr;
 
     static_assert(
@@ -202,6 +207,14 @@ class Delegate<R(Args...), H, O> {
     m_function = callable;
   }
 
+  template <typename Type>
+  void connect(function_type callable, const Type *instance)
+    requires(kOwnership == DelegateType::NonOwning)
+  {
+    m_payload.payload = instance;
+    m_function = callable;
+  }
+
   /// Connect a member function to be called on an instance
   /// @tparam Callable The compile-time member function pointer
   /// @tparam Type The type of the instance the member function should be called on
@@ -210,13 +223,11 @@ class Delegate<R(Args...), H, O> {
   ///       it's lifetime is longer than that of @c Delegate.
   template <auto Callable, typename Type>
   void connect(const Type *instance)
-    requires(kOwnership == DelegateType::NonOwning)
-  {
-    static_assert(Concepts::invocable_and_returns<Callable, return_type, Type,
-                                                  Args &&...>,
-                  "Callable given does not correspond exactly to required call "
-                  "signature");
+    requires(kOwnership == DelegateType::NonOwning &&
+             Concepts::invocable_and_returns<Callable, return_type, Type,
+                                             Args && ...>)
 
+  {
     m_payload.payload = instance;
 
     m_function = [](const holder_type *payload, Args... args) -> return_type {
@@ -234,13 +245,10 @@ class Delegate<R(Args...), H, O> {
   /// @note @c Delegate assumes owner ship over @p instance.
   template <auto Callable, typename Type>
   void connect(std::unique_ptr<const Type> instance)
-    requires(kOwnership == DelegateType::Owning)
+    requires(kOwnership == DelegateType::Owning &&
+             Concepts::invocable_and_returns<Callable, return_type, Type,
+                                             Args && ...>)
   {
-    static_assert(Concepts::invocable_and_returns<Callable, return_type, Type,
-                                                  Args &&...>,
-                  "Callable given does not correspond exactly to required call "
-                  "signature");
-
     m_payload.payload = std::unique_ptr<const holder_type, deleter_type>(
         instance.release(), [](const holder_type *payload) {
           const auto *concretePayload = static_cast<const Type *>(payload);
@@ -259,7 +267,9 @@ class Delegate<R(Args...), H, O> {
   /// @param args The arguments to call the contained function with
   /// @return Return value of the contained function
   template <typename... Ts>
-  return_type operator()(Ts &&...args) const {
+  return_type operator()(Ts &&...args) const
+    requires(std::is_invocable_v<function_type, const holder_type *, Ts...>)
+  {
     assert(connected() && "Delegate is not connected");
     return std::invoke(m_function, m_payload.ptr(), std::forward<Ts>(args)...);
   }
@@ -328,6 +338,11 @@ class OwningDelegate;
 /// Alias for an owning delegate
 template <typename R, typename H, typename... Args>
 class OwningDelegate<R(Args...), H>
-    : public Delegate<R(Args...), H, DelegateType::Owning> {};
+    : public Delegate<R(Args...), H, DelegateType::Owning> {
+ public:
+  OwningDelegate() = default;
+  OwningDelegate(Delegate<R(Args...), H, DelegateType::Owning> &&delegate)
+      : Delegate<R(Args...), H, DelegateType::Owning>(std::move(delegate)) {}
+};
 
 }  // namespace Acts

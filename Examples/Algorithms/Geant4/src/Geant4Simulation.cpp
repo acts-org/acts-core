@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Geant4/Geant4Simulation.hpp"
 
@@ -234,7 +234,7 @@ ActsExamples::Geant4Simulation::Geant4Simulation(const Config& cfg,
     SensitiveSteppingAction::Config stepCfg;
     stepCfg.eventStore = m_eventStore;
     stepCfg.charged = true;
-    stepCfg.neutral = false;
+    stepCfg.neutral = cfg.recordHitsOfNeutrals;
     stepCfg.primary = true;
     stepCfg.secondary = cfg.recordHitsOfSecondaries;
 

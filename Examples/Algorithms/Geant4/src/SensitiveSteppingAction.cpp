@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Geant4/SensitiveSteppingAction.hpp"
 
@@ -18,6 +18,7 @@
 #include "ActsExamples/Geant4/SensitiveSurfaceMapper.hpp"
 #include "ActsFatras/EventData/Barcode.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <string>
 #include <unordered_map>
@@ -182,8 +183,7 @@ void ActsExamples::SensitiveSteppingAction::UserSteppingAction(
   }
 
   // This is not the case if we have a particle-ID collision
-  if (eventStore().trackIdMapping.find(track->GetTrackID()) ==
-      eventStore().trackIdMapping.end()) {
+  if (!eventStore().trackIdMapping.contains(track->GetTrackID())) {
     return;
   }
 
@@ -192,8 +192,7 @@ void ActsExamples::SensitiveSteppingAction::UserSteppingAction(
   ACTS_VERBOSE("Step of " << particleId << " in sensitive volume " << geoId);
 
   // Set particle hit count to zero, so we have this entry in the map later
-  if (eventStore().particleHitCount.find(particleId) ==
-      eventStore().particleHitCount.end()) {
+  if (!eventStore().particleHitCount.contains(particleId)) {
     eventStore().particleHitCount[particleId] = 0;
   }
 
@@ -256,11 +255,10 @@ void ActsExamples::SensitiveSteppingAction::UserSteppingAction(
         buffer.back().momentum4After(),
         eventStore().particleHitCount.at(particleId) - 1);
 
-    assert(std::all_of(buffer.begin(), buffer.end(),
-                       [&](const auto& h) { return h.geometryId() == geoId; }));
-    assert(std::all_of(buffer.begin(), buffer.end(), [&](const auto& h) {
-      return h.particleId() == particleId;
-    }));
+    assert(std::ranges::all_of(
+        buffer, [&](const auto& h) { return h.geometryId() == geoId; }));
+    assert(std::ranges::all_of(
+        buffer, [&](const auto& h) { return h.particleId() == particleId; }));
 
     eventStore().numberGeantSteps += buffer.size();
     eventStore().maxStepsForHit =

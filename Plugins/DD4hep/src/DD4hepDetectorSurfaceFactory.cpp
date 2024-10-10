@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/DD4hep/DD4hepDetectorSurfaceFactory.hpp"
 
@@ -108,7 +108,7 @@ Acts::DD4hepDetectorSurfaceFactory::constructSensitiveComponents(
   // Measure if configured to do so
   if (cache.sExtent.has_value()) {
     auto sExtent =
-        sSurface->polyhedronRepresentation(gctx, cache.nExtentSegments)
+        sSurface->polyhedronRepresentation(gctx, cache.nExtentQSegments)
             .extent();
     cache.sExtent.value().extend(sExtent, cache.extentConstraints);
   }
@@ -137,7 +137,7 @@ Acts::DD4hepDetectorSurfaceFactory::constructPassiveComponents(
   // Measure if configured to do so
   if (cache.pExtent.has_value()) {
     auto sExtent =
-        pSurface->polyhedronRepresentation(gctx, cache.nExtentSegments)
+        pSurface->polyhedronRepresentation(gctx, cache.nExtentQSegments)
             .extent();
     cache.pExtent.value().extend(sExtent, cache.extentConstraints);
   }

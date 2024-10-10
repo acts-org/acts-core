@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2021 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/DiscSurface.hpp"
 
@@ -154,12 +154,9 @@ const Acts::SurfaceBounds& Acts::DiscSurface::bounds() const {
 }
 
 Acts::Polyhedron Acts::DiscSurface::polyhedronRepresentation(
-    const GeometryContext& gctx, std::size_t lseg) const {
+    const GeometryContext& gctx, unsigned int quarterSegments) const {
   // Prepare vertices and faces
   std::vector<Vector3> vertices;
-  std::vector<Polyhedron::FaceType> faces;
-  std::vector<Polyhedron::FaceType> triangularMesh;
-
   // Understand the disc
   bool fullDisc = m_bounds->coversFullAzimuth();
   bool toCenter = m_bounds->rMin() < s_onSurfaceTolerance;
@@ -167,7 +164,7 @@ Acts::Polyhedron Acts::DiscSurface::polyhedronRepresentation(
   bool exactPolyhedron = (m_bounds->type() == SurfaceBounds::eDiscTrapezoid);
   bool addCentreFromConvexFace = (m_bounds->type() != SurfaceBounds::eAnnulus);
   if (m_bounds) {
-    auto vertices2D = m_bounds->vertices(lseg);
+    auto vertices2D = m_bounds->vertices(quarterSegments);
     vertices.reserve(vertices2D.size() + 1);
     Vector3 wCenter(0., 0., 0);
     for (const auto& v2D : vertices2D) {
@@ -182,22 +179,19 @@ Acts::Polyhedron Acts::DiscSurface::polyhedronRepresentation(
       if (addCentreFromConvexFace) {
         vertices.push_back(wCenter);
       }
-      auto facesMesh = detail::FacesHelper::convexFaceMesh(vertices, true);
-      faces = facesMesh.first;
-      triangularMesh = facesMesh.second;
+      auto [faces, triangularMesh] =
+          detail::FacesHelper::convexFaceMesh(vertices, true);
+      return Polyhedron(vertices, faces, triangularMesh, exactPolyhedron);
     } else {
       // Two concentric rings, we use the pure concentric method momentarily,
       // but that creates too  many unneccesarry faces, when only two
       // are needed to describe the mesh, @todo investigate merging flag
-      auto facesMesh = detail::FacesHelper::cylindricalFaceMesh(vertices, true);
-      faces = facesMesh.first;
-      triangularMesh = facesMesh.second;
+      auto [faces, triangularMesh] =
+          detail::FacesHelper::cylindricalFaceMesh(vertices);
+      return Polyhedron(vertices, faces, triangularMesh, exactPolyhedron);
     }
-  } else {
-    throw std::domain_error(
-        "Polyhedron repr of boundless surface not possible.");
   }
-  return Polyhedron(vertices, faces, triangularMesh, exactPolyhedron);
+  throw std::domain_error("Polyhedron repr of boundless surface not possible.");
 }
 
 Acts::Vector2 Acts::DiscSurface::localPolarToCartesian(
@@ -208,7 +202,7 @@ Acts::Vector2 Acts::DiscSurface::localPolarToCartesian(
 
 Acts::Vector2 Acts::DiscSurface::localCartesianToPolar(
     const Vector2& lcart) const {
-  return Vector2(std::hypot(lcart[eBoundLoc0], lcart[eBoundLoc1]),
+  return Vector2(lcart.norm(),
                  std::atan2(lcart[eBoundLoc1], lcart[eBoundLoc0]));
 }
 
@@ -385,7 +379,7 @@ Acts::DiscSurface::mergedWith(const DiscSurface& other, BinningValue direction,
                               const Logger& logger) const {
   using namespace Acts::UnitLiterals;
 
-  ACTS_DEBUG("Merging disc surfaces in " << direction << " direction");
+  ACTS_VERBOSE("Merging disc surfaces in " << direction << " direction");
 
   if (m_associatedDetElement != nullptr ||
       other.m_associatedDetElement != nullptr) {

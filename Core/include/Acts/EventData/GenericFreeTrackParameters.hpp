@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2019-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -13,6 +13,7 @@
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/EventData/TrackParametersConcept.hpp"
 #include "Acts/EventData/detail/PrintParameters.hpp"
+#include "Acts/Utilities/MathHelpers.hpp"
 #include "Acts/Utilities/UnitVectors.hpp"
 
 #include <cassert>
@@ -154,12 +155,12 @@ class GenericFreeTrackParameters {
     //   [f*sin(theta)*cos(phi), f*sin(theta)*sin(phi), f*cos(theta)]
     // w/ f,sin(theta) positive, the transverse magnitude is then
     //   sqrt(f^2*sin^2(theta)) = f*sin(theta)
-    Scalar transverseMagnitude =
-        std::hypot(m_params[eFreeDir0], m_params[eFreeDir1]);
+    Scalar transverseMagnitude2 =
+        square(m_params[eFreeDir0]) + square(m_params[eFreeDir1]);
     // absolute magnitude is f by construction
-    Scalar magnitude = std::hypot(transverseMagnitude, m_params[eFreeDir2]);
+    Scalar magnitude2 = transverseMagnitude2 + square(m_params[eFreeDir2]);
     // such that we can extract sin(theta) = f*sin(theta) / f
-    return (transverseMagnitude / magnitude) * absoluteMomentum();
+    return std::sqrt(transverseMagnitude2 / magnitude2) * absoluteMomentum();
   }
   /// Momentum three-vector.
   Vector3 momentum() const { return absoluteMomentum() * direction(); }

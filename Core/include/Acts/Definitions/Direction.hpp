@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2018 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -41,7 +41,7 @@ class Direction final {
   /// @param scalar is the signed value
   ///
   /// @return a direction enum
-  static inline constexpr Direction fromScalar(ActsScalar scalar) {
+  static constexpr Direction fromScalar(ActsScalar scalar) {
     assert(scalar != 0);
     return scalar >= 0 ? Value::Positive : Value::Negative;
   }
@@ -53,8 +53,7 @@ class Direction final {
   /// @param scalar is the signed value
   ///
   /// @return a direction enum
-  static inline constexpr Direction fromScalarZeroAsPositive(
-      ActsScalar scalar) {
+  static constexpr Direction fromScalarZeroAsPositive(ActsScalar scalar) {
     return scalar >= 0 ? Value::Positive : Value::Negative;
   }
 
@@ -62,7 +61,7 @@ class Direction final {
   /// std::array<T, 2u>
   ///
   /// @param index is the direction at input
-  static inline constexpr Direction fromIndex(std::size_t index) {
+  static constexpr Direction fromIndex(std::size_t index) {
     if (index == 0u) {
       return Value::Negative;
     }
@@ -73,7 +72,7 @@ class Direction final {
   /// objects in std::array<T, 2u>
   ///
   /// @return either 0 or 1
-  inline constexpr std::size_t index() const {
+  constexpr std::size_t index() const {
     if (m_value == Value::Negative) {
       return 0u;
     }
@@ -83,26 +82,22 @@ class Direction final {
   /// Turns the direction into a signed value
   ///
   /// @return a signed value
-  inline constexpr int sign() const { return static_cast<int>(m_value); }
+  constexpr int sign() const { return static_cast<int>(m_value); }
 
   /// Reverse the direction
   ///
   /// @return an opposite direction
-  inline constexpr Direction invert() const {
+  constexpr Direction invert() const {
     return (m_value == Value::Positive) ? Value::Negative : Value::Positive;
   }
 
   std::string toString() const;
 
-  inline constexpr Direction() = default;
-  inline constexpr Direction(Value value) : m_value(value) {}
+  constexpr Direction() = default;
+  constexpr Direction(Value value) : m_value(value) {}
 
-  inline constexpr bool operator==(Direction other) const {
+  constexpr bool operator==(Direction other) const {
     return m_value == other.m_value;
-  }
-
-  inline constexpr bool operator!=(Direction other) const {
-    return m_value != other.m_value;
   }
 
  private:
@@ -113,15 +108,15 @@ std::ostream& operator<<(std::ostream& os, Direction dir);
 
 // Direction * T
 
-inline constexpr int operator*(Direction dir, int value) {
+constexpr int operator*(Direction dir, int value) {
   return dir.sign() * value;
 }
 
-inline constexpr float operator*(Direction dir, float value) {
+constexpr float operator*(Direction dir, float value) {
   return dir.sign() * value;
 }
 
-inline constexpr double operator*(Direction dir, double value) {
+constexpr double operator*(Direction dir, double value) {
   return dir.sign() * value;
 }
 
@@ -131,15 +126,15 @@ inline Acts::Vector3 operator*(Direction dir, const Acts::Vector3& value) {
 
 // T * Direction
 
-inline constexpr int operator*(int value, Direction dir) {
+constexpr int operator*(int value, Direction dir) {
   return value * dir.sign();
 }
 
-inline constexpr float operator*(float value, Direction dir) {
+constexpr float operator*(float value, Direction dir) {
   return value * dir.sign();
 }
 
-inline constexpr double operator*(double value, Direction dir) {
+constexpr double operator*(double value, Direction dir) {
   return value * dir.sign();
 }
 
@@ -149,17 +144,17 @@ inline Acts::Vector3 operator*(const Acts::Vector3& value, Direction dir) {
 
 // T *= Direction
 
-inline constexpr int operator*=(int& value, Direction dir) {
+constexpr int operator*=(int& value, Direction dir) {
   value *= dir.sign();
   return value;
 }
 
-inline constexpr float operator*=(float& value, Direction dir) {
+constexpr float operator*=(float& value, Direction dir) {
   value *= dir.sign();
   return value;
 }
 
-inline constexpr double operator*=(double& value, Direction dir) {
+constexpr double operator*=(double& value, Direction dir) {
   value *= dir.sign();
   return value;
 }

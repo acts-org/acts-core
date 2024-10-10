@@ -1,12 +1,14 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/ExaTrkX/ExaTrkXPipeline.hpp"
+
+#include "Acts/Utilities/Helpers.hpp"
 
 #include <algorithm>
 
@@ -27,9 +29,8 @@ ExaTrkXPipeline::ExaTrkXPipeline(
   if (!m_trackBuilder) {
     throw std::invalid_argument("Missing track building module");
   }
-  if (m_edgeClassifiers.empty() or
-      not std::all_of(m_edgeClassifiers.begin(), m_edgeClassifiers.end(),
-                      [](const auto &a) { return static_cast<bool>(a); })) {
+  if (m_edgeClassifiers.empty() ||
+      rangeContainsValue(m_edgeClassifiers, nullptr)) {
     throw std::invalid_argument("Missing graph construction module");
   }
 }

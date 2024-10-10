@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2018-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include <boost/test/unit_test.hpp>
 
@@ -138,31 +138,6 @@ auto makeDefaultBoundPars(bool cov = true, std::size_t n = 4,
 //////////////////////
 /// Test the reducers
 //////////////////////
-BOOST_AUTO_TEST_CASE(test_weighted_reducer) {
-  // Can use this multistepper since we only care about the state which is
-  // invariant
-  using MultiState = typename MultiStepperLoop::State;
-
-  constexpr std::size_t N = 4;
-  const auto multi_pars = makeDefaultBoundPars(false, N);
-
-  MultiState state(geoCtx, magCtx, defaultBField, multi_pars, defaultStepSize);
-  SingleStepper singleStepper(defaultBField);
-
-  WeightedComponentReducerLoop reducer{};
-
-  Acts::Vector3 pos = Acts::Vector3::Zero();
-  Acts::Vector3 dir = Acts::Vector3::Zero();
-  for (const auto &[sstate, weight, _] : state.components) {
-    pos += weight * singleStepper.position(sstate);
-    dir += weight * singleStepper.direction(sstate);
-  }
-  dir.normalize();
-
-  BOOST_CHECK_EQUAL(reducer.position(state), pos);
-  BOOST_CHECK_EQUAL(reducer.direction(state), dir);
-}
-
 BOOST_AUTO_TEST_CASE(test_max_weight_reducer) {
   // Can use this multistepper since we only care about the state which is
   // invariant

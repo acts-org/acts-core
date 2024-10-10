@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Surfaces/CylinderSurface.hpp"
 
@@ -188,19 +188,15 @@ const Acts::CylinderBounds& Acts::CylinderSurface::bounds() const {
 }
 
 Acts::Polyhedron Acts::CylinderSurface::polyhedronRepresentation(
-    const GeometryContext& gctx, std::size_t lseg) const {
+    const GeometryContext& gctx, unsigned int quarterSegments) const {
   auto ctrans = transform(gctx);
 
   // Prepare vertices and faces
-  std::vector<Vector3> vertices = bounds().createCircles(ctrans, lseg);
-  std::vector<Polyhedron::FaceType> faces;
-  std::vector<Polyhedron::FaceType> triangularMesh;
-
-  bool fullCylinder = bounds().coversFullAzimuth();
-
-  auto facesMesh =
-      detail::FacesHelper::cylindricalFaceMesh(vertices, fullCylinder);
-  return Polyhedron(vertices, facesMesh.first, facesMesh.second, false);
+  std::vector<Vector3> vertices =
+      bounds().circleVertices(ctrans, quarterSegments);
+  auto [faces, triangularMesh] =
+      detail::FacesHelper::cylindricalFaceMesh(vertices);
+  return Polyhedron(vertices, faces, triangularMesh, false);
 }
 
 Acts::Vector3 Acts::CylinderSurface::rotSymmetryAxis(
@@ -374,8 +370,8 @@ Acts::CylinderSurface::mergedWith(const CylinderSurface& other,
                                   const Logger& logger) const {
   using namespace Acts::UnitLiterals;
 
-  ACTS_DEBUG("Merging cylinder surfaces in " << binningValueName(direction)
-                                             << " direction");
+  ACTS_VERBOSE("Merging cylinder surfaces in " << binningValueName(direction)
+                                               << " direction");
 
   if (m_associatedDetElement != nullptr ||
       other.m_associatedDetElement != nullptr) {

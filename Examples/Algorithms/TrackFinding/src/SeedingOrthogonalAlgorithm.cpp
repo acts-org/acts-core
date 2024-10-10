@@ -1,14 +1,15 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/TrackFinding/SeedingOrthogonalAlgorithm.hpp"
 
 #include "Acts/Definitions/Algebra.hpp"
+#include "Acts/EventData/Seed.hpp"
 #include "Acts/Seeding/SeedFilter.hpp"
 #include "ActsExamples/EventData/SimSeed.hpp"
 
@@ -66,10 +67,9 @@ ActsExamples::SeedingOrthogonalAlgorithm::SeedingOrthogonalAlgorithm(
 
   // construct seed filter
   m_cfg.seedFinderConfig.seedFilter =
-      std::make_unique<Acts::SeedFilter<SimSpacePoint>>(
-          Acts::SeedFilter<SimSpacePoint>(m_cfg.seedFilterConfig));
+      std::make_unique<Acts::SeedFilter<proxy_type>>(m_cfg.seedFilterConfig);
 
-  m_finder = Acts::SeedFinderOrthogonal<SimSpacePoint>(m_cfg.seedFinderConfig);
+  m_finder = Acts::SeedFinderOrthogonal<proxy_type>(m_cfg.seedFinderConfig);
 }
 
 ActsExamples::ProcessCode ActsExamples::SeedingOrthogonalAlgorithm::execute(
@@ -82,24 +82,40 @@ ActsExamples::ProcessCode ActsExamples::SeedingOrthogonalAlgorithm::execute(
     }
   }
 
-  Acts::SeedFinderOrthogonal<SimSpacePoint> finder(m_cfg.seedFinderConfig);
+  // Config
+  Acts::SpacePointContainerConfig spConfig;
 
-  std::function<
-      std::tuple<Acts::Vector3, Acts::Vector2, std::optional<Acts::ActsScalar>>(
-          const SimSpacePoint *sp)>
-      create_coordinates = [](const SimSpacePoint *sp) {
-        Acts::Vector3 position(sp->x(), sp->y(), sp->z());
-        Acts::Vector2 variance(sp->varianceR(), sp->varianceZ());
-        return std::make_tuple(position, variance, sp->t());
-      };
+  // Options
+  Acts::SpacePointContainerOptions spOptions;
+  spOptions.beamPos = {0., 0.};
 
-  SimSeedContainer seeds = finder.createSeeds(m_cfg.seedFinderOptions,
-                                              spacePoints, create_coordinates);
+  ActsExamples::SpacePointContainer container(spacePoints);
+  Acts::SpacePointContainer<decltype(container), Acts::detail::RefHolder>
+      spContainer(spConfig, spOptions, container);
 
-  ACTS_DEBUG("Created " << seeds.size() << " track seeds from "
-                        << spacePoints.size() << " space points");
+  ACTS_INFO("About to process " << spContainer.size() << " space points ...");
 
-  m_outputSeeds(ctx, std::move(seeds));
+  Acts::SeedFinderOrthogonal<proxy_type> finder(m_cfg.seedFinderConfig);
+  std::vector<Acts::Seed<proxy_type>> seeds =
+      finder.createSeeds(m_cfg.seedFinderOptions, spContainer);
+
+  ACTS_INFO("Created " << seeds.size() << " track seeds from "
+                       << spacePoints.size() << " space points");
+
+  // need to convert here from seed of proxies to seed of sps
+  SimSeedContainer seedsToAdd;
+  seedsToAdd.reserve(seeds.size());
+
+  for (const auto &seed : seeds) {
+    const auto &sps = seed.sp();
+    seedsToAdd.emplace_back(*sps[0]->externalSpacePoint(),
+                            *sps[1]->externalSpacePoint(),
+                            *sps[2]->externalSpacePoint());
+    seedsToAdd.back().setVertexZ(seed.z());
+    seedsToAdd.back().setQuality(seed.seedQuality());
+  }
+
+  m_outputSeeds(ctx, std::move(seedsToAdd));
 
   return ActsExamples::ProcessCode::SUCCESS;
 }

@@ -14,11 +14,13 @@ add_library(
     src/detail/GeoTrdConverter.cpp
     src/detail/GeoTubeConverter.cpp
     src/detail/GeoPolygonConverter.cpp
+    src/detail/GeoSubtractionConverter.cpp
     src/detail/GeoShiftConverter.cpp
     src/detail/GeoIntersectionAnnulusConverter.cpp
     src/detail/GeoModelBinningHelper.cpp
     src/detail/GeoModelExtentHelper.cpp
     src/detail/GeoUnionDoubleTrdConverter.cpp
+    src/GeoModelDetectorElementITk.cpp
 )
 target_include_directories(
     ActsPluginGeoModel

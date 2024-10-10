@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -22,7 +22,7 @@ static inline Acts::Svg::Style layerStyle() {
   lStyle.highlights = {"mouseover", "mouseout"};
   lStyle.strokeColor = {25, 25, 25};
   lStyle.strokeWidth = 0.5;
-  lStyle.nSegments = 72u;
+  lStyle.quarterSegments = 72u;
 
   return lStyle;
 }
@@ -43,7 +43,7 @@ static inline Acts::Svg::Style backgroundStyle() {
   bgStyle.highlights = {};
   bgStyle.strokeColor = {25, 25, 25};
   bgStyle.strokeWidth = 0.5;
-  bgStyle.nSegments = 72u;
+  bgStyle.quarterSegments = 72u;
   return bgStyle;
 }
 
@@ -55,7 +55,7 @@ static inline Acts::Svg::Style pointStyle() {
   pStyle.highlights = {"mouseover", "mouseout"};
   pStyle.strokeColor = {0, 0, 0};
   pStyle.strokeWidth = 0.5;
-  pStyle.nSegments = 72u;
+  pStyle.quarterSegments = 72u;
 
   return pStyle;
 }

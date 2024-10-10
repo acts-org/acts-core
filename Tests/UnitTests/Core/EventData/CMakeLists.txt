@@ -14,5 +14,7 @@ add_unittest(TrackStatePropMask TrackStatePropMaskTests.cpp)
 add_unittest(ParticleHypothesis ParticleHypothesisTests.cpp)
 add_unittest(MultiTrajectoryHelpers MultiTrajectoryHelpersTests.cpp)
 add_unittest(SubspaceHelpers SubspaceHelpersTests.cpp)
+add_unittest(SeedEdm SeedEdmTests.cpp)
+add_unittest(SpacePointContainerEdm SpacePointContainerEdmTests.cpp)
 
 add_non_compile_test(MultiTrajectory TrackContainerComplianceTests.cpp)

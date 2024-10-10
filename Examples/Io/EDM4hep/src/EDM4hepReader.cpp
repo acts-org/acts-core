@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Io/EDM4hep/EDM4hepReader.hpp"
 
@@ -181,11 +181,9 @@ ProcessCode EDM4hepReader::read(const AlgorithmContext& ctx) {
     vtxPos /= Acts::UnitConstants::mm;
 
     // linear search for vector
-    auto it = std::find_if(
-        primaryVertices.begin(), primaryVertices.end(),
-        [&vtxPos](
-            const std::pair<Acts::Vector3, std::vector<edm4hep::MCParticle>>&
-                pair) { return pair.first == vtxPos; });
+    auto it = std::ranges::find_if(primaryVertices, [&vtxPos](const auto& v) {
+      return v.first == vtxPos;
+    });
 
     if (it == primaryVertices.end()) {
       ACTS_DEBUG("Found primary vertex at " << vtx.x << ", " << vtx.y << ", "

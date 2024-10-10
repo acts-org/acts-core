@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -87,6 +87,7 @@ class SvgPointWriter final : public WriterT<GeometryIdMultiset<T>> {
         s_pointStyle;  //!< The style of the space point to be drawn
 
     std::string infoBoxTitle = "";  //!< If an info box title is set, draw it
+    Acts::Svg::Style infoTitleStyle = s_infoStyle;
     Acts::Svg::Style infoBoxStyle = s_infoStyle;  // The style of the info box
 
     bool projectionXY = true;  ///< xy projection
@@ -170,7 +171,8 @@ ActsExamples::ProcessCode ActsExamples::SvgPointWriter<T, Acc>::writeT(
         auto xyIbox = Acts::Svg::infoBox(
             static_cast<actsvg::scalar>(point3D.x() + 10.),
             static_cast<actsvg::scalar>(point3D.y() - 10.), m_cfg.infoBoxTitle,
-            {"Position: " + Acts::toString(point3D)}, m_cfg.infoBoxStyle, p);
+            m_cfg.infoTitleStyle, {"Position: " + Acts::toString(point3D)},
+            m_cfg.infoBoxStyle, p);
         xyView.add_object(xyIbox);
       }
     }

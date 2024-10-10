@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/Json/DetectorVolumeJsonConverter.hpp"
 
@@ -21,6 +21,7 @@
 #include "Acts/Plugins/Json/VolumeBoundsJsonConverter.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
 
+#include <algorithm>
 #include <ctime>
 
 nlohmann::json Acts::DetectorVolumeJsonConverter::toJson(
@@ -59,7 +60,7 @@ nlohmann::json Acts::DetectorVolumeJsonConverter::toJson(
   nlohmann::json jPortals;
   if (!portals.empty()) {
     for (const auto* p : volume.portals()) {
-      auto it = std::find(portals.begin(), portals.end(), p);
+      auto it = std::ranges::find(portals, p);
       if (it != portals.end()) {
         jPortals.push_back(std::distance(portals.begin(), it));
       } else {

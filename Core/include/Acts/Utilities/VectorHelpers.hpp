@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -73,7 +73,7 @@ double perp(const Eigen::MatrixBase<Derived>& v) noexcept {
     assert(v.rows() >= 2 &&
            "Perp function not valid for vectors not at least 2D");
   }
-  return std::hypot(v[0], v[1]);
+  return v.template head<2>().norm();
 }
 
 /// Calculate the theta angle (longitudinal w.r.t. z axis) of a vector

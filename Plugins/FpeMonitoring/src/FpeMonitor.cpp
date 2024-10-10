@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022-2023 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Plugins/FpeMonitoring/FpeMonitor.hpp"
 
@@ -87,10 +87,9 @@ void FpeMonitor::Result::add(FpeType type, void *stackPtr,
   auto st = std::make_unique<boost::stacktrace::stacktrace>(
       boost::stacktrace::stacktrace::from_dump(stackPtr, bufferSize));
 
-  auto it = std::find_if(
-      m_stracktraces.begin(), m_stracktraces.end(), [&](const FpeInfo &el) {
-        return areFpesEquivalent({el.type, *el.st}, {type, *st});
-      });
+  auto it = std::ranges::find_if(m_stracktraces, [&](const FpeInfo &el) {
+    return areFpesEquivalent({el.type, *el.st}, {type, *st});
+  });
 
   if (it != m_stracktraces.end()) {
     it->count += 1;
@@ -101,10 +100,9 @@ void FpeMonitor::Result::add(FpeType type, void *stackPtr,
 
 bool FpeMonitor::Result::contains(
     FpeType type, const boost::stacktrace::stacktrace &st) const {
-  return std::find_if(m_stracktraces.begin(), m_stracktraces.end(),
-                      [&](const FpeInfo &el) {
-                        return areFpesEquivalent({el.type, *el.st}, {type, st});
-                      }) != m_stracktraces.end();
+  return std::ranges::any_of(m_stracktraces, [&](const FpeInfo &el) {
+    return areFpesEquivalent({el.type, *el.st}, {type, st});
+  });
 }
 
 FpeMonitor::Result &FpeMonitor::result() {
@@ -167,11 +165,9 @@ void FpeMonitor::Result::deduplicate() {
   m_stracktraces.clear();
 
   for (auto &info : copy) {
-    auto it = std::find_if(m_stracktraces.begin(), m_stracktraces.end(),
-                           [&info](const FpeInfo &el) {
-                             return areFpesEquivalent({el.type, *el.st},
-                                                      {info.type, *info.st});
-                           });
+    auto it = std::ranges::find_if(m_stracktraces, [&info](const FpeInfo &el) {
+      return areFpesEquivalent({el.type, *el.st}, {info.type, *info.st});
+    });
     if (it != m_stracktraces.end()) {
       it->count += info.count;
       continue;

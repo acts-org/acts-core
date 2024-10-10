@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2021-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/Digitization/MeasurementCreation.hpp"
 
@@ -31,12 +31,6 @@ ActsExamples::VariableBoundMeasurementProxy ActsExamples::createMeasurement(
   return Acts::visit_measurement(
       dParams.indices.size(), [&](auto dim) -> VariableBoundMeasurementProxy {
         auto [indices, par, cov] = measurementConstituents<dim>(dParams);
-        FixedBoundMeasurementProxy<dim> measurement =
-            container.makeMeasurement<dim>();
-        measurement.setSourceLink(sl);
-        measurement.setSubspaceIndices(indices);
-        measurement.parameters() = par;
-        measurement.covariance() = cov;
-        return measurement;
+        return container.emplaceMeasurement<dim>(sl, indices, par, cov);
       });
 }

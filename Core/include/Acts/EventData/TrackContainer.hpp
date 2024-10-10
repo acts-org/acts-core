@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2023-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -19,6 +19,8 @@
 #include "Acts/EventData/Utils.hpp"
 #include "Acts/Utilities/HashedString.hpp"
 #include "Acts/Utilities/Holders.hpp"
+#include "Acts/Utilities/Iterator.hpp"
+#include "Acts/Utilities/TypeTraits.hpp"
 #include "Acts/Utilities/UnitVectors.hpp"
 
 #include <any>
@@ -77,6 +79,12 @@ class TrackContainer {
   using TrackStateProxy = typename MultiTrajectory<traj_t>::TrackStateProxy;
   using ConstTrackStateProxy =
       typename MultiTrajectory<traj_t>::ConstTrackStateProxy;
+
+  using size_type = IndexType;
+  using iterator =
+      Acts::ContainerIndexIterator<TrackContainer, TrackProxy, false>;
+  using const_iterator =
+      Acts::ContainerIndexIterator<TrackContainer, ConstTrackProxy, true>;
 
 #ifndef DOXYGEN
   friend TrackProxy;
@@ -148,6 +156,21 @@ class TrackContainer {
     return {*this, itrack};
   }
 
+  /// Get a const track proxy for a track index
+  /// @param itrack the track index in the container
+  /// @return A const track proxy for the index
+  ConstTrackProxy at(IndexType itrack) const { return getTrack(itrack); }
+
+  /// Get a mutable track proxy for a track index
+  /// @note Only available if the track container is not read-only
+  /// @param itrack the track index in the container
+  /// @return A mutable track proxy for the index
+  TrackProxy at(IndexType itrack)
+    requires(!ReadOnly)
+  {
+    return {*this, itrack};
+  }
+
   /// Add a track to the container. Note this only creates the logical track and
   /// allocates memory. You can combine this with @c getTrack to obtain a track proxy
   /// @note Only available if the track container is not read-only
@@ -184,36 +207,28 @@ class TrackContainer {
   /// Get a mutable iterator to the first track in the container
   /// @note Only available if the track container is not read-only
   /// @return a mutable iterator to the first track
-  auto begin()
+  iterator begin()
     requires(!ReadOnly)
   {
-    return detail_tc::TrackProxyIterator<std::decay_t<decltype(*this)>,
-                                         TrackProxy, false>{*this, 0};
+    return iterator{*this, 0};
   }
 
   /// Get a past-the-end iterator for this container
   /// @note Only available if the track container is not read-only
   /// @return a past-the-end iterator
-  auto end()
+  iterator end()
     requires(!ReadOnly)
   {
-    return detail_tc::TrackProxyIterator<std::decay_t<decltype(*this)>,
-                                         TrackProxy, false>{*this, size()};
+    return iterator{*this, size()};
   }
 
   /// Get an const iterator to the first track in the container
   /// @return a const iterator to the first track
-  auto begin() const {
-    return detail_tc::TrackProxyIterator<std::decay_t<decltype(*this)>,
-                                         ConstTrackProxy, true>{*this, 0};
-  }
+  const_iterator begin() const { return const_iterator{*this, 0}; }
 
   /// Get a past-the-end iterator for this container
   /// @return a past-the-end iterator
-  auto end() const {
-    return detail_tc::TrackProxyIterator<std::decay_t<decltype(*this)>,
-                                         ConstTrackProxy, true>{*this, size()};
-  }
+  const_iterator end() const { return const_iterator{*this, size()}; }
 
   /// @}
 
@@ -411,8 +426,8 @@ class TrackContainer {
     }
   }
 
-  detail_tc::ConstIf<holder_t<track_container_t>, ReadOnly> m_container;
-  detail_tc::ConstIf<holder_t<traj_t>, ReadOnly> m_traj;
+  const_if_t<ReadOnly, holder_t<track_container_t>> m_container;
+  const_if_t<ReadOnly, holder_t<traj_t>> m_traj;
 };
 
 template <TrackContainerBackend track_container_t, typename traj_t>

@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2020 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -126,7 +126,7 @@ class GeometryIdentifier {
   /// Set the masked bits to id in the encoded value.
   constexpr GeometryIdentifier& setBits(Value mask, Value id) {
     m_value = (m_value & ~mask) | ((id << extractShift(mask)) & mask);
-    // return *this here so we need to write less lines in the set... methods
+    // return *this here that we need to write fewer lines in the setXXX methods
     return *this;
   }
 
@@ -134,10 +134,7 @@ class GeometryIdentifier {
                                    GeometryIdentifier rhs) {
     return lhs.m_value == rhs.m_value;
   }
-  friend constexpr bool operator!=(GeometryIdentifier lhs,
-                                   GeometryIdentifier rhs) {
-    return lhs.m_value != rhs.m_value;
-  }
+
   friend constexpr bool operator<(GeometryIdentifier lhs,
                                   GeometryIdentifier rhs) {
     return lhs.m_value < rhs.m_value;

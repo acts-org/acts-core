@@ -18,9 +18,9 @@ The interaction of these two components is handled by the {class}`Acts::Propagat
 Propagator<Navigator, Stepper>
 ```
 
-Additional to these mandatory components, the propagator can be equipped with **Actors** and **Aborters** to allow for custom behaviour. These are function objects that are hooked in the propagation loop. Actors just perform some action on the propagator state (e.g. the {class}`Acts::KalmanFitter` is an actor), aborts can abort propagation (e.g., the {struct}`Acts::PathLimitReached`).
+Additional to these mandatory components, the propagator can be equipped with **Actors** to allow for custom behaviour. These are function objects that are hooked in the propagation loop. Actors just perform some action on the propagator state (e.g. the {class}`Acts::KalmanFitter` is an actor), aborts can abort propagation (e.g., the {struct}`Acts::PathLimitReached`).
 
-The propagator exposes its state to the actors and aborters as arguments to `operator()`. Actors must define a default-constructable `result_type`, which can be modified in each call:
+The propagator exposes its state to the actors as arguments to `act()` and `checkAbort()`. Actors must define a default-constructable `result_type`, which can be modified in each call:
 
 ```cpp
 template<typename propagator_state_t, typename stepper_t>
@@ -36,23 +36,21 @@ The result of a propagation consists of the track parameters at the endpoint of 
 ## Initialization and running
 
 The {class}`Acts::Propagator` is initialized with the helper class
-{struct}`Acts::PropagatorOptions`, which is templated on the list of actors and
-aborters. This is done with the classes {struct}`Acts::ActionList` and
-{struct}`Acts::AbortList` (which are in fact small wrappers around
-`std::tuple`):
+{struct}`Acts::PropagatorOptions`, which is templated on the list of actors.
+This is done with the class {struct}`Acts::ActorList`
+(which are in fact small wrappers around `std::tuple`):
 
 ```cpp
 using MyOptions = Acts::PropagatorOptions<
-                    Acts::ActionList<MyActor1, MyActor2>,
-                    Acts::AbortList<MyAborter1, MyAborter2>
+                    Acts::ActorList<MyActor1, MyActor2>
                   >;
 ```
 
-The actors and aborters are instantiated with the options and can be accessed with the `get`-method that expects the corresponding actor type as template parameter. Besides this, the {struct}`Acts::PropagatorOptions` also contains a lot of general options like the `maxStepSize`:
+The actors are instantiated with the options and can be accessed with the `get`-method that expects the corresponding actor type as template parameter. Besides this, the {struct}`Acts::PropagatorOptions` also contains a lot of general options like the `maxStepSize`:
 
 ```cpp
 auto options = MyOptions();
-options.actionList.get<MyActor1>().foo = bar;
+options.actorList.get<MyActor1>().foo = bar;
 options.maxStepSize = 100;
 ```
 
@@ -63,7 +61,7 @@ The propagator also contains a loop-protection mechanism. It estimates a circle 
 :::
 
 To run the propagation, we must call the member function `propagate(...)` with the initial track parameters and the propagator options. There are several overloads to the `propagate(...)` function, which allow further customization:
-* With/without a target surface: The overload with a target surface automatically adds an aborter for the passed `Surface` to the `AbortList`.
+* With/without a target surface: The overload with a target surface automatically adds an aborter for the passed `Surface` to the `ActorList`.
 * With/without a prepared result object: Without a result object, a suitable result object is default-constructed internally.
 
 The result is an instance of {class}`Acts::Result`. It contains the actual result, or an error code in case something went wrong. In the actual result, the results of the different actors can again be accessed via a `get` method:

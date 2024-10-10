@@ -87,7 +87,7 @@ with tempfile.TemporaryDirectory() as temp:
         rnd,
         preSelectParticles=None,
         postSelectParticles=ParticleSelectorConfig(removeSecondaries=True),
-        killVolume=setup.trackingGeometry.worldVolume,
+        killVolume=setup.trackingGeometry.highestTrackingVolume,
         killAfterTime=25 * u.ns,
         killSecondaries=True,
         inputParticles="particles_input",

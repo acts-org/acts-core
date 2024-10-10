@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2022 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "ActsExamples/TrackFindingExaTrkX/TrackFindingAlgorithmExaTrkX.hpp"
 
@@ -19,6 +19,7 @@
 #include "ActsExamples/EventData/SimSpacePoint.hpp"
 #include "ActsExamples/Framework/WhiteBoard.hpp"
 
+#include <algorithm>
 #include <numeric>
 
 using namespace ActsExamples;
@@ -97,8 +98,8 @@ ActsExamples::TrackFindingAlgorithmExaTrkX::TrackFindingAlgorithmExaTrkX(
       NodeFeature::eClusterX, NodeFeature::eClusterY,  NodeFeature::eCellCount,
       NodeFeature::eCellSum,  NodeFeature::eCluster1R, NodeFeature::eCluster2R};
 
-  auto wantClFeatures = std::any_of(
-      m_cfg.nodeFeatures.begin(), m_cfg.nodeFeatures.end(),
+  auto wantClFeatures = std::ranges::any_of(
+      m_cfg.nodeFeatures,
       [&](const auto& f) { return Acts::rangeContainsValue(clFeatures, f); });
 
   if (wantClFeatures && !m_inputClusters.isInitialized()) {

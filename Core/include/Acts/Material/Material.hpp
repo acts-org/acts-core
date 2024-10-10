@@ -1,10 +1,10 @@
-// This file is part of the Acts project.
+// This file is part of the ACTS project.
 //
-// Copyright (C) 2016-2024 CERN for the benefit of the Acts project
+// Copyright (C) 2016 CERN for the benefit of the ACTS project
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #pragma once
 
@@ -116,9 +116,6 @@ class Material {
     return (lhs.m_x0 == rhs.m_x0) && (lhs.m_l0 == rhs.m_l0) &&
            (lhs.m_ar == rhs.m_ar) && (lhs.m_z == rhs.m_z) &&
            (lhs.m_molarRho == rhs.m_molarRho);
-  }
-  friend constexpr bool operator!=(const Material& lhs, const Material& rhs) {
-    return !(lhs == rhs);
   }
 };
 
