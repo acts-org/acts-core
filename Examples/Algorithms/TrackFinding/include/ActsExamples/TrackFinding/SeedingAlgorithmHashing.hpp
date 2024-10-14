@@ -110,6 +110,12 @@ class SeedingAlgorithmHashing final : public IAlgorithm {
     // Connect custom selections on the space points or to the doublet
     // compatibility
     bool useExtraCuts = false;
+
+    float deltaRMiddleMinSPRange = 10. * Acts::UnitConstants::mm;
+    float deltaRMiddleMaxSPRange = 10. * Acts::UnitConstants::mm;
+
+    /// Order of z bins to loop over when searching for SPs
+    std::vector<std::size_t> zBinsCustomLooping = {};
   };
 
   /// Construct the seeding algorithm.

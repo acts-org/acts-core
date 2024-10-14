@@ -144,18 +144,13 @@ int main(int argc, char** argv) {
 
   Acts::SeedFinderConfig<value_type> config;
   // silicon detector max
-  config.rMax = 160._mm;
-  config.rMin = 0._mm;
   config.deltaRMin = 5._mm;
-  config.deltaRMax = 160._mm;
   config.deltaRMinTopSP = config.deltaRMin;
   config.deltaRMinBottomSP = config.deltaRMin;
-  config.deltaRMaxTopSP = config.deltaRMax;
-  config.deltaRMaxBottomSP = config.deltaRMax;
+  config.deltaRMaxTopSP = 160._mm;
+  config.deltaRMaxBottomSP = config.deltaRMaxTopSP;
   config.collisionRegionMin = -250._mm;
   config.collisionRegionMax = 250._mm;
-  config.zMin = -2800._mm;
-  config.zMax = 2800._mm;
   config.maxSeedsPerSpM = 5;
   // 2.7 eta
   config.cotThetaMax = 7.40627;
@@ -165,16 +160,11 @@ int main(int argc, char** argv) {
 
   config.impactMax = 10._mm;
 
-  config.useVariableMiddleSPRange = false;
-
   Acts::SeedFinderOptions options;
   options.beamPos = spOptions.beamPos;
   options.bFieldInZ = 2_T;
 
   int numPhiNeighbors = 1;
-
-  config.useVariableMiddleSPRange = false;
-  const Acts::Range1D<float> rMiddleSPRange;
 
   std::vector<std::pair<int, int>> zBinNeighborsTop;
   std::vector<std::pair<int, int>> zBinNeighborsBottom;
@@ -196,10 +186,10 @@ int main(int argc, char** argv) {
   // setup spacepoint grid config
   Acts::CylindricalSpacePointGridConfig gridConf;
   gridConf.minPt = config.minPt;
-  gridConf.rMax = config.rMax;
-  gridConf.zMax = config.zMax;
-  gridConf.zMin = config.zMin;
-  gridConf.deltaRMax = config.deltaRMax;
+  gridConf.rMax = 160._mm;
+  gridConf.zMax = 2800._mm;
+  gridConf.zMin = -2800._mm;
+  gridConf.deltaRMax = config.deltaRMaxTopSP;
   gridConf.cotThetaMax = config.cotThetaMax;
   // setup spacepoint grid options
   Acts::CylindricalSpacePointGridOptions gridOpts;
@@ -210,7 +200,7 @@ int main(int argc, char** argv) {
       Acts::CylindricalSpacePointGridCreator::createGrid<value_type>(gridConf,
                                                                      gridOpts);
   Acts::CylindricalSpacePointGridCreator::fillGrid(
-      config, options, grid, spContainer.begin(), spContainer.end());
+      config, grid, spContainer.begin(), spContainer.end());
 
   auto spGroup = Acts::CylindricalBinnedGroup<value_type>(
       std::move(grid), *bottomBinFinder, *topBinFinder);
@@ -221,7 +211,7 @@ int main(int argc, char** argv) {
   for (auto [bottom, middle, top] : spGroup) {
     auto& v = seedVector.emplace_back();
     a.createSeedsForGroup(options, state, spGroup.grid(), v, bottom, middle,
-                          top, rMiddleSPRange);
+                          top);
   }
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;

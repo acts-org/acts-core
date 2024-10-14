@@ -29,6 +29,7 @@ ParticleSmearingSigmas = namedtuple(
 SeedFinderConfigArg = namedtuple(
     "SeedFinderConfig",
     [
+        "middleRangeStrategy",
         "maxSeedsPerSpM",
         "cotThetaMax",
         "sigmaScattering",
@@ -40,25 +41,25 @@ SeedFinderConfigArg = namedtuple(
         "deltaZMax",
         "maxPtScattering",
         "zBinEdges",
-        "zBinsCustomLooping",
-        "rRangeMiddleSP",
-        "useVariableMiddleSPRange",
-        "binSizeR",
         "seedConfirmation",
         "centralSeedConfirmationRange",
         "forwardSeedConfirmationRange",
         "deltaR",  # (min,max)
         "deltaRBottomSP",  # (min,max)
         "deltaRTopSP",  # (min,max)
-        "deltaRMiddleSPRange",  # (min,max)
         "collisionRegion",  # (min,max)
-        "r",  # (min,max)
-        "z",  # (min,max)
     ],
-    defaults=[None] * 18 + [(None, None)] * 7,
+    defaults=[None] * 15 + [(None, None)] * 4,
 )
 SeedFinderOptionsArg = namedtuple(
-    "SeedFinderOptions", ["beamPos", "bFieldInZ"], defaults=[(None, None), None]
+    "SeedFinderOptions",
+    [
+        "beamPos",
+        "bFieldInZ",
+        "rMinMiddle",
+        "rMaxMiddle"
+    ],
+    defaults=[(None, None)] + [None] * 3,
 )
 
 SeedFilterConfigArg = namedtuple(
@@ -81,16 +82,17 @@ SeedFilterConfigArg = namedtuple(
 
 SpacePointGridConfigArg = namedtuple(
     "SeedGridConfig",
-    [
-        "rMax",
+    [        
         "zBinEdges",
         "phiBinDeflectionCoverage",
         "impactMax",
         "deltaRMax",
         "maxPhiBins",
         "phi",  # (min,max)
+        "r", # (min, max)
+        "z", # (min, max)
     ],
-    defaults=[None] * 6 + [(None, None)] * 1,
+    defaults=[None] * 5 + [(None, None)] * 3,
 )
 
 SeedingAlgorithmConfigArg = namedtuple(
@@ -101,8 +103,11 @@ SeedingAlgorithmConfigArg = namedtuple(
         "zBinNeighborsBottom",
         "numPhiNeighbors",
         "useExtraCuts",
+        "deltaRMiddleMinSPRange",
+        "deltaRMiddleMaxSPRange",
+        "zBinsCustomLooping",
     ],
-    defaults=[None] * 5,
+    defaults=[None] * 8,
 )
 
 TruthEstimatedSeedingAlgorithmConfigArg = namedtuple(
@@ -218,8 +223,13 @@ HashingTrainingConfigArg = namedtuple(
 
 HashingAlgorithmConfigArg = namedtuple(
     "HashingAlgorithmConfig",
-    ["bucketSize", "zBins", "phiBins"],
-    defaults=[None] * 3,
+    ["bucketSize",
+     "zBins",
+     "phiBins",
+     "deltaRMiddleMinSPRange",
+     "deltaRMiddleMaxSPRange",
+     "zBinsCustomLooping"],
+    defaults=[None] * 6,
 )
 
 
@@ -302,8 +312,8 @@ def addSeeding(
     initialVarInflation : list
         List of 6 scale factors to inflate the initial covariance matrix
         Defaults (all 1) specified in Examples/Algorithms/TruthTracking/ActsExamples/TruthTracking/ParticleSmearing.hpp
-    seedFinderConfigArg : SeedFinderConfigArg(maxSeedsPerSpM, cotThetaMax, sigmaScattering, radLengthPerSeed, minPt, impactMax, deltaPhiMax, interactionPointCut, deltaZMax, maxPtScattering, zBinEdges, zBinsCustomLooping, rRangeMiddleSP, useVariableMiddleSPRange, binSizeR, seedConfirmation, centralSeedConfirmationRange, forwardSeedConfirmationRange, deltaR, deltaRBottomSP, deltaRTopSP, deltaRMiddleSPRange, collisionRegion, r, z)
-        SeedFinderConfig settings. deltaR, deltaRBottomSP, deltaRTopSP, deltaRMiddleSPRange, collisionRegion, r, z.
+    seedFinderConfigArg : SeedFinderConfigArg(maxSeedsPerSpM, cotThetaMax, sigmaScattering, radLengthPerSeed, minPt, impactMax, deltaPhiMax, interactionPointCut, deltaZMax, maxPtScattering, zBinEdges, seedConfirmation, centralSeedConfirmationRange, forwardSeedConfirmationRange, deltaR, deltaRBottomSP, deltaRTopSP, collisionRegion)
+        SeedFinderConfig settings. deltaR, deltaRBottomSP, deltaRTopSP, collisionRegion.
         Defaults specified in Core/include/Acts/Seeding/SeedFinderConfig.hpp
     seedFinderOptionsArg :  SeedFinderOptionsArg(bFieldInZ, beamPos)
         Defaults specified in Core/include/Acts/Seeding/SeedFinderConfig.hpp
@@ -664,10 +674,7 @@ def addStandardSeeding(
 
     seedFinderConfig = acts.SeedFinderConfig(
         **acts.examples.defaultKWArgs(
-            rMin=seedFinderConfigArg.r[0],
-            rMax=seedFinderConfigArg.r[1],
             deltaRMin=seedFinderConfigArg.deltaR[0],
-            deltaRMax=seedFinderConfigArg.deltaR[1],
             deltaRMinTopSP=(
                 seedFinderConfigArg.deltaR[0]
                 if seedFinderConfigArg.deltaRTopSP[0] is None
@@ -688,12 +695,9 @@ def addStandardSeeding(
                 if seedFinderConfigArg.deltaRBottomSP[1] is None
                 else seedFinderConfigArg.deltaRBottomSP[1]
             ),
-            deltaRMiddleMinSPRange=seedFinderConfigArg.deltaRMiddleSPRange[0],
-            deltaRMiddleMaxSPRange=seedFinderConfigArg.deltaRMiddleSPRange[1],
+            middleRangeStrategy=seedFinderConfigArg.middleRangeStrategy,
             collisionRegionMin=seedFinderConfigArg.collisionRegion[0],
             collisionRegionMax=seedFinderConfigArg.collisionRegion[1],
-            zMin=seedFinderConfigArg.z[0],
-            zMax=seedFinderConfigArg.z[1],
             maxSeedsPerSpM=seedFinderConfigArg.maxSeedsPerSpM,
             cotThetaMax=seedFinderConfigArg.cotThetaMax,
             sigmaScattering=seedFinderConfigArg.sigmaScattering,
@@ -704,10 +708,6 @@ def addStandardSeeding(
             deltaZMax=seedFinderConfigArg.deltaZMax,
             maxPtScattering=seedFinderConfigArg.maxPtScattering,
             zBinEdges=seedFinderConfigArg.zBinEdges,
-            zBinsCustomLooping=seedFinderConfigArg.zBinsCustomLooping,
-            rRangeMiddleSP=seedFinderConfigArg.rRangeMiddleSP,
-            useVariableMiddleSPRange=seedFinderConfigArg.useVariableMiddleSPRange,
-            binSizeR=seedFinderConfigArg.binSizeR,
             seedConfirmation=seedFinderConfigArg.seedConfirmation,
             centralSeedConfirmationRange=seedFinderConfigArg.centralSeedConfirmationRange,
             forwardSeedConfirmationRange=seedFinderConfigArg.forwardSeedConfirmationRange,
@@ -751,21 +751,14 @@ def addStandardSeeding(
     gridConfig = acts.SpacePointGridConfig(
         **acts.examples.defaultKWArgs(
             minPt=seedFinderConfig.minPt,
-            rMax=(
-                seedFinderConfig.rMax
-                if spacePointGridConfigArg.rMax is None
-                else spacePointGridConfigArg.rMax
-            ),
-            zMax=seedFinderConfig.zMax,
-            zMin=seedFinderConfig.zMin,
-            deltaRMax=(
-                seedFinderConfig.deltaRMax
-                if spacePointGridConfigArg.deltaRMax is None
-                else spacePointGridConfigArg.deltaRMax
-            ),
-            cotThetaMax=seedFinderConfig.cotThetaMax,
+            rMin=spacePointGridConfigArg.r[0],
+            rMax=spacePointGridConfigArg.r[1],
+            zMin=spacePointGridConfigArg.z[0],
+            zMax=spacePointGridConfigArg.z[1],
             phiMin=spacePointGridConfigArg.phi[0],
             phiMax=spacePointGridConfigArg.phi[1],
+            deltaRMax=spacePointGridConfigArg.deltaRMax,
+            cotThetaMax=seedFinderConfig.cotThetaMax,
             maxPhiBins=spacePointGridConfigArg.maxPhiBins,
             impactMax=spacePointGridConfigArg.impactMax,
             zBinEdges=spacePointGridConfigArg.zBinEdges,
@@ -778,7 +771,7 @@ def addStandardSeeding(
             bFieldInZ=seedFinderOptions.bFieldInZ,
         )
     )
-
+      
     seedingAlg = acts.examples.SeedingAlgorithm(
         level=logLevel,
         inputSpacePoints=[spacePoints],
@@ -789,6 +782,9 @@ def addStandardSeeding(
             zBinNeighborsBottom=seedingAlgorithmConfigArg.zBinNeighborsBottom,
             numPhiNeighbors=seedingAlgorithmConfigArg.numPhiNeighbors,
             useExtraCuts=seedingAlgorithmConfigArg.useExtraCuts,
+            deltaRMiddleMinSPRange=seedingAlgorithmConfigArg.deltaRMiddleMinSPRange,
+            deltaRMiddleMaxSPRange=seedingAlgorithmConfigArg.deltaRMiddleMaxSPRange,
+            zBinsCustomLooping=seedingAlgorithmConfigArg.zBinsCustomLooping,            
         ),
         gridConfig=gridConfig,
         gridOptions=gridOptions,
@@ -924,10 +920,7 @@ def addHashingSeeding(
     # Same configuration than the standard seeding
     seedFinderConfig = acts.SeedFinderConfig(
         **acts.examples.defaultKWArgs(
-            rMin=seedFinderConfigArg.r[0],
-            rMax=seedFinderConfigArg.r[1],
             deltaRMin=seedFinderConfigArg.deltaR[0],
-            deltaRMax=seedFinderConfigArg.deltaR[1],
             deltaRMinTopSP=(
                 seedFinderConfigArg.deltaR[0]
                 if seedFinderConfigArg.deltaRTopSP[0] is None
@@ -948,12 +941,9 @@ def addHashingSeeding(
                 if seedFinderConfigArg.deltaRBottomSP[1] is None
                 else seedFinderConfigArg.deltaRBottomSP[1]
             ),
-            deltaRMiddleMinSPRange=seedFinderConfigArg.deltaRMiddleSPRange[0],
-            deltaRMiddleMaxSPRange=seedFinderConfigArg.deltaRMiddleSPRange[1],
+            middleRangeStrategy=seedFinderConfigArg.middleRangeStrategy,
             collisionRegionMin=seedFinderConfigArg.collisionRegion[0],
             collisionRegionMax=seedFinderConfigArg.collisionRegion[1],
-            zMin=seedFinderConfigArg.z[0],
-            zMax=seedFinderConfigArg.z[1],
             maxSeedsPerSpM=seedFinderConfigArg.maxSeedsPerSpM,
             cotThetaMax=seedFinderConfigArg.cotThetaMax,
             sigmaScattering=seedFinderConfigArg.sigmaScattering,
@@ -964,10 +954,6 @@ def addHashingSeeding(
             deltaZMax=seedFinderConfigArg.deltaZMax,
             maxPtScattering=seedFinderConfigArg.maxPtScattering,
             zBinEdges=seedFinderConfigArg.zBinEdges,
-            zBinsCustomLooping=seedFinderConfigArg.zBinsCustomLooping,
-            rRangeMiddleSP=seedFinderConfigArg.rRangeMiddleSP,
-            useVariableMiddleSPRange=seedFinderConfigArg.useVariableMiddleSPRange,
-            binSizeR=seedFinderConfigArg.binSizeR,
             seedConfirmation=seedFinderConfigArg.seedConfirmation,
             centralSeedConfirmationRange=seedFinderConfigArg.centralSeedConfirmationRange,
             forwardSeedConfirmationRange=seedFinderConfigArg.forwardSeedConfirmationRange,
@@ -1011,18 +997,11 @@ def addHashingSeeding(
     gridConfig = acts.SpacePointGridConfig(
         **acts.examples.defaultKWArgs(
             minPt=seedFinderConfig.minPt,
-            rMax=(
-                seedFinderConfig.rMax
-                if spacePointGridConfigArg.rMax is None
-                else spacePointGridConfigArg.rMax
-            ),
-            zMax=seedFinderConfig.zMax,
-            zMin=seedFinderConfig.zMin,
-            deltaRMax=(
-                seedFinderConfig.deltaRMax
-                if spacePointGridConfigArg.deltaRMax is None
-                else spacePointGridConfigArg.deltaRMax
-            ),
+            rMin=spacePointGridConfigArg.r[0],
+            rMax=spacePointGridConfigArg.r[1],
+            zMin=spacePointGridConfigArg.z[0],
+            zMax=spacePointGridConfigArg.z[1],
+            deltaRMax=spacePointGridConfigArg.deltaRMax,
             cotThetaMax=seedFinderConfig.cotThetaMax,
             phiMin=spacePointGridConfigArg.phi[0],
             phiMax=spacePointGridConfigArg.phi[1],
@@ -1052,6 +1031,9 @@ def addHashingSeeding(
             bucketSize=hashingAlgorithmConfigArg.bucketSize,
             zBins=hashingAlgorithmConfigArg.zBins,
             phiBins=hashingAlgorithmConfigArg.phiBins,
+            deltaRMiddleMinSPRange=hashingAlgorithmConfigArg.deltaRMiddleMinSPRange,
+            deltaRMiddleMaxSPRange=hashingAlgorithmConfigArg.deltaRMiddleMaxSPRange,
+            zBinsCustomLooping=hashingAlgorithmConfigArg.zBinsCustomLooping,
         ),
     )
 

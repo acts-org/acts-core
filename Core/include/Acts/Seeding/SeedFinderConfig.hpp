@@ -15,7 +15,29 @@
 
 #include <limits>
 #include <memory>
+#include <numbers>
 #include <vector>
+
+namespace Acts::SeedFinding {
+/// @brief enum to define how to check the Radial range for middle space-point
+/// used in the Seed Finding process
+  enum class MiddleRadialStrategy : int {
+  /// Rely on the Grid. In case there is a binnind in radius
+  /// and the binning assures the middle space point candidate
+  // is already in the proper radius range
+  RelyOnGrid,
+  /// The radius validity range changes according to the z-bin
+  /// The user has to provide a list of ranges, one entry for each z bin in the
+  /// grid
+  VariableRange,
+  /// The range is the same for every z-bin in the grid and is provided by the
+  /// user
+  /// In this case the values are to be stored in the "SeedFinderOption" object
+  /// and can
+  /// be recomputed every event
+  UserRange
+};
+}  // namespace Acts::SeedFinding
 
 namespace Acts {
 
@@ -24,63 +46,32 @@ template <typename T>
 class SeedFilter;
 
 /// @brief Structure that holds configuration parameters for the seed finder algorithm
-template <typename SpacePoint>
+template <typename external_spacepoint_t>
 struct SeedFinderConfig {
-  std::shared_ptr<Acts::SeedFilter<SpacePoint>> seedFilter;
-
-  /// Seeding parameters used in the space-point grid creation and bin finding
-
-  /// Geometry Settings + Detector ROI
-  /// (r, z, phi) range for limiting location of all measurements and grid
-  /// creation
-  float phiMin = -M_PI;
-  float phiMax = M_PI;
-  float zMin = -2800 * Acts::UnitConstants::mm;
-  float zMax = 2800 * Acts::UnitConstants::mm;
-  float rMax = 600 * Acts::UnitConstants::mm;
-  /// WARNING: if rMin is smaller than impactMax, the bin size will be 2*pi,
-  /// which will make seeding very slow!
-  float rMin = 33 * Acts::UnitConstants::mm;
+  std::shared_ptr<Acts::SeedFilter<external_spacepoint_t>> seedFilter{nullptr};
 
   /// Vector containing the z-bin edges for non equidistant binning in z
-  std::vector<float> zBinEdges;
-
-  /// Order of z bins to loop over when searching for SPs
-  std::vector<std::size_t> zBinsCustomLooping = {};
-
-  /// Radial bin size used in space-point grid
-  float binSizeR = 1. * Acts::UnitConstants::mm;
+  std::vector<float> zBinEdges = {};
 
   /// Seeding parameters used to define the region of interest for middle
   /// space-point
 
   /// Radial range for middle space-point
-  /// The range can be defined manually with (rMinMiddle, rMaxMiddle). If
-  /// useVariableMiddleSPRange is set to false and the vector rRangeMiddleSP is
-  /// empty, we use (rMinMiddle, rMaxMiddle) to cut the middle space-points
-  float rMinMiddle = 60.f * Acts::UnitConstants::mm;
-  float rMaxMiddle = 120.f * Acts::UnitConstants::mm;
-  /// If useVariableMiddleSPRange is set to false, the vector rRangeMiddleSP can
-  /// be used to define a fixed r range for each z bin: {{rMin, rMax}, ...}
-  bool useVariableMiddleSPRange = false;
-  /// Range defined in vector for each z bin
-  std::vector<std::vector<float>> rRangeMiddleSP;
-  /// If useVariableMiddleSPRange is true, the radial range will be calculated
-  /// based on the maximum and minimum r values of the space-points in the event
-  /// and a deltaR (deltaRMiddleMinSPRange, deltaRMiddleMaxSPRange)
-  float deltaRMiddleMinSPRange = 10. * Acts::UnitConstants::mm;
-  float deltaRMiddleMaxSPRange = 10. * Acts::UnitConstants::mm;
+  Acts::SeedFinding::MiddleRadialStrategy middleRangeStrategy =
+      Acts::SeedFinding::MiddleRadialStrategy::UserRange;
+  /// If MiddleRadialStrategy is set to VariableRange,  the vector
+  /// rRangeMiddleSP can be used to define a fixed r range for each z bin:
+  /// {{rMin, rMax}, ...} Range defined in vector for each z bin
+  std::vector<std::vector<float>> rRangeMiddleSP = {};
 
   /// Seeding parameters used to define the cuts on space-point doublets
 
   /// Minimum radial distance between two doublet components (prefer
   /// deltaRMinTopSP and deltaRMinBottomSP to set separate values for outer and
   /// inner space-points)
+  /// TODO Used in the filtering step ... is this correct???
   float deltaRMin = 5 * Acts::UnitConstants::mm;
-  /// Maximum radial distance between two doublet components (prefer
-  /// deltaRMaxTopSP and deltaRMacBottomSP to set separate values for outer and
-  /// inner space-points)
-  float deltaRMax = 270 * Acts::UnitConstants::mm;
+
   /// Minimum radial distance between middle-outer doublet components
   float deltaRMinTopSP = std::numeric_limits<float>::quiet_NaN();
   /// Maximum radial distance between middle-outer doublet components
@@ -145,6 +136,8 @@ struct SeedFinderConfig {
   /// Contains parameters for forward seed confirmation
   SeedConfirmationRangeConfig forwardSeedConfirmationRange;
   /// Maximum number (minus one) of accepted seeds per middle space-point
+
+  /// TODO: MOVE AWAY
   unsigned int maxSeedsPerSpM = 5;
 
   /// Other parameters
@@ -177,10 +170,10 @@ struct SeedFinderConfig {
   /// Enables setting of the following delegates.
   bool useDetailedDoubleMeasurementInfo = false;
 
-  Delegate<bool(const SpacePoint&)> spacePointSelector{
+  Delegate<bool(const external_spacepoint_t&)> spacePointSelector{
       DelegateFuncTag<voidSpacePointSelector>{}};
 
-  static bool voidSpacePointSelector(const SpacePoint& /*sp*/) { return true; }
+  static bool voidSpacePointSelector(const external_spacepoint_t& /*sp*/) { return true; }
 
   /// Tolerance parameter used to check the compatibility of space-point
   /// coordinates in xyz. This is only used in a detector specific check for
@@ -213,25 +206,26 @@ struct SeedFinderConfig {
 
     using namespace Acts::UnitLiterals;
     SeedFinderConfig config = *this;
+    if (config.middleRangeStrategy ==
+            Acts::SeedFinding::MiddleRadialStrategy::VariableRange &&
+        config.zBinEdges.empty()) {
+      throw std::runtime_error(
+          "Seed Finder condiguration asked for a VariableRange strategy for "
+          "checking middle space point radial validity, but the user provided "
+          "an empty zBinEdges vector in the SeedFinderConfig");
+    }
+
     config.isInInternalUnits = true;
     config.minPt /= 1_MeV;
     config.deltaRMin /= 1_mm;
-    config.deltaRMax /= 1_mm;
-    config.binSizeR /= 1_mm;
     config.deltaRMinTopSP /= 1_mm;
     config.deltaRMaxTopSP /= 1_mm;
     config.deltaRMinBottomSP /= 1_mm;
     config.deltaRMaxBottomSP /= 1_mm;
-    config.deltaRMiddleMinSPRange /= 1_mm;
-    config.deltaRMiddleMaxSPRange /= 1_mm;
     config.impactMax /= 1_mm;
     config.maxPtScattering /= 1_MeV;  // correct?
     config.collisionRegionMin /= 1_mm;
     config.collisionRegionMax /= 1_mm;
-    config.zMin /= 1_mm;
-    config.zMax /= 1_mm;
-    config.rMax /= 1_mm;
-    config.rMin /= 1_mm;
     config.deltaZMax /= 1_mm;
 
     config.zAlign /= 1_mm;
@@ -241,6 +235,7 @@ struct SeedFinderConfig {
 
     return config;
   }
+
   SeedFinderConfig calculateDerivedQuantities() const {
     SeedFinderConfig config = *this;
     // calculation of scattering using the highland formula
@@ -261,6 +256,12 @@ struct SeedFinderOptions {
   // field induction
   float bFieldInZ = 2.08 * Acts::UnitConstants::T;
 
+  /// The range can be defined manually with (rMinMiddle, rMaxMiddle). If
+  /// useVariableMiddleSPRange is set to false and the vector rRangeMiddleSP is
+  /// empty, we use (rMinMiddle, rMaxMiddle) to cut the middle space-points
+  float rMinMiddle = 60.f * Acts::UnitConstants::mm;
+  float rMaxMiddle = 120.f * Acts::UnitConstants::mm;
+
   // derived quantities
   float pTPerHelixRadius = std::numeric_limits<float>::quiet_NaN();
   float minHelixDiameter2 = std::numeric_limits<float>::quiet_NaN();
@@ -280,7 +281,8 @@ struct SeedFinderOptions {
     options.isInInternalUnits = true;
     options.beamPos[0] /= 1_mm;
     options.beamPos[1] /= 1_mm;
-
+    options.rMinMiddle /= 1_mm;
+    options.rMaxMiddle /= 1_mm;
     options.bFieldInZ /= 1000. * 1_T;
     return options;
   }

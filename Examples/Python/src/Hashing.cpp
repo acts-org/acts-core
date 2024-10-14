@@ -57,7 +57,8 @@ void addHashing(Context& ctx) {
       "SeedingAlgorithmHashing", inputSpacePoints, outputSeeds, outputBuckets,
       seedFilterConfig, seedFinderConfig, seedFinderOptions, gridConfig,
       gridOptions, allowSeparateRMax, zBinNeighborsTop, zBinNeighborsBottom,
-      numPhiNeighbors, hashingConfig, hashingTrainingConfig, useExtraCuts);
+      numPhiNeighbors, hashingConfig, hashingTrainingConfig, useExtraCuts, deltaRMiddleMinSPRange,
+      deltaRMiddleMaxSPRange, zBinsCustomLooping);
 }
 
 }  // namespace Acts::Python

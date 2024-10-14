@@ -77,20 +77,8 @@ ActsExamples::SeedingAlgorithmHashing::SeedingAlgorithmHashing(
   m_outputSeeds.initialize(m_cfg.outputSeeds);
   m_outputBuckets.initialize(m_cfg.outputBuckets);
 
-  if (m_cfg.gridConfig.rMax != m_cfg.seedFinderConfig.rMax &&
-      m_cfg.allowSeparateRMax == false) {
-    throw std::invalid_argument(
-        "Inconsistent config rMax: using different values in gridConfig and "
-        "seedFinderConfig. If values are intentional set allowSeparateRMax to "
-        "true");
-  }
-
   if (m_cfg.seedFilterConfig.deltaRMin != m_cfg.seedFinderConfig.deltaRMin) {
     throw std::invalid_argument("Inconsistent config deltaRMin");
-  }
-
-  if (m_cfg.gridConfig.deltaRMax != m_cfg.seedFinderConfig.deltaRMax) {
-    throw std::invalid_argument("Inconsistent config deltaRMax");
   }
 
   static_assert(
@@ -114,7 +102,7 @@ ActsExamples::SeedingAlgorithmHashing::SeedingAlgorithmHashing(
       "Value of deltaRMinBottomSP must support NaN values");
 
   if (std::isnan(m_cfg.seedFinderConfig.deltaRMaxTopSP)) {
-    m_cfg.seedFinderConfig.deltaRMaxTopSP = m_cfg.seedFinderConfig.deltaRMax;
+    m_cfg.seedFinderConfig.deltaRMaxTopSP = m_cfg.gridConfig.deltaRMax;
   }
 
   if (std::isnan(m_cfg.seedFinderConfig.deltaRMinTopSP)) {
@@ -122,19 +110,11 @@ ActsExamples::SeedingAlgorithmHashing::SeedingAlgorithmHashing(
   }
 
   if (std::isnan(m_cfg.seedFinderConfig.deltaRMaxBottomSP)) {
-    m_cfg.seedFinderConfig.deltaRMaxBottomSP = m_cfg.seedFinderConfig.deltaRMax;
+    m_cfg.seedFinderConfig.deltaRMaxBottomSP = m_cfg.gridConfig.deltaRMax;
   }
 
   if (std::isnan(m_cfg.seedFinderConfig.deltaRMinBottomSP)) {
     m_cfg.seedFinderConfig.deltaRMinBottomSP = m_cfg.seedFinderConfig.deltaRMin;
-  }
-
-  if (m_cfg.gridConfig.zMin != m_cfg.seedFinderConfig.zMin) {
-    throw std::invalid_argument("Inconsistent config zMin");
-  }
-
-  if (m_cfg.gridConfig.zMax != m_cfg.seedFinderConfig.zMax) {
-    throw std::invalid_argument("Inconsistent config zMax");
   }
 
   if (m_cfg.seedFilterConfig.maxSeedsPerSpM !=
@@ -273,10 +253,12 @@ ActsExamples::ProcessCode ActsExamples::SeedingAlgorithmHashing::execute(
         Acts::CylindricalSpacePointGridCreator::createGrid<value_type>(
             m_cfg.gridConfig, m_cfg.gridOptions);
     Acts::CylindricalSpacePointGridCreator::fillGrid(
-        m_cfg.seedFinderConfig, m_cfg.seedFinderOptions, grid,
+        m_cfg.seedFinderConfig, grid,
         spContainer.begin(), spContainer.end());
 
     // Compute radius Range
+    auto localSeedFinderOptions = m_cfg.seedFinderOptions;
+    
     // we rely on the fact the grid is storing the proxies
     // with a sorting in the radius
     float minRange = std::numeric_limits<float>::max();
@@ -292,7 +274,7 @@ ActsExamples::ProcessCode ActsExamples::SeedingAlgorithmHashing::execute(
     }
 
     std::array<std::vector<std::size_t>, 3ul> navigation;
-    navigation[1ul] = m_cfg.seedFinderConfig.zBinsCustomLooping;
+    navigation[1ul] = m_cfg.zBinsCustomLooping;
 
     // groups spacepoints
     auto spacePointsGrouping = Acts::CylindricalBinnedGroup<value_type>(
@@ -300,16 +282,17 @@ ActsExamples::ProcessCode ActsExamples::SeedingAlgorithmHashing::execute(
         std::move(navigation));
 
     /// variable middle SP radial region of interest
-    const Acts::Range1D<float> rMiddleSPRange(
-        minRange + m_cfg.seedFinderConfig.deltaRMiddleMinSPRange,
-        maxRange - m_cfg.seedFinderConfig.deltaRMiddleMaxSPRange);
-
+    localSeedFinderOptions.rMinMiddle = std::floor(minRange / 2) * 2 +
+      m_cfg.deltaRMiddleMinSPRange;
+    localSeedFinderOptions.rMaxMiddle = std::floor(maxRange / 2) * 2 -
+      m_cfg.deltaRMiddleMaxSPRange;
+    
     // this creates seeds of proxy, we need to convert it to seed of space
     // points
     for (const auto [bottom, middle, top] : spacePointsGrouping) {
       m_seedFinder.createSeedsForGroup(
-          m_cfg.seedFinderOptions, state, spacePointsGrouping.grid(),
-          seedsSetForBucket, bottom, middle, top, rMiddleSPRange);
+          localSeedFinderOptions, state, spacePointsGrouping.grid(),
+          seedsSetForBucket, bottom, middle, top);
     }
 
     // proxies die when the Acts::SpacePointContainer dies, so we need to

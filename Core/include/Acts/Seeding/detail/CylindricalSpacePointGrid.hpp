@@ -17,9 +17,18 @@
 
 namespace Acts {
 
-/// Cylindrical Space Point bin is a 2D grid with (phi, z) bins
-/// It stores a vector of internal space points to external space points
+/// Concept to check the provided external space point type
+/// can be used to fill the space point grid
 template <typename external_spacepoint_t>
+concept CylindricalGridElement = requires(external_spacepoint_t sp) {
+  { sp.phi() } -> std::same_as<float>;
+  { sp.z() } -> std::same_as<float>;
+  { sp.radius() } -> std::same_as<float>;
+};
+  
+/// Cylindrical Space Point bin is a 3D grid with (phi, z, radius) bins
+/// It stores a vector of external space points
+template <Acts::CylindricalGridElement external_spacepoint_t>
 using CylindricalSpacePointGrid = Acts::Grid<
     std::vector<const external_spacepoint_t*>,
     Acts::Axis<Acts::AxisType::Equidistant, Acts::AxisBoundaryType::Closed>,
@@ -40,10 +49,10 @@ struct CylindricalSpacePointGridConfig {
   float minPt = 0 * Acts::UnitConstants::MeV;
   // maximum extension of sensitive detector layer relevant for seeding as
   // distance from x=y=0 (i.e. in r)
-  float rMax = 320 * Acts::UnitConstants::mm;
+  float rMax = 600 * Acts::UnitConstants::mm;
   // maximum extension of sensitive detector layer relevant for seeding as
   // distance from x=y=0 (i.e. in r)
-  float rMin = 0 * Acts::UnitConstants::mm;
+  float rMin = 33 * Acts::UnitConstants::mm;
   // maximum extension of sensitive detector layer relevant for seeding in
   // positive direction in z
   float zMax = 0 * Acts::UnitConstants::mm;
@@ -89,7 +98,13 @@ struct CylindricalSpacePointGridConfig {
     config.zMax /= 1_mm;
     config.zMin /= 1_mm;
     config.deltaRMax /= 1_mm;
-
+    for (float& val : config.zBinEdges) {
+      val /= 1_mm;
+    }
+    for (float& val : config.rBinEdges) {
+      val /= 1_mm;
+    }
+    
     if (config.phiMin < -std::numbers::pi_v<float> ||
         config.phiMax > std::numbers::pi_v<float>) {
       throw std::runtime_error(
@@ -119,7 +134,7 @@ struct CylindricalSpacePointGridConfig {
 
 struct CylindricalSpacePointGridOptions {
   // magnetic field
-  float bFieldInZ = 0.;
+  float bFieldInZ = 0. * Acts::UnitConstants::T;
   bool isInInternalUnits = false;
   CylindricalSpacePointGridOptions toInternalUnits() const {
     if (isInInternalUnits) {
@@ -148,10 +163,16 @@ class CylindricalSpacePointGridCreator {
             typename external_spacepoint_iterator_t>
   static void fillGrid(
       const Acts::SeedFinderConfig<external_spacepoint_t>& config,
-      const Acts::SeedFinderOptions& options,
       Acts::CylindricalSpacePointGrid<external_spacepoint_t>& grid,
       external_spacepoint_iterator_t spBegin,
       external_spacepoint_iterator_t spEnd);
+
+  template <typename external_spacepoint_t,
+	    typename external_collection_t>
+  requires std::ranges::range<external_collection_t> && std::same_as<typename external_collection_t::value_type, external_spacepoint_t>
+  static void fillGrid(const Acts::SeedFinderConfig<external_spacepoint_t>& config,
+		       Acts::CylindricalSpacePointGrid<external_spacepoint_t>& grid,
+		       const external_collection_t& collection);
 };
 
 }  // namespace Acts

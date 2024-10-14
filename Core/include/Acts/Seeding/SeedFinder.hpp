@@ -27,9 +27,21 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <ranges>
 
 namespace Acts {
 
+template <typename Coll>
+concept GridBinCollection =
+  std::ranges::random_access_range<Coll> &&
+  std::same_as<typename Coll::value_type, std::size_t>;
+
+template <typename Coll, typename external_t, std::size_t N = 3ul>
+concept CollectionStoresSeedsTo = requires(Coll coll, external_t sp) {
+  Acts::detail::pushBackOrInsertAtEnd(coll,
+                                      Acts::Seed<external_t, N>(sp, sp, sp));
+};
+    
 enum class SpacePointCandidateType : short { eBottom, eTop };
 
 enum class DetectorMeasurementInfo : short { eDefault, eDetailed };
@@ -44,33 +56,34 @@ class SeedFinder {
  public:
   struct SeedingState {
     // bottom space point
-    std::vector<const external_spacepoint_t*> compatBottomSP;
-    std::vector<const external_spacepoint_t*> compatTopSP;
+    std::vector<const external_spacepoint_t*> compatBottomSP{};
+    std::vector<const external_spacepoint_t*> compatTopSP{};
     // contains parameters required to calculate circle with linear equation
     // ...for bottom-middle
-    std::vector<LinCircle> linCircleBottom;
+    std::vector<LinCircle> linCircleBottom{};
     // ...for middle-top
-    std::vector<LinCircle> linCircleTop;
+    std::vector<LinCircle> linCircleTop{};
 
     // create vectors here to avoid reallocation in each loop
-    std::vector<const external_spacepoint_t*> topSpVec;
-    std::vector<float> curvatures;
-    std::vector<float> impactParameters;
+    std::vector<const external_spacepoint_t*> topSpVec{};
+    std::vector<float> curvatures{};
+    std::vector<float> impactParameters{};
 
     // managing seed candidates for SpM
-    CandidatesForMiddleSp<const external_spacepoint_t> candidates_collector;
+    CandidatesForMiddleSp<const external_spacepoint_t> candidates_collector{};
 
     // managing doublet candidates
     boost::container::small_vector<Acts::Neighbour<grid_t>,
                                    Acts::detail::ipow(3, grid_t::DIM)>
-        bottomNeighbours;
+    bottomNeighbours{};
     boost::container::small_vector<Acts::Neighbour<grid_t>,
                                    Acts::detail::ipow(3, grid_t::DIM)>
-        topNeighbours;
+    topNeighbours{};
 
     // Mutable variables for Space points used in the seeding
-    Acts::SpacePointMutableData spacePointMutableData;
+    Acts::SpacePointMutableData spacePointMutableData{};
   };
+  
 
   /// The only constructor. Requires a config object.
   /// @param config the configuration for the SeedFinder
@@ -94,28 +107,28 @@ class SeedFinder {
   /// @param bottomSPs group of space points to be used as innermost SP in a seed.
   /// @param middleSPs group of space points to be used as middle SP in a seed.
   /// @param topSPs group of space points to be used as outermost SP in a seed.
-  /// @param rMiddleSPRange range object containing the minimum and maximum r for middle SP for a certain z bin.
   /// @note Ranges must return pointers.
   /// @note Ranges must be separate objects for each parallel call.
-  template <typename container_t, typename sp_range_t>
+  template <typename container_t,
+	    Acts::GridBinCollection sp_range_t>
+  requires Acts::CollectionStoresSeedsTo<container_t, external_spacepoint_t, 3ul>
   void createSeedsForGroup(const Acts::SeedFinderOptions& options,
                            SeedingState& state, const grid_t& grid,
                            container_t& outputCollection,
                            const sp_range_t& bottomSPs,
                            const std::size_t middleSPs,
-                           const sp_range_t& topSPs,
-                           const Acts::Range1D<float>& rMiddleSPRange) const;
+                           const sp_range_t& topSPs) const;
 
  private:
-  /// Given a middle space point candidate, get the proper radius validity range
+  /// Given a middle space point candidate get the proper radius validity range
   /// In case the radius range changes according to the z-bin we need to
-  /// retrieve the proper range. We can do this computation only once, since
+  /// retrieve the proper range We can do it this computation only once, since
   /// all the middle space point candidates belong to the same z-bin
+  /// @param options frequently changing configuration (like beam position) 
   /// @param spM space point candidate to be used as middle SP in a seed
-  /// @param rMiddleSPRange range object containing the minimum and maximum r for middle SP for a certain z bin.
   std::pair<float, float> retrieveRadiusRangeForMiddle(
-      const external_spacepoint_t& spM,
-      const Acts::Range1D<float>& rMiddleSPRange) const;
+      const Acts::SeedFinderOptions& options,
+      const external_spacepoint_t& spM) const;
 
   /// Iterates over dublets and tests the compatibility between them by applying
   /// a series of cuts that can be tested with only two SPs
