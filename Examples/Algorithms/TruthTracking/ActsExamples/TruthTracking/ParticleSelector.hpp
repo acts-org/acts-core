@@ -62,6 +62,8 @@ class ParticleSelector final : public IAlgorithm {
     bool removeCharged = false;
     /// Remove neutral particles.
     bool removeNeutral = false;
+    /// Remove intermediate particles
+    bool removeIntermediate = true;
     /// Remove secondaries.
     bool removeSecondaries = false;
     /// Exclude particles depending on absolute pdg value

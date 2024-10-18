@@ -131,14 +131,32 @@ Pythia8Generator::operator()(RandomEngine& rng) {
     if (genParticle.statusHepMC() == 4) {
       continue;
     }
-    // only interested in final, visible particles
-    if (!genParticle.isFinal()) {
-      continue;
-    }
-    if (!genParticle.isVisible()) {
+
+    // ignore intermediate particles with a status code that
+    // do not fall in status code = 2 category
+    // see: https://pythia.org/latest-manual/ParticleProperties.html
+
+    if (genParticle.statusHepMC() == 11) {
       continue;
     }
 
+    // ignore quark/gluons and intermediate particles of no interest
+    if (genParticle.statusHepMC() != 1 && genParticle.statusHepMC() != 2) {
+      continue;
+    }
+    
+    // if we don't want intermediate particles
+    // only interested in final, visible particles
+    
+    if (!m_cfg.keepIntermediate) {
+      if (!genParticle.isFinal()) {
+	continue;
+      }
+      if (!genParticle.isVisible()) {
+	continue;
+      }
+    }
+    
     // production vertex. Pythia8 time uses units mm/c, and we use c=1
     SimParticle::Vector4 pos4(
         genParticle.xProd() * 1_mm, genParticle.yProd() * 1_mm,
@@ -186,7 +204,8 @@ Pythia8Generator::operator()(RandomEngine& rng) {
     particle.setAbsoluteMomentum(
         Acts::fastHypot(genParticle.px(), genParticle.py(), genParticle.pz()) *
         1_GeV);
-
+    // A particle is intermediate if it's not final and not visible
+    particle.setIsIntermediate(!genParticle.isVisible() && !genParticle.isFinal());
     particles.push_back(std::move(particle));
   }
 

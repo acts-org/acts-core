@@ -98,6 +98,16 @@ class Particle {
     m_particleId = barcode;
     return *this;
   }
+
+  /// Set if the particle is intermediate
+  /// (not final and not visible)
+  Particle &setIsIntermediate(bool isIntermediate) {
+    m_isIntermediate = isIntermediate;
+    return *this;
+  }
+
+  /// 
+  
   /// Set the space-time position four-vector.
   Particle &setPosition4(const Vector4 &pos4) {
     m_position4 = pos4;
@@ -219,6 +229,10 @@ class Particle {
            particleId().generation() != 0 || particleId().subParticle() != 0;
   }
 
+  constexpr bool isIntermediate() const {
+    return m_isIntermediate;
+  }
+
   // simulation specific properties
 
   /// Set the proper time in the particle rest frame.
@@ -330,6 +344,8 @@ class Particle {
   const Acts::Surface *m_referenceSurface{nullptr};
   /// outcome
   ParticleOutcome m_outcome = ParticleOutcome::Alive;
+  /// Intermediate particle. 
+  bool m_isIntermediate = false;
 };
 
 std::ostream &operator<<(std::ostream &os, const Particle &particle);

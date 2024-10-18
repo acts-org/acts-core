@@ -92,25 +92,32 @@ ActsExamples::ProcessCode ActsExamples::ParticleSelector::execute(
     const bool validNeutral = (p.charge() == 0) && !m_cfg.removeNeutral;
     const bool validCharged = (p.charge() != 0) && !m_cfg.removeCharged;
     const bool validCharge = validNeutral || validCharged;
+    const bool validIntermediate = (p.isIntermediate() || !m_cfg.removeIntermediate);
     const bool validSecondary = !m_cfg.removeSecondaries || !p.isSecondary();
+        
 
     nInvalidCharge += static_cast<std::size_t>(!validCharge);
 
     // default valid measurement count to true and only change if we have loaded
     // the measurement particles map
     bool validMeasurementCount = true;
-    if (particlesMeasMap) {
-      auto [b, e] = particlesMeasMap->equal_range(p.particleId());
-      validMeasurementCount =
+
+    // Only check the particle maps for non-intermediate particles
+    if (!validIntermediate) {
+      if (particlesMeasMap) {
+	auto [b, e] = particlesMeasMap->equal_range(p.particleId());
+	validMeasurementCount =
           within(static_cast<std::size_t>(std::distance(b, e)),
                  m_cfg.measurementsMin, m_cfg.measurementsMax);
-
-      ACTS_VERBOSE("Found " << std::distance(b, e) << " measurements for "
-                            << p.particleId());
-    }
-
-    nInvalidMeasurementCount +=
+	
+	ACTS_VERBOSE("Found " << std::distance(b, e) << " measurements for "
+		     << p.particleId());
+      }
+      
+      nInvalidMeasurementCount +=
         static_cast<std::size_t>(!validMeasurementCount);
+      
+    }
 
     // Pdg selection
     bool validPdg = true;
@@ -121,7 +128,7 @@ ActsExamples::ProcessCode ActsExamples::ParticleSelector::execute(
       }
     }
 
-    return validPdg && validCharge && validSecondary && validMeasurementCount &&
+    return validPdg && validCharge && validSecondary && validIntermediate && validMeasurementCount &&
            within(p.transverseMomentum(), m_cfg.ptMin, m_cfg.ptMax) &&
            within(std::abs(eta), m_cfg.absEtaMin, m_cfg.absEtaMax) &&
            within(eta, m_cfg.etaMin, m_cfg.etaMax) &&
