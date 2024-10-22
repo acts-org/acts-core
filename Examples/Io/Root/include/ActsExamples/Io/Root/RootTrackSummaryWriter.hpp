@@ -148,6 +148,8 @@ class RootTrackSummaryWriter final : public WriterT<ConstTrackContainer> {
   std::vector<float> m_t_vx;
   /// Vertex y positions of majority particle
   std::vector<float> m_t_vy;
+  /// Vertex R positions of majority particle
+  std::vector<float> m_prodR;
   /// Vertex z positions of majority particle
   std::vector<float> m_t_vz;
   /// Initial momenta px of majority particle

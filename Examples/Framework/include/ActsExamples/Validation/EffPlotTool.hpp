@@ -34,7 +34,9 @@ class EffPlotTool {
         {"Eta", PlotHelpers::Binning("#eta", 40, -4, 4)},
         {"Phi", PlotHelpers::Binning("#phi", 100, -3.15, 3.15)},
         {"Pt", PlotHelpers::Binning("pT [GeV/c]", 40, 0, 100)},
-        {"DeltaR", PlotHelpers::Binning("#Delta R", 100, 0, 0.3)}};
+        {"DeltaR", PlotHelpers::Binning("#Delta R", 100, 0, 0.3)},
+        {"prodR", PlotHelpers::Binning("prodR", 100, 0, 100)},
+    };
   };
 
   /// @brief Nested Cache struct
@@ -45,6 +47,7 @@ class EffPlotTool {
     TEfficiency* trackEff_vs_DeltaR{
         nullptr};  ///< Tracking efficiency vs distance to the closest truth
                    ///< particle
+    TEfficiency* trackEff_vs_prodR{nullptr};
   };
 
   /// Constructor

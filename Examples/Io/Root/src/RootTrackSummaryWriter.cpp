@@ -105,6 +105,7 @@ RootTrackSummaryWriter::RootTrackSummaryWriter(
   m_outputTree->Branch("t_time", &m_t_time);
   m_outputTree->Branch("t_vx", &m_t_vx);
   m_outputTree->Branch("t_vy", &m_t_vy);
+  m_outputTree->Branch("t_prodR", &m_prodR);
   m_outputTree->Branch("t_vz", &m_t_vz);
   m_outputTree->Branch("t_px", &m_t_px);
   m_outputTree->Branch("t_py", &m_t_py);
@@ -367,7 +368,7 @@ ProcessCode RootTrackSummaryWriter::writeT(const AlgorithmContext& ctx,
       ACTS_DEBUG("Truth particle for track " << track.tipIndex()
                                              << " not found!");
     }
-
+    float prodR = sqrt(t_vx * t_vx + t_vy * t_vy);
     // Push the corresponding truth particle info for the track.
     // Always push back even if majority particle not found
     m_majorityParticleId.push_back(majorityParticleId.value());
@@ -377,6 +378,7 @@ ProcessCode RootTrackSummaryWriter::writeT(const AlgorithmContext& ctx,
     m_t_time.push_back(t_time);
     m_t_vx.push_back(t_vx);
     m_t_vy.push_back(t_vy);
+    m_prodR.push_back(prodR);
     m_t_vz.push_back(t_vz);
     m_t_px.push_back(t_px);
     m_t_py.push_back(t_py);
@@ -561,6 +563,7 @@ ProcessCode RootTrackSummaryWriter::writeT(const AlgorithmContext& ctx,
   m_t_time.clear();
   m_t_vx.clear();
   m_t_vy.clear();
+  m_prodR.clear();
   m_t_vz.clear();
   m_t_px.clear();
   m_t_py.clear();
