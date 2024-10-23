@@ -404,7 +404,7 @@ std::shared_ptr<Acts::Surface> Acts::Geant4PhysicalVolumeConverter::surface(
     if (forcedType == Surface::SurfaceType::Other ||
         forcedType == Surface::SurfaceType::Plane) {
       auto [bounds, axes, original] =
-          Geant4ShapeConverter{}.trapezoidBounds_g4Trap(*g4Trap);
+          Geant4ShapeConverter{}.trapezoidBounds(*g4Trap);
       auto orientedToGlobal = axesOriented(toGlobal, axes);
       surface = Acts::Surface::makeShared<PlaneSurface>(orientedToGlobal,
                                                         std::move(bounds));
