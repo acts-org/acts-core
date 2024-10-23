@@ -16,16 +16,10 @@
 #include <memory>
 #include <tuple>
 
-
 namespace CLHEP {
 class Hep3Vector;
 class HepRotation;
 }  // namespace CLHEP
-
-#include "/home/cms/software/geant4/install_dir/include/Geant4/G4RotationMatrix.hh"
-#include "/home/cms/software/geant4/install_dir/include/Geant4/G4ThreeVector.hh"
-#include "/home/cms/software/geant4/install_dir/include/Geant4/G4Transform3D.hh"
-
 
 class G4Box;
 class G4Material;
