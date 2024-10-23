@@ -6,8 +6,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-//#include "Acts/Plugins/Geant4/Geant4Converters.hpp"
-#include "/home/cms/software/ACTS_ODD/ACTS_Source/Plugins/Geant4/include/Acts/Plugins/Geant4/Geant4Converters.hpp"
+#include "Acts/Plugins/Geant4/Geant4Converters.hpp"
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Geometry/CylinderVolumeBounds.hpp"
@@ -19,8 +18,7 @@
 #include "Acts/Surfaces/DiscSurface.hpp"
 #include "Acts/Surfaces/LineBounds.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
-//#include "RadialBounds.hpp"
-#include "/home/cms/software/ACTS_ODD/ACTS_Source/Core/include/Acts/Surfaces/RadialBounds.hpp"
+#include "Acts/Surfaces/RadialBounds.hpp"
 #include "Acts/Surfaces/RectangleBounds.hpp"
 #include "Acts/Surfaces/StrawSurface.hpp"
 #include "Acts/Surfaces/TrapezoidBounds.hpp"
@@ -32,7 +30,6 @@
 #include <stdexcept>
 #include <utility>
 #include <vector>
-#include <iostream>
 
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
@@ -238,11 +235,9 @@ Acts::Geant4ShapeConverter::trapezoidBounds(const G4Trd& g4Trd) {
   return std::make_tuple(std::move(tBounds), rAxes, thickness);
 }
 
-// *********************************************************************************************************
-
 std::tuple<std::shared_ptr<Acts::TrapezoidBounds>, std::array<int, 2u>,
            Acts::ActsScalar>
-Acts::Geant4ShapeConverter::trapezoidBounds_g4Trap(const G4Trap& g4Trap) {
+Acts::Geant4ShapeConverter::trapezoidBounds(const G4Trap& g4Trap) {
   // primary parameters
   ActsScalar y1 = static_cast<ActsScalar>(g4Trap.GetYHalfLength1());
   ActsScalar y2 = static_cast<ActsScalar>(g4Trap.GetYHalfLength2());
@@ -304,8 +299,6 @@ Acts::Geant4ShapeConverter::trapezoidBounds_g4Trap(const G4Trap& g4Trap) {
       halfLengthXminY, halfLengthXmaxY, halfLengthY);
   return std::make_tuple(std::move(tBounds), rAxes, thickness);
 }
-
-// *********************************************************************************************************
 
 std::tuple<std::shared_ptr<Acts::PlanarBounds>, std::array<int, 2u>,
            Acts::ActsScalar>
