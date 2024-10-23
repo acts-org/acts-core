@@ -398,8 +398,6 @@ std::shared_ptr<Acts::Surface> Acts::Geant4PhysicalVolumeConverter::surface(
     }
   }
 
-  // ***************************************************************************************
-
   // Into a Trapezoid (G4Trap)
   auto g4Trap = dynamic_cast<const G4Trap*>(g4Solid);
   if (g4Trap != nullptr) {
@@ -416,8 +414,6 @@ std::shared_ptr<Acts::Surface> Acts::Geant4PhysicalVolumeConverter::surface(
       throw std::runtime_error("Can not convert 'G4Trap' into forced shape.");
     }
   }
-
-  // ***************************************************************************************
 
   // Into a Cylinder, disc or line
   auto g4Tubs = dynamic_cast<const G4Tubs*>(g4Solid);
