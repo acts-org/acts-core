@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(spacepoint_container_edm_traits) {
   using proxy_t = Acts::SpacePointProxy<container_t>;
   using iterator_t = Acts::ContainerIndexIterator<container_t, proxy_t&, false>;
 
-  static_assert(std::ranges::range<container_t>);
+  static_assert(std::ranges::random_access_range<container_t>);
   static_assert(std::same_as<typename iterator_t::iterator_category,
                              std::random_access_iterator_tag>);
   static_assert(
@@ -148,9 +148,9 @@ BOOST_AUTO_TEST_CASE(spacepoint_container_edm_functionalities) {
       std::same_as<typename proxy_t::ValueType, Acts::Test::SpacePoint>);
 
   using iterator_t =
-      Acts::ContainerIndexIterator<decltype(spContainer), proxy_t&, false>;
+      Acts::ContainerIndexIterator<decltype(spContainer), proxy_t, false>;
   using const_iterator_t =
-      Acts::ContainerIndexIterator<decltype(spContainer), const proxy_t&, true>;
+      Acts::ContainerIndexIterator<decltype(spContainer), const proxy_t, true>;
   static_assert(
       std::same_as<iterator_t, typename decltype(spContainer)::iterator>);
   static_assert(std::same_as<const_iterator_t,

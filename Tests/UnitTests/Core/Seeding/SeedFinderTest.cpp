@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
             << " in " << elapsed_read.count() << "s" << std::endl;
 
   using value_type = typename decltype(spContainer)::SpacePointProxyType;
-  using seed_type = Acts::Seed<value_type>;
+  using seed_type = Acts::Seed<SpacePoint>;
 
   Acts::SeedFinderConfig<value_type> config;
   // silicon detector max
@@ -236,15 +236,15 @@ int main(int argc, char** argv) {
     for (auto& regionVec : seedVector) {
       for (std::size_t i = 0; i < regionVec.size(); i++) {
         const seed_type* seed = &regionVec[i];
-        const value_type* sp = seed->sp()[0];
+        const auto* sp = seed->sp()[0];
         std::cout << " (" << sp->x() << ", " << sp->y() << ", " << sp->z()
                   << ") ";
         sp = seed->sp()[1];
-        std::cout << sp->externalSpacePoint()->layer << " (" << sp->x() << ", "
-                  << sp->y() << ", " << sp->z() << ") ";
+        std::cout << sp->layer << " (" << sp->x() << ", " << sp->y() << ", "
+                  << sp->z() << ") ";
         sp = seed->sp()[2];
-        std::cout << sp->externalSpacePoint()->layer << " (" << sp->x() << ", "
-                  << sp->y() << ", " << sp->z() << ") ";
+        std::cout << sp->layer << " (" << sp->x() << ", " << sp->y() << ", "
+                  << sp->z() << ") ";
         std::cout << std::endl;
       }
     }

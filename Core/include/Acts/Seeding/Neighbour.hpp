@@ -60,14 +60,14 @@ Neighbour<grid_t>::Neighbour(const grid_t& grid, std::size_t idx,
 
   /// First check that the first element is not already above the lower bound
   /// If so, avoid any computation and set the iterator to begin()
-  if (collection.front()->radius() > lowerBound) {
+  if (collection.front().radius() > lowerBound) {
     itr = collection.begin();
   }
   /// In case the last element is below the lower bound, that means that there
   /// can't be any element in that collection that can be considered a valuable
   /// candidate.
   /// Set the iterator to end() so that we do not run on this collection
-  else if (collection.back()->radius() < lowerBound) {
+  else if (collection.back().radius() < lowerBound) {
     itr = collection.end();
   }
   /// Cannot decide a priori. We need to find the first element such that it's
@@ -79,18 +79,18 @@ Neighbour<grid_t>::Neighbour(const grid_t& grid, std::size_t idx,
     std::size_t stop = collection.size() - 1;
     while (start <= stop) {
       std::size_t mid = (start + stop) / 2;
-      if (collection[mid]->radius() == lowerBound) {
+      if (collection[mid].radius() == lowerBound) {
         itr = collection.begin() + mid;
         return;
-      } else if (collection[mid]->radius() > lowerBound) {
-        if (mid > 0 && collection[mid - 1]->radius() < lowerBound) {
+      } else if (collection[mid].radius() > lowerBound) {
+        if (mid > 0 && collection[mid - 1].radius() < lowerBound) {
           itr = collection.begin() + mid;
           return;
         }
         stop = mid - 1;
       } else {
         if (mid + 1 < collection.size() &&
-            collection[mid + 1]->radius() > lowerBound) {
+            collection[mid + 1].radius() > lowerBound) {
           itr = collection.begin() + mid + 1;
           return;
         }

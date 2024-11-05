@@ -31,7 +31,7 @@ concept CylindricalGridElement = requires(external_spacepoint_t sp) {
 /// It stores a vector of internal space points to external space points
 template <Acts::CylindricalGridElement external_spacepoint_t>
 using CylindricalSpacePointGrid = Acts::Grid<
-    std::vector<const external_spacepoint_t*>,
+    std::vector<external_spacepoint_t>,
     Acts::Axis<Acts::AxisType::Equidistant, Acts::AxisBoundaryType::Closed>,
     Acts::Axis<Acts::AxisType::Variable, Acts::AxisBoundaryType::Open>,
     Acts::Axis<Acts::AxisType::Variable, Acts::AxisBoundaryType::Open>>;

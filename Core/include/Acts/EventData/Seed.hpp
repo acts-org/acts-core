@@ -26,12 +26,12 @@ class Seed {
             (std::same_as<external_spacepoint_t, args_t> && ...)
   explicit Seed(const args_t&... points);
 
-  void setVertexZ(float vertex);
-  void setQuality(float seedQuality);
+  void setVertexZ(float vertex) noexcept;
+  void setQuality(float seedQuality) noexcept;
 
-  const std::array<const external_spacepoint_t*, N>& sp() const;
-  float z() const;
-  float seedQuality() const;
+  const std::array<const external_spacepoint_t*, N>& sp() const noexcept;
+  float z() const noexcept;
+  float seedQuality() const noexcept;
 
  private:
   std::array<const external_spacepoint_t*, N> m_spacepoints{};

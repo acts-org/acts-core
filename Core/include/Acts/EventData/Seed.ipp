@@ -16,28 +16,28 @@ Seed<external_spacepoint_t, N>::Seed(const args_t&... points)
     : m_spacepoints({&points...}) {}
 
 template <typename external_spacepoint_t, std::size_t N>
-void Seed<external_spacepoint_t, N>::setVertexZ(float vertex) {
+void Seed<external_spacepoint_t, N>::setVertexZ(float vertex) noexcept {
   m_vertexZ = vertex;
 }
 
 template <typename external_spacepoint_t, std::size_t N>
-void Seed<external_spacepoint_t, N>::setQuality(float seedQuality) {
+void Seed<external_spacepoint_t, N>::setQuality(float seedQuality) noexcept {
   m_seedQuality = seedQuality;
 }
 
 template <typename external_spacepoint_t, std::size_t N>
 const std::array<const external_spacepoint_t*, N>&
-Seed<external_spacepoint_t, N>::sp() const {
+Seed<external_spacepoint_t, N>::sp() const noexcept {
   return m_spacepoints;
 }
 
 template <typename external_spacepoint_t, std::size_t N>
-float Seed<external_spacepoint_t, N>::z() const {
+float Seed<external_spacepoint_t, N>::z() const noexcept {
   return m_vertexZ;
 }
 
 template <typename external_spacepoint_t, std::size_t N>
-float Seed<external_spacepoint_t, N>::seedQuality() const {
+float Seed<external_spacepoint_t, N>::seedQuality() const noexcept {
   return m_seedQuality;
 }
 

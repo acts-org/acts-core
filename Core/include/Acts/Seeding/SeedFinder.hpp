@@ -38,12 +38,6 @@ concept GridBinCollection =
     std::ranges::random_access_range<Coll> &&
     std::same_as<typename Coll::value_type, std::size_t>;
 
-template <typename collection_t, typename external_t, std::size_t N = 3ul>
-concept CollectionStoresSeedsTo =
-    requires(collection_t coll, Acts::Seed<external_t, N> seed) {
-      Acts::detail::pushBackOrInsertAtEnd(coll, seed);
-    };
-
 enum class SpacePointCandidateType : short { eBottom, eTop };
 
 enum class DetectorMeasurementInfo : short { eDefault, eDetailed };
@@ -119,8 +113,8 @@ class SeedFinder {
   /// @note Ranges must return pointers.
   /// @note Ranges must be separate objects for each parallel call.
   template <typename container_t, Acts::GridBinCollection sp_range_t>
-    requires Acts::CollectionStoresSeedsTo<container_t, external_spacepoint_t,
-                                           3ul>
+  // requires Acts::CollectionStoresSeedsTo<container_t, external_spacepoint_t,
+  //                                        3ul>
   void createSeedsForGroup(const Acts::SeedFinderOptions& options,
                            SeedingState& state, const grid_t& grid,
                            container_t& outputCollection,

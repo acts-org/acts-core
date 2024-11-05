@@ -285,10 +285,10 @@ ActsExamples::ProcessCode ActsExamples::SeedingAlgorithmHashing::execute(
       if (coll.empty()) {
         continue;
       }
-      const auto* firstEl = coll.front();
-      const auto* lastEl = coll.back();
-      minRange = std::min(firstEl->radius(), minRange);
-      maxRange = std::max(lastEl->radius(), maxRange);
+      const auto& firstEl = coll.front();
+      const auto& lastEl = coll.back();
+      minRange = std::min(firstEl.radius(), minRange);
+      maxRange = std::max(lastEl.radius(), maxRange);
     }
 
     std::array<std::vector<std::size_t>, 3ul> navigation;

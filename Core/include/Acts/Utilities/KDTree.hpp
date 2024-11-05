@@ -487,8 +487,8 @@ class KDTree {
     const range_t m_range;
 
     /// @brief Pointers to the left and right children.
-    std::unique_ptr<KDTreeNode> m_lhs;
-    std::unique_ptr<KDTreeNode> m_rhs;
+    std::unique_ptr<KDTreeNode> m_lhs{nullptr};
+    std::unique_ptr<KDTreeNode> m_rhs{nullptr};
   };
 
   /// @brief Vector containing all of the elements in this k-d tree, including
@@ -496,6 +496,6 @@ class KDTree {
   vector_t m_elems;
 
   /// @brief Pointer to the root node of this k-d tree.
-  std::unique_ptr<KDTreeNode> m_root;
+  std::unique_ptr<KDTreeNode> m_root{nullptr};
 };
 }  // namespace Acts

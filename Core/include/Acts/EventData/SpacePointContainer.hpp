@@ -72,10 +72,10 @@ class SpacePointContainer {
 
   using iterator =
       ContainerIndexIterator<Acts::SpacePointContainer<container_t, holder_t>,
-                             SpacePointProxyType&, false>;
+                             SpacePointProxyType, false>;
   using const_iterator =
       ContainerIndexIterator<Acts::SpacePointContainer<container_t, holder_t>,
-                             const SpacePointProxyType&, true>;
+                             const SpacePointProxyType, true>;
 
   using ValueType = typename container_t::ValueType;
   using ProxyType = SpacePointProxyType;
@@ -126,17 +126,14 @@ class SpacePointContainer {
   const_iterator begin() const;
   const_iterator end() const;
 
-  ProxyType& at(const std::size_t n);
-  const ProxyType& at(const std::size_t n) const;
+  ProxyType at(const std::size_t n);
+  ProxyType at(const std::size_t n) const;
   const ValueType& sp(const std::size_t n) const;
 
  private:
   void initialize();
 
   const container_t& container() const;
-  const ProxyType& proxy(const std::size_t n) const;
-  std::vector<ProxyType>& proxies();
-  const std::vector<ProxyType>& proxies() const;
 
   float x(const std::size_t n) const;
   float y(const std::size_t n) const;
@@ -155,7 +152,6 @@ class SpacePointContainer {
   Acts::SpacePointContainerOptions m_options;
   Acts::SpacePointData m_data;
   holder_t<const container_t> m_container;
-  std::vector<ProxyType> m_proxies;
 };
 
 }  // namespace Acts

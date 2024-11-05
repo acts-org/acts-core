@@ -303,18 +303,35 @@ void SeedFilter<external_spacepoint_t>::filterSeeds_1SpFixed(
     mutableData.setQuality(medium->index(), bestSeedQuality);
     mutableData.setQuality(top->index(), bestSeedQuality);
 
-    Acts::Seed<external_spacepoint_t> seed{*bottom, *medium, *top};
-    seed.setVertexZ(zOrigin);
-    seed.setQuality(bestSeedQuality);
-
     ACTS_VERBOSE("Adding seed: [b=" << bottom->index() << ", m="
                                     << medium->index() << ", t=" << top->index()
                                     << "], quality=" << bestSeedQuality
                                     << ", vertexZ=" << zOrigin);
-    Acts::detail::pushBackOrInsertAtEnd(outputCollection, std::move(seed));
+
+    createAndStoreSeeds(outputCollection, *bottom, *medium, *top,
+                        bestSeedQuality, zOrigin);
     ++numTotalSeeds;
   }
   ACTS_VERBOSE("Identified " << numTotalSeeds << " seeds");
+}
+
+template <typename external_spacepoint_t>
+template <typename collection_t>
+  requires Acts::CollectionStoresSeedsToProxied<collection_t,
+                                                external_spacepoint_t, 3ul>
+void SeedFilter<external_spacepoint_t>::createAndStoreSeeds(
+    collection_t& outputCollection, const external_spacepoint_t& bottom,
+    const external_spacepoint_t& middle, const external_spacepoint_t& top,
+    float zOrigin, float bestSeedQuality) const {
+  using seed_type = Acts::Seed<std::remove_const_t<std::remove_pointer_t<
+                                   typename external_spacepoint_t::ValueType> >,
+                               3ul>;
+  seed_type seed(*bottom.externalSpacePoint(), *middle.externalSpacePoint(),
+                 *top.externalSpacePoint());
+  seed.setVertexZ(zOrigin);
+  seed.setQuality(bestSeedQuality);
+
+  Acts::detail::pushBackOrInsertAtEnd(outputCollection, std::move(seed));
 }
 
 }  // namespace Acts
