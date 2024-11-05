@@ -21,6 +21,10 @@ class Hep3Vector;
 class HepRotation;
 }  // namespace CLHEP
 
+namespace HepGeom {
+class Transform3D;
+}
+
 class G4Box;
 class G4Material;
 class G4Trd;

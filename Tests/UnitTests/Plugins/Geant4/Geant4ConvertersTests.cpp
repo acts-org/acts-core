@@ -212,7 +212,8 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
 
 BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   // Standard Trap: XY are already well defined
-  G4Trap trapXY("trapXY", 2, 0.523599, 0.785398, 125, 200, 125, 0.174533, 50, 125, 50, 0.174533); 
+  G4Trap trapXY("trapXY", 2, 0.523599, 0.785398, 125, 200, 125, 0.174533, 50,
+                125, 50, 0.174533);
   auto [boundsXY, axesXY, thicknessZ] =
       Acts::Geant4ShapeConverter{}.TrapezoidBounds(trapXY);
   CHECK_CLOSE_ABS(
@@ -229,7 +230,8 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   CHECK_CLOSE_ABS(thicknessZ, 4., 10e-10);
 
   // Flipped, yX are the coordinates
-  G4Trap trapyX("trapyX", 2, 0.523599, 0.785398, 50, 125, 50, 0.174533, 125, 200, 125, 0.174533); 
+  G4Trap trapyX("trapyX", 2, 0.523599, 0.785398, 50, 125, 50, 0.174533, 125,
+                200, 125, 0.174533);
   auto [boundsyX, axesyX, thicknessZ2] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trapyX);
   CHECK_CLOSE_ABS(
@@ -246,7 +248,8 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   CHECK_CLOSE_ABS(thicknessZ2, 4., 10e-10);
 
   // YZ span the trapezoid
-  G4Trap trapYZ("trapYZ", 200, 0.523599, 0.785398, 140, 2, 2, 0.174533, 120, 2, 2, 0.174533); 
+  G4Trap trapYZ("trapYZ", 200, 0.523599, 0.785398, 140, 2, 2, 0.174533, 120, 2,
+                2, 0.174533);
   auto [boundsYZ, axesYZ, thicknessX] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trapYZ);
   CHECK_CLOSE_ABS(
@@ -263,7 +266,8 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   CHECK_CLOSE_ABS(thicknessX, 166, 10e-10);
 
   // Xz span the trapezoid
-  G4Trap trapXz("trapXz", 200, 0.523599, 0.785398, 2, 150, 100, 0.174533, 2, 150, 100, 0.174533); 
+  G4Trap trapXz("trapXz", 200, 0.523599, 0.785398, 2, 150, 100, 0.174533, 2,
+                150, 100, 0.174533);
   auto [boundsXz, axesXz, thicknessY] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trapXz);
   CHECK_CLOSE_ABS(
