@@ -44,8 +44,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/version.hpp>
-
 namespace {
 
 /// Simple struct to select surfaces where hits should be generated.
@@ -264,34 +262,11 @@ ActsExamples::ProcessCode ActsExamples::FatrasSimulation::execute(
   ACTS_DEBUG(simHitsUnordered.size() << " simulated hits");
 
   // order output containers
-#if BOOST_VERSION >= 107800
   SimParticleContainer particlesInitial(particlesInitialUnordered.begin(),
                                         particlesInitialUnordered.end());
   SimParticleContainer particlesFinal(particlesFinalUnordered.begin(),
                                       particlesFinalUnordered.end());
   SimHitContainer simHits(simHitsUnordered.begin(), simHitsUnordered.end());
-#else
-  // working around a nasty boost bug
-  // https://github.com/boostorg/container/issues/244
-
-  SimParticleContainer particlesInitial;
-  SimParticleContainer particlesFinal;
-  SimHitContainer simHits;
-
-  particlesInitial.reserve(particlesInitialUnordered.size());
-  particlesFinal.reserve(particlesFinalUnordered.size());
-  simHits.reserve(simHitsUnordered.size());
-
-  for (const auto &p : particlesInitialUnordered) {
-    particlesInitial.insert(p);
-  }
-  for (const auto &p : particlesFinalUnordered) {
-    particlesFinal.insert(p);
-  }
-  for (const auto &h : simHitsUnordered) {
-    simHits.insert(h);
-  }
-#endif
 
   // store ordered output containers
   m_outputParticlesInitial(ctx, std::move(particlesInitial));

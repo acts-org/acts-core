@@ -318,17 +318,8 @@ ActsExamples::ProcessCode ActsExamples::Geant4Simulation::execute(
   m_outputParticlesFinal(
       ctx, SimParticleContainer(eventStore().particlesFinal.begin(),
                                 eventStore().particlesFinal.end()));
-
-#if BOOST_VERSION < 107800
-  SimHitContainer container;
-  for (const auto& hit : eventStore().hits) {
-    container.insert(hit);
-  }
-  m_outputSimHits(ctx, std::move(container));
-#else
   m_outputSimHits(
       ctx, SimHitContainer(eventStore().hits.begin(), eventStore().hits.end()));
-#endif
 
   return ActsExamples::ProcessCode::SUCCESS;
 }
