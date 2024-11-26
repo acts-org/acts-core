@@ -38,6 +38,7 @@
 #include "G4RotationMatrix.hh"
 #include "G4ThreeVector.hh"
 #include "G4Transform3D.hh"
+#include "G4Trap.hh"
 #include "G4Trd.hh"
 #include "G4Tubs.hh"
 #include "G4VPhysicalVolume.hh"
@@ -235,6 +236,71 @@ Acts::Geant4ShapeConverter::trapezoidBounds(const G4Trd& g4Trd) {
   return std::make_tuple(std::move(tBounds), rAxes, thickness);
 }
 
+std::tuple<std::shared_ptr<Acts::TrapezoidBounds>, std::array<int, 2u>,
+           Acts::ActsScalar>
+Acts::Geant4ShapeConverter::trapezoidBounds(const G4Trap& g4Trap) {
+  // primary parameters
+  ActsScalar y1 = static_cast<ActsScalar>(g4Trap.GetYHalfLength1());
+  ActsScalar y2 = static_cast<ActsScalar>(g4Trap.GetYHalfLength2());
+  ActsScalar x1 = static_cast<ActsScalar>(g4Trap.GetXHalfLength1());
+  ActsScalar x2 = static_cast<ActsScalar>(g4Trap.GetXHalfLength2());
+  ActsScalar x3 = static_cast<ActsScalar>(g4Trap.GetXHalfLength3());
+  ActsScalar x4 = static_cast<ActsScalar>(g4Trap.GetXHalfLength4());
+  ActsScalar phi = static_cast<ActsScalar>(g4Trap.GetPhi());
+  ActsScalar theta = static_cast<ActsScalar>(g4Trap.GetTheta());
+  ActsScalar z = static_cast<ActsScalar>(g4Trap.GetZHalfLength());
+
+  ActsScalar hlX0 = (x1 + x2) * 0.5;
+  ActsScalar hlX1 = 2 * z * std::tan(theta) * std::cos(phi) + (x3 + x4) * 0.5;
+  ActsScalar hlY0 = y1;
+  ActsScalar hlY1 = y2 + 2 * z * std::tan(theta) * std::sin(phi);
+  ActsScalar hlZ = z;
+
+  std::vector<ActsScalar> dXYZ = {(hlX0 + hlX1) * 0.5, (hlY0 + hlY1) * 0.5,
+                                  hlZ};
+
+  auto minAt = std::min_element(dXYZ.begin(), dXYZ.end());
+  std::size_t minPos = std::distance(dXYZ.begin(), minAt);
+  ActsScalar thickness = 2. * dXYZ[minPos];
+
+  ActsScalar halfLengthXminY = 0.;
+  ActsScalar halfLengthXmaxY = 0.;
+  ActsScalar halfLengthY = 0.;
+
+  std::array<int, 2u> rAxes = {};
+  switch (minPos) {
+    case 0: {
+      halfLengthXminY = std::min(hlY0, hlY1);
+      halfLengthXmaxY = std::max(hlY0, hlY1);
+      halfLengthY = hlZ;
+      rAxes = {1, 2};
+    } break;
+    case 1: {
+      halfLengthXminY = std::min(hlX0, hlX1);
+      halfLengthXmaxY = std::max(hlX0, hlX1);
+      halfLengthY = hlZ;
+      rAxes = {0, -2};
+    } break;
+    case 2: {
+      if (std::abs(hlY0 - hlY1) < std::abs(hlX0 - hlX1)) {
+        halfLengthXminY = std::min(hlX0, hlX1);
+        halfLengthXmaxY = std::max(hlX0, hlX1);
+        halfLengthY = (hlY0 + hlY1) * 0.5;
+        rAxes = {0, 1};
+      } else {
+        halfLengthXminY = std::min(hlY0, hlY1);
+        halfLengthXmaxY = std::max(hlY0, hlY1);
+        halfLengthY = (hlX0 + hlX1) * 0.5;
+        rAxes = {-1, 0};
+      }
+    } break;
+  }
+
+  auto tBounds = std::make_shared<TrapezoidBounds>(
+      halfLengthXminY, halfLengthXmaxY, halfLengthY);
+  return std::make_tuple(std::move(tBounds), rAxes, thickness);
+}
+
 std::tuple<std::shared_ptr<Acts::PlanarBounds>, std::array<int, 2u>,
            Acts::ActsScalar>
 Acts::Geant4ShapeConverter::planarBounds(const G4VSolid& g4Solid) {
@@ -330,6 +396,23 @@ std::shared_ptr<Acts::Surface> Acts::Geant4PhysicalVolumeConverter::surface(
       return surface;
     } else {
       throw std::runtime_error("Can not convert 'G4Trd' into forced shape.");
+    }
+  }
+
+  // Into a Trapezoid (G4Trap)
+  auto g4Trap = dynamic_cast<const G4Trap*>(g4Solid);
+  if (g4Trap != nullptr) {
+    if (forcedType == Surface::SurfaceType::Other ||
+        forcedType == Surface::SurfaceType::Plane) {
+      auto [bounds, axes, original] =
+          Geant4ShapeConverter{}.trapezoidBounds(*g4Trap);
+      auto orientedToGlobal = axesOriented(toGlobal, axes);
+      surface = Acts::Surface::makeShared<PlaneSurface>(orientedToGlobal,
+                                                        std::move(bounds));
+      assignMaterial(*surface.get(), original, compressed);
+      return surface;
+    } else {
+      throw std::runtime_error("Can not convert 'G4Trap' into forced shape.");
     }
   }
 
