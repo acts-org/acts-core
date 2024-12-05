@@ -36,8 +36,8 @@ Acts::FreeVector Acts::estimateTrackParamsFromSeed(const Vector3& sp0,
   Transform3 transform(trans * rotation);
 
   // The coordinate of the middle and top space point in the new frame
-  Vector3 local1 = transform.inverse() * sp1;
-  Vector3 local2 = transform.inverse() * sp2;
+  Vector3 local1 = inverseTransform(transform) * sp1;
+  Vector3 local2 = inverseTransform(transform) * sp2;
 
   // In the new frame the bottom sp is at the origin, while the middle
   // sp in along the x axis. As such, the x-coordinate of the circle is

@@ -22,6 +22,7 @@
 #include "Acts/Surfaces/detail/FacesHelper.hpp"
 #include "Acts/Surfaces/detail/MergeHelper.hpp"
 #include "Acts/Surfaces/detail/PlanarHelper.hpp"
+#include "Acts/Utilities/AlgebraHelpers.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 #include "Acts/Utilities/JacobianHelpers.hpp"
@@ -99,7 +100,7 @@ Acts::Result<Acts::Vector2> Acts::DiscSurface::globalToLocal(
     const GeometryContext& gctx, const Vector3& position,
     double tolerance) const {
   // transport it to the globalframe
-  Vector3 loc3Dframe = (transform(gctx).inverse()) * position;
+  Vector3 loc3Dframe = inverseTransform(transform(gctx)) * position;
   if (std::abs(loc3Dframe.z()) > std::abs(tolerance)) {
     return Result<Vector2>::failure(SurfaceError::GlobalPositionNotOnSurface);
   }
@@ -138,7 +139,7 @@ Acts::Vector3 Acts::DiscSurface::localCartesianToGlobal(
 Acts::Vector2 Acts::DiscSurface::globalToLocalCartesian(
     const GeometryContext& gctx, const Vector3& position,
     double /*direction*/) const {
-  Vector3 loc3Dframe = (transform(gctx).inverse()) * position;
+  Vector3 loc3Dframe = inverseTransform(transform(gctx)) * position;
   return Vector2(loc3Dframe.x(), loc3Dframe.y());
 }
 
@@ -216,7 +217,7 @@ Acts::BoundToFreeMatrix Acts::DiscSurface::boundToFreeJacobian(
       referenceFrame(gctx, position, direction).transpose();
 
   // calculate the transformation to local coordinates
-  const Vector3 posLoc = transform(gctx).inverse() * position;
+  const Vector3 posLoc = inverseTransform(transform(gctx)) * position;
   const double lr = perp(posLoc);
   const double lphi = phi(posLoc);
   const double lcphi = std::cos(lphi);
@@ -252,7 +253,7 @@ Acts::FreeToBoundMatrix Acts::DiscSurface::freeToBoundJacobian(
       referenceFrame(gctx, position, direction).transpose();
 
   // calculate the transformation to local coordinates
-  const Vector3 posLoc = transform(gctx).inverse() * position;
+  const Vector3 posLoc = inverseTransform(transform(gctx)) * position;
   const double lr = perp(posLoc);
   const double lphi = phi(posLoc);
   const double lcphi = std::cos(lphi);
@@ -317,7 +318,7 @@ Acts::ActsMatrix<2, 3> Acts::DiscSurface::localCartesianToBoundLocalDerivative(
   // The local frame transform
   const auto& sTransform = transform(gctx);
   // calculate the transformation to local coordinates
-  const Vector3 localPos = sTransform.inverse() * position;
+  const Vector3 localPos = inverseTransform(sTransform) * position;
   const double lr = perp(localPos);
   const double lphi = phi(localPos);
   const double lcphi = std::cos(lphi);
@@ -389,7 +390,7 @@ Acts::DiscSurface::mergedWith(const DiscSurface& other, BinningValue direction,
   }
   assert(m_transform != nullptr && other.m_transform != nullptr);
 
-  Transform3 otherLocal = m_transform->inverse() * *other.m_transform;
+  Transform3 otherLocal = inverseTransform(*m_transform) * *other.m_transform;
 
   constexpr auto tolerance = s_onSurfaceTolerance;
 

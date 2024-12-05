@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
+#include "Acts/Utilities/AlgebraHelpers.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
@@ -37,10 +38,7 @@ namespace Acts {
 class BinUtility {
  public:
   /// Constructor for equidistant
-  BinUtility()
-      : m_binningData(),
-        m_transform(Transform3::Identity()),
-        m_itransform(Transform3::Identity()) {
+  BinUtility() : m_binningData(), m_transform(Transform3::Identity()) {
     m_binningData.reserve(3);
   }
 
@@ -48,7 +46,7 @@ class BinUtility {
   ///
   /// @param tForm is the local to global transform
   explicit BinUtility(const Transform3& tForm)
-      : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
+      : m_binningData(), m_transform(tForm) {
     m_binningData.reserve(3);
   }
 
@@ -58,7 +56,7 @@ class BinUtility {
   /// @param tForm is the (optional) transform
   BinUtility(const BinningData& bData,
              const Transform3& tForm = Transform3::Identity())
-      : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
+      : m_binningData(), m_transform(tForm) {
     m_binningData.reserve(3);
     m_binningData.push_back(bData);
   }
@@ -74,7 +72,7 @@ class BinUtility {
   BinUtility(std::size_t bins, float min, float max, BinningOption opt = open,
              BinningValue value = BinningValue::binX,
              const Transform3& tForm = Transform3::Identity())
-      : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
+      : m_binningData(), m_transform(tForm) {
     m_binningData.reserve(3);
     m_binningData.push_back(BinningData(opt, value, bins, min, max));
   }
@@ -88,7 +86,7 @@ class BinUtility {
   BinUtility(std::vector<float>& bValues, BinningOption opt = open,
              BinningValue value = BinningValue::binPhi,
              const Transform3& tForm = Transform3::Identity())
-      : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
+      : m_binningData(), m_transform(tForm) {
     m_binningData.reserve(3);
     m_binningData.push_back(BinningData(opt, value, bValues));
   }
@@ -107,7 +105,6 @@ class BinUtility {
     if (this != &sbu) {
       m_binningData = sbu.m_binningData;
       m_transform = sbu.m_transform;
-      m_itransform = sbu.m_itransform;
     }
     return (*this);
   }
@@ -121,7 +118,6 @@ class BinUtility {
     const std::vector<BinningData>& bData = gbu.binningData();
 
     m_transform = m_transform * gbu.transform();
-    m_itransform = m_transform.inverse();
     if (m_binningData.size() + bData.size() > 3) {
       throw std::runtime_error{"BinUtility does not support dim > 3"};
     }
@@ -153,7 +149,7 @@ class BinUtility {
   /// @return is the bin value in 3D
   std::array<std::size_t, 3> binTriple(const Vector3& position) const {
     /// transform or not
-    const Vector3 bPosition = m_itransform * position;
+    const Vector3 bPosition = inverseTransform(m_transform) * position;
     // get the dimension
     std::size_t mdim = m_binningData.size();
     /// now get the bins
@@ -174,7 +170,8 @@ class BinUtility {
     if (ba >= m_binningData.size()) {
       return 0;
     }
-    std::size_t bEval = m_binningData[ba].searchGlobal(m_itransform * position);
+    std::size_t bEval = m_binningData[ba].searchGlobal(
+        inverseTransform(m_transform) * position);
     return bEval;
   }
 
@@ -218,7 +215,7 @@ class BinUtility {
   /// @return is a boolean check
   bool inside(const Vector3& position) const {
     /// transform or not
-    const Vector3& bPosition = m_itransform * position;
+    const Vector3& bPosition = inverseTransform(m_transform) * position;
     // loop and break
     for (auto& bData : m_binningData) {
       if (!(bData.inside(bPosition))) {
@@ -325,7 +322,6 @@ class BinUtility {
  private:
   std::vector<BinningData> m_binningData;  /// vector of BinningData
   Transform3 m_transform;                  /// shared transform
-  Transform3 m_itransform;                 /// unique inverse transform
 };
 
 }  // namespace Acts

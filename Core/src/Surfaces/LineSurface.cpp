@@ -15,6 +15,7 @@
 #include "Acts/Surfaces/SurfaceBounds.hpp"
 #include "Acts/Surfaces/SurfaceError.hpp"
 #include "Acts/Surfaces/detail/AlignmentHelper.hpp"
+#include "Acts/Utilities/AlgebraHelpers.hpp"
 #include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 #include "Acts/Utilities/JacobianHelpers.hpp"
@@ -291,7 +292,7 @@ Acts::AlignmentToPathMatrix Acts::LineSurface::alignmentToPathDerivative(
 Acts::ActsMatrix<2, 3> Acts::LineSurface::localCartesianToBoundLocalDerivative(
     const GeometryContext& gctx, const Vector3& position) const {
   // calculate the transformation to local coordinates
-  Vector3 localPosition = transform(gctx).inverse() * position;
+  Vector3 localPosition = inverseTransform(transform(gctx)) * position;
   double localPhi = VectorHelpers::phi(localPosition);
 
   ActsMatrix<2, 3> loc3DToLocBound = ActsMatrix<2, 3>::Zero();

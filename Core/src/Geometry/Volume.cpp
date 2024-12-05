@@ -22,14 +22,12 @@ Volume::Volume(const Transform3& transform,
                std::shared_ptr<VolumeBounds> volbounds)
     : GeometryObject(),
       m_transform(transform),
-      m_itransform(m_transform.inverse()),
       m_center(m_transform.translation()),
       m_volumeBounds(std::move(volbounds)) {}
 
 Volume::Volume(const Volume& vol, const Transform3& shift)
     : GeometryObject(),
       m_transform(shift * vol.m_transform),
-      m_itransform(m_transform.inverse()),
       m_center(m_transform.translation()),
       m_volumeBounds(vol.m_volumeBounds) {}
 
@@ -56,7 +54,7 @@ Volume& Volume::operator=(const Volume& vol) {
 }
 
 bool Volume::inside(const Vector3& gpos, double tol) const {
-  Vector3 posInVolFrame((transform().inverse()) * gpos);
+  Vector3 posInVolFrame(inverseTransform(transform()) * gpos);
   return (volumeBounds()).inside(posInVolFrame, tol);
 }
 
@@ -93,10 +91,6 @@ const Transform3& Volume::transform() const {
   return m_transform;
 }
 
-const Transform3& Volume::itransform() const {
-  return m_itransform;
-}
-
 const Vector3& Volume::center() const {
   return m_center;
 }
@@ -119,7 +113,6 @@ std::shared_ptr<VolumeBounds> Volume::volumeBoundsPtr() {
 
 void Volume::setTransform(const Transform3& transform) {
   m_transform = transform;
-  m_itransform = m_transform.inverse();
   m_center = m_transform.translation();
 }
 

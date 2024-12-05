@@ -14,6 +14,7 @@
 #include "Acts/Surfaces/detail/AlignmentHelper.hpp"
 #include "Acts/Surfaces/detail/FacesHelper.hpp"
 #include "Acts/Surfaces/detail/VerticesHelper.hpp"
+#include "Acts/Utilities/AlgebraHelpers.hpp"
 #include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 #include "Acts/Utilities/ThrowAssert.hpp"
@@ -128,7 +129,7 @@ Acts::Vector3 Acts::ConeSurface::localToGlobal(const GeometryContext& gctx,
 Acts::Result<Acts::Vector2> Acts::ConeSurface::globalToLocal(
     const GeometryContext& gctx, const Vector3& position,
     double tolerance) const {
-  Vector3 loc3Dframe = transform(gctx).inverse() * position;
+  Vector3 loc3Dframe = inverseTransform(transform(gctx)) * position;
   double r = loc3Dframe.z() * bounds().tanAlpha();
   if (std::abs(perp(loc3Dframe) - r) > tolerance) {
     return Result<Vector2>::failure(SurfaceError::GlobalPositionNotOnSurface);
@@ -141,7 +142,7 @@ double Acts::ConeSurface::pathCorrection(const GeometryContext& gctx,
                                          const Vector3& position,
                                          const Vector3& direction) const {
   // (cos phi cos alpha, sin phi cos alpha, sgn z sin alpha)
-  Vector3 posLocal = transform(gctx).inverse() * position;
+  Vector3 posLocal = inverseTransform(transform(gctx)) * position;
   double phi = VectorHelpers::phi(posLocal);
   double sgn = posLocal.z() > 0. ? -1. : +1.;
   double cosAlpha = std::cos(bounds().get(ConeBounds::eAlpha));
@@ -173,7 +174,7 @@ Acts::Vector3 Acts::ConeSurface::normal(const GeometryContext& gctx,
                                         const Acts::Vector3& position) const {
   // get it into the cylinder frame if needed
   // @todo respect opening angle
-  Vector3 pos3D = transform(gctx).inverse() * position;
+  Vector3 pos3D = inverseTransform(transform(gctx)) * position;
   pos3D.z() = 0;
   return pos3D.normalized();
 }
@@ -262,7 +263,7 @@ Acts::detail::RealQuadraticEquation Acts::ConeSurface::intersectionSolver(
     const GeometryContext& gctx, const Vector3& position,
     const Vector3& direction) const {
   // Transform into the local frame
-  Transform3 invTrans = transform(gctx).inverse();
+  Transform3 invTrans = inverseTransform(transform(gctx));
   Vector3 point1 = invTrans * position;
   Vector3 dir1 = invTrans.linear() * direction;
 
@@ -384,7 +385,7 @@ Acts::ActsMatrix<2, 3> Acts::ConeSurface::localCartesianToBoundLocalDerivative(
   // The local frame transform
   const auto& sTransform = transform(gctx);
   // calculate the transformation to local coordinates
-  const Vector3 localPos = sTransform.inverse() * position;
+  const Vector3 localPos = inverseTransform(sTransform) * position;
   const double lr = perp(localPos);
   const double lphi = phi(localPos);
   const double lcphi = std::cos(lphi);

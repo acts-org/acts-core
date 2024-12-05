@@ -24,13 +24,13 @@ namespace Acts {
 /// Estimate the full track parameters from three space points
 ///
 /// This method is based on the conformal map transformation. It estimates the
-/// full free track parameters, i.e. (x, y, z, t, dx, dy, dz, q/p) at the bottom
-/// space point. The bottom space is assumed to be the first element in the
-/// range defined by the iterators. The magnetic field (which might be along any
-/// direction) is also necessary for the momentum estimation.
+/// full free track parameters, i.e. (x, y, z, t, dx, dy, dz, q/p) at the
+/// bottom space point. The bottom space is assumed to be the first element in
+/// the range defined by the iterators. The magnetic field (which might be
+/// along any direction) is also necessary for the momentum estimation.
 ///
-/// This is a purely spatial estimation, i.e. the time parameter will be set to
-/// 0.
+/// This is a purely spatial estimation, i.e. the time parameter will be set
+/// to 0.
 ///
 /// It resembles the method used in ATLAS for the track parameters estimated
 /// from seed, i.e. the function InDet::SiTrackMaker_xk::getAtaPlane here:
@@ -51,10 +51,10 @@ FreeVector estimateTrackParamsFromSeed(const Vector3& sp0, const Vector3& sp1,
 /// Estimate the full track parameters from three space points
 ///
 /// This method is based on the conformal map transformation. It estimates the
-/// full free track parameters, i.e. (x, y, z, t, dx, dy, dz, q/p) at the bottom
-/// space point. The bottom space is assumed to be the first element in the
-/// range defined by the iterators. The magnetic field (which might be along any
-/// direction) is also necessary for the momentum estimation.
+/// full free track parameters, i.e. (x, y, z, t, dx, dy, dz, q/p) at the
+/// bottom space point. The bottom space is assumed to be the first element in
+/// the range defined by the iterators. The magnetic field (which might be
+/// along any direction) is also necessary for the momentum estimation.
 ///
 /// It resembles the method used in ATLAS for the track parameters estimated
 /// from seed, i.e. the function InDet::SiTrackMaker_xk::getAtaPlane here:
@@ -173,11 +173,12 @@ struct EstimateTrackParamCovarianceConfig {
 };
 
 /// Estimate the covariance matrix of the given track parameters based on the
-/// provided configuration. The assumption is that we can model the uncertainty
-/// of the track parameters as a diagonal matrix with the provided initial
-/// sigmas. The inflation factors are used to inflate the initial variances
-/// based on the provided configuration. The uncertainty of q/p is estimated
-/// based on the relative uncertainty of the q/pt and the theta uncertainty.
+/// provided configuration. The assumption is that we can model the
+/// uncertainty of the track parameters as a diagonal matrix with the provided
+/// initial sigmas. The inflation factors are used to inflate the initial
+/// variances based on the provided configuration. The uncertainty of q/p is
+/// estimated based on the relative uncertainty of the q/pt and the theta
+/// uncertainty.
 ///
 /// @param config is the configuration for the estimation
 /// @param params is the track parameters

@@ -11,6 +11,8 @@
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/EventData/SourceLink.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
+#include "Acts/Utilities/AlgebraHelpers.hpp"
+#include "Acts/Utilities/Intersection.hpp"
 #include "Acts/Utilities/Zip.hpp"
 #include "ActsExamples/EventData/Cluster.hpp"
 #include "ActsExamples/EventData/IndexSourceLink.hpp"
@@ -404,7 +406,8 @@ RootAthenaDumpReader::readMeasurements(
 
       if (!inside) {
         const Acts::Vector3 v =
-            surface->transform(gctx).inverse() * cluster.globalPosition;
+            Acts::inverseTransform(surface->transform(gctx)) *
+            cluster.globalPosition;
         ACTS_WARNING("Projected position is not in surface bounds for "
                      << surface->geometryId() << ", skip hit");
         ACTS_WARNING("Position in local coordinates: " << v.transpose());
@@ -417,7 +420,8 @@ RootAthenaDumpReader::readMeasurements(
 
       if (!loc.ok()) {
         const Acts::Vector3 v =
-            surface->transform(gctx).inverse() * cluster.globalPosition;
+            Acts::inverseTransform(surface->transform(gctx)) *
+            cluster.globalPosition;
         ACTS_WARNING("Global-to-local fit failed on "
                      << geoId << " (z dist: " << v[2]
                      << ", projected on surface: " << std::boolalpha << inside

@@ -8,6 +8,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 #include "Acts/Utilities/AlgebraHelpers.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
@@ -117,6 +118,15 @@ BOOST_AUTO_TEST_CASE(SafeInverseFPELargeMatrix) {
 //
 //   auto mInv = Acts::safeInverse(m);
 // }
+
+BOOST_AUTO_TEST_CASE(InverseTransform) {
+  Transform3 transform = AngleAxis3{1.5, Vector3{1, 2, 3}.normalized()} *
+                         Translation3(Vector3{4, 5, -9});
+
+  CHECK_CLOSE_OR_SMALL(transform.inverse().matrix(),
+                       Acts::inverseTransform(transform).matrix(), 1e-10,
+                       1e-10);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

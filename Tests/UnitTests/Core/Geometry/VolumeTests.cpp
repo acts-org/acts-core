@@ -25,7 +25,6 @@ namespace Acts::Test {
 
 BOOST_AUTO_TEST_CASE(VolumeTest) {
   using namespace Acts::UnitLiterals;
-  double eps = std::numeric_limits<double>::epsilon();
 
   // Build a translation
   Vector3 translation{1_mm, 2_mm, 3_mm};
@@ -49,8 +48,6 @@ BOOST_AUTO_TEST_CASE(VolumeTest) {
   // Build and test the volume
   Volume volume(transform, std::make_shared<CuboidVolumeBounds>(bounds));
   BOOST_CHECK_EQUAL(volume.transform().matrix(), transform.matrix());
-  CHECK_CLOSE_ABS(volume.itransform().matrix(), transform.inverse().matrix(),
-                  eps);
   BOOST_CHECK_EQUAL(volume.center(), translation);
   auto vBounds = static_cast<const decltype(bounds)*>(&volume.volumeBounds());
   BOOST_CHECK_EQUAL(*vBounds, bounds);

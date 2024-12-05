@@ -57,9 +57,6 @@ class Volume : public GeometryObject {
   /// Return methods for geometry transform
   const Transform3& transform() const;
 
-  /// Returns the inverted transform of this volume.
-  const Transform3& itransform() const;
-
   void setTransform(const Transform3& transform);
 
   /// returns the center of the volume
@@ -129,7 +126,6 @@ class Volume : public GeometryObject {
 
  protected:
   Transform3 m_transform;
-  Transform3 m_itransform;
   Vector3 m_center;
 
  private:

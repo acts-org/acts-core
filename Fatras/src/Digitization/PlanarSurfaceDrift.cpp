@@ -20,7 +20,7 @@ ActsFatras::PlanarSurfaceDrift::toReadout(const Acts::GeometryContext& gctx,
                                           const Acts::Vector3& dir,
                                           const Acts::Vector3& driftDir) const {
   // Transform the hit & direction into the local surface frame
-  const auto& invTransform = surface.transform(gctx).inverse();
+  const auto& invTransform = Acts::inverseTransform(surface.transform(gctx));
   Acts::Vector2 pos2Local = (invTransform * pos).segment<2>(0);
   Acts::Vector3 seg3Local = invTransform.linear() * dir;
   // Scale unit direction to the actual segment in the (depletion/drift) zone

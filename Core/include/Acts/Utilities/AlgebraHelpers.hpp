@@ -214,6 +214,17 @@ std::optional<ResultType> safeInverse(const MatrixType& m) noexcept {
   return std::nullopt;
 }
 
+/// Perform the inversion of a transform under the assumption that the linear
+/// part is only a rotation and has no other contributions.
+/// @param transform The transform to invert
+/// @return The inverted transform
+inline Transform3 inverseTransform(const Transform3& transform) noexcept {
+  Transform3 result;
+  result.linear() = transform.linear().transpose();
+  result.translation() = -result.linear() * transform.translation();
+  return result;
+}
+
 /// Specialization of the exponent limit to be used for safe exponential,
 /// depending on the floating point type.
 /// See https://godbolt.org/z/z53Er6Mzf for reasoning for the concrete numbers.

@@ -12,6 +12,7 @@
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/detail/BoundaryCheckHelper.hpp"
 #include "Acts/Surfaces/detail/VerticesHelper.hpp"
+#include "Acts/Utilities/AlgebraHelpers.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
 
 #include <algorithm>
@@ -134,7 +135,7 @@ std::vector<Acts::Vector3> Acts::CylinderBounds::circleVertices(
   if ((bevelMinZ != 0. || bevelMaxZ != 0.) && vertices.size() % 2 == 0) {
     auto halfWay = vertices.end() - vertices.size() / 2;
     double mult{1};
-    auto invTransform = transform.inverse();
+    auto invTransform = inverseTransform(transform);
     auto func = [&mult, &transform, &invTransform](Vector3& v) {
       v = invTransform * v;
       v(2) += v(1) * mult;

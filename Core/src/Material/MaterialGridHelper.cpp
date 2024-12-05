@@ -8,6 +8,7 @@
 
 #include "Acts/Material/MaterialGridHelper.hpp"
 
+#include "Acts/Utilities/AlgebraHelpers.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 
 #include <algorithm>
@@ -158,7 +159,7 @@ Acts::Grid2D Acts::createGrid2D(
       globalToLocalFromBin(bu[0].binvalue);
   std::function<double(Acts::Vector3)> coord2 =
       globalToLocalFromBin(bu[1].binvalue);
-  Transform3 transfo = bins.transform().inverse();
+  Transform3 transfo = inverseTransform(bins.transform());
   transfoGlobalToLocal = [coord1, coord2,
                           transfo](Acts::Vector3 pos) -> Acts::Vector2 {
     pos = transfo * pos;
@@ -202,7 +203,7 @@ Acts::Grid3D Acts::createGrid3D(
       globalToLocalFromBin(bu[1].binvalue);
   std::function<double(Acts::Vector3)> coord3 =
       globalToLocalFromBin(bu[2].binvalue);
-  Transform3 transfo = bins.transform().inverse();
+  Transform3 transfo = inverseTransform(bins.transform());
 
   transfoGlobalToLocal = [coord1, coord2, coord3,
                           transfo](Acts::Vector3 pos) -> Acts::Vector3 {
