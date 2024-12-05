@@ -238,7 +238,10 @@ Acts::Geant4ShapeConverter::trapezoidBounds(const G4Trd& g4Trd) {
 std::tuple<std::shared_ptr<Acts::TrapezoidBounds>, std::array<int, 2u>,
            Acts::ActsScalar>
 Acts::Geant4ShapeConverter::trapezoidBounds(const G4Trap& g4Trap) {
-  // primary parameters
+  // The conversion considers:
+  // - Theta = Tilt angle of the trapezoid along the Y-axis
+  // - Phi   = Rotation angle around the Z-axis to determine the Y-axis
+  // - Half-lengths are adjusted based on these angles to maintain the shape
   ActsScalar y1 = static_cast<ActsScalar>(g4Trap.GetYHalfLength1());
   ActsScalar y2 = static_cast<ActsScalar>(g4Trap.GetYHalfLength2());
   ActsScalar x1 = static_cast<ActsScalar>(g4Trap.GetXHalfLength1());
