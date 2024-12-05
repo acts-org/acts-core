@@ -411,7 +411,7 @@ std::shared_ptr<Acts::Surface> Acts::Geant4PhysicalVolumeConverter::surface(
       assignMaterial(*surface.get(), original, compressed);
       return surface;
     } else {
-      throw std::runtime_error("Can not convert 'G4Trap' into forced shape.");
+      throw std::runtime_error("Cannot convert 'G4Trap' into forced shape.");
     }
   }
 

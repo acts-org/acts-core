@@ -18,7 +18,7 @@
 #include "Acts/Surfaces/RadialBounds.hpp"
 #include "Acts/Surfaces/RectangleBounds.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "Acts/Surfaces/TrapezoidBounds.hpp"
+#include "Acts/Surfaces/trapezoidBounds.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 
 #include <array>
@@ -146,13 +146,13 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   auto [boundsXY, axesXY, thicknessZ] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trdXY);
   CHECK_CLOSE_ABS(
-      boundsXY->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXnegY), 100,
+      boundsXY->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXnegY), 100,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsXY->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXposY), 150,
+      boundsXY->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXposY), 150,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsXY->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthY), 200,
+      boundsXY->get(Acts::trapezoidBounds::BoundValues::eHalfLengthY), 200,
       10e-10);
   auto refXY = std::array<int, 2u>{0, 1};
   BOOST_CHECK(axesXY == refXY);
@@ -163,13 +163,13 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   auto [boundsyX, axesyX, thicknessZ2] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trdyX);
   CHECK_CLOSE_ABS(
-      boundsyX->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXnegY), 100,
+      boundsyX->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXnegY), 100,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsyX->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXposY), 150,
+      boundsyX->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXposY), 150,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsyX->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthY), 200,
+      boundsyX->get(Acts::trapezoidBounds::BoundValues::eHalfLengthY), 200,
       10e-10);
   auto refyX = std::array<int, 2u>{-1, 0};
   BOOST_CHECK(axesyX == refyX);
@@ -180,13 +180,13 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   auto [boundsYZ, axesYZ, thicknessX] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trdYZ);
   CHECK_CLOSE_ABS(
-      boundsYZ->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXnegY), 120.,
+      boundsYZ->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXnegY), 120.,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsYZ->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXposY), 140.,
+      boundsYZ->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXposY), 140.,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsYZ->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthY), 200.,
+      boundsYZ->get(Acts::trapezoidBounds::BoundValues::eHalfLengthY), 200.,
       10e-10);
   auto refYZ = std::array<int, 2u>{1, 2};
   BOOST_CHECK(axesYZ == refYZ);
@@ -197,33 +197,33 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   auto [boundsXz, axesXz, thicknessY] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trdXz);
   CHECK_CLOSE_ABS(
-      boundsXz->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXnegY), 50.,
+      boundsXz->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXnegY), 50.,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsXz->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXposY), 75.,
+      boundsXz->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXposY), 75.,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsXz->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthY), 200.,
+      boundsXz->get(Acts::trapezoidBounds::BoundValues::eHalfLengthY), 200.,
       10e-10);
   auto refXz = std::array<int, 2u>{0, -2};
   BOOST_CHECK(axesXz == refXz);
   CHECK_CLOSE_ABS(thicknessY, 2., 10e-10);
 }
 
-BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
+BOOST_AUTO_TEST_CASE(Geant4TrapConversion_G4Trap) {
   // Standard Trap: XY are already well defined
   G4Trap trapXY("trapXY", 2, 0.523599, 0.785398, 125, 200, 125, 0.174533, 50,
                 125, 50, 0.174533);
   auto [boundsXY, axesXY, thicknessZ] =
-      Acts::Geant4ShapeConverter{}.TrapezoidBounds(trapXY);
+      Acts::Geant4ShapeConverter{}.trapezoidBounds(trapXY);
   CHECK_CLOSE_ABS(
-      boundsXY->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXnegY), 51,
+      boundsXY->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXnegY), 51,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsXY->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXposY), 125,
+      boundsXY->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXposY), 125,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsXY->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthY), 125,
+      boundsXY->get(Acts::trapezoidBounds::BoundValues::eHalfLengthY), 125,
       10e-10);
   auto refXY = std::array<int, 2u>{0, 1};
   BOOST_CHECK(axesXY == refXY);
@@ -235,13 +235,13 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   auto [boundsyX, axesyX, thicknessZ2] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trapyX);
   CHECK_CLOSE_ABS(
-      boundsyX->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXnegY), 87,
+      boundsyX->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXnegY), 87,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsyX->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXposY), 164,
+      boundsyX->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXposY), 164,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsyX->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthY), 88,
+      boundsyX->get(Acts::trapezoidBounds::BoundValues::eHalfLengthY), 88,
       10e-10);
   auto refyX = std::array<int, 2u>{-1, 0};
   BOOST_CHECK(axesyX == refyX);
@@ -253,13 +253,13 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   auto [boundsYZ, axesYZ, thicknessX] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trapYZ);
   CHECK_CLOSE_ABS(
-      boundsYZ->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXnegY), 140.,
+      boundsYZ->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXnegY), 140.,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsYZ->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXposY), 283.,
+      boundsYZ->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXposY), 283.,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsYZ->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthY), 200.,
+      boundsYZ->get(Acts::trapezoidBounds::BoundValues::eHalfLengthY), 200.,
       10e-10);
   auto refYZ = std::array<int, 2u>{1, 2};
   BOOST_CHECK(axesYZ == refYZ);
@@ -271,13 +271,13 @@ BOOST_AUTO_TEST_CASE(Geant4TrapzoidConversion) {
   auto [boundsXz, axesXz, thicknessY] =
       Acts::Geant4ShapeConverter{}.trapezoidBounds(trapXz);
   CHECK_CLOSE_ABS(
-      boundsXz->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXnegY), 125.,
+      boundsXz->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXnegY), 125.,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsXz->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthXposY), 288.,
+      boundsXz->get(Acts::trapezoidBounds::BoundValues::eHalfLengthXposY), 288.,
       10e-10);
   CHECK_CLOSE_ABS(
-      boundsXz->get(Acts::TrapezoidBounds::BoundValues::eHalfLengthY), 200.,
+      boundsXz->get(Acts::trapezoidBounds::BoundValues::eHalfLengthY), 200.,
       10e-10);
   auto refXz = std::array<int, 2u>{0, -2};
   BOOST_CHECK(axesXz == refXz);
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(Geant4PlanarConversion) {
   G4Trd trdXY("trdXY", 100, 150, 200, 200, 2);
   auto pBoundsTrd =
       std::get<0u>(Acts::Geant4ShapeConverter{}.planarBounds(trdXY));
-  auto tBounds = dynamic_cast<const Acts::TrapezoidBounds*>(pBoundsTrd.get());
+  auto tBounds = dynamic_cast<const Acts::trapezoidBounds*>(pBoundsTrd.get());
   BOOST_CHECK_NE(tBounds, nullptr);
 }
 

@@ -135,7 +135,7 @@ struct Geant4ShapeConverter {
 
   /// @brief Convert to trapezoid bounds - from Trap
   ///
-  /// @param g4Trd a Geant4 trapezoid shape
+  /// @param g4Trap a Geant4 trapezoid shape
   ///
   /// @return an ACTS Trapezoid bounds object, axis orientation, and thickness
   std::tuple<std::shared_ptr<TrapezoidBounds>, std::array<int, 2u>, ActsScalar>
