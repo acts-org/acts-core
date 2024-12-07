@@ -8,6 +8,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "Acts/Utilities/BinUtility.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 #include "ActsExamples/Digitization/ModuleClusters.hpp"
 #include "ActsFatras/Digitization/Segmentizer.hpp"
@@ -46,10 +47,10 @@ DigitizedParameters makeDigitizationParameters(const Vector2 &position,
 auto testDigitizedParametersWithTwoClusters(bool merge, const Vector2 &firstHit,
                                             const Vector2 &secondHit) {
   BinUtility binUtility;
-  binUtility +=
-      BinningData(BinningOption::open, BinningValue::binX, 20, -10.0f, 10.0f);
-  binUtility +=
-      BinningData(BinningOption::open, BinningValue::binY, 20, -10.0f, 10.0f);
+  binUtility += BinUtility{
+      BinningData(BinningOption::open, BinningValue::binX, 20, -10.0f, 10.0f)};
+  binUtility += BinUtility{
+      BinningData(BinningOption::open, BinningValue::binY, 20, -10.0f, 10.0f)};
   std::vector<Acts::BoundIndices> boundIndices = {eBoundLoc0, eBoundLoc1};
   double nsigma = 1;
   bool commonCorner = true;

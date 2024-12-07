@@ -6,18 +6,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-#include "Acts/Plugins/Json/UtilitiesJsonConverter.hpp"
-
-#include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Plugins/Json/AlgebraJsonConverter.hpp"
 #include "Acts/Utilities/BinningData.hpp"
-#include "Acts/Utilities/BinningType.hpp"
-
-#include <algorithm>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
 
 void Acts::to_json(nlohmann::json& j, const Acts::BinningData& bd) {
   // Common to all bin utilities
@@ -75,30 +64,5 @@ void Acts::from_json(const nlohmann::json& j, BinningData& bd) {
   } else {
     std::vector<float> boundaries = j["boundaries"];
     bd = BinningData(bOption, bValue, boundaries, std::move(subBinning));
-  }
-}
-
-void Acts::to_json(nlohmann::json& j, const BinUtility& bu) {
-  nlohmann::json jbindata;
-  for (const auto& bdata : bu.binningData()) {
-    jbindata.push_back(nlohmann::json(bdata));
-  }
-  j["binningdata"] = jbindata;
-  if (!bu.transform().isApprox(Transform3::Identity())) {
-    nlohmann::json jtrf = Transform3JsonConverter::toJson(bu.transform());
-    j["transform"] = jtrf;
-  }
-}
-
-void Acts::from_json(const nlohmann::json& j, Acts::BinUtility& bu) {
-  bu = Acts::BinUtility();
-  if (j.find("transform") != j.end() && !j["transform"].empty()) {
-    Acts::Transform3 trf = Transform3JsonConverter::fromJson(j["transform"]);
-    bu = Acts::BinUtility(trf);
-  }
-  for (const auto& jdata : j["binningdata"]) {
-    Acts::BinningData bd;
-    from_json(jdata, bd);
-    bu += Acts::BinUtility(bd);
   }
 }

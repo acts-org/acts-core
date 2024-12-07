@@ -56,8 +56,8 @@ class BinUtility {
   ///
   /// @param bData is the provided binning data
   /// @param tForm is the (optional) transform
-  BinUtility(const BinningData& bData,
-             const Transform3& tForm = Transform3::Identity())
+  explicit BinUtility(const BinningData& bData,
+                      const Transform3& tForm = Transform3::Identity())
       : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
     m_binningData.reserve(3);
     m_binningData.push_back(bData);
@@ -327,5 +327,9 @@ class BinUtility {
   Transform3 m_transform;                  /// shared transform
   Transform3 m_itransform;                 /// unique inverse transform
 };
+
+void to_json(nlohmann::json& j, const BinUtility& bu);
+
+void from_json(const nlohmann::json& j, BinUtility& bu);
 
 }  // namespace Acts

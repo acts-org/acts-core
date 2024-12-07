@@ -6,7 +6,6 @@ add_library(
     src/AlgebraJsonConverter.cpp
     src/DetectorJsonConverter.cpp
     src/DetectorVolumeJsonConverter.cpp
-    src/ExtentJsonConverter.cpp
     src/GridJsonConverter.cpp
     src/DetectorVolumeFinderJsonConverter.cpp
     src/IndexedSurfacesJsonConverter.cpp
@@ -17,7 +16,6 @@ add_library(
     src/ProtoDetectorJsonConverter.cpp
     src/SurfaceBoundsJsonConverter.cpp
     src/SurfaceJsonConverter.cpp
-    src/UtilitiesJsonConverter.cpp
     src/VolumeBoundsJsonConverter.cpp
     src/VolumeJsonConverter.cpp
     src/AmbiguityConfigJsonConverter.cpp

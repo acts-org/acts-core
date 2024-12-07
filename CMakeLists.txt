@@ -36,7 +36,7 @@ option(ACTS_USE_SYSTEM_DETRAY "Use a system-provided detray installation" ${ACTS
 option(ACTS_USE_SYSTEM_TRACCC "Use a system-provided traccc installation" ${ACTS_USE_SYSTEM_LIBS})
 option(ACTS_USE_SYSTEM_VECMEM "Use a system-provided vecmem installation" ${ACTS_USE_SYSTEM_LIBS})
 option(ACTS_USE_SYSTEM_ALGEBRAPLUGINS "Use a system-provided algebra-plugins installation" ${ACTS_USE_SYSTEM_LIBS})
-option(ACTS_USE_SYSTEM_NLOHMANN_JSON "Use nlohmann::json provided by the system instead of the bundled version" ${ACTS_USE_SYSTEM_LIBS})
+option(ACTS_USE_SYSTEM_NLOHMANN_JSON "Use nlohmann::json provided by the system instead of the bundled version" ON)
 option(ACTS_USE_SYSTEM_PYBIND11 "Use a system installation of pybind11" ${ACTS_USE_SYSTEM_LIBS} )
 option(ACTS_USE_SYSTEM_EIGEN3 "Use a system-provided eigen3" ON)
 
@@ -90,6 +90,7 @@ option(ACTS_RUN_CLANG_TIDY "Run clang-tidy static analysis" OFF)
 option(ACTS_BUILD_DOCS "Build documentation" OFF)
 option(ACTS_SETUP_BOOST "Explicitly set up Boost for the project" ON)
 option(ACTS_SETUP_EIGEN3 "Explicitly set up Eigen3 for the project" ON)
+option(ACTS_SETUP_NLOHMANN_JSON "Explicitly set up nlohmann_json for the project" ON)
 option(ACTS_BUILD_ODD "Build the OpenDataDetector" OFF)
 # profiling related options
 option(ACTS_ENABLE_CPU_PROFILING "Enable CPU profiling using gperftools" OFF)
@@ -309,6 +310,15 @@ if(ACTS_SETUP_EIGEN3)
     endif()
 endif()
 
+if(ACTS_SETUP_NLOHMANN_JSON)
+    if(ACTS_USE_SYSTEM_NLOHMANN_JSON)
+        message(STATUS "Using system installation of nlohmann::json")
+        find_package(nlohmann_json ${_acts_nlohmanjson_version} REQUIRED CONFIG)
+    else()
+        add_subdirectory(thirdparty/nlohmann_json)
+    endif()
+endif()
+
 find_package(Filesystem REQUIRED)
 
 # the `<project_name>_VERSION` variables set by `setup(... VERSION ...)` have
@@ -368,13 +378,7 @@ if(ACTS_BUILD_PLUGIN_DD4HEP)
         COMPONENTS DDCore DDDetectors
     )
 endif()
-if(ACTS_BUILD_PLUGIN_JSON)
-    if(ACTS_USE_SYSTEM_NLOHMANN_JSON)
-        find_package(nlohmann_json ${_acts_nlohmanjson_version} REQUIRED CONFIG)
-    else()
-        add_subdirectory(thirdparty/nlohmann_json)
-    endif()
-endif()
+
 if(ACTS_BUILD_PLUGIN_GEOMODEL)
     find_package(GeoModelCore CONFIG)
     if(NOT GeoModelCore_FOUND)
@@ -395,6 +399,7 @@ if(ACTS_BUILD_PLUGIN_GEOMODEL)
     # find other GeoModel components of EXACT same version
     find_package(GeoModelIO ${GeoModelCore_VERSION} REQUIRED EXACT CONFIG)
 endif()
+
 if(ACTS_BUILD_PLUGIN_TGEO)
     find_package(
         ROOT

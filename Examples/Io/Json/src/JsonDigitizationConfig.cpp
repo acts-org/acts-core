@@ -10,7 +10,6 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
-#include "Acts/Plugins/Json/UtilitiesJsonConverter.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 #include "ActsExamples/Digitization/Smearers.hpp"
 #include "ActsExamples/Framework/RandomNumbers.hpp"

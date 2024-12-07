@@ -29,17 +29,64 @@
 
 #include <nlohmann/json.hpp>
 
-#include "EqualityHelpers.hpp"
-
 using namespace Acts;
 
 namespace {
 
-/// @brief Helper method to compare proto volumes
-/// @param one the first volume object
-/// @param two the second volume object
-/// @param tolerance the tolerance
-/// @return a boolean to see if they are equal
+bool isEqual(const BinningData& ba, const BinningData& bb, float tolerance) {
+  bool equalBool = (ba.type == bb.type) && (ba.option == bb.option) &&
+                   (ba.binvalue == bb.binvalue) && (ba.zdim == bb.zdim) &&
+                   (ba.subBinningAdditive == bb.subBinningAdditive);
+
+  BOOST_CHECK(equalBool);
+  bool equalRange = (std::abs(ba.min - bb.min) < tolerance) &&
+                    (std::abs(ba.max - bb.max) < tolerance) &&
+                    (std::abs(ba.step - bb.step) < tolerance);
+
+  BOOST_CHECK(equalRange);
+  bool euqalStructure =
+      (ba.subBinningData != nullptr)
+          ? isEqual(*ba.subBinningData, *bb.subBinningData, tolerance)
+          : (bb.subBinningData == nullptr);
+
+  BOOST_CHECK(euqalStructure);
+
+  bool equalBoundaries = (ba.boundaries().size() == bb.boundaries().size());
+  if (equalBoundaries) {
+    for (std::size_t ib = 0; ib < ba.boundaries().size(); ++ib) {
+      equalBoundaries =
+          (std::abs(ba.boundaries()[ib] - bb.boundaries()[ib]) < tolerance);
+      if (!equalBoundaries) {
+        break;
+      }
+    }
+  }
+  BOOST_CHECK(equalBoundaries);
+
+  return equalBool && equalRange && euqalStructure;
+}
+
+bool isEqual(const Acts::Extent& ea, const Acts::Extent& eb,
+             double tolerance = 0.) {
+  bool equalConstrains = true;
+  bool equalRange = true;
+  for (auto& bVal : allBinningValues()) {
+    equalConstrains =
+        equalConstrains && (ea.constrains(bVal) == eb.constrains(bVal));
+    BOOST_CHECK(equalConstrains);
+    if (ea.constrains(bVal) && eb.constrains(bVal)) {
+      equalRange =
+          equalRange && std::abs(ea.min(bVal) - eb.min(bVal)) < tolerance;
+      equalRange =
+          equalRange && std::abs(ea.max(bVal) - eb.max(bVal)) < tolerance;
+      BOOST_CHECK(equalRange);
+    }
+  }
+  BOOST_CHECK(equalConstrains);
+  BOOST_CHECK(equalRange);
+  return equalRange && equalConstrains;
+}
+
 bool isEqual(const Acts::ProtoVolume& one, const Acts::ProtoVolume& two,
              const double tolerance = 0.) {
   bool nameEq = (one.name == two.name);

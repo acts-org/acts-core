@@ -12,6 +12,8 @@
 
 #include <ostream>
 
+#include <nlohmann/json.hpp>
+
 namespace Acts {
 /// Enum which determines how the axis handle its outer boundaries
 /// possible values values
@@ -26,6 +28,11 @@ enum class AxisBoundaryType {
   /// bin on the opposite side
   Closed,
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(Acts::AxisBoundaryType,
+                             {{Acts::AxisBoundaryType::Bound, "Bound"},
+                              {Acts::AxisBoundaryType::Open, "Open"},
+                              {Acts::AxisBoundaryType::Closed, "Closed"}})
 
 /// Tag helper type for Axis constructors with class template deduction
 /// @tparam bdt the boundary type
@@ -59,6 +66,10 @@ enum class AxisType {
   /// An axis where bins can have different sizes
   Variable,
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(Acts::AxisType,
+                             {{Acts::AxisType::Equidistant, "Equidistant"},
+                              {Acts::AxisType::Variable, "Variable"}})
 
 inline std::ostream& operator<<(std::ostream& os, AxisType type) {
   switch (type) {

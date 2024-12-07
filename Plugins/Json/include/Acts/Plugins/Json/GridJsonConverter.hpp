@@ -19,18 +19,6 @@
 // Custom Json encoder/decoders.
 namespace Acts {
 
-/// @cond
-NLOHMANN_JSON_SERIALIZE_ENUM(Acts::AxisBoundaryType,
-                             {{Acts::AxisBoundaryType::Bound, "Bound"},
-                              {Acts::AxisBoundaryType::Open, "Open"},
-                              {Acts::AxisBoundaryType::Closed, "Closed"}})
-
-NLOHMANN_JSON_SERIALIZE_ENUM(Acts::AxisType,
-                             {{Acts::AxisType::Equidistant, "Equidistant"},
-                              {Acts::AxisType::Variable, "Variable"}})
-
-/// @endcond
-
 namespace AxisJsonConverter {
 
 /// Convert an axis to json

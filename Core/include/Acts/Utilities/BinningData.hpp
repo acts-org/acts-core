@@ -22,6 +22,8 @@
 #include <utility>
 #include <vector>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace Acts {
 
 /// @class BinningData
@@ -553,4 +555,9 @@ class BinningData {
     return sl.str();
   }
 };
+
+void to_json(nlohmann::json& j, const BinningData& bd);
+
+void from_json(const nlohmann::json& j, BinningData& bd);
+
 }  // namespace Acts

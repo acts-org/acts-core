@@ -23,6 +23,8 @@
 #include <Eigen/Geometry>
 #endif
 
+#include <nlohmann/json.hpp>
+
 namespace Acts {
 
 /// @defgroup acts-algebra-types Vector/matrix types with a common scalar type
@@ -91,4 +93,21 @@ using Transform3 = Eigen::Transform<double, 3, Eigen::Affine>;
 
 constexpr double s_transformEquivalentTolerance = 1e-9;
 
+void to_json(nlohmann::json& j, const Transform3& t);
+
+void from_json(const nlohmann::json& j, Transform3& t);
+
 }  // namespace Acts
+
+NLOHMANN_JSON_NAMESPACE_BEGIN
+template <>
+struct adl_serializer<Acts::Transform3> {
+  static void to_json(json& j, const Acts::Transform3& t) {
+    Acts::to_json(j, t);
+  }
+
+  static void from_json(const json& j, Acts::Transform3& t) {
+    Acts::from_json(j, t);
+  }
+};
+NLOHMANN_JSON_NAMESPACE_END

@@ -103,6 +103,7 @@ class NeverFilterPolicy final : public OutputFilterPolicy {
 class DummyPrintPolicy final : public OutputPrintPolicy {
  public:
   void flush(const Level& /*lvl*/, const std::string& /*input*/) override {}
+  void flush(const Level& /*lvl*/, nlohmann::json&& /*json*/) override {}
 
   const std::string& name() const override {
     const static std::string s_name = "Dummy";
