@@ -10,6 +10,7 @@
 
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Plugins/DD4hep/DD4hepFieldAdapter.hpp"
+#include "ActsExamples/DD4hepDetector/DD4hepAlignmentDecorator.hpp"
 #include "ActsExamples/DD4hepDetector/DD4hepGeometryService.hpp"
 
 #include <memory>
@@ -40,7 +41,15 @@ auto DD4hepDetector::finalize(
     throw std::runtime_error{
         "Did not receive tracking geometry from DD4hep geometry service"};
   }
+
+  DD4hepAlignmentDecorator::Config dd4hepAcfg;
+  dd4hepAcfg.nominal = m_nominal;
+  dd4hepAcfg.trackingGeometry = dd4tGeometry;
   ContextDecorators dd4ContextDecorators = {};
+  dd4ContextDecorators.push_back(std::make_shared<DD4hepAlignmentDecorator>(
+      std::move(dd4hepAcfg),
+      Acts::getDefaultLogger("AlignmentDecorator", Acts::Logging::INFO)));
+  std::cout << "After dd4ContextDecorators push back" << std::endl;
   // return the pair of geometry and empty decorators
   return {std::move(dd4tGeometry), std::move(dd4ContextDecorators)};
 }

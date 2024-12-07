@@ -86,6 +86,9 @@ struct DD4hepDetector {
   /// @brief Access to the DD4hep field
   /// @return a shared pointer to the DD4hep field
   std::shared_ptr<Acts::DD4hepFieldAdapter> field() const;
+
+  // whether use the nominal geometry
+  bool m_nominal = false;
 };
 
 }  // namespace ActsExamples

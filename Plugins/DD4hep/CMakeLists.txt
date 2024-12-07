@@ -9,6 +9,7 @@ add_library(
     src/DD4hepDetectorStructure.cpp
     src/DD4hepMaterialHelpers.cpp
     src/DD4hepDetectorElement.cpp
+    src/DD4hepGeometryContext.cpp
     src/DD4hepDetectorSurfaceFactory.cpp
     src/DD4hepLayerBuilder.cpp
     src/DD4hepLayerStructure.cpp

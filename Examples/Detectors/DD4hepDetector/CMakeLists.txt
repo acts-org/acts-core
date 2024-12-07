@@ -3,6 +3,7 @@ add_library(
     SHARED
     src/DD4hepDetector.cpp
     src/DD4hepGeometryService.cpp
+    src/DD4hepAlignmentDecorator.cpp
 )
 
 target_include_directories(

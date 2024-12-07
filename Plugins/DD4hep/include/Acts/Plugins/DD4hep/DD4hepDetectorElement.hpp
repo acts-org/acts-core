@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Acts/Geometry/GeometryContext.hpp"
+#include "Acts/Plugins/DD4hep/DD4hepGeometryContext.hpp"
 #include "Acts/Plugins/TGeo/TGeoDetectorElement.hpp"
 #include "Acts/Utilities/ThrowAssert.hpp"
 
@@ -86,6 +87,11 @@ class DD4hepDetectorElement : public TGeoDetectorElement {
 
   // Give access to the DD4hep detector element
   const dd4hep::DetElement& sourceElement() const { return m_detElement; }
+
+  const Transform3& transform(const GeometryContext& gctx) const override;
+  Transform3 nominalTransform(const GeometryContext& gctx) const {
+    return TGeoDetectorElement::transform(gctx);
+  }
 
  private:
   /// DD4hep detector element
