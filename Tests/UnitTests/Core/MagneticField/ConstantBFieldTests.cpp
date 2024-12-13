@@ -13,9 +13,6 @@
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
-#include "Acts/Utilities/Result.hpp"
-
-#include <utility>
 
 namespace bdata = boost::unit_test::data;
 using namespace Acts::UnitLiterals;
@@ -66,9 +63,9 @@ BOOST_DATA_TEST_CASE(
 
   BOOST_CHECK_EQUAL(Btrue, BField.getField());
 
-  BOOST_CHECK_EQUAL(Btrue, BField.getField(pos, bCache).value());
-  BOOST_CHECK_EQUAL(Btrue, BField.getField(Vector3(0, 0, 0), bCache).value());
-  BOOST_CHECK_EQUAL(Btrue, BField.getField(-2 * pos, bCache).value());
+  BOOST_CHECK_EQUAL(Btrue, BField.getField(pos, bCache));
+  BOOST_CHECK_EQUAL(Btrue, BField.getField(Vector3(0, 0, 0), bCache));
+  BOOST_CHECK_EQUAL(Btrue, BField.getField(-2 * pos, bCache));
 }
 
 /// @brief unit test for update of constant magnetic field
@@ -114,9 +111,9 @@ BOOST_DATA_TEST_CASE(
 
   BOOST_CHECK_EQUAL(Btrue, BField.getField());
 
-  BOOST_CHECK_EQUAL(Btrue, BField.getField(pos, bCache).value());
-  BOOST_CHECK_EQUAL(Btrue, BField.getField(Vector3(0, 0, 0), bCache).value());
-  BOOST_CHECK_EQUAL(Btrue, BField.getField(-2 * pos, bCache).value());
+  BOOST_CHECK_EQUAL(Btrue, BField.getField(pos, bCache));
+  BOOST_CHECK_EQUAL(Btrue, BField.getField(Vector3(0, 0, 0), bCache));
+  BOOST_CHECK_EQUAL(Btrue, BField.getField(-2 * pos, bCache));
 }
 
 }  // namespace Acts::Test

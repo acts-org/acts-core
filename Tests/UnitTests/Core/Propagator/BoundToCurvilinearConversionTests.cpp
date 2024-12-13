@@ -210,11 +210,10 @@ void test_bound_to_curvilinear(const std::vector<TestData> &test_data_list,
     for (unsigned int i = 0; i < 4; ++i) {
       MagneticFieldProvider::Cache cache = bField->makeCache(magFieldContext);
 
-      Result<Acts::Vector3> local_bfield = bField->getField(position, cache);
-      assert(local_bfield.ok());
+      Vector3 localBfield = bField->getField(position, cache);
 
       auto path_length_derivatives = computeFreeToPathDerivatives(
-          direction, params.parameters()[eBoundQOverP], local_bfield.value(),
+          direction, params.parameters()[eBoundQOverP], localBfield,
           ParticleHypothesis::pion());
       MSG_DEBUG("derivatives : " << path_length_derivatives);
 
@@ -223,9 +222,9 @@ void test_bound_to_curvilinear(const std::vector<TestData> &test_data_list,
       Acts::detail::boundToCurvilinearTransportJacobian(
           direction, surface->boundToFreeJacobian(geoCtx, position, direction),
           Acts::FreeMatrix::Identity(),
-          computeFreeToPathDerivatives(
-              direction, params.parameters()[eBoundQOverP],
-              local_bfield.value(), ParticleHypothesis::pion()),
+          computeFreeToPathDerivatives(direction,
+                                       params.parameters()[eBoundQOverP],
+                                       localBfield, ParticleHypothesis::pion()),
           b2c);
 
       auto curvi_cov_alt = b2c * cov * b2c.transpose();

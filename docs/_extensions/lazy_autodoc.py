@@ -136,7 +136,6 @@ def run() -> None:
         "Acts::BinningValue",
         "Acts::BoundIndices",
         "Acts::FreeIndices",
-        "Acts::MagneticFieldError",
         "Acts::TrackStatePropMask",
         "Acts::AxisType",
         "Acts::AxisBoundaryType",

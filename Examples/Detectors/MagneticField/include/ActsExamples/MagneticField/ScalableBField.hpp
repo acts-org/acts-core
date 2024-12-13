@@ -52,11 +52,10 @@ class ScalableBField final : public Acts::MagneticFieldProvider {
   ///
   /// @note The @p position is ignored and only kept as argument to provide
   ///       a consistent interface with other magnetic field services.
-  Acts::Result<Acts::Vector3> getField(
-      const Acts::Vector3& /*position*/,
-      MagneticFieldProvider::Cache& gCache) const override {
+  Acts::Vector3 getField(const Acts::Vector3& /*position*/,
+                         MagneticFieldProvider::Cache& gCache) const override {
     Cache& cache = gCache.as<Cache>();
-    return Acts::Result<Acts::Vector3>::success(m_BField * cache.scalor);
+    return m_BField * cache.scalor;
   }
 
   /// @brief retrieve magnetic field value & its gradient
@@ -71,11 +70,11 @@ class ScalableBField final : public Acts::MagneticFieldProvider {
   ///       a consistent interface with other magnetic field services.
   /// @note currently the derivative is not calculated
   /// @todo return derivative
-  Acts::Result<Acts::Vector3> getFieldGradient(
-      const Acts::Vector3& /*position*/, Acts::ActsMatrix<3, 3>& /*derivative*/,
+  std::pair<Acts::Vector3, Acts::SquareMatrix3> getFieldAndGradient(
+      const Acts::Vector3& /*position*/,
       MagneticFieldProvider::Cache& gCache) const override {
     Cache& cache = gCache.as<Cache>();
-    return Acts::Result<Acts::Vector3>::success(m_BField * cache.scalor);
+    return {m_BField * cache.scalor, Acts::SquareMatrix3::Zero()};
   }
 
   Acts::MagneticFieldProvider::Cache makeCache(
@@ -106,6 +105,6 @@ class ScalableBField final : public Acts::MagneticFieldProvider {
  private:
   /// magnetic field vector
   Acts::Vector3 m_BField;
-};  // namespace BField
+};
 
 }  // namespace ActsExamples

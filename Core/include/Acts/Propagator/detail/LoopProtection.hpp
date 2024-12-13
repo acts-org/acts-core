@@ -31,15 +31,8 @@ void setupLoopProtection(propagator_state_t& state, const stepper_t& stepper,
   }
 
   // Get the field at the start position
-  auto fieldRes =
+  Vector3 field =
       stepper.getField(state.stepping, stepper.position(state.stepping));
-  if (!fieldRes.ok()) {
-    // there's no great way to return the error here, so resort to warning
-    // and not applying the loop protection in this case
-    ACTS_WARNING("Field lookup was unsuccessful, this is very likely an error");
-    return;
-  }
-  const Vector3 field = *fieldRes;
   const double B = field.norm();
   if (B == 0) {
     return;

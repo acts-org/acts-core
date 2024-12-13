@@ -64,13 +64,7 @@ auto newBuilder(const magnetic_field_t& magneticField,
             std::min(z * sampleSpacing[2] + min[2], maxima[2])};
 
         Field::view_t::output_t& p = view.at(x, y, z);
-        Result<Vector3> result = magneticField.getField(position, cache);
-
-        if (!result.ok()) {
-          throw std::runtime_error("Field lookup failed!");
-        }
-
-        Acts::Vector3 rv = *result;
+        Acts::Vector3 rv = magneticField.getField(position, cache);
         p[0] = static_cast<float>(rv[0]);
         p[1] = static_cast<float>(rv[1]);
         p[2] = static_cast<float>(rv[2]);

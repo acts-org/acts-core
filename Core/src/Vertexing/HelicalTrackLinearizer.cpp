@@ -9,7 +9,6 @@
 #include "Acts/Vertexing/HelicalTrackLinearizer.hpp"
 
 #include "Acts/Propagator/PropagatorOptions.hpp"
-#include "Acts/Surfaces/PerigeeSurface.hpp"
 #include "Acts/Utilities/MathHelpers.hpp"
 #include "Acts/Vertexing/LinearizerTrackParameters.hpp"
 
@@ -98,10 +97,7 @@ Acts::HelicalTrackLinearizer::linearizeTrack(
 
   // get the z-component of the B-field at the PCA
   auto field = m_cfg.bField->getField(VectorHelpers::position(pca), fieldCache);
-  if (!field.ok()) {
-    return field.error();
-  }
-  double Bz = (*field)[eZ];
+  double Bz = field[eZ];
 
   // Complete Jacobian (consists of positionJacobian and momentumJacobian)
   ActsMatrix<eBoundSize, eLinSize> completeJacobian =

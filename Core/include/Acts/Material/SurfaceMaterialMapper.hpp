@@ -18,12 +18,9 @@
 #include "Acts/Material/AccumulatedSurfaceMaterial.hpp"
 #include "Acts/Material/ISurfaceMaterial.hpp"
 #include "Acts/Material/MaterialInteraction.hpp"
-#include "Acts/Propagator/MaterialInteractor.hpp"
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
-#include "Acts/Propagator/SurfaceCollector.hpp"
-#include "Acts/Propagator/VolumeCollector.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
@@ -225,4 +222,5 @@ class SurfaceMaterialMapper {
   /// The logging instance
   std::unique_ptr<const Logger> m_logger;
 };
+
 }  // namespace Acts

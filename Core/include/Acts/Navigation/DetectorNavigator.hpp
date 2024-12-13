@@ -8,24 +8,19 @@
 
 #pragma once
 
-#include "Acts/Definitions/Units.hpp"
 #include "Acts/Detector/Detector.hpp"
 #include "Acts/Detector/DetectorVolume.hpp"
 #include "Acts/Detector/Portal.hpp"
-#include "Acts/Geometry/BoundarySurfaceT.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Geometry/Layer.hpp"
 #include "Acts/Navigation/NavigationState.hpp"
 #include "Acts/Propagator/NavigatorOptions.hpp"
 #include "Acts/Propagator/NavigatorStatistics.hpp"
-#include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <algorithm>
-#include <iomanip>
-#include <iterator>
 #include <sstream>
 #include <string>
 
@@ -424,14 +419,7 @@ class DetectorNavigator {
     nState.direction =
         state.options.direction * stepper.direction(state.stepping);
     nState.absMomentum = stepper.absoluteMomentum(state.stepping);
-    auto fieldResult = stepper.getField(state.stepping, nState.position);
-    if (!fieldResult.ok()) {
-      std::string msg = "DetectorNavigator: " + volInfo(state) +
-                        posInfo(state, stepper) +
-                        "could not read from the magnetic field";
-      throw std::runtime_error(msg);
-    }
-    nState.magneticField = *fieldResult;
+    nState.magneticField = stepper.getField(state.stepping, nState.position);
   }
 };
 

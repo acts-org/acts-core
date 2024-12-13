@@ -13,10 +13,8 @@
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/MagneticField/SolenoidBField.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
-#include "Acts/Utilities/Result.hpp"
 
 #include <cstddef>
-#include <fstream>
 
 using namespace Acts::UnitLiterals;
 
@@ -34,8 +32,8 @@ BOOST_AUTO_TEST_CASE(TestSolenoidBField) {
   SolenoidBField bField(cfg);
 
   auto cache = bField.makeCache(mfContext);
-  CHECK_CLOSE_ABS(bField.getField({0, 0, 0}, cache).value(),
-                  Vector3(0, 0, 2.0_T), 1e-6_T);
+  CHECK_CLOSE_ABS(bField.getField({0, 0, 0}, cache), Vector3(0, 0, 2.0_T),
+                  1e-6_T);
 
   // std::ofstream outf("solenoid.csv");
   // outf << "x;y;z;B_x;B_y;B_z" << std::endl;
@@ -46,8 +44,8 @@ BOOST_AUTO_TEST_CASE(TestSolenoidBField) {
   for (std::size_t i = 0; i < steps; i++) {
     double r = 1.5 * cfg.radius / steps * i;
     BOOST_TEST_CONTEXT("r=" << r) {
-      Vector3 B1 = bField.getField({r, 0, 0}, cache).value();
-      Vector3 B2 = bField.getField({-r, 0, 0}, cache).value();
+      Vector3 B1 = bField.getField({r, 0, 0}, cache);
+      Vector3 B2 = bField.getField({-r, 0, 0}, cache);
       CHECK_SMALL(B1.x(), tol);
       CHECK_SMALL(B1.y(), tol);
       BOOST_CHECK_GT(std::abs(B1.z()), tol_B);  // greater than zero
@@ -59,10 +57,10 @@ BOOST_AUTO_TEST_CASE(TestSolenoidBField) {
         // double z = cfg.L/steps * j - (cfg.L/2.);
         double z = (1.5 * cfg.length / 2.) / steps * j;
         BOOST_TEST_CONTEXT("z=" << z) {
-          Vector3 B_zp_rp = bField.getField({r, 0, z}, cache).value();
-          Vector3 B_zn_rp = bField.getField({r, 0, -z}, cache).value();
-          Vector3 B_zp_rn = bField.getField({-r, 0, z}, cache).value();
-          Vector3 B_zn_rn = bField.getField({-r, 0, -z}, cache).value();
+          Vector3 B_zp_rp = bField.getField({r, 0, z}, cache);
+          Vector3 B_zn_rp = bField.getField({r, 0, -z}, cache);
+          Vector3 B_zp_rn = bField.getField({-r, 0, z}, cache);
+          Vector3 B_zn_rn = bField.getField({-r, 0, -z}, cache);
 
           // outf << r << ";0;" << z << ";" << B_zp_rp.x() << ";" <<
           // B_zp_rp.y() << ";" << B_zp_rp.z() << std::endl;

@@ -19,7 +19,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <utility>
-#include <vector>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -30,12 +29,11 @@ namespace ActsExamples {
 void RootBFieldWriter::run(const Config& config,
                            std::unique_ptr<const Acts::Logger> p_logger) {
   // Set up (local) logging
-  // @todo Remove dangerous using declaration once the logger macro
-  // tolerates it
-  using namespace Acts;
   ACTS_LOCAL_LOGGER(std::move(p_logger))
 
   Acts::MagneticFieldContext bFieldContext;
+
+  auto bFieldCache = config.bField->makeCache(bFieldContext);
 
   // Check basic configuration
   if (config.treeName.empty()) {
@@ -179,7 +177,7 @@ void RootBFieldWriter::run(const Config& config,
         for (std::size_t k = 0; k < nBinsZ; k++) {
           double raw_z = minZ + k * stepZ;
           Acts::Vector3 position(raw_x, raw_y, raw_z);
-          Vector3 bField = config.bField->getFieldUnchecked(position);
+          Acts::Vector3 bField = config.bField->getField(position, bFieldCache);
 
           x = raw_x / Acts::UnitConstants::mm;
           y = raw_y / Acts::UnitConstants::mm;
@@ -264,11 +262,11 @@ void RootBFieldWriter::run(const Config& config,
         double raw_r = minR + j * stepR;
         Acts::Vector3 position(raw_r, 0.0, raw_z);  // position at phi=0
         ACTS_VERBOSE("Requesting position: " << position.transpose());
-        auto bField = config.bField->getFieldUnchecked(position);
+        auto bField = config.bField->getField(position, bFieldCache);
         z = raw_z / Acts::UnitConstants::mm;
         r = raw_r / Acts::UnitConstants::mm;
         Bz = bField.z() / Acts::UnitConstants::T;
-        Br = VectorHelpers::perp(bField) / Acts::UnitConstants::T;
+        Br = Acts::VectorHelpers::perp(bField) / Acts::UnitConstants::T;
         outputTree->Fill();
       }  // for R
     }  // for z

@@ -31,16 +31,10 @@ void MagneticFieldWrapper::GetFieldValue(const G4double Point[4],
 
   auto bCache = m_cfg.magneticField->makeCache(Acts::MagneticFieldContext());
 
-  auto fieldRes = m_cfg.magneticField->getField(
+  auto field = m_cfg.magneticField->getField(
       {convertLength * Point[0], convertLength * Point[1],
        convertLength * Point[2]},
       bCache);
-  if (!fieldRes.ok()) {
-    ACTS_ERROR("Field lookup error: " << fieldRes.error());
-    return;
-  }
-  // Get the field now
-  const Acts::Vector3& field = *fieldRes;
 
   Bfield[0] = convertField * field[0];
   Bfield[1] = convertField * field[1];

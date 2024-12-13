@@ -68,10 +68,9 @@ struct Stepper {
   ///                 the magnetic field cell is used (and potentially
   ///                 updated)
   /// @param [in] pos is the field position
-  Result<Vector3> getField(SteppingState& /*state*/,
-                           const Vector3& /*pos*/) const {
+  Vector3 getField(SteppingState& /*state*/, const Vector3& /*pos*/) const {
     // get the field from the cell
-    return Result<Vector3>::success(field);
+    return field;
   }
 
   /// Access method - position

@@ -20,11 +20,7 @@ Acts::Result<bool> rk4(const T* p, const T* d, const T t, const T h,
                        const T lambda, const T m, const T p_abs, GetB getB,
                        T* err, const T errTol, T* new_p, T* new_d, T* new_time,
                        T* path_derivatives, T* J) {
-  const auto B1res = getB(p);
-  if (!B1res.ok()) {
-    return Acts::Result<bool>::failure(B1res.error());
-  }
-  const auto B1 = *B1res;
+  const auto B1 = getB(p);
   const auto x5 = std::pow(h, 2);
   const auto x0 = B1[1] * d[2];
   const auto x1 = B1[0] * d[2];
@@ -42,11 +38,7 @@ Acts::Result<bool> rk4(const T* p, const T* d, const T t, const T h,
   p2[0] = (1.0 / 2.0) * x4 + x6 * k1[0] + p[0];
   p2[1] = x6 * k1[1] + (1.0 / 2.0) * x7 + p[1];
   p2[2] = x6 * k1[2] + (1.0 / 2.0) * x8 + p[2];
-  const auto B2res = getB(p2);
-  if (!B2res.ok()) {
-    return Acts::Result<bool>::failure(B2res.error());
-  }
-  const auto B2 = *B2res;
+  const auto B2 = getB(p2);
   const auto x9 = (1.0 / 2.0) * h;
   const auto x19 = (1.0 / 2.0) * x5;
   const auto x11 = lambda * B2[2];
@@ -73,11 +65,7 @@ Acts::Result<bool> rk4(const T* p, const T* d, const T t, const T h,
   p3[0] = x19 * k3[0] + x20;
   p3[1] = x19 * k3[1] + x21;
   p3[2] = x19 * k3[2] + x22;
-  const auto B3res = getB(p3);
-  if (!B3res.ok()) {
-    return Acts::Result<bool>::failure(B3res.error());
-  }
-  const auto B3 = *B3res;
+  const auto B3 = getB(p3);
   const auto x24 = lambda * B3[2];
   const auto x26 = lambda * B3[1];
   const auto x28 = lambda * B3[0];

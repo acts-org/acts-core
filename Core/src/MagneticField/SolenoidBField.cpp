@@ -10,7 +10,6 @@
 
 #include "Acts/Utilities/VectorHelpers.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <numbers>
 
@@ -49,19 +48,20 @@ Acts::Vector3 Acts::SolenoidBField::getField(const Vector3& position) const {
   return xyzField;
 }
 
-Acts::Result<Acts::Vector3> Acts::SolenoidBField::getField(
+Acts::Vector3 Acts::SolenoidBField::getField(
     const Vector3& position, MagneticFieldProvider::Cache& /*cache*/) const {
-  return Result<Vector3>::success(getField(position));
+  return getField(position);
 }
 
 Acts::Vector2 Acts::SolenoidBField::getField(const Vector2& position) const {
   return multiCoilField(position, m_scale);
 }
 
-Acts::Result<Acts::Vector3> Acts::SolenoidBField::getFieldGradient(
-    const Vector3& position, ActsMatrix<3, 3>& /*derivative*/,
+std::pair<Acts::Vector3, Acts::SquareMatrix3>
+Acts::SolenoidBField::getFieldAndGradient(
+    const Vector3& /*position*/,
     MagneticFieldProvider::Cache& /*cache*/) const {
-  return Result<Vector3>::success(getField(position));
+  throw std::runtime_error("Not implemented");
 }
 
 Acts::Vector2 Acts::SolenoidBField::multiCoilField(const Vector2& pos,

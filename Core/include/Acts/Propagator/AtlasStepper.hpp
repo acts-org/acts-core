@@ -353,13 +353,8 @@ class AtlasStepper {
   /// @param [in,out] state is the stepper state associated with the track
   ///                 the magnetic field cell is used (and potentially updated)
   /// @param [in] pos is the field position
-  Result<Vector3> getField(State& state, const Vector3& pos) const {
-    // get the field from the cell
-    auto res = m_bField->getField(pos, state.fieldCache);
-    if (res.ok()) {
-      state.field = *res;
-    }
-    return res;
+  Vector3 getField(State& state, const Vector3& pos) const {
+    return m_bField->getField(pos, state.fieldCache);
   }
 
   Vector3 position(const State& state) const {
@@ -1179,11 +1174,7 @@ class AtlasStepper {
     if (state.stepping.newfield) {
       const Vector3 pos(R[0], R[1], R[2]);
       // This is sd.B_first in EigenStepper
-      auto fRes = getField(state.stepping, pos);
-      if (!fRes.ok()) {
-        return fRes.error();
-      }
-      f0 = *fRes;
+      f0 = getField(state.stepping, pos);
     } else {
       f0 = state.stepping.field;
     }
@@ -1221,11 +1212,7 @@ class AtlasStepper {
         // This is pos1 in EigenStepper
         const Vector3 pos(R[0] + A1 * S4, R[1] + B1 * S4, R[2] + C1 * S4);
         // This is sd.B_middle in EigenStepper
-        auto fRes = getField(state.stepping, pos);
-        if (!fRes.ok()) {
-          return fRes.error();
-        }
-        f = *fRes;
+        f = getField(state.stepping, pos);
       } else {
         f = f0;
       }
@@ -1251,11 +1238,7 @@ class AtlasStepper {
         // This is pos2 in EigenStepper
         const Vector3 pos(R[0] + h * A4, R[1] + h * B4, R[2] + h * C4);
         // This is sd.B_last in Eigen stepper
-        auto fRes = getField(state.stepping, pos);
-        if (!fRes.ok()) {
-          return fRes.error();
-        }
-        f = *fRes;
+        f = getField(state.stepping, pos);
       } else {
         f = f0;
       }

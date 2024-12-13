@@ -10,7 +10,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
@@ -23,25 +22,19 @@
 #include "Acts/Propagator/MaterialInteractor.hpp"
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
-#include "Acts/Propagator/StandardAborters.hpp"
 #include "Acts/Propagator/SurfaceCollector.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Tests/CommonHelpers/CylindricalTrackingGeometry.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 #include "Acts/Utilities/Result.hpp"
 
-#include <algorithm>
-#include <array>
 #include <cmath>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <numbers>
 #include <optional>
 #include <random>
-#include <tuple>
 #include <utility>
-#include <vector>
 
 namespace bdata = boost::unit_test::data;
 using namespace Acts::UnitLiterals;
@@ -278,10 +271,9 @@ BOOST_DATA_TEST_CASE(
   // this test assumes state.options.loopFraction = 0.5
   // maximum momentum allowed
   auto bCache = bField->makeCache(mfContext);
-  double pmax =
-      options.pathLimit *
-      bField->getField(start.position(tgContext), bCache).value().norm() /
-      std::numbers::pi;
+  double pmax = options.pathLimit *
+                bField->getField(start.position(tgContext), bCache).norm() /
+                std::numbers::pi;
   if (p < pmax) {
     BOOST_CHECK_LT(status.pathLength, options.pathLimit);
   } else {

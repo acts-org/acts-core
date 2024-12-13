@@ -198,11 +198,7 @@ def my_step_function_print(name_exprs, run_cse=True):
     head = "template <typename T, typename GetB> Acts::Result<bool> rk4(const T* p, const T* d, const T t, const T h, const T lambda, const T m, const T p_abs, GetB getB, T* err, const T errTol, T* new_p, T* new_d, T* new_time, T* path_derivatives, T* J) {"
     lines.append(head)
 
-    lines.append("  const auto B1res = getB(p);")
-    lines.append(
-        "  if (!B1res.ok()) {\n    return Acts::Result<bool>::failure(B1res.error());\n  }"
-    )
-    lines.append("  const auto B1 = *B1res;")
+    lines.append("  const auto B1 = getB(p);")
 
     def pre_expr_hook(var):
         if str(var) == "p2":
@@ -215,9 +211,9 @@ def my_step_function_print(name_exprs, run_cse=True):
 
     def post_expr_hook(var):
         if str(var) == "p2":
-            return "const auto B2res = getB(p2);\n  if (!B2res.ok()) {\n    return Acts::Result<bool>::failure(B2res.error());\n  }\n  const auto B2 = *B2res;"
+            return "const auto B2 = getB(p2);"
         if str(var) == "p3":
-            return "const auto B3res = getB(p3);\n  if (!B3res.ok()) {\n    return Acts::Result<bool>::failure(B3res.error());\n  }\n  const auto B3 = *B3res;"
+            return "const auto B3 = getB(p3);"
         if str(var) == "err":
             return (
                 "if (*err > errTol) {\n  return Acts::Result<bool>::success(false);\n}"

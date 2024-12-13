@@ -32,7 +32,6 @@
 #include "Acts/Utilities/MathHelpers.hpp"
 #include "Acts/Utilities/Result.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <functional>
 #include <limits>
@@ -171,9 +170,9 @@ class StraightLineStepper {
       const double stepSize = std::numeric_limits<double>::max()) const;
 
   /// Get the field for the stepping, this gives back a zero field
-  Result<Vector3> getField(State& /*state*/, const Vector3& /*pos*/) const {
+  Vector3 getField(State& /*state*/, const Vector3& /*pos*/) const {
     // get the field from the cell
-    return Result<Vector3>::success({0., 0., 0.});
+    return Vector3::Zero();
   }
 
   /// Global particle position accessor

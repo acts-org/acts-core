@@ -13,13 +13,11 @@
 #include "Acts/MagneticField/BFieldMapUtils.hpp"
 #include "Acts/MagneticField/InterpolatedBFieldMap.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
-#include "Acts/Utilities/Result.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
 
 #include <array>
 #include <cstddef>
 #include <random>
-#include <utility>
 #include <vector>
 
 namespace bdata = boost::unit_test::data;
@@ -98,9 +96,9 @@ BOOST_AUTO_TEST_CASE(bfield_creation) {
   Acts::Vector3 pos0_rz(0., 0., 0.);
   Acts::Vector3 pos1_rz(1., 0., 1.);
   Acts::Vector3 pos2_rz(0., 2., 2.);
-  auto value0_rz = map_rz.getField(pos0_rz).value();
-  auto value1_rz = map_rz.getField(pos1_rz).value();
-  auto value2_rz = map_rz.getField(pos2_rz).value();
+  auto value0_rz = map_rz.getField(pos0_rz);
+  auto value1_rz = map_rz.getField(pos1_rz);
+  auto value2_rz = map_rz.getField(pos2_rz);
   // calculate what the value should be at this point
   auto b0_rz =
       bField_rz.at(localToGlobalBin_rz({{0, 0}}, {{rPos.size(), zPos.size()}}));
@@ -124,9 +122,9 @@ BOOST_AUTO_TEST_CASE(bfield_creation) {
   Acts::Vector3 pos0_xyz(0., 0., 0.);
   Acts::Vector3 pos1_xyz(1., 1., 1.);
   Acts::Vector3 pos2_xyz(2., 2., 2.);
-  auto value0_xyz = map_xyz.getField(pos0_xyz).value();
-  auto value1_xyz = map_xyz.getField(pos1_xyz).value();
-  auto value2_xyz = map_xyz.getField(pos2_xyz).value();
+  auto value0_xyz = map_xyz.getField(pos0_xyz);
+  auto value1_xyz = map_xyz.getField(pos1_xyz);
+  auto value2_xyz = map_xyz.getField(pos2_xyz);
   // calculate what the value should be at this point
   auto b0_xyz = bField_xyz.at(localToGlobalBin_xyz(
       {{0, 0, 0}}, {{xPos.size(), yPos.size(), zPos.size()}}));
@@ -212,17 +210,17 @@ BOOST_AUTO_TEST_CASE(bfield_symmetry) {
   Acts::Vector3 pos3(1.2, -1.3, 1.4);
   Acts::Vector3 pos4(-1.2, -1.3, 1.4);
 
-  auto value0_rz = map_rz.getField(pos0).value();
-  auto value1_rz = map_rz.getField(pos1).value();
-  auto value2_rz = map_rz.getField(pos2).value();
-  auto value3_rz = map_rz.getField(pos3).value();
-  auto value4_rz = map_rz.getField(pos4).value();
+  auto value0_rz = map_rz.getField(pos0);
+  auto value1_rz = map_rz.getField(pos1);
+  auto value2_rz = map_rz.getField(pos2);
+  auto value3_rz = map_rz.getField(pos3);
+  auto value4_rz = map_rz.getField(pos4);
 
-  auto value0_xyz = map_xyz.getField(pos0).value();
-  auto value1_xyz = map_xyz.getField(pos1).value();
-  auto value2_xyz = map_xyz.getField(pos2).value();
-  auto value3_xyz = map_xyz.getField(pos3).value();
-  auto value4_xyz = map_xyz.getField(pos4).value();
+  auto value0_xyz = map_xyz.getField(pos0);
+  auto value1_xyz = map_xyz.getField(pos1);
+  auto value2_xyz = map_xyz.getField(pos2);
+  auto value3_xyz = map_xyz.getField(pos3);
+  auto value4_xyz = map_xyz.getField(pos4);
 
   // check z- and phi-symmetry
   CHECK_CLOSE_REL(perp(value0_rz), perp(value1_rz), 1e-10);
@@ -337,11 +335,11 @@ BOOST_DATA_TEST_CASE(
   Acts::Vector3 pos3(x, -y, z);
   Acts::Vector3 pos4(-x, -y, z);
 
-  auto value0_rz = map_rz.getField(pos0).value();
-  auto value1_rz = map_rz.getField(pos1).value();
-  auto value2_rz = map_rz.getField(pos2).value();
-  auto value3_rz = map_rz.getField(pos3).value();
-  auto value4_rz = map_rz.getField(pos4).value();
+  auto value0_rz = map_rz.getField(pos0);
+  auto value1_rz = map_rz.getField(pos1);
+  auto value2_rz = map_rz.getField(pos2);
+  auto value3_rz = map_rz.getField(pos3);
+  auto value4_rz = map_rz.getField(pos4);
 
   // check z- and phi-symmetry
   CHECK_CLOSE_REL(perp(value0_rz), perp(value1_rz), 1e-10);
@@ -353,11 +351,11 @@ BOOST_DATA_TEST_CASE(
   CHECK_CLOSE_REL(perp(value0_rz), perp(value4_rz), 1e-10);
   CHECK_CLOSE_REL(value0_rz.z(), value4_rz.z(), 1e-10);
 
-  auto value0_xyz = map_xyz.getField(pos0).value();
-  auto value1_xyz = map_xyz.getField(pos1).value();
-  auto value2_xyz = map_xyz.getField(pos2).value();
-  auto value3_xyz = map_xyz.getField(pos3).value();
-  auto value4_xyz = map_xyz.getField(pos4).value();
+  auto value0_xyz = map_xyz.getField(pos0);
+  auto value1_xyz = map_xyz.getField(pos1);
+  auto value2_xyz = map_xyz.getField(pos2);
+  auto value3_xyz = map_xyz.getField(pos3);
+  auto value4_xyz = map_xyz.getField(pos4);
 
   // checkx-,y-,z-symmetry - need to check close (because of interpolation
   // there can be small differences)

@@ -13,7 +13,6 @@
 #include "Acts/MagneticField/InterpolatedBFieldMap.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "Acts/Utilities/Result.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
 #include "ActsExamples/Io/Csv/CsvInputOutput.hpp"
 
@@ -132,26 +131,7 @@ void CsvBFieldWriter::run(const Config<Coord, Grid>& config,
           Acts::Vector3 pos = {x * delta[0] + min[0], y * delta[1] + min[1],
                                z * delta[2] + min[2]};
 
-          Acts::Vector3 bField;
-          if (auto fieldMap =
-                  dynamic_cast<const Acts::InterpolatedMagneticField*>(
-                      &field)) {
-            // InterpolatedMagneticField::getField() returns an error for the
-            // final point (upper edge), which is just outside the field volume.
-            // So we use getFieldUnchecked instead.
-            bField = fieldMap->getFieldUnchecked(pos);
-          } else {
-            Acts::Result<Acts::Vector3> flx = field.getField(pos, cache);
-
-            // The aforementioned method is not guaranteed to succeed, so we
-            // must check for a valid result, and then write it to disk. If the
-            // result is invalid, throw an exception.
-            if (flx.ok()) {
-              bField = *flx;
-            } else {
-              throw std::runtime_error("B-field returned a non-extant value!");
-            }
-          }
+          Acts::Vector3 bField = field.getField(pos, cache);
 
           writer.append(pos[0] / Acts::UnitConstants::mm,
                         pos[1] / Acts::UnitConstants::mm,
@@ -189,26 +169,7 @@ void CsvBFieldWriter::run(const Config<Coord, Grid>& config,
         // the phi coordinate is zero. Then grab the field.
         Acts::Vector3 pos(min[0] + r * delta[0], 0.f, min[1] + z * delta[1]);
 
-        Acts::Vector3 bField;
-        if (auto fieldMap =
-                dynamic_cast<const Acts::InterpolatedMagneticField*>(&field)) {
-          // InterpolatedMagneticField::getField() returns an error for the
-          // final point (upper edge), which is just outside the field volume.
-          // So we use getFieldUnchecked instead.
-          bField = fieldMap->getFieldUnchecked(pos);
-        } else {
-          Acts::Result<Acts::Vector3> flx = field.getField(pos, cache);
-
-          // Check the result, then write to disk. We write the r and z
-          // positions as they are, then we write the z component of the result
-          // vector as is, and we compute the r-value from the other components
-          // of the vector.
-          if (flx.ok()) {
-            bField = *flx;
-          } else {
-            throw std::runtime_error("B-field returned a non-extant value!");
-          }
-        }
+        Acts::Vector3 bField = field.getField(pos, cache);
 
         writer.append(
             pos[0] / Acts::UnitConstants::mm, pos[2] / Acts::UnitConstants::mm,

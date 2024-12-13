@@ -36,11 +36,8 @@ void checkMagneticFieldEqual(const Acts::MagneticFieldProvider& fieldProvider,
     auto x = point[0], y = point[1], z = point[2];
 
     auto lookupResult = fieldProvider.getField(Acts::Vector3{x, y, z}, cache);
-    if (!lookupResult.ok()) {
-      throw std::runtime_error{"Field lookup failure"};
-    }
-    auto actsValueX = (*lookupResult)[0], actsValueY = (*lookupResult)[1],
-         actsValueZ = (*lookupResult)[2];
+    auto actsValueX = lookupResult[0], actsValueY = lookupResult[1],
+         actsValueZ = lookupResult[2];
 
     auto covfieValues = view.at(x, y, z);
     auto covfieValueX = covfieValues[0], covfieValueY = covfieValues[1],

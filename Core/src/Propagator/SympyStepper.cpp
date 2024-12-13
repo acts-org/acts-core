@@ -12,7 +12,6 @@
 #include "Acts/Propagator/detail/SympyJacobianEngine.hpp"
 
 #include <cmath>
-#include <cstdint>
 
 #include "codegen/sympy_stepper_math.hpp"
 
@@ -115,7 +114,7 @@ Result<double> SympyStepper::stepImpl(
   double m = particleHypothesis(state).mass();
   double p_abs = absoluteMomentum(state);
 
-  auto getB = [&](const double* p) -> Result<Vector3> {
+  auto getB = [&](const double* p) -> Vector3 {
     return getField(state, {p[0], p[1], p[2]});
   };
 

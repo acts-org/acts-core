@@ -174,13 +174,8 @@ Result<std::pair<Vector4, Vector3>> getDistanceAndMomentumImpl(
 
   // Z-component of the B field at the reference position.
   // Note that we assume a constant B field here!
-  auto fieldRes = cfg.bField->getField(refPoint, state.fieldCache);
-  if (!fieldRes.ok()) {
-    ACTS_ERROR("In getDistanceAndMomentum, the B field at\n"
-               << refPoint << "\ncould not be retrieved.");
-    return fieldRes.error();
-  }
-  double bZ = (*fieldRes)[eZ];
+  auto field = cfg.bField->getField(refPoint, state.fieldCache);
+  double bZ = field[eZ];
 
   // The particle moves on a straight trajectory if its charge is 0 or if there
   // is no B field. In that case, the 3D PCA can be calculated analytically, see

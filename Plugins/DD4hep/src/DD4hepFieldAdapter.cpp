@@ -11,7 +11,6 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
-#include "Acts/MagneticField/MagneticFieldError.hpp"
 #include "Acts/MagneticField/MagneticFieldProvider.hpp"
 
 #include <DD4hep/Fields.h>
@@ -33,7 +32,7 @@ MagneticFieldProvider::Cache DD4hepFieldAdapter::makeCache(
   return MagneticFieldProvider::Cache{};
 }
 
-Result<Vector3> DD4hepFieldAdapter::getField(
+Vector3 DD4hepFieldAdapter::getField(
     const Vector3& position, MagneticFieldProvider::Cache& /*cache*/) const {
   dd4hep::Position dd4hepPosition{position.x(), position.y(), position.z()};
 
@@ -47,13 +46,13 @@ Result<Vector3> DD4hepFieldAdapter::getField(
   // dd4hep tesla -> ACTS tesla
   result *= m_fieldConversionFactor;
 
-  return Result<Vector3>::success(result);
+  return result;
 }
 
-Result<Vector3> DD4hepFieldAdapter::getFieldGradient(
-    const Vector3& /*position*/, ActsMatrix<3, 3>& /*derivative*/,
+std::pair<Vector3, SquareMatrix3> DD4hepFieldAdapter::getFieldAndGradient(
+    const Vector3& /*position*/,
     MagneticFieldProvider::Cache& /*cache*/) const {
-  return Result<Vector3>::failure(MagneticFieldError::NotImplemented);
+  throw std::runtime_error("not implemented");
 }
 
 }  // namespace Acts

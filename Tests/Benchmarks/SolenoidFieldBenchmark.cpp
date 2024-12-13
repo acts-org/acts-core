@@ -14,7 +14,6 @@
 #include "Acts/Tests/CommonHelpers/BenchmarkTools.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
 
-#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <numbers>
@@ -124,7 +123,7 @@ int main(int argc, char* argv[]) {
               << std::flush;
     auto cache = bFieldMap.makeCache(mctx);
     const auto map_cached_result_cache = Acts::Test::microBenchmark(
-        [&] { return bFieldMap.getField(fixedPos, cache).value(); }, iters_map);
+        [&] { return bFieldMap.getField(fixedPos, cache); }, iters_map);
     std::cout << map_cached_result_cache << std::endl;
     csv("interp_cache_fixed", map_cached_result_cache);
   }
@@ -138,8 +137,7 @@ int main(int argc, char* argv[]) {
               << std::flush;
     auto cache2 = bFieldMap.makeCache(mctx);
     const auto map_rand_result_cache = Acts::Test::microBenchmark(
-        [&] { return bFieldMap.getField(genPos(), cache2).value(); },
-        iters_map);
+        [&] { return bFieldMap.getField(genPos(), cache2); }, iters_map);
     std::cout << map_rand_result_cache << std::endl;
     csv("interp_cache_random", map_rand_result_cache);
   }
@@ -181,8 +179,7 @@ int main(int argc, char* argv[]) {
               << std::flush;
     auto cache = bFieldMap.makeCache(mctx);
     const auto map_adv_result_cache = Acts::Test::microBenchmark(
-        [&](const auto& s) { return bFieldMap.getField(s, cache).value(); },
-        steps);
+        [&](const auto& s) { return bFieldMap.getField(s, cache); }, steps);
     std::cout << map_adv_result_cache << std::endl;
     csv("interp_cache_adv", map_adv_result_cache);
   }

@@ -8,19 +8,12 @@
 
 #pragma once
 
-#include "Acts/Definitions/Units.hpp"
-#include "Acts/MagneticField/InterpolatedBFieldMap.hpp"
 #include "Acts/Utilities/Logger.hpp"
-#include "ActsExamples/Framework/ProcessCode.hpp"
 
 #include <array>
 #include <cstddef>
-#include <ios>
 #include <memory>
-#include <mutex>
 #include <optional>
-#include <sstream>
-#include <stdexcept>
 #include <string>
 
 #include <TFile.h>

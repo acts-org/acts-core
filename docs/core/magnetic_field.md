@@ -38,9 +38,7 @@ The main lookup method of {class}`Acts::MagneticFieldProvider` is
 
 Aside from the lookup position as a global position vector, it accepts an
 instance of the opaque cache object mentioned before. The return value is a
-{class}`Acts::Result` object. It either contains the field value at the
-requested location, or an {enum}`Acts::MagneticFieldError` in case of a lookup
-failure, like an out-of-bounds lookup position.
+simple {type}`Acts::Vector3` object.
 
 Below is an example of how a client can interact with an instance of
 {class}`Acts::MagneticFieldProvider`.

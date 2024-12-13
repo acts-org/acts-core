@@ -215,9 +215,9 @@ struct PropagatorState {
         State& /*state*/, const Surface& /*surface*/,
         const FreeToBoundCorrection& /*freeToBoundCorrection*/) const {}
 
-    Result<Vector3> getField(State& /*state*/, const Vector3& /*pos*/) const {
+    Vector3 getField(State& /*state*/, const Vector3& /*pos*/) const {
       // get the field from the cell
-      return Result<Vector3>::success({0., 0., 0.});
+      return Vector3::Zero();
     }
   };
 

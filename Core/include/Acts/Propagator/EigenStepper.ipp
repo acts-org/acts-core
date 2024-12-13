@@ -68,31 +68,31 @@ template <typename propagator_state_t, typename navigator_t>
 bool Acts::EigenStepper<E>::prepareCurvilinearState(
     propagator_state_t& prop_state, const navigator_t& navigator) const {
   // test whether the accumulated path has still its initial value.
-  if (prop_state.stepping.pathAccumulated == 0.) {
-    // if no step was executed the path length derivates have not been
-    // computed but are needed to compute the curvilinear covariance. The
-    // derivates are given by k1 for a zero step width.
-    // First Runge-Kutta point (at current position)
-    auto& sd = prop_state.stepping.stepData;
-    auto pos = position(prop_state.stepping);
-    auto fieldRes = getField(prop_state.stepping, pos);
-    if (fieldRes.ok()) {
-      sd.B_first = *fieldRes;
-      if (prop_state.stepping.extension.template k<0>(
-              prop_state, *this, navigator, sd.k1, sd.B_first, sd.kQoP)) {
-        // dr/ds :
-        prop_state.stepping.derivative.template head<3>() =
-            prop_state.stepping.pars.template segment<3>(eFreeDir0);
-        // d (dr/ds) / ds :
-        prop_state.stepping.derivative.template segment<3>(4) = sd.k1;
-        // to set dt/ds :
-        prop_state.stepping.extension.finalize(
-            prop_state, *this, navigator, prop_state.stepping.pathAccumulated);
-        return true;
-      }
-    }
+  if (prop_state.stepping.pathAccumulated != 0.) {
+    return true;
+  }
+
+  // if no step was executed the path length derivates have not been
+  // computed but are needed to compute the curvilinear covariance. The
+  // derivates are given by k1 for a zero step width.
+  // First Runge-Kutta point (at current position)
+  auto& sd = prop_state.stepping.stepData;
+  auto pos = position(prop_state.stepping);
+  sd.B_first = getField(prop_state.stepping, pos);
+  if (prop_state.stepping.extension.template k<0>(prop_state, *this, navigator,
+                                                  sd.k1, sd.B_first, sd.kQoP)) {
     return false;
   }
+
+  // dr/ds :
+  prop_state.stepping.derivative.template head<3>() =
+      prop_state.stepping.pars.template segment<3>(eFreeDir0);
+  // d (dr/ds) / ds :
+  prop_state.stepping.derivative.template segment<3>(4) = sd.k1;
+  // to set dt/ds :
+  prop_state.stepping.extension.finalize(prop_state, *this, navigator,
+                                         prop_state.stepping.pathAccumulated);
+
   return true;
 }
 
@@ -160,11 +160,7 @@ Acts::Result<double> Acts::EigenStepper<E>::step(
   auto dir = direction(state.stepping);
 
   // First Runge-Kutta point (at current position)
-  auto fieldRes = getField(state.stepping, pos);
-  if (!fieldRes.ok()) {
-    return fieldRes.error();
-  }
-  sd.B_first = *fieldRes;
+  sd.B_first = getField(state.stepping, pos);
   if (!state.stepping.extension.template k<0>(state, *this, navigator, sd.k1,
                                               sd.B_first, sd.kQoP)) {
     return 0.;
@@ -201,46 +197,34 @@ Acts::Result<double> Acts::EigenStepper<E>::step(
   // size, going up to the point where it can return an estimate of the local
   // integration error. The results are stated in the local variables above,
   // allowing integration to continue once the error is deemed satisfactory
-  const auto tryRungeKuttaStep = [&](const double h) -> Result<bool> {
-    // helpers because bool and std::error_code are ambiguous
-    constexpr auto success = &Result<bool>::success;
-    constexpr auto failure = &Result<bool>::failure;
-
+  const auto tryRungeKuttaStep = [&](const double h) -> bool {
     // State the square and half of the step size
     h2 = h * h;
     half_h = h * 0.5;
 
     // Second Runge-Kutta point
     const Vector3 pos1 = pos + half_h * dir + h2 * 0.125 * sd.k1;
-    auto field = getField(state.stepping, pos1);
-    if (!field.ok()) {
-      return failure(field.error());
-    }
-    sd.B_middle = *field;
+    sd.B_middle = getField(state.stepping, pos1);
 
     if (!state.stepping.extension.template k<1>(state, *this, navigator, sd.k2,
                                                 sd.B_middle, sd.kQoP, half_h,
                                                 sd.k1)) {
-      return success(false);
+      return false;
     }
 
     // Third Runge-Kutta point
     if (!state.stepping.extension.template k<2>(state, *this, navigator, sd.k3,
                                                 sd.B_middle, sd.kQoP, half_h,
                                                 sd.k2)) {
-      return success(false);
+      return false;
     }
 
     // Last Runge-Kutta point
     const Vector3 pos2 = pos + h * dir + h2 * 0.5 * sd.k3;
-    field = getField(state.stepping, pos2);
-    if (!field.ok()) {
-      return failure(field.error());
-    }
-    sd.B_last = *field;
+    sd.B_last = getField(state.stepping, pos2);
     if (!state.stepping.extension.template k<3>(state, *this, navigator, sd.k4,
                                                 sd.B_last, sd.kQoP, h, sd.k3)) {
-      return success(false);
+      return false;
     }
 
     // Compute and check the local integration error estimate
@@ -250,7 +234,7 @@ Acts::Result<double> Acts::EigenStepper<E>::step(
     // Protect against division by zero
     errorEstimate = std::max(1e-20, errorEstimate);
 
-    return success(isErrorTolerable(errorEstimate));
+    return isErrorTolerable(errorEstimate);
   };
 
   const double initialH =
@@ -264,10 +248,7 @@ Acts::Result<double> Acts::EigenStepper<E>::step(
     ++state.stepping.statistics.nAttemptedSteps;
 
     auto res = tryRungeKuttaStep(h);
-    if (!res.ok()) {
-      return res.error();
-    }
-    if (!!res.value()) {
+    if (res) {
       break;
     }
 

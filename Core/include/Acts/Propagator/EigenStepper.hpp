@@ -201,7 +201,7 @@ class EigenStepper {
   /// @param [in,out] state is the propagation state associated with the track
   ///                 the magnetic field cell is used (and potentially updated)
   /// @param [in] pos is the field position
-  Result<Vector3> getField(State& state, const Vector3& pos) const {
+  Vector3 getField(State& state, const Vector3& pos) const {
     // get the field from the cell
     return m_bField->getField(pos, state.fieldCache);
   }

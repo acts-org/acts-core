@@ -16,17 +16,12 @@
 #include "Acts/Utilities/Axis.hpp"
 #include "Acts/Utilities/AxisFwd.hpp"
 #include "Acts/Utilities/Grid.hpp"
-#include "Acts/Utilities/Result.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
-#include "Acts/Utilities/detail/grid_helper.hpp"
 
 #include <array>
 #include <cstddef>
-#include <functional>
 #include <optional>
-#include <tuple>
 #include <utility>
-#include <vector>
 
 using Acts::VectorHelpers::perp;
 
@@ -106,15 +101,15 @@ BOOST_AUTO_TEST_CASE(InterpolatedBFieldMap_rz) {
   check(1);
   check(-1);
 
+  // this was previously checked, but is actually out of bounds
   Vector3 pos;
-  pos << -3, 2.5,
-      1.7;  // this was previously checked, but is actually out of bounds
+  pos << -3, 2.5, 1.7;
   BOOST_CHECK(!b.isInside(pos));
-  BOOST_CHECK(!b.getField(pos, bCacheAny).ok());
+  BOOST_CHECK_EQUAL(b.getField(pos, bCacheAny), Vector3::Zero());
 
   pos << -1.6, 2.5, 1.7;
   BOOST_CHECK(b.isInside(pos));
-  CHECK_CLOSE_REL(b.getField(pos, bCacheAny).value(),
+  CHECK_CLOSE_REL(b.getField(pos, bCacheAny),
                   BField::value({{perp(pos), pos.z()}}), 1e-6);
 
   auto& c = *bCache.fieldCell;
@@ -124,21 +119,21 @@ BOOST_AUTO_TEST_CASE(InterpolatedBFieldMap_rz) {
 
   ActsMatrix<3, 3> deriv;
 
-  pos << 1, 1, -5.5;  // this position is outside the grid
+  // this position is outside the grid
+  pos << 1, 1, -5.5;
   BOOST_CHECK(!b.isInside(pos));
-  BOOST_CHECK(!b.getField(pos, bCacheAny).ok());
-  BOOST_CHECK(!b.getFieldGradient(pos, deriv, bCacheAny).ok());
+  BOOST_CHECK_EQUAL(b.getField(pos, bCacheAny), Vector3::Zero());
 
-  pos << 1, 6, -1.7;  // this position is outside the grid
+  // this position is outside the grid
+  pos << 1, 6, -1.7;
   BOOST_CHECK(!b.isInside(pos));
-  BOOST_CHECK(!b.getField(pos, bCacheAny).ok());
-  BOOST_CHECK(!b.getFieldGradient(pos, deriv, bCacheAny).ok());
+  BOOST_CHECK_EQUAL(b.getField(pos, bCacheAny), Vector3::Zero());
 
   pos << 0, 1.5, -2.5;
   BOOST_CHECK(b.isInside(pos));
   bCacheAny = b.makeCache(mfContext);
   BField_t::Cache& bCache2 = bCacheAny.as<BField_t::Cache>();
-  CHECK_CLOSE_REL(b.getField(pos, bCacheAny).value(),
+  CHECK_CLOSE_REL(b.getField(pos, bCacheAny),
                   BField::value({{perp(pos), pos.z()}}), 1e-6);
   c = *bCache2.fieldCell;
   BOOST_CHECK(c.isInside(transformPos(pos)));
@@ -152,7 +147,7 @@ BOOST_AUTO_TEST_CASE(InterpolatedBFieldMap_rz) {
   BOOST_CHECK(b.isInside(pos));
   bCacheAny = b.makeCache(mfContext);
   BField_t::Cache& bCache3 = bCacheAny.as<BField_t::Cache>();
-  CHECK_CLOSE_REL(b.getField(pos, bCacheAny).value(),
+  CHECK_CLOSE_REL(b.getField(pos, bCacheAny),
                   BField::value({{perp(pos), pos.z()}}), 1e-6);
   c = *bCache3.fieldCell;
   BOOST_CHECK(c.isInside(transformPos(pos)));

@@ -449,7 +449,7 @@ class MultiEigenStepperLoop : public EigenStepper<extension_t> {
   /// @param [in] pos is the field position
   ///
   /// @note This uses the cache of the first component stored in the state
-  Result<Vector3> getField(State& state, const Vector3& pos) const {
+  Vector3 getField(State& state, const Vector3& pos) const {
     return SingleStepper::getField(state.components.front().state, pos);
   }
 
