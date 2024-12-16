@@ -59,7 +59,8 @@ class DiscTrapezoidBounds : public DiscBounds {
   /// Constructor - from fixed size array
   ///
   /// @param values The parameter values
-  DiscTrapezoidBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit DiscTrapezoidBounds(
+      const std::array<double, eSize>& values) noexcept(false)
       : m_values(values) {
     checkConsistency();
   }

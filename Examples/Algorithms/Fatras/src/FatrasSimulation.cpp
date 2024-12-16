@@ -222,7 +222,7 @@ ActsExamples::ProcessCode ActsExamples::FatrasSimulation::execute(
   std::vector<ActsFatras::Particle> particlesInput;
   particlesInput.reserve(inputParticles.size());
   for (const auto &p : inputParticles) {
-    particlesInput.push_back(p.initial());
+    particlesInput.push_back(p.initialState());
   }
 
   // prepare output containers
@@ -302,7 +302,7 @@ ActsExamples::ProcessCode ActsExamples::FatrasSimulation::execute(
 
     if (auto it = particlesFinal.find(particleInitial.particleId());
         it != particlesFinal.end()) {
-      particleSimulated.final() = *it;
+      particleSimulated.finalState() = *it;
     } else {
       ACTS_ERROR("particle " << particleInitial.particleId()
                              << " has no final state");

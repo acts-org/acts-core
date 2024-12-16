@@ -268,7 +268,7 @@ ProcessCode EDM4hepReader::read(const AlgorithmContext& ctx) {
       }
     }
 
-    particleSimulated.final().setPosition4(
+    particleSimulated.finalState().setPosition4(
         inParticle.getEndpoint()[0] * Acts::UnitConstants::mm,
         inParticle.getEndpoint()[1] * Acts::UnitConstants::mm,
         inParticle.getEndpoint()[2] * Acts::UnitConstants::mm, time);
@@ -276,15 +276,15 @@ ProcessCode EDM4hepReader::read(const AlgorithmContext& ctx) {
     Acts::Vector3 momentumFinal = {inParticle.getMomentumAtEndpoint()[0],
                                    inParticle.getMomentumAtEndpoint()[1],
                                    inParticle.getMomentumAtEndpoint()[2]};
-    particleSimulated.final().setDirection(momentumFinal.normalized());
-    particleSimulated.final().setAbsoluteMomentum(momentumFinal.norm());
+    particleSimulated.finalState().setDirection(momentumFinal.normalized());
+    particleSimulated.finalState().setAbsoluteMomentum(momentumFinal.norm());
 
     ACTS_VERBOSE("- Updated particle initial -> final, position: "
                  << particleInitial.fourPosition().transpose() << " -> "
-                 << particleSimulated.final().fourPosition().transpose());
+                 << particleSimulated.finalState().fourPosition().transpose());
     ACTS_VERBOSE("                                     momentum: "
                  << particleInitial.fourMomentum().transpose() << " -> "
-                 << particleSimulated.final().fourMomentum().transpose());
+                 << particleSimulated.finalState().fourMomentum().transpose());
 
     particlesSimulated.insert(particleSimulated);
   }

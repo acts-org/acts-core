@@ -75,7 +75,7 @@ class ConeBounds : public SurfaceBounds {
   /// Constructor - from parameters array
   ///
   /// @param values The parameter array
-  ConeBounds(const std::array<double, eSize>& values) noexcept(false);
+  explicit ConeBounds(const std::array<double, eSize>& values) noexcept(false);
 
   ~ConeBounds() override = default;
 

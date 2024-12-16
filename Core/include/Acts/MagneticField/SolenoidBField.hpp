@@ -71,7 +71,7 @@ class SolenoidBField final : public MagneticFieldProvider {
  public:
   struct Cache {
     /// @brief Constructor with magnetic field context
-    Cache(const MagneticFieldContext& /*mctx*/) {}
+    explicit Cache(const MagneticFieldContext& /*mctx*/) {}
   };
 
   /// Config struct for the SolenoidBfield.
@@ -91,7 +91,7 @@ class SolenoidBField final : public MagneticFieldProvider {
   /// @brief the constructor with a shared pointer
   /// @note since it is a shared field, we enforce it to be const
   /// @tparam bField is the shared BField to be stored
-  SolenoidBField(Config config);
+  explicit SolenoidBField(Config config);
 
   /// @brief Retrieve magnetic field value in local (r,z) coordinates
   ///

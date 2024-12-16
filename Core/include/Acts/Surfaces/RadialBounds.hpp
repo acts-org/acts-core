@@ -57,7 +57,7 @@ class RadialBounds : public DiscBounds {
   /// Constructor from array values
   ///
   /// @param values The bound values
-  RadialBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit RadialBounds(const std::array<double, eSize>& values) noexcept(false)
       : m_values(values) {
     checkConsistency();
   }

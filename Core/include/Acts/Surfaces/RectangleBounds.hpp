@@ -50,21 +50,22 @@ class RectangleBounds : public PlanarBounds {
     checkConsistency();
   }
 
-  /// Constructor - from fixed size array - generic
-  ///
-  /// @param values The parameter values
-  RectangleBounds(const std::array<double, eSize>& values) noexcept(false)
-      : m_min({values[eMinX], values[eMinY]}),
-        m_max({values[eMaxX], values[eMaxY]}) {
-    checkConsistency();
-  }
-
   /// Constructor - from min/max - generic
   ///
   /// @param min The left bottom corner
   /// @param max The right top corning
   RectangleBounds(const Vector2& min, const Vector2& max) noexcept(false)
       : m_min(min), m_max(max) {
+    checkConsistency();
+  }
+
+  /// Constructor - from fixed size array - generic
+  ///
+  /// @param values The parameter values
+  explicit RectangleBounds(const std::array<double, eSize>& values) noexcept(
+      false)
+      : m_min({values[eMinX], values[eMinY]}),
+        m_max({values[eMaxX], values[eMaxY]}) {
     checkConsistency();
   }
 

@@ -118,7 +118,8 @@ void ActsAlignment::Alignment<fitter_t>::calculateAlignmentParameters(
     alignResult.measurementDim += alignState.measurementDim;
     sumChi2ONdf += alignState.chi2 / alignState.measurementDim;
   }
-  alignResult.averageChi2ONdf = sumChi2ONdf / alignResult.numTracks;
+  alignResult.averageChi2ONdf =
+      sumChi2ONdf / static_cast<double>(alignResult.numTracks);
 
   // Get the inverse of chi2 second derivative matrix (we need this to
   // calculate the covariance of the alignment parameters)

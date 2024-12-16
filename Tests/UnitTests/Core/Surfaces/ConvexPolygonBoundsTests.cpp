@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(ConvexPolygonBoundsConvexity) {
     // wrong number of vertices
     BOOST_CHECK_THROW(poly<3> trip{vertices}, AssertionFailureException);
   }
-  { poly<4> quad = {vertices}; }
+  { poly<4> quad(vertices); }
 
   // this one is self intersecting
   vertices = {{0, 0}, {1, 0}, {0.5, 1}, {0.9, 1.2}};
@@ -50,13 +50,13 @@ BOOST_AUTO_TEST_CASE(ConvexPolygonBoundsConvexity) {
 
   // this one is not
   vertices = {{0, 0}, {1, 0}, {0.9, 1.2}, {0.5, 1}};
-  { poly<4> quad = {vertices}; }
+  { poly<4> quad(vertices); }
 
   vertices = {{0, 0}, {1, 0}, {0.8, 0.5}, {1, 1}, {0, 1}};
   { BOOST_CHECK_THROW(poly<5> pent(vertices), std::logic_error); }
 
   vertices = {{0, 0}, {1, 0}, {1.1, 0.5}, {1, 1}, {0, 1}};
-  { poly<5> pent{vertices}; }
+  { poly<5> pent(vertices); }
 }
 
 BOOST_AUTO_TEST_CASE(ConvexPolygonBoundsConstruction) {

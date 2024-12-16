@@ -56,11 +56,16 @@ class SimParticle final {
     }
   }
 
-  const SimParticleState& initial() const { return m_initial; }
-  const SimParticleState& final() const { return m_final; }
+  /// Const reference access to the initial particle state
+  const SimParticleState& initialState() const { return m_initial; }
+  /// Const reference access to the final particle state
+  const SimParticleState& finalState() const { return m_final; }
 
-  SimParticleState& initial() { return m_initial; }
-  SimParticleState& final() { return m_final; }
+  /// Non-const reference access to the initial particle state
+  SimParticleState& initialState() { return m_initial; }
+
+  /// Non-const reference access to the final particle state
+  SimParticleState& finalState() { return m_final; }
 
   /// Construct a new particle with a new identifier but same kinematics.
   ///
@@ -68,100 +73,108 @@ class SimParticle final {
   ///       is used to identify the whole particle. Setting it on an existing
   ///       particle is usually a mistake.
   SimParticle withParticleId(SimBarcode particleId) const {
-    return SimParticle(initial().withParticleId(particleId),
-                       final().withParticleId(particleId));
+    return SimParticle(initialState().withParticleId(particleId),
+                       finalState().withParticleId(particleId));
   }
 
   /// Set the process type that generated this particle.
   SimParticle& setProcess(ActsFatras::ProcessType proc) {
-    initial().setProcess(proc);
-    final().setProcess(proc);
+    initialState().setProcess(proc);
+    finalState().setProcess(proc);
     return *this;
   }
   /// Set the pdg.
   SimParticle& setPdg(Acts::PdgParticle pdg) {
-    initial().setPdg(pdg);
-    final().setPdg(pdg);
+    initialState().setPdg(pdg);
+    finalState().setPdg(pdg);
     return *this;
   }
   /// Set the charge.
   SimParticle& setCharge(double charge) {
-    initial().setCharge(charge);
-    final().setCharge(charge);
+    initialState().setCharge(charge);
+    finalState().setCharge(charge);
     return *this;
   }
   /// Set the mass.
   SimParticle& setMass(double mass) {
-    initial().setMass(mass);
-    final().setMass(mass);
+    initialState().setMass(mass);
+    finalState().setMass(mass);
     return *this;
   }
   /// Set the particle ID.
   SimParticle& setParticleId(SimBarcode barcode) {
-    initial().setParticleId(barcode);
-    final().setParticleId(barcode);
+    initialState().setParticleId(barcode);
+    finalState().setParticleId(barcode);
     return *this;
   }
 
   /// Particle identifier within an event.
-  SimBarcode particleId() const { return initial().particleId(); }
+  SimBarcode particleId() const { return initialState().particleId(); }
   /// Which type of process generated this particle.
-  ActsFatras::ProcessType process() const { return initial().process(); }
+  ActsFatras::ProcessType process() const { return initialState().process(); }
   /// PDG particle number that identifies the type.
-  Acts::PdgParticle pdg() const { return initial().pdg(); }
+  Acts::PdgParticle pdg() const { return initialState().pdg(); }
   /// Absolute PDG particle number that identifies the type.
-  Acts::PdgParticle absolutePdg() const { return initial().absolutePdg(); }
+  Acts::PdgParticle absolutePdg() const { return initialState().absolutePdg(); }
   /// Particle charge.
-  double charge() const { return initial().charge(); }
+  double charge() const { return initialState().charge(); }
   /// Particle absolute charge.
-  double absoluteCharge() const { return initial().absoluteCharge(); }
+  double absoluteCharge() const { return initialState().absoluteCharge(); }
   /// Particle mass.
-  double mass() const { return initial().mass(); }
+  double mass() const { return initialState().mass(); }
 
   /// Check if this is a secondary particle.
-  bool isSecondary() const { return initial().isSecondary(); }
+  bool isSecondary() const { return initialState().isSecondary(); }
 
   /// Particle hypothesis.
-  Acts::ParticleHypothesis hypothesis() const { return initial().hypothesis(); }
+  Acts::ParticleHypothesis hypothesis() const {
+    return initialState().hypothesis();
+  }
   /// Particl qOverP.
-  double qOverP() const { return initial().qOverP(); }
+  double qOverP() const { return initialState().qOverP(); }
 
   /// Space-time position four-vector.
-  const Acts::Vector4& fourPosition() const { return initial().fourPosition(); }
+  const Acts::Vector4& fourPosition() const {
+    return initialState().fourPosition();
+  }
   /// Three-position, i.e. spatial coordinates without the time.
-  auto position() const { return initial().position(); }
+  auto position() const { return initialState().position(); }
   /// Time coordinate.
-  double time() const { return initial().time(); }
+  double time() const { return initialState().time(); }
   /// Energy-momentum four-vector.
-  Acts::Vector4 fourMomentum() const { return initial().fourMomentum(); }
+  Acts::Vector4 fourMomentum() const { return initialState().fourMomentum(); }
   /// Unit three-direction, i.e. the normalized momentum three-vector.
-  const Acts::Vector3& direction() const { return initial().direction(); }
+  const Acts::Vector3& direction() const { return initialState().direction(); }
   /// Polar angle.
-  double theta() const { return initial().theta(); }
+  double theta() const { return initialState().theta(); }
   /// Azimuthal angle.
-  double phi() const { return initial().phi(); }
+  double phi() const { return initialState().phi(); }
   /// Absolute momentum in the x-y plane.
-  double transverseMomentum() const { return initial().transverseMomentum(); }
+  double transverseMomentum() const {
+    return initialState().transverseMomentum();
+  }
   /// Absolute momentum.
-  double absoluteMomentum() const { return initial().absoluteMomentum(); }
+  double absoluteMomentum() const { return initialState().absoluteMomentum(); }
   /// Absolute momentum.
-  Acts::Vector3 momentum() const { return initial().momentum(); }
+  Acts::Vector3 momentum() const { return initialState().momentum(); }
   /// Total energy, i.e. norm of the four-momentum.
-  double energy() const { return initial().energy(); }
+  double energy() const { return initialState().energy(); }
 
   /// Energy loss over the particles lifetime or simulation time.
-  double energyLoss() const { return initial().energy() - final().energy(); }
+  double energyLoss() const {
+    return initialState().energy() - finalState().energy();
+  }
 
   /// Accumulated path within material measured in radiation lengths.
-  double pathInX0() const { return final().pathInX0(); }
+  double pathInX0() const { return finalState().pathInX0(); }
   /// Accumulated path within material measured in interaction lengths.
-  double pathInL0() const { return final().pathInL0(); }
+  double pathInL0() const { return finalState().pathInL0(); }
 
   /// Number of hits.
-  std::uint32_t numberOfHits() const { return final().numberOfHits(); }
+  std::uint32_t numberOfHits() const { return finalState().numberOfHits(); }
 
   /// Particle outcome.
-  ActsFatras::ParticleOutcome outcome() const { return final().outcome(); }
+  ActsFatras::ParticleOutcome outcome() const { return finalState().outcome(); }
 
  private:
   SimParticleState m_initial;

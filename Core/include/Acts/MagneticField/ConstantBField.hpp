@@ -22,7 +22,7 @@ class ConstantBField final : public MagneticFieldProvider {
  public:
   struct Cache {
     /// @brief constructor with context
-    Cache(const MagneticFieldContext& /*mcfg*/) {}
+    explicit Cache(const MagneticFieldContext& /*mcfg*/) {}
   };
 
   /// Construct constant magnetic field from field vector.

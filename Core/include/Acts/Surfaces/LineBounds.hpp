@@ -39,7 +39,7 @@ class LineBounds : public SurfaceBounds {
   /// Constructor - from fixed size array
   ///
   /// @param values The parameter values
-  LineBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit LineBounds(const std::array<double, eSize>& values) noexcept(false)
       : m_values(values) {
     checkConsistency();
   }

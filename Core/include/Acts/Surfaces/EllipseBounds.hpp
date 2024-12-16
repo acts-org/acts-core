@@ -68,7 +68,8 @@ class EllipseBounds : public PlanarBounds {
   /// Constructor - from fixed size array
   ///
   /// @param values The parameter values
-  EllipseBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit EllipseBounds(const std::array<double, eSize>& values) noexcept(
+      false)
       : m_values(values), m_boundingBox(values[eInnerRy], values[eOuterRy]) {
     checkConsistency();
   }

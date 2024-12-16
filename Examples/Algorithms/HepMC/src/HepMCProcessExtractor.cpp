@@ -76,7 +76,7 @@ void setPassedMaterial(const HepMC3::ConstGenVertexPtr& vertex, const int id,
     currentVertex = currentParticle->production_vertex();
   }
   // Assign the passed material to the particle
-  particle.final().setMaterialPassed(x0, l0);
+  particle.finalState().setMaterialPassed(x0, l0);
 }
 
 /// @brief This function collects outgoing particles from a vertex while keeping

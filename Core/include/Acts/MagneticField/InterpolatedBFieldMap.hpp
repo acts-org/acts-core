@@ -145,7 +145,7 @@ class InterpolatedBFieldMap : public InterpolatedMagneticField {
 
   struct Cache {
     /// @brief Constructor with magnetic field context
-    Cache(const MagneticFieldContext& /*mctx*/) {}
+    explicit Cache(const MagneticFieldContext& /*mctx*/) {}
 
     std::optional<FieldCell> fieldCell;
     bool initialized = false;
@@ -174,7 +174,8 @@ class InterpolatedBFieldMap : public InterpolatedMagneticField {
 
   /// @brief default constructor
   ///
-  InterpolatedBFieldMap(Config cfg) : m_cfg{std::move(cfg)} {
+  /// @param cfg the configuration struct
+  explicit InterpolatedBFieldMap(Config cfg) : m_cfg{std::move(cfg)} {
     typename Grid::index_t minBin{};
     minBin.fill(1);
     m_lowerLeft = m_cfg.grid.lowerLeftBinEdge(minBin);

@@ -95,7 +95,7 @@ void ParticleTrackingAction::PostUserTrackingAction(const G4Track* aTrack) {
     return;
   }
   SimParticle particle = *particleIt;
-  particle.final() = convert(*aTrack, barcode);
+  particle.finalState() = convert(*aTrack, barcode);
 
   auto [it, success] = eventStore().particlesSimulated.insert(particle);
 

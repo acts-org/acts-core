@@ -70,7 +70,8 @@ class AnnulusBounds : public DiscBounds {
   /// Constructor - from parameters array
   ///
   /// @param values The parameter array
-  AnnulusBounds(const std::array<double, eSize>& values) noexcept(false);
+  explicit AnnulusBounds(const std::array<double, eSize>& values) noexcept(
+      false);
 
   AnnulusBounds(const AnnulusBounds& source) = default;
 

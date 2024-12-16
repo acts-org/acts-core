@@ -84,7 +84,8 @@ class TrapezoidVolumeBounds : public VolumeBounds {
   /// Constructor - from a fixed size array
   ///
   /// @param values The bound values
-  TrapezoidVolumeBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit TrapezoidVolumeBounds(
+      const std::array<double, eSize>& values) noexcept(false)
       : m_values(values) {
     checkConsistency();
     buildSurfaceBounds();

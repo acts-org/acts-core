@@ -80,8 +80,8 @@ ProcessCode EventGenerator::read(const AlgorithmContext& ctx) {
         ACTS_VERBOSE(" - particle at " << pos4.transpose());
         // `withParticleId` returns a copy because it changes the identity
         particle = particle.withParticleId(pid);
-        particle.initial().setPosition4(pos4);
-        particle.final().setPosition4(pos4);
+        particle.initialState().setPosition4(pos4);
+        particle.finalState().setPosition4(pos4);
       };
       for (auto& vertexParticle : newParticles) {
         updateParticleInPlace(vertexParticle);

@@ -35,17 +35,17 @@ SimParticle EDM4hepUtil::readParticle(const edm4hep::MCParticle& from,
   // TODO do we have that in EDM4hep?
   // particle.setProcess(static_cast<ActsFatras::ProcessType>(data.process));
 
-  to.initial().setPosition4(from.getVertex()[0] * Acts::UnitConstants::mm,
-                            from.getVertex()[1] * Acts::UnitConstants::mm,
-                            from.getVertex()[2] * Acts::UnitConstants::mm,
-                            from.getTime() * Acts::UnitConstants::ns);
+  to.initialState().setPosition4(from.getVertex()[0] * Acts::UnitConstants::mm,
+                                 from.getVertex()[1] * Acts::UnitConstants::mm,
+                                 from.getVertex()[2] * Acts::UnitConstants::mm,
+                                 from.getTime() * Acts::UnitConstants::ns);
 
   // Only used for direction; normalization/units do not matter
   Acts::Vector3 momentum = {from.getMomentum()[0], from.getMomentum()[1],
                             from.getMomentum()[2]};
-  to.initial().setDirection(momentum.normalized());
+  to.initialState().setDirection(momentum.normalized());
 
-  to.initial().setAbsoluteMomentum(momentum.norm() * 1_GeV);
+  to.initialState().setAbsoluteMomentum(momentum.norm() * 1_GeV);
 
   return to;
 }
@@ -62,9 +62,9 @@ void EDM4hepUtil::writeParticle(const SimParticle& from,
                   static_cast<float>(from.fourMomentum().y()),
                   static_cast<float>(from.fourMomentum().z())});
   to.setMomentumAtEndpoint(
-      {static_cast<float>(from.final().fourMomentum().x()),
-       static_cast<float>(from.final().fourMomentum().y()),
-       static_cast<float>(from.final().fourMomentum().z())});
+      {static_cast<float>(from.finalState().fourMomentum().x()),
+       static_cast<float>(from.finalState().fourMomentum().y()),
+       static_cast<float>(from.finalState().fourMomentum().z())});
 }
 
 ActsFatras::Hit EDM4hepUtil::readSimHit(
