@@ -28,7 +28,8 @@ enum TrackStateFlag {
   HoleFlag = 3,
   MaterialFlag = 4,
   SharedHitFlag = 5,
-  NumTrackStateFlags = 6
+  EdgeHoleFlag = 6,
+  NumTrackStateFlags = 7
 };
 
 class ConstTrackStateType;

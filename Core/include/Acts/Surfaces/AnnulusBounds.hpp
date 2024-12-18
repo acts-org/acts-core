@@ -195,7 +195,7 @@ class AnnulusBounds : public DiscBounds {
   /// @return boolean indicator for the success of this operation
   virtual bool inside(const Vector2& lposition, double tolR,
                       double tolPhi) const final;
-
+   
   /// Transform the strip cartesian
   /// into the module polar system
   ///
@@ -209,6 +209,11 @@ class AnnulusBounds : public DiscBounds {
 
   /// Private helper method
   double squaredNorm(const Vector2& v, const SquareMatrix2& weight) const;
+
+private:
+  bool inside(const Vector2& lposition, double tolR,
+              double tolPhiR,
+              double scale) const;
 };
 
 inline SurfaceBounds::BoundsType AnnulusBounds::type() const {

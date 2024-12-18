@@ -171,6 +171,44 @@ bool Acts::AnnulusBounds::inside(const Vector2& lposition, double tolR,
   return true;
 }
 
+bool Acts::AnnulusBounds::inside(const Vector2& lposition, double tolR,
+                                 double tolPhiR,
+                                 double scale) const {
+  // locpo is PC in STRIP SYSTEM
+  // need to perform internal rotation induced by average phi
+  Vector2 locpo_rotated = m_rotationStripPC * lposition;
+  double phiLoc = locpo_rotated[eBoundLoc1];
+  double phiLocR = phiLoc*scale;
+  double rLoc = locpo_rotated[eBoundLoc0];
+
+  if (phiLocR < (get(eMinPhiRel)*scale - tolPhiR) ||
+      phiLocR > (get(eMaxPhiRel)*scale + tolPhiR)) {
+    return false;
+  }
+
+  // calculate R in MODULE SYSTEM to evaluate R-bounds
+  if (tolR == 0.) {
+    // don't need R, can use R^2
+    double r_mod2 =
+        m_shiftPC[eBoundLoc0] * m_shiftPC[eBoundLoc0] + rLoc * rLoc +
+        2 * m_shiftPC[eBoundLoc0] * rLoc * cos(phiLoc - m_shiftPC[eBoundLoc1]);
+
+    if (r_mod2 < get(eMinR) * get(eMinR) || r_mod2 > get(eMaxR) * get(eMaxR)) {
+      return false;
+    }
+  } else {
+    // use R
+    double r_mod = sqrt(
+        m_shiftPC[eBoundLoc0] * m_shiftPC[eBoundLoc0] + rLoc * rLoc +
+        2 * m_shiftPC[eBoundLoc0] * rLoc * cos(phiLoc - m_shiftPC[eBoundLoc1]));
+
+    if (r_mod < (get(eMinR) - tolR) || r_mod > (get(eMaxR) + tolR)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool Acts::AnnulusBounds::inside(
     const Vector2& lposition,
     const BoundaryTolerance& boundaryTolerance) const {
@@ -180,6 +218,12 @@ bool Acts::AnnulusBounds::inside(
 
   if (boundaryTolerance.isNone()) {
     return inside(lposition, 0., 0.);
+  }
+  if (boundaryTolerance.hasAbsoluteCartesian()) {
+     const double r = lposition(0,0);
+     const BoundaryTolerance::AbsoluteCartesian& tolerance = boundaryTolerance.asAbsoluteCartesian();
+     return inside(lposition, tolerance.tolerance0,
+                   tolerance.tolerance1,r);
   }
 
   if (auto absoluteBound = boundaryTolerance.asAbsoluteBoundOpt();

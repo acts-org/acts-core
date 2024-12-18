@@ -49,6 +49,9 @@ struct PurePropagatorPlainOptions {
   /// @note ignored if empty
   /// @note requires `VolumeConstraintAborter` aborter
   std::vector<std::uint32_t> endOfWorldVolumeIds;
+  /// Placeholder:: edgeHoles
+  bool keepEdgeHoles=false;
+
 };
 
 }  // namespace detail

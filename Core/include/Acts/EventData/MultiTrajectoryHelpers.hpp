@@ -28,6 +28,7 @@ struct TrajectoryState {
   std::size_t nMeasurements = 0;
   std::size_t nOutliers = 0;
   std::size_t nHoles = 0;
+  //std::size_t nEdgeHoles = 0;
   double chi2Sum = 0;
   std::vector<double> measurementChi2 = {};
   std::vector<double> outlierChi2 = {};
@@ -61,7 +62,10 @@ TrajectoryState trajectoryState(const traj_t& multiTraj, std::size_t tipIndex) {
     auto typeFlags = state.typeFlags();
     if (typeFlags.test(Acts::TrackStateFlag::HoleFlag)) {
       trajState.nHoles++;
-    } else if (typeFlags.test(Acts::TrackStateFlag::OutlierFlag)) {
+    } //else if (typeFlags.test(Acts::TrackStateFlag::EdgeHoleFlag)) {
+      //trajState.nEdgeHoles++;
+    //} 
+    else if (typeFlags.test(Acts::TrackStateFlag::OutlierFlag)) {
       trajState.nOutliers++;
       trajState.outlierChi2.push_back(state.chi2());
       trajState.outlierVolume.push_back(volume);
@@ -113,7 +117,10 @@ VolumeTrajectoryStateContainer trajectoryState(
     auto typeFlags = state.typeFlags();
     if (typeFlags.test(Acts::TrackStateFlag::HoleFlag)) {
       trajState.nHoles++;
-    } else if (typeFlags.test(Acts::TrackStateFlag::OutlierFlag)) {
+    } //else if (typeFlags.test(Acts::TrackStateFlag::EdgeHoleFlag)) {
+      //trajState.nEdgeHoles++;
+    //} 
+    else if (typeFlags.test(Acts::TrackStateFlag::OutlierFlag)) {
       trajState.nOutliers++;
       trajState.outlierChi2.push_back(state.chi2());
       trajState.outlierVolume.push_back(volume);

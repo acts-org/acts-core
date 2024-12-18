@@ -84,6 +84,8 @@ class VectorTrackContainerBase {
         return &instance.m_nMeasurements[itrack];
       case "nHoles"_hash:
         return &instance.m_nHoles[itrack];
+      //case "nEdgeHoles"_hash:
+      //   return &instance.m_nEdgeHoles[itrack];
       case "chi2"_hash:
         return &instance.m_chi2[itrack];
       case "ndf"_hash:
@@ -126,6 +128,8 @@ class VectorTrackContainerBase {
     assert(result);
     result = result && m_nHoles.size() == size;
     assert(result);
+    //result = result && m_nEdgeHoles.size() == size;
+    //assert(result);
     result = result && m_chi2.size() == size;
     assert(result);
     result = result && m_ndf.size() == size;
@@ -180,6 +184,7 @@ class VectorTrackContainerBase {
 
   std::vector<unsigned int> m_nMeasurements;
   std::vector<unsigned int> m_nHoles;
+  //std::vector<unsigned int> m_nEdgeHoles;
   std::vector<float> m_chi2;
   std::vector<unsigned int> m_ndf;
   std::vector<unsigned int> m_nOutliers;

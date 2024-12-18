@@ -518,6 +518,10 @@ class CombinatorialKalmanFilter {
     /// Calibration context for the finding run
     const CalibrationContext* calibrationContextPtr{nullptr};
 
+
+    /// PlaceHolder for EdgeHoles
+    bool keepEdgeHoles = false;
+
     /// @brief CombinatorialKalmanFilter actor operation
     ///
     /// @tparam propagator_state_t Type of the Propagator state
@@ -814,6 +818,7 @@ class CombinatorialKalmanFilter {
         currentBranch = result.activeBranches.back();
         prevTip = currentBranch.tipIndex();
       } else {
+
         if (expectMeasurements) {
           ACTS_VERBOSE("Detected hole after measurement selection on surface "
                        << surface->geometryId());
@@ -827,7 +832,23 @@ class CombinatorialKalmanFilter {
         currentBranch.tipIndex() = currentTip;
         auto currentState = currentBranch.outermostTrackState();
         if (expectMeasurements) {
-          currentBranch.nHoles()++;
+           static const BoundaryTolerance exclude_sensor_border
+              = BoundaryTolerance(BoundaryTolerance::AbsoluteCartesian{-2*UnitConstants::mm,-2*UnitConstants::mm});
+           if (currentState.referenceSurface().insideBounds(currentState.parameters().template head<2>(),
+                                                            exclude_sensor_border)) {
+              currentBranch.nHoles()++;
+           }
+           else {
+            if (!keepEdgeHoles) {
+              currentBranch.nHoles()++;
+            } 
+            else {
+              auto typeFlags = currentState.typeFlags();
+              typeFlags.reset(TrackStateFlag::HoleFlag);
+              typeFlags.set(TrackStateFlag::EdgeHoleFlag);
+              //currentBranch.nEdgeHoles()++;
+            }
+           }
         }
 
         BranchStopperResult branchStopperResult =
@@ -1201,6 +1222,8 @@ class CombinatorialKalmanFilter {
     combKalmanActor.actorLogger = m_actorLogger.get();
     combKalmanActor.updaterLogger = m_updaterLogger.get();
     combKalmanActor.calibrationContextPtr = &tfOptions.calibrationContext.get();
+
+    combKalmanActor.keepEdgeHoles = tfOptions.propagatorPlainOptions.keepEdgeHoles;
 
     // copy source link accessor, calibrator and measurement selector
     combKalmanActor.m_sourceLinkAccessor = tfOptions.sourceLinkAccessor;

@@ -349,11 +349,27 @@ class TrackProxy {
     return component<unsigned int, hashString("nHoles")>();
   }
 
-  /// Return the number of measurements for the track. Const version
-  /// @return The number of measurements
+  /// Return the number of holes for the track. Const version
+  /// @return The number of holes
   unsigned int nHoles() const {
     return component<unsigned int, hashString("nHoles")>();
   }
+
+  /// Return a mutable reference to the number of edge holes for the track.
+  /// Mutable version
+  /// @note Only available if the track proxy is not read-only
+  /// @return The number of edge holes
+  //unsigned int& nEdgeHoles()
+  //  requires(!ReadOnly)
+  //{
+  //   return component<unsigned int, hashString("nEdgeHoles")>();
+  //}
+
+  /// Return the number of edge holes for the track. Const version
+  /// @return The number of edge holes
+  //unsigned int nEdgeHoles() const {
+  // return component<unsigned int, hashString("nEdgeHoles")>();
+  //}
 
   /// Return a mutable reference to the number of outliers for the track.
   /// Mutable version
@@ -596,6 +612,7 @@ class TrackProxy {
 
     nMeasurements() = other.nMeasurements();
     nHoles() = other.nHoles();
+    //nEdgeHoles() = other.nEdgeHoles();
     nOutliers() = other.nOutliers();
     nSharedHits() = other.nSharedHits();
     chi2() = other.chi2();
