@@ -51,9 +51,6 @@ jobs:
           restore-keys: |
             ccache-${{ runner.os  }}-${{ github.job }}-${{ env.CCACHE_KEY_SUFFIX }}-
 
-      # - uses: mxschmitt/action-tmate@v3
-        # if: failure()
-
       - name: Configure
         # setting CMAKE_CXX_STANDARD=20 is a workaround for a bug in the
         # dd4hep CMake configuration that gets triggered on recent CMake
@@ -148,11 +145,6 @@ jobs:
           && python3 -m pip install pytest-md-report
           && pytest -rFsv -k "not exatrkx" -v
           && cat ${PYTEST_MD_REPORT_OUTPUT} >> $GITHUB_STEP_SUMMARY
-
-      - uses: mxschmitt/action-tmate@v3
-        if: failure()
-
-
 
   linux_physmon:
     runs-on: ubuntu-latest
