@@ -191,7 +191,7 @@ jobs:
       - name: Physics performance checks
         shell: bash
         run: |
-          # echo "::group::Dependencies"
+          echo "::group::Dependencies"
           git config --global safe.directory "$GITHUB_WORKSPACE"
           python3 -m pip install histcmp==0.6.8 matplotlib
           python3 -m pip install -r Examples/Scripts/requirements.txt
@@ -202,10 +202,8 @@ jobs:
           export PATH=$(dirname $venv_python):$PATH
           which python3
           echo $PATH
-          # cat build/this_acts_withdeps.sh
-          python -c "import ROOT"
-          # echo "::endgroup::"
-          # CI/physmon/phys_perf_mon.sh all physmon
+          echo "::endgroup::"
+          CI/physmon/phys_perf_mon.sh all physmon
 
 
       - uses: mxschmitt/action-tmate@v3
@@ -250,89 +248,89 @@ jobs:
   #         git commit -m"update metrics"
   #         git push
   #
-  # linux_ubuntu_extra:
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - image: ubuntu2204
-  #           std: 20
-  #           compiler: g++
-  #         - image: ubuntu2204
-  #           std: 20
-  #           compiler: clang++
-  #   container: ghcr.io/acts-project/${{ matrix.image }}:71
-  #   env:
-  #     INSTALL_DIR: ${{ github.workspace }}/install
-  #     ACTS_LOG_FAILURE_THRESHOLD: WARNING
-  #
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         submodules: true
-  #         lfs: true
-  #
-  #     - name: Install dependencies
-  #       uses: ./.github/actions/dependencies
-  #       with:
-  #         compiler: ${{ matrix.compiler }}
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #
-  #     - name: Restore ccache
-  #       uses: actions/cache/restore@v4
-  #       id: ccache-restore
-  #       with:
-  #         path: ${{ env.CCACHE_DIR }}
-  #         key: ccache-${{ runner.os  }}-${{ github.job }}-${{ env.CCACHE_KEY_SUFFIX }}-${{ matrix.image }}-${{ matrix.std }}-${{ matrix.compiler }}-${{ github.sha }}
-  #         restore-keys: |
-  #           ccache-${{ runner.os  }}-${{ github.job }}-${{ env.CCACHE_KEY_SUFFIX }}-${{ matrix.image }}-${{ matrix.std }}-${{ matrix.compiler }}-
-  #
-  #
-  #     - name: Configure
-  #       run: >
-  #         ccache -z &&
-  #         cmake -B build -S .
-  #         --preset=github-ci
-  #         -DCMAKE_CXX_STANDARD=${{ matrix.std }}
-  #         -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
-  #         -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
-  #
-  #     - name: Build
-  #       run: cmake --build build
-  #
-  #     - name: ccache stats
-  #       run: ccache -s
-  #
-  #     - name: Save ccache
-  #       uses: actions/cache/save@v4
-  #       if: always()
-  #       with:
-  #         path: ${{ github.workspace }}/ccache
-  #         key: ${{ steps.ccache-restore.outputs.cache-primary-key }}
-  #
-  #     - name: Unit tests
-  #       run: cmake --build build --target test
-  #
-  #     - name: Integration tests
-  #       run: cmake --build build --target integrationtests
-  #
-  #     - name: Install
-  #       run: cmake --build build --target install
-  #
-  #     - name: Downstream configure
-  #       run: >
-  #         cmake -B build-downstream -S Tests/DownstreamProject
-  #         -GNinja
-  #         -DCMAKE_BUILD_TYPE=Release
-  #         -DCMAKE_CXX_FLAGS=-Werror
-  #         -DCMAKE_CXX_STANDARD=${{ matrix.std }}
-  #         -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
-  #
-  #     - name: Downstream build
-  #       run: cmake --build build-downstream
-  #
-  #     - name: Downstream run
-  #       run: ./build-downstream/bin/ShowActsVersion
+  linux_ubuntu_extra:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - image: ubuntu2204
+            std: 20
+            compiler: g++
+          - image: ubuntu2204
+            std: 20
+            compiler: clang++
+    container: ghcr.io/acts-project/${{ matrix.image }}:71
+    env:
+      INSTALL_DIR: ${{ github.workspace }}/install
+      ACTS_LOG_FAILURE_THRESHOLD: WARNING
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          lfs: true
+
+      - name: Install dependencies
+        uses: ./.github/actions/dependencies
+        with:
+          compiler: ${{ matrix.compiler }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore ccache
+        uses: actions/cache/restore@v4
+        id: ccache-restore
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ runner.os  }}-${{ github.job }}-${{ env.CCACHE_KEY_SUFFIX }}-${{ matrix.image }}-${{ matrix.std }}-${{ matrix.compiler }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ runner.os  }}-${{ github.job }}-${{ env.CCACHE_KEY_SUFFIX }}-${{ matrix.image }}-${{ matrix.std }}-${{ matrix.compiler }}-
+
+
+      - name: Configure
+        run: >
+          ccache -z &&
+          cmake -B build -S .
+          --preset=github-ci
+          -DCMAKE_CXX_STANDARD=${{ matrix.std }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+          -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
+
+      - name: Build
+        run: cmake --build build
+
+      - name: ccache stats
+        run: ccache -s
+
+      - name: Save ccache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: ${{ github.workspace }}/ccache
+          key: ${{ steps.ccache-restore.outputs.cache-primary-key }}
+
+      - name: Unit tests
+        run: cmake --build build --target test
+
+      - name: Integration tests
+        run: cmake --build build --target integrationtests
+
+      - name: Install
+        run: cmake --build build --target install
+
+      - name: Downstream configure
+        run: >
+          cmake -B build-downstream -S Tests/DownstreamProject
+          -GNinja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_CXX_FLAGS=-Werror
+          -DCMAKE_CXX_STANDARD=${{ matrix.std }}
+          -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
+
+      - name: Downstream build
+        run: cmake --build build-downstream
+
+      - name: Downstream run
+        run: ./build-downstream/bin/ShowActsVersion
 
   macos:
     runs-on: macos-14
