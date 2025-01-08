@@ -29,14 +29,13 @@ clang_tidy:
         && ln -sf /usr/bin/clang-18 /usr/bin/clang
         && ln -sf /usr/bin/clang-tidy-18 /usr/bin/clang-tidy
 
-    - source CI/dependencies.sh
+    - source CI/dependencies/setup.sh
 
     - >
         cmake -B build -S .
         --preset=gitlab-ci-clangtidy
         -DCMAKE_CXX_COMPILER=clang++
         -DCMAKE_C_COMPILER=clang
-        -DPython_EXECUTABLE=$(which python3)
 
     # Main clang-tidy run during cmake compilation
     - CI/clang_tidy/run_clang_tidy.sh clang-tidy build
@@ -83,14 +82,13 @@ build_exatrkx_cpu:
     - git clone $CLONE_URL src
     - cd src
     - git checkout $HEAD_SHA
-    - source CI/dependencies.sh
+    - source CI/dependencies/setup.sh
     - cd ..
     - mkdir build
     # Here we only do a minimal build without examples to save resources
     - >
       cmake -B build -S src
       --preset=gitlab-ci-exatrkx
-      -DPython_EXECUTABLE=$(which python3)
       -DACTS_EXATRKX_ENABLE_CUDA=OFF
 
     - ccache -z
@@ -129,13 +127,12 @@ build_exatrkx:
     - git clone $CLONE_URL src
     - cd src
     - git checkout $HEAD_SHA
-    - source CI/dependencies.sh
+    - source CI/dependencies/setup.sh
     - cd ..
     - mkdir build
     - >
       cmake -B build -S src
       --preset=gitlab-ci-exatrkx
-      -DPython_EXECUTABLE=$(which python3)
       -DCMAKE_CUDA_ARCHITECTURES="75;86"
 
     - ccache -z
@@ -157,7 +154,7 @@ test_exatrkx_unittests:
     - git clone $CLONE_URL src
     - cd src
     - git checkout $HEAD_SHA
-    - source CI/dependencies.sh
+    - source CI/dependencies/setup.sh
     - cd ..
     - ctest --test-dir build -R ExaTrkX
 
@@ -176,7 +173,7 @@ test_exatrkx_python:
     - cd src
     - git checkout $HEAD_SHA
     - nvidia-smi
-    - source CI/dependencies.sh
+    - source CI/dependencies/setup.sh
     - source ../build/this_acts_withdeps.sh
     - python3 -m pip install -r Examples/Python/tests/requirements.txt
     - echo $PYTHONPATH
@@ -217,14 +214,13 @@ build_linux_ubuntu:
     - git checkout $HEAD_SHA
     - git submodule init
     - git submodule update
-    - source CI/dependencies.sh
+    - source CI/dependencies/setup.sh
 
     - cd ..
     - mkdir build
     - >
       cmake -B build -S src
       --preset=gitlab-ci
-      -DPython_EXECUTABLE=$(which python3)
       -DACTS_BUILD_PLUGIN_ONNX=ON
 
     - ccache -z
@@ -246,7 +242,7 @@ linux_test_examples:
     - git checkout $HEAD_SHA
     - git submodule init
     - git submodule update
-    - source CI/dependencies.sh
+    - source CI/dependencies/setup.sh
     - cd ..
 
     - geant4-config --install-datasets
@@ -276,7 +272,7 @@ linux_physmon:
     - git checkout $HEAD_SHA
     - git submodule init
     - git submodule update
-    - source CI/dependencies.sh
+    - source CI/dependencies/setup.sh
     - cd ..
 
     - git config --global safe.directory "$GITHUB_WORKSPACE"
@@ -324,7 +320,6 @@ linux_physmon:
     - >
       cmake -B build -S src
       --preset=gitlab-ci
-      -DPython_EXECUTABLE=$(which python3)
       -DCMAKE_CXX_STANDARD=${CXXSTD}
 
     - ccache -z
@@ -421,7 +416,6 @@ linux_ubuntu_2204_clang:
       cmake -B build -S src
       --preset=gitlab-ci
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
-      -DPython_EXECUTABLE=$(which python3)
       -DACTS_BUILD_PLUGIN_GEOMODEL=OFF # GeoModel is not in LCG at this point
 
     - ccache -z
