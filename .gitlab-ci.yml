@@ -223,7 +223,7 @@ build_linux_ubuntu:
     - git checkout $HEAD_SHA
     - git submodule init
     - git submodule update
-    - source CI/dependencies/setup.sh
+    - source CI/dependencies/setup.sh -c g++
 
     - cd ..
     - mkdir build
