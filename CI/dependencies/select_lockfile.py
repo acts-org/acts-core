@@ -164,7 +164,7 @@ def main():
 
     if args.output:
         with open(args.output, "wb") as f:
-            f.write(fetch_github(lockfile, Path(args.cache_dir), args.cache_limit))
+            f.write(fetch_github(lockfile, args.cache_dir, args.cache_limit))
 
 
 def parse_assets(data: Dict) -> Dict[str, Dict[str, Tuple[str, str]]]:
