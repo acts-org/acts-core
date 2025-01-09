@@ -215,9 +215,15 @@ build_linux_ubuntu:
 
   after_script:
     - du -sh spack
+    - du -sh spack/*
+    - du -sh spack/opt/spack/*
+    - du -sh spack/var/spack/*
     - rm -rf spack/opt
     - rm -rf spack/var/spack/cache
+    - find spack -type f -name "*.pyc" -delete
     - du -sh spack
+    - du -sh spack/*
+    - du -sh spack/var/spack/*
 
   artifacts:
     paths:
