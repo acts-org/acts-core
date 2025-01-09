@@ -107,15 +107,19 @@ end_section
 source "$(pwd)/spack/share/spack/setup-env.sh"
 
 if [ -n "${CI:-}" ]; then
-start_section "Add buildcache mirror"
-mirror_name="acts-spack-buildcache"
-mirror_url="oci://ghcr.io/acts-project/spack-buildcache"
-spack mirror add ${mirror_name} ${mirror_url} --unsigned
-end_section
+  start_section "Add buildcache mirror"
+  mirror_name="acts-spack-buildcache"
+    mirror_url="oci://ghcr.io/acts-project/spack-buildcache"
+  if [ -n "${GITLAB_CI:-}" ]; then
+    # Use CERN mirror for non-Github Actions
+    mirror_url="oci://registry.cern.ch/ghcr.io/acts-project/spack-buildcache"
+  fi
+  spack mirror add ${mirror_name} ${mirror_url} --unsigned
+  end_section
 
-start_section "Locate OpenGL"
-"${SCRIPT_DIR}/opengl.sh"
-end_section
+  start_section "Locate OpenGL"
+  "${SCRIPT_DIR}/opengl.sh"
+  end_section
 fi
 
 start_section "Get spack lock file"
