@@ -218,6 +218,7 @@ build_linux_ubuntu:
     - du -sh spack/*
     - du -sh spack/opt/spack/*
     - du -sh spack/var/spack/*
+    - rm -rf spack/.git
     - rm -rf spack/opt
     - rm -rf spack/var/spack/cache
     - find spack -type f -name "*.pyc" -delete
