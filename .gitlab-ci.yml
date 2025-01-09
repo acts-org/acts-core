@@ -5,6 +5,7 @@ variables:
   CTEST_OUTPUT_ON_FAILURE: 1
 
   SPACK_VERSION: develop-acts
+  LOCKFILE_CACHE_DIR: ~/spack_lockfile_cache
 
   DEPENDENCY_TAG: v7_b7
 
@@ -205,6 +206,12 @@ build_linux_ubuntu:
       paths:
         - spack
         - ~/.spack
+    - key:
+        files:
+          - ${LOCKFILE_CACHE_DIR}/digest.txt
+        prefix: spack_lockfile_
+      paths:
+        - ${LOCKFILE_CACHE_DIR}
 
   artifacts:
     paths:
