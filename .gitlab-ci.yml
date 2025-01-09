@@ -4,7 +4,7 @@ variables:
   CCACHE_KEY_SUFFIX: r2
   CTEST_OUTPUT_ON_FAILURE: 1
 
-  DEPENDENCY_TAG: v5
+  DEPENDENCY_TAG: v7_b7
 
 clang_tidy:
   stage: build
