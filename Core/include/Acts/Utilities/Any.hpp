@@ -77,6 +77,9 @@ static std::set<std::pair<std::type_index, void*>> _s_any_allocations;
     _s_any_allocations.erase(it);                                             \
   } while (0)
 
+// Do not make member functions noexcept in the debug case
+#define _ACTS_ANY_NOEXCEPT /*nothing*/
+
 struct _AnyAllocationReporter {
   static void checkAllocations() {
     std::lock_guard guard{_s_any_mutex};
@@ -100,6 +103,7 @@ static _AnyAllocationReporter s_reporter;
 #define _ACTS_ANY_TRACK_DEALLOCATION(T, heap) \
   do {                                        \
   } while (0)
+#define _ACTS_ANY_NOEXCEPT noexcept
 #endif
 
 class AnyBaseAll {};
@@ -143,7 +147,7 @@ class AnyBase : public AnyBaseAll {
 #endif
 
   template <typename T>
-  explicit AnyBase(T&& value)
+  explicit AnyBase(T&& value) _ACTS_ANY_NOEXCEPT
     requires(!std::same_as<std::decay_t<T>, AnyBase<SIZE>>)
       : AnyBase{std::in_place_type<T>, std::forward<T>(value)} {}
 
@@ -176,7 +180,7 @@ class AnyBase : public AnyBaseAll {
 
   ~AnyBase() { destroy(); }
 
-  AnyBase(const AnyBase& other) {
+  AnyBase(const AnyBase& other) _ACTS_ANY_NOEXCEPT {
     if (m_handler == nullptr && other.m_handler == nullptr) {
       // both are empty, noop
       return;
@@ -189,7 +193,7 @@ class AnyBase : public AnyBaseAll {
     copyConstruct(other);
   }
 
-  AnyBase& operator=(const AnyBase& other) {
+  AnyBase& operator=(const AnyBase& other) _ACTS_ANY_NOEXCEPT {
     _ACTS_ANY_VERBOSE("Copy assign (this="
                       << this << ") at: " << static_cast<void*>(m_data.data()));
 
@@ -213,7 +217,7 @@ class AnyBase : public AnyBaseAll {
     return *this;
   }
 
-  AnyBase(AnyBase&& other) {
+  AnyBase(AnyBase&& other) _ACTS_ANY_NOEXCEPT {
     _ACTS_ANY_VERBOSE("Move construct (this="
                       << this << ") at: " << static_cast<void*>(m_data.data()));
     if (m_handler == nullptr && other.m_handler == nullptr) {
@@ -225,7 +229,7 @@ class AnyBase : public AnyBaseAll {
     moveConstruct(std::move(other));
   }
 
-  AnyBase& operator=(AnyBase&& other) {
+  AnyBase& operator=(AnyBase&& other) _ACTS_ANY_NOEXCEPT {
     _ACTS_ANY_VERBOSE("Move assign (this="
                       << this << ") at: " << static_cast<void*>(m_data.data()));
     if (m_handler == nullptr && other.m_handler == nullptr) {
