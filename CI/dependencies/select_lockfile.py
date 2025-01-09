@@ -7,7 +7,88 @@ import urllib.request
 import urllib.error
 import re
 import subprocess
+import hashlib
+import tempfile
+from pathlib import Path
 from typing import Tuple, Dict, Optional
+import contextlib
+
+# Modify the default cache dir to use a temporary directory
+DEFAULT_CACHE_SIZE_LIMIT = 1 * 1024 * 1024  # 1MB
+
+
+def compute_cache_key(url: str) -> str:
+    """Compute a cache key for a URL"""
+    return hashlib.sha256(url.encode()).hexdigest()
+
+
+def prune_cache(cache_dir: Optional[Path], size_limit: int):
+    """Prune the cache to keep it under the size limit"""
+    if cache_dir is None or not cache_dir.exists():
+        return
+
+    # Get all cache files with their modification times
+    cache_files = [
+        (cache_dir / f, (cache_dir / f).stat().st_mtime)
+        for f in os.listdir(cache_dir)
+        if (cache_dir / f).is_file()
+    ]
+    total_size = sum(f.stat().st_size for f, _ in cache_files)
+
+    if total_size <= size_limit:
+        return
+
+    # Sort by modification time (oldest first)
+    cache_files.sort(key=lambda x: x[1])
+
+    # Remove files until we're under the limit
+    for file_path, _ in cache_files:
+        if total_size <= size_limit:
+            break
+        total_size -= file_path.stat().st_size
+        file_path.unlink()
+
+
+def fetch_github(base_url: str, cache_dir: Optional[Path], cache_limit: int) -> bytes:
+    headers = {}
+    token = os.environ.get("GITHUB_TOKEN")
+    if token is not None and token != "":
+        headers["Authorization"] = f"token {token}"
+
+    with contextlib.ExitStack() as stack:
+        if cache_dir is not None:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+        else:
+            cache_dir = Path(stack.enter_context(tempfile.TemporaryDirectory()))
+
+        # Check cache first
+        cache_key = compute_cache_key(base_url)
+        cache_file = cache_dir / cache_key
+
+        if cache_file.exists():
+            print("Cache hit on", base_url)
+            return cache_file.read_bytes()
+        else:
+            print("Cache miss on", base_url)
+
+        try:
+            req = urllib.request.Request(base_url, headers=headers)
+            with urllib.request.urlopen(req) as response:
+                content = response.read()
+
+                # Write to cache
+                cache_file.write_bytes(content)
+
+                # Prune cache if necessary
+                prune_cache(cache_dir, cache_limit)
+
+                return content
+        except urllib.error.URLError as e:
+            print(f"Failed to fetch from {base_url}: {e}")
+            exit(1)
+        except json.JSONDecodeError as e:
+            print(f"Failed to parse JSON response: {e}")
+            exit(1)
 
 
 def main():
@@ -32,6 +113,18 @@ def main():
         default=None,
         help="Output file to write lockfile to",
     )
+    parser.add_argument(
+        "--cache-dir",
+        type=lambda x: Path(x) if x else None,
+        default=os.environ.get("LOCKFILE_CACHE_DIR"),
+        help="Directory to use for caching (defaults to LOCKFILE_CACHE_DIR env var)",
+    )
+    parser.add_argument(
+        "--cache-limit",
+        type=int,
+        default=int(os.environ.get("LOCKFILE_CACHE_LIMIT", DEFAULT_CACHE_SIZE_LIMIT)),
+        help="Cache size limit in bytes (defaults to LOCKFILE_CACHE_LIMIT env var)",
+    )
     args = parser.parse_args()
 
     print("Fetching lockfiles for tag:", args.tag)
@@ -39,7 +132,7 @@ def main():
 
     base_url = f"https://api.github.com/repos/acts-project/ci-dependencies/releases/tags/{args.tag}"
 
-    data = json.loads(fetch_github(base_url))
+    data = json.loads(fetch_github(base_url, args.cache_dir, args.cache_limit))
 
     lockfiles = parse_assets(data)
 
@@ -71,7 +164,7 @@ def main():
 
     if args.output:
         with open(args.output, "wb") as f:
-            f.write(fetch_github(lockfile))
+            f.write(fetch_github(lockfile, Path(args.cache_dir), args.cache_limit))
 
 
 def parse_assets(data: Dict) -> Dict[str, Dict[str, Tuple[str, str]]]:
@@ -154,24 +247,6 @@ def determine_compiler_version(binary: str):
 
     except (subprocess.SubprocessError, FileNotFoundError):
         print(f"Failed to determine version for compiler: {binary}")
-        exit(1)
-
-
-def fetch_github(base_url):
-    headers = {}
-    token = os.environ.get("GITHUB_TOKEN")
-    if token is not None and token != "":
-        headers["Authorization"] = f"token {token}"
-
-    try:
-        req = urllib.request.Request(base_url, headers=headers)
-        with urllib.request.urlopen(req) as response:
-            return response.read()
-    except urllib.error.URLError as e:
-        print(f"Failed to fetch from {base_url}: {e}")
-        exit(1)
-    except json.JSONDecodeError as e:
-        print(f"Failed to parse JSON response: {e}")
         exit(1)
 
 
