@@ -104,7 +104,14 @@ if ! command -v spack &> /dev/null; then
 fi
 end_section
 
+if [ -n "${GITLAB_CI:-}" ]; then
+  # Use the project spack config for GitLab CI so we can cache it
+  mkdir -p ${CI_PROJECT_DIR}/.spack
+  ln -s ${CI_PROJECT_DIR}/.spack ${HOME}/.spack
+fi
+
 source "$(pwd)/spack/share/spack/setup-env.sh"
+
 
 if [ -n "${CI:-}" ]; then
   start_section "Add buildcache mirror"
