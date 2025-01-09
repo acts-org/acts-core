@@ -22,6 +22,29 @@ def compute_cache_key(url: str) -> str:
     return hashlib.sha256(url.encode()).hexdigest()
 
 
+def compute_cache_digest(cache_dir: Path) -> str:
+    """Compute a digest of all cache files except digest.txt"""
+    files = sorted(
+        f
+        for f in os.listdir(cache_dir)
+        if (cache_dir / f).is_file() and f != "digest.txt"
+    )
+
+    digest = hashlib.sha256()
+    for fname in files:
+        fpath = cache_dir / fname
+        digest.update(fname.encode())
+        digest.update(str(fpath.stat().st_size).encode())
+        digest.update(fpath.read_bytes())
+    return digest.hexdigest()
+
+
+def update_cache_digest(cache_dir: Path):
+    """Update the cache digest file"""
+    digest = compute_cache_digest(cache_dir)
+    (cache_dir / "digest.txt").write_text(digest)
+
+
 def prune_cache(cache_dir: Optional[Path], size_limit: int):
     """Prune the cache to keep it under the size limit"""
     if cache_dir is None or not cache_dir.exists():
@@ -32,6 +55,7 @@ def prune_cache(cache_dir: Optional[Path], size_limit: int):
         (cache_dir / f, (cache_dir / f).stat().st_mtime)
         for f in os.listdir(cache_dir)
         if (cache_dir / f).is_file()
+        and f != "digest.txt"  # Exclude digest from pruning
     ]
     total_size = sum(f.stat().st_size for f, _ in cache_files)
 
@@ -47,6 +71,9 @@ def prune_cache(cache_dir: Optional[Path], size_limit: int):
             break
         total_size -= file_path.stat().st_size
         file_path.unlink()
+
+    # Update digest after pruning
+    update_cache_digest(cache_dir)
 
 
 def fetch_github(base_url: str, cache_dir: Optional[Path], cache_limit: int) -> bytes:
@@ -79,7 +106,10 @@ def fetch_github(base_url: str, cache_dir: Optional[Path], cache_limit: int) -> 
                 # Write to cache
                 cache_file.write_bytes(content)
 
-                # Prune cache if necessary
+                # Update digest after adding new file
+                update_cache_digest(cache_dir)
+
+                # Prune cache if necessary (this will update digest again if pruning occurs)
                 prune_cache(cache_dir, cache_limit)
 
                 return content
@@ -115,7 +145,7 @@ def main():
     )
     parser.add_argument(
         "--cache-dir",
-        type=lambda x: Path(x) if x else None,
+        type=lambda x: Path(x).expanduser() if x else None,
         default=os.environ.get("LOCKFILE_CACHE_DIR"),
         help="Directory to use for caching (defaults to LOCKFILE_CACHE_DIR env var)",
     )
