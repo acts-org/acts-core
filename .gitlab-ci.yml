@@ -255,7 +255,7 @@ build_linux_ubuntu:
       -DACTS_BUILD_PLUGIN_ONNX=ON
 
     - ccache -z
-    # - cmake --build build -- -j6
+    - cmake --build build -- -j6
     - ccache -s
 
 # linux_test_examples:
