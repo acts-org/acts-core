@@ -233,7 +233,7 @@ build_linux_ubuntu:
 
     - cd ..
 
-    - source CI/dependencies/setup.sh -c g++
+    - source src/CI/dependencies/setup.sh -c g++
 
     - mkdir build
     - >
