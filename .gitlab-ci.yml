@@ -213,6 +213,12 @@ build_linux_ubuntu:
       paths:
         - spack_lockfile_cache
 
+  after_script:
+    - du -sh spack
+    - rm -rf spack/opt
+    - rm -rf spack/var/spack/cache
+    - du -sh spack
+
   artifacts:
     paths:
       - build/
