@@ -1,6 +1,9 @@
 #!/bin/bash
-set -e
-set -u
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  # Only set these properties if it's called as a subprocess
+  set -e
+  set -u
+fi
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -211,3 +214,5 @@ end_section
 
 # Pythia8 looks for settings in this directory
 # set_env PYTHIA8DATA "${destination}/share/Pythia8/xmldoc"
+
+set +u
