@@ -61,130 +61,130 @@ variables:
 #     # Generate an html report
 #     - codereport clang-tidy/clang-tidy.json clang-tidy/html
 
-# build_exatrkx_cpu:
-#   stage: build
-#   image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
-#   variables:
-#     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
-#   tags:
-#     - large
-#
-#   cache:
-#     key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
-#     fallback_keys:
-#       - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
-#     when: always
-#     paths:
-#       - ${CCACHE_DIR}
-#
-#   script:
-#     - export PATH=/usr/local/sbin:/usr/sbin:/sbin:$PATH
-#     - export PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
-#     - export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
-#     - echo $PATH
-#     - git clone $CLONE_URL src
-#     - cd src
-#     - git checkout $HEAD_SHA
-#     - source CI/dependencies/setup.sh
-#     - cd ..
-#     - mkdir build
-#     # Here we only do a minimal build without examples to save resources
-#     - >
-#       cmake -B build -S src
-#       --preset=gitlab-ci-exatrkx
-#       -DACTS_EXATRKX_ENABLE_CUDA=OFF
-#
-#     - ccache -z
-#     - cmake --build build -- -j6
-#     - ccache -s
-#
-# build_exatrkx:
-#   stage: build
-#   image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
-#   variables:
-#     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
-#   tags:
-#     - large
-#
-#   cache:
-#     key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
-#     fallback_keys:
-#       - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
-#     when: always
-#     paths:
-#       - ${CCACHE_DIR}
-#
-#   artifacts:
-#     paths:
-#       - build/
-#     exclude:
-#       - build/**/*.o
-#       - build/bin/ActsIntegrationTest*
-#     expire_in: 6 hours
-#
-#   script:
-#     - export PATH=/usr/local/sbin:/usr/sbin:/sbin:$PATH
-#     - export PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
-#     - export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
-#     - echo $PATH
-#     - git clone $CLONE_URL src
-#     - cd src
-#     - git checkout $HEAD_SHA
-#     - source CI/dependencies/setup.sh
-#     - cd ..
-#     - mkdir build
-#     - >
-#       cmake -B build -S src
-#       --preset=gitlab-ci-exatrkx
-#       -DCMAKE_CUDA_ARCHITECTURES="75;86"
-#
-#     - ccache -z
-#     - cmake --build build -- -j6
-#     - ccache -s
-#
-# test_exatrkx_unittests:
-#   stage: test
-#   needs:
-#     - build_exatrkx
-#   image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
-#   variables:
-#     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
-#   tags:
-#     - docker-gpu-nvidia
-#   script:
-#
-#     - apt-get update -y
-#     - git clone $CLONE_URL src
-#     - cd src
-#     - git checkout $HEAD_SHA
-#     - source CI/dependencies/setup.sh
-#     - cd ..
-#     - ctest --test-dir build -R ExaTrkX
-#
-# test_exatrkx_python:
-#   stage: test
-#   needs:
-#     - build_exatrkx
-#   image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
-#   variables:
-#     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
-#   tags:
-#     - docker-gpu-nvidia
-#   script:
-#     - apt-get update -y
-#     - git clone $CLONE_URL src
-#     - cd src
-#     - git checkout $HEAD_SHA
-#     - nvidia-smi
-#     - source CI/dependencies/setup.sh
-#     - source ../build/this_acts_withdeps.sh
-#     - python3 -m pip install -r Examples/Python/tests/requirements.txt
-#     - echo $PYTHONPATH
-#     - which python3
-#     - python3 --version
-#     - python3 -c "import acts"
-#     - pytest -rFsv -k torch --collect-only
-#     - pytest -rFsv -k gpu-torch # For now only test torch GPU pipeline
+build_exatrkx_cpu:
+  stage: build
+  image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
+  variables:
+    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
+  tags:
+    - large
+
+  cache:
+    key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
+    fallback_keys:
+      - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
+    when: always
+    paths:
+      - ${CCACHE_DIR}
+
+  script:
+    - export PATH=/usr/local/sbin:/usr/sbin:/sbin:$PATH
+    - export PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
+    - export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
+    - echo $PATH
+    - git clone $CLONE_URL src
+    - cd src
+    - git checkout $HEAD_SHA
+    - source CI/dependencies/setup.sh
+    - cd ..
+    - mkdir build
+    # Here we only do a minimal build without examples to save resources
+    - >
+      cmake -B build -S src
+      --preset=gitlab-ci-exatrkx
+      -DACTS_EXATRKX_ENABLE_CUDA=OFF
+
+    - ccache -z
+    - cmake --build build -- -j6
+    - ccache -s
+
+build_exatrkx:
+  stage: build
+  image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
+  variables:
+    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
+  tags:
+    - large
+
+  cache:
+    key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
+    fallback_keys:
+      - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
+    when: always
+    paths:
+      - ${CCACHE_DIR}
+
+  artifacts:
+    paths:
+      - build/
+    exclude:
+      - build/**/*.o
+      - build/bin/ActsIntegrationTest*
+    expire_in: 6 hours
+
+  script:
+    - export PATH=/usr/local/sbin:/usr/sbin:/sbin:$PATH
+    - export PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH
+    - export TORCH_CUDA_ARCH_LIST="8.0 8.6 8.9 9.0"
+    - echo $PATH
+    - git clone $CLONE_URL src
+    - cd src
+    - git checkout $HEAD_SHA
+    - source CI/dependencies/setup.sh
+    - cd ..
+    - mkdir build
+    - >
+      cmake -B build -S src
+      --preset=gitlab-ci-exatrkx
+      -DCMAKE_CUDA_ARCHITECTURES="75;86"
+
+    - ccache -z
+    - cmake --build build -- -j6
+    - ccache -s
+
+test_exatrkx_unittests:
+  stage: test
+  needs:
+    - build_exatrkx
+  image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
+  variables:
+    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
+  tags:
+    - docker-gpu-nvidia
+  script:
+
+    - apt-get update -y
+    - git clone $CLONE_URL src
+    - cd src
+    - git checkout $HEAD_SHA
+    - source CI/dependencies/setup.sh
+    - cd ..
+    - ctest --test-dir build -R ExaTrkX
+
+test_exatrkx_python:
+  stage: test
+  needs:
+    - build_exatrkx
+  image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
+  variables:
+    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
+  tags:
+    - docker-gpu-nvidia
+  script:
+    - apt-get update -y
+    - git clone $CLONE_URL src
+    - cd src
+    - git checkout $HEAD_SHA
+    - nvidia-smi
+    - source CI/dependencies/setup.sh
+    - source ../build/this_acts_withdeps.sh
+    - python3 -m pip install -r Examples/Python/tests/requirements.txt
+    - echo $PYTHONPATH
+    - which python3
+    - python3 --version
+    - python3 -c "import acts"
+    - pytest -rFsv -k torch --collect-only
+    - pytest -rFsv -k gpu-torch # For now only test torch GPU pipeline
 
 build_linux_ubuntu:
   stage: build
@@ -258,66 +258,66 @@ build_linux_ubuntu:
     - cmake --build build -- -j6
     - ccache -s
 
-# linux_test_examples:
-#   stage: test
-#   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
-#   variables:
-#     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
-#   needs: [build_linux_ubuntu]
-#
-#   script:
-#     - apt-get update && apt-get install -y git-lfs
-#
-#     - git clone $CLONE_URL src
-#     - cd src
-#     - git checkout $HEAD_SHA
-#     - git submodule init
-#     - git submodule update
-#     - source CI/dependencies/setup.sh
-#     - cd ..
-#
-#     - geant4-config --install-datasets
-#     - source build/this_acts_withdeps.sh
-#     - cd src
-#     - python3 -m pip install -r Examples/Python/tests/requirements.txt
-#     - pytest -rFsv -k "not exatrkx" -v -s
-#
-# linux_physmon:
-#   stage: test
-#   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
-#   variables:
-#     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
-#   needs: [build_linux_ubuntu]
-#
-#   artifacts:
-#     when: always
-#     paths:
-#       - src/physmon
-#     expire_in: 1 week
-#
-#   script:
-#     - apt-get update && apt-get install -y git-lfs time
-#
-#     - git clone $CLONE_URL src
-#     - cd src
-#     - git checkout $HEAD_SHA
-#     - git submodule init
-#     - git submodule update
-#     - source CI/dependencies/setup.sh
-#     - cd ..
-#
-#     - git config --global safe.directory "$GITHUB_WORKSPACE"
-#     - python3 -m pip install histcmp==0.6.8 matplotlib
-#     - python3 -m pip install -r src/Examples/Scripts/requirements.txt
-#     - geant4-config --install-datasets
-#     - venv_python=$(which python3)
-#     - echo $venv_python
-#     - source build/this_acts_withdeps.sh
-#     - export PATH=$(dirname $venv_python):$PATH
-#     - echo $PATH
-#     - which python3
-#     - cd src
-#     - CI/physmon/phys_perf_mon.sh all physmon
+linux_test_examples:
+  stage: test
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
+  variables:
+    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
+  needs: [build_linux_ubuntu]
+
+  script:
+    - apt-get update && apt-get install -y git-lfs
+
+    - git clone $CLONE_URL src
+    - cd src
+    - git checkout $HEAD_SHA
+    - git submodule init
+    - git submodule update
+    - source CI/dependencies/setup.sh
+    - cd ..
+
+    - geant4-config --install-datasets
+    - source build/this_acts_withdeps.sh
+    - cd src
+    - python3 -m pip install -r Examples/Python/tests/requirements.txt
+    - pytest -rFsv -k "not exatrkx" -v -s
+
+linux_physmon:
+  stage: test
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
+  variables:
+    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
+  needs: [build_linux_ubuntu]
+
+  artifacts:
+    when: always
+    paths:
+      - src/physmon
+    expire_in: 1 week
+
+  script:
+    - apt-get update && apt-get install -y git-lfs time
+
+    - git clone $CLONE_URL src
+    - cd src
+    - git checkout $HEAD_SHA
+    - git submodule init
+    - git submodule update
+    - source CI/dependencies/setup.sh
+    - cd ..
+
+    - git config --global safe.directory "$GITHUB_WORKSPACE"
+    - python3 -m pip install histcmp==0.6.8 matplotlib
+    - python3 -m pip install -r src/Examples/Scripts/requirements.txt
+    - geant4-config --install-datasets
+    - venv_python=$(which python3)
+    - echo $venv_python
+    - source build/this_acts_withdeps.sh
+    - export PATH=$(dirname $venv_python):$PATH
+    - echo $PATH
+    - which python3
+    - cd src
+    - CI/physmon/phys_perf_mon.sh all physmon
 
 ###############################
 ### UBUNTU EXTRA JOB MATRIX ###
@@ -354,131 +354,131 @@ build_linux_ubuntu:
       -DCMAKE_CXX_STANDARD=${CXXSTD}
 
     - ccache -z
-    # - cmake --build build -- -j6
+    - cmake --build build -- -j6
     - ccache -s
 
-    # - ctest --test-dir build -j$(nproc)
-    # - cmake --build build --target integrationtests
-    #
-    # # Install main project
-    # - cmake --install build
-    #
-    # # Downstream configure
-    # - >
-    #   cmake -B build-downstream -S src/Tests/DownstreamProject
-    #   -GNinja
-    #   -DCMAKE_BUILD_TYPE=Release
-    #   -DCMAKE_CXX_FLAGS=-Werror
-    #   -DCMAKE_CXX_STANDARD=${CXXSTD}
-    #   -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
-    #
-    # # Downstream build
-    # - cmake --build build-downstream
-    #
-    # # Downstream run
-    # - ./build-downstream/bin/ShowActsVersion
+    - ctest --test-dir build -j$(nproc)
+    - cmake --build build --target integrationtests
 
-# linux_ubuntu_2204:
-#   extends: .linux_ubuntu_extra
-#   variables:
-#     CXXSTD: 20
-#     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
-#   image: ghcr.io/acts-project/ubuntu2204:63
-#
-# linux_ubuntu_2204_clang:
-#   extends: .linux_ubuntu_extra
-#   variables:
-#     CXXSTD: 20
-#     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
-#   image: ghcr.io/acts-project/ubuntu2204_clang:63
+    # Install main project
+    - cmake --install build
+
+    # Downstream configure
+    - >
+      cmake -B build-downstream -S src/Tests/DownstreamProject
+      -GNinja
+      -DCMAKE_BUILD_TYPE=Release
+      -DCMAKE_CXX_FLAGS=-Werror
+      -DCMAKE_CXX_STANDARD=${CXXSTD}
+      -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
+
+    # Downstream build
+    - cmake --build build-downstream
+
+    # Downstream run
+    - ./build-downstream/bin/ShowActsVersion
+
+linux_ubuntu_2204:
+  extends: .linux_ubuntu_extra
+  variables:
+    CXXSTD: 20
+    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
+  image: ghcr.io/acts-project/ubuntu2204:63
+
+linux_ubuntu_2204_clang:
+  extends: .linux_ubuntu_extra
+  variables:
+    CXXSTD: 20
+    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
+  image: ghcr.io/acts-project/ubuntu2204_clang:63
 
 
 ######################
 ### LCG JOB MATRIX ###
 ######################
 
-# .lcg_base_job:
-#   image: ghcr.io/acts-project/${OS}-base:63
-#   stage: build
-#   tags:
-#     - cvmfs
-#
-#   variables:
-#     ACTS_LOG_FAILURE_THRESHOLD: WARNING
-#     INSTALL_DIR: ${{ github.workspace }}/install
-#
-#     SETUP:
-#
-#   cache:
-#     key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
-#     fallback_keys:
-#       - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
-#     when: always
-#     paths:
-#       - ${CCACHE_DIR}
-#
-#   before_script:
-#     - 'echo "LCG_VERSION: ${LCG_VERSION}"'
-#     - 'echo "COMPILER: ${COMPILER}"'
-#
-#     # Figure out LCG platform name based on version number and OS
-#     - >
-#       if [ "$OS" = "alma9"  ]; then
-#         export LCG_PLATFORM="el9"
-#       else
-#         export LCG_PLATFORM="$OS"
-#       fi
-#
-#     - 'echo "LCG_PLATFORM: ${LCG_PLATFORM}"'
-#     - source /cvmfs/sft.cern.ch/lcg/views/LCG_${LCG_VERSION}/x86_64-${LCG_PLATFORM}-${COMPILER}-opt/setup.sh
-#
-#     - git clone $CLONE_URL src
-#
-#     - cd src
-#     - git checkout $HEAD_SHA
-#     - git submodule init
-#     - git submodule update
-#     - cd ..
-#
-#     - ccache --version
-#
-#   script:
-#     - >
-#       cmake -B build -S src
-#       --preset=gitlab-ci
-#       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
-#       -DACTS_BUILD_PLUGIN_GEOMODEL=OFF # GeoModel is not in LCG at this point
-#
-#     - ccache -z
-#     - cmake --build build -- -j6
-#     - ccache -s
-#
-#     - ctest --test-dir build -j$(nproc)
-#
-#
-# lcg_105:
-#   extends: .lcg_base_job
-#
-#   variables:
-#     LCG_VERSION: "105"
-#
-#   parallel:
-#     matrix:
-#       - OS: [alma9]
-#         COMPILER:
-#           - gcc13
-#           - clang16
-#
-# lcg_106a:
-#   extends: .lcg_base_job
-#
-#   variables:
-#     LCG_VERSION: "106a"
-#
-#   parallel:
-#     matrix:
-#       - OS: [alma9]
-#         COMPILER:
-#           - gcc13
-#           - gcc14
-#           - clang16
+.lcg_base_job:
+  image: ghcr.io/acts-project/${OS}-base:63
+  stage: build
+  tags:
+    - cvmfs
+
+  variables:
+    ACTS_LOG_FAILURE_THRESHOLD: WARNING
+    INSTALL_DIR: ${{ github.workspace }}/install
+
+    SETUP:
+
+  cache:
+    key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
+    fallback_keys:
+      - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
+    when: always
+    paths:
+      - ${CCACHE_DIR}
+
+  before_script:
+    - 'echo "LCG_VERSION: ${LCG_VERSION}"'
+    - 'echo "COMPILER: ${COMPILER}"'
+
+    # Figure out LCG platform name based on version number and OS
+    - >
+      if [ "$OS" = "alma9"  ]; then
+        export LCG_PLATFORM="el9"
+      else
+        export LCG_PLATFORM="$OS"
+      fi
+
+    - 'echo "LCG_PLATFORM: ${LCG_PLATFORM}"'
+    - source /cvmfs/sft.cern.ch/lcg/views/LCG_${LCG_VERSION}/x86_64-${LCG_PLATFORM}-${COMPILER}-opt/setup.sh
+
+    - git clone $CLONE_URL src
+
+    - cd src
+    - git checkout $HEAD_SHA
+    - git submodule init
+    - git submodule update
+    - cd ..
+
+    - ccache --version
+
+  script:
+    - >
+      cmake -B build -S src
+      --preset=gitlab-ci
+      -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
+      -DACTS_BUILD_PLUGIN_GEOMODEL=OFF # GeoModel is not in LCG at this point
+
+    - ccache -z
+    - cmake --build build -- -j6
+    - ccache -s
+
+    - ctest --test-dir build -j$(nproc)
+
+
+lcg_105:
+  extends: .lcg_base_job
+
+  variables:
+    LCG_VERSION: "105"
+
+  parallel:
+    matrix:
+      - OS: [alma9]
+        COMPILER:
+          - gcc13
+          - clang16
+
+lcg_106a:
+  extends: .lcg_base_job
+
+  variables:
+    LCG_VERSION: "106a"
+
+  parallel:
+    matrix:
+      - OS: [alma9]
+        COMPILER:
+          - gcc13
+          - gcc14
+          - clang16
