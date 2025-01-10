@@ -18,6 +18,35 @@ variables:
       paths:
         - ${CCACHE_DIR}
 
+.spack_cache:
+  cache:
+   - key:
+       files:
+        - CI/dependencies/setup_spack.sh
+     prefix: spack_${SPACK_VERSION}
+     paths:
+      - spack
+      - .spack
+   - key:
+       files:
+        - spack_lockfile_cache/digest.txt
+       prefix: spack_lockfile_
+       paths:
+        - spack_lockfile_cache
+
+.spack_cleanup:
+  after_script:
+    - du -sh spack
+    - du -sh spack/*
+    - du -sh spack/opt/spack/*
+    - du -sh spack/var/spack/*
+    - rm -rf spack/.git
+    - rm -rf spack/opt
+    - rm -rf spack/var/spack/cache
+    - find spack -type f -name "*.pyc" -delete
+    - du -sh spack
+    - du -sh spack/*
+    - du -sh spack/var/spack/*
 
 
 # clang_tidy:
@@ -71,6 +100,9 @@ variables:
 #
 #     # Generate an html report
 #     - codereport clang-tidy/clang-tidy.json clang-tidy/html
+    #
+  # after_script:
+  #  - !reference [.spack_cleanup, after_script]
 
 build_exatrkx_cpu:
   stage: build
@@ -82,6 +114,7 @@ build_exatrkx_cpu:
 
   cache:
    - !reference [.ccache_base, cache]
+   - !reference [.spack_cache, cache]
 
   script:
     - export PATH=/usr/local/sbin:/usr/sbin:/sbin:$PATH
@@ -104,6 +137,9 @@ build_exatrkx_cpu:
     - cmake --build build -- -j6
     - ccache -s
 
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+
 build_exatrkx:
   stage: build
   image: ghcr.io/acts-project/ubuntu2204_exatrkx:63
@@ -114,6 +150,7 @@ build_exatrkx:
 
   cache:
    - !reference [.ccache_base, cache]
+   - !reference [.spack_cache, cache]
 
   artifacts:
     paths:
@@ -143,6 +180,9 @@ build_exatrkx:
     - cmake --build build -- -j6
     - ccache -s
 
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+
 test_exatrkx_unittests:
   stage: test
   needs:
@@ -152,6 +192,9 @@ test_exatrkx_unittests:
     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
   tags:
     - docker-gpu-nvidia
+
+  cache:
+   - !reference [.spack_cache, cache]
   script:
 
     - apt-get update -y
@@ -162,6 +205,9 @@ test_exatrkx_unittests:
     - cd ..
     - ctest --test-dir build -R ExaTrkX
 
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+
 test_exatrkx_python:
   stage: test
   needs:
@@ -171,6 +217,10 @@ test_exatrkx_python:
     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
   tags:
     - docker-gpu-nvidia
+
+  cache:
+   - !reference [.spack_cache, cache]
+
   script:
     - apt-get update -y
     - git clone $CLONE_URL src
@@ -187,6 +237,9 @@ test_exatrkx_python:
     - pytest -rFsv -k torch --collect-only
     - pytest -rFsv -k gpu-torch # For now only test torch GPU pipeline
 
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+
 build_linux_ubuntu:
   stage: build
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
@@ -195,32 +248,7 @@ build_linux_ubuntu:
 
   cache:
    - !reference [.ccache_base, cache]
-   - key:
-       files:
-        - CI/dependencies/setup_spack.sh
-     prefix: spack_${SPACK_VERSION}
-     paths:
-      - spack
-      - .spack
-   - key:
-       files:
-        - spack_lockfile_cache/digest.txt
-       prefix: spack_lockfile_
-       paths:
-        - spack_lockfile_cache
-
-  after_script:
-    - du -sh spack
-    - du -sh spack/*
-    - du -sh spack/opt/spack/*
-    - du -sh spack/var/spack/*
-    - rm -rf spack/.git
-    - rm -rf spack/opt
-    - rm -rf spack/var/spack/cache
-    - find spack -type f -name "*.pyc" -delete
-    - du -sh spack
-    - du -sh spack/*
-    - du -sh spack/var/spack/*
+   - !reference [.spack_cache, cache]
 
   artifacts:
     paths:
@@ -254,12 +282,19 @@ build_linux_ubuntu:
     - cmake --build build -- -j6
     - ccache -s
 
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+
+
 linux_test_examples:
   stage: test
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
   variables:
     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
   needs: [build_linux_ubuntu]
+
+  cache:
+   - !reference [.spack_cache, cache]
 
   script:
     - apt-get update && apt-get install -y git-lfs
@@ -278,6 +313,9 @@ linux_test_examples:
     - python3 -m pip install -r Examples/Python/tests/requirements.txt
     - pytest -rFsv -k "not exatrkx" -v -s
 
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+
 linux_physmon:
   stage: test
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
@@ -290,6 +328,9 @@ linux_physmon:
     paths:
       - src/physmon
     expire_in: 1 week
+
+  cache:
+   - !reference [.spack_cache, cache]
 
   script:
     - apt-get update && apt-get install -y git-lfs time
@@ -315,6 +356,9 @@ linux_physmon:
     - cd src
     - CI/physmon/phys_perf_mon.sh all physmon
 
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+
 ###############################
 ### UBUNTU EXTRA JOB MATRIX ###
 ###############################
@@ -327,6 +371,7 @@ linux_physmon:
 
   cache:
    - !reference [.ccache_base, cache]
+   - !reference [.spack_cache, cache]
 
   script:
     - git clone $CLONE_URL src
@@ -369,6 +414,10 @@ linux_physmon:
     # Downstream run
     - ./build-downstream/bin/ShowActsVersion
 
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+   - !reference [.spack_cache, cache]
+
 linux_ubuntu_2204:
   extends: .linux_ubuntu_extra
   variables:
@@ -402,6 +451,7 @@ linux_ubuntu_2204_clang:
 
   cache:
    - !reference [.ccache_base, cache]
+   - !reference [.spack_cache, cache]
 
   before_script:
     - 'echo "LCG_VERSION: ${LCG_VERSION}"'
@@ -440,6 +490,9 @@ linux_ubuntu_2204_clang:
     - ccache -s
 
     - ctest --test-dir build -j$(nproc)
+
+  after_script:
+   - !reference [.spack_cleanup, after_script]
 
 
 lcg_105:
