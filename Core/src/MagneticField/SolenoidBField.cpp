@@ -8,6 +8,7 @@
 
 #include "Acts/MagneticField/SolenoidBField.hpp"
 
+#include "Acts/MagneticField/MagneticFieldError.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
 
 #include <cmath>
@@ -55,12 +56,6 @@ Acts::Result<Acts::Vector3> Acts::SolenoidBField::getField(
 
 Acts::Vector2 Acts::SolenoidBField::getField(const Vector2& position) const {
   return multiCoilField(position, m_scale);
-}
-
-Acts::Result<Acts::Vector3> Acts::SolenoidBField::getFieldGradient(
-    const Vector3& position, SquareMatrix3& /*derivative*/,
-    MagneticFieldProvider::Cache& /*cache*/) const {
-  return Result<Vector3>::success(getField(position));
 }
 
 Acts::Vector2 Acts::SolenoidBField::multiCoilField(const Vector2& pos,

@@ -37,6 +37,7 @@ struct RootMeasurementWriter::DigitizationTree {
   int volumeID = 0;
   int layerID = 0;
   int surfaceID = 0;
+  int extraID = 0;
 
   // Reconstruction information
   float recBound[Acts::eBoundSize] = {};
@@ -74,6 +75,7 @@ struct RootMeasurementWriter::DigitizationTree {
     tree->Branch("volume_id", &volumeID);
     tree->Branch("layer_id", &layerID);
     tree->Branch("surface_id", &surfaceID);
+    tree->Branch("extra_id", &extraID);
 
     for (auto ib : recoIndices) {
       tree->Branch(("rec_" + bNames[ib]).c_str(), &recBound[ib]);
@@ -120,6 +122,7 @@ struct RootMeasurementWriter::DigitizationTree {
     volumeID = geoId.volume();
     layerID = geoId.layer();
     surfaceID = geoId.sensitive();
+    extraID = geoId.extra();
   }
 
   /// Convenience function to register the truth parameters

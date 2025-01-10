@@ -27,10 +27,10 @@ template <typename Iterator>
 class Range {
  public:
   Range(Iterator b, Iterator e) : m_begin(b), m_end(e) {}
-  Range(Range&&) = default;
+  Range(Range&&) noexcept = default;
   Range(const Range&) = default;
   ~Range() = default;
-  Range& operator=(Range&&) = default;
+  Range& operator=(Range&&) noexcept = default;
   Range& operator=(const Range&) = default;
 
   Iterator begin() const { return m_begin; }

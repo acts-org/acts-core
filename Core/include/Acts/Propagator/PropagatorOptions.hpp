@@ -58,7 +58,10 @@ struct PropagatorPlainOptions : public detail::PurePropagatorPlainOptions {
   /// PropagatorPlainOptions with context
   PropagatorPlainOptions(const GeometryContext& gctx,
                          const MagneticFieldContext& mctx)
-      : geoContext(gctx), magFieldContext(mctx) {}
+      : geoContext(gctx),
+        magFieldContext(mctx),
+        stepping(gctx, mctx),
+        navigation() {}
 
   /// The context object for the geometry
   std::reference_wrapper<const GeometryContext> geoContext;
@@ -88,12 +91,17 @@ struct PropagatorOptions : public detail::PurePropagatorPlainOptions {
   /// PropagatorOptions with context
   PropagatorOptions(const GeometryContext& gctx,
                     const MagneticFieldContext& mctx)
-      : geoContext(gctx), magFieldContext(mctx) {}
+      : geoContext(gctx),
+        magFieldContext(mctx),
+        stepping(gctx, mctx),
+        navigation() {}
 
   /// PropagatorOptions with context and plain options
   PropagatorOptions(const PropagatorPlainOptions& pOptions)
       : geoContext(pOptions.geoContext),
-        magFieldContext(pOptions.magFieldContext) {
+        magFieldContext(pOptions.magFieldContext),
+        stepping(pOptions.geoContext, pOptions.magFieldContext),
+        navigation() {
     setPlainOptions(pOptions);
   }
 

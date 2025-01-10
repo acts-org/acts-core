@@ -79,10 +79,10 @@ class GeometryHierarchyMap {
   // defaulted constructors and assignment operators
   GeometryHierarchyMap() = default;
   GeometryHierarchyMap(const GeometryHierarchyMap&) = default;
-  GeometryHierarchyMap(GeometryHierarchyMap&&) = default;
+  GeometryHierarchyMap(GeometryHierarchyMap&&) noexcept = default;
   ~GeometryHierarchyMap() = default;
   GeometryHierarchyMap& operator=(const GeometryHierarchyMap&) = default;
-  GeometryHierarchyMap& operator=(GeometryHierarchyMap&&) = default;
+  GeometryHierarchyMap& operator=(GeometryHierarchyMap&&) noexcept = default;
 
   /// Return an iterator pointing to the beginning of the stored values.
   Iterator begin() const { return m_values.begin(); }

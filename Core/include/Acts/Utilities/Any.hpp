@@ -213,7 +213,7 @@ class AnyBase : public AnyBaseAll {
     return *this;
   }
 
-  AnyBase(AnyBase&& other) {
+  AnyBase(AnyBase&& other) noexcept {
     _ACTS_ANY_VERBOSE("Move construct (this="
                       << this << ") at: " << static_cast<void*>(m_data.data()));
     if (m_handler == nullptr && other.m_handler == nullptr) {

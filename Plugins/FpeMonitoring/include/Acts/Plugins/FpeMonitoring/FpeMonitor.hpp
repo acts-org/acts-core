@@ -45,7 +45,7 @@ class FpeMonitor {
           m_size{bufferSize} {}
 
     Buffer(const Buffer &) = delete;
-    Buffer(Buffer &&other) {
+    Buffer(Buffer &&other) noexcept {
       m_data = std::move(other.m_data);
       m_size = other.m_size;
       m_offset = other.m_offset;

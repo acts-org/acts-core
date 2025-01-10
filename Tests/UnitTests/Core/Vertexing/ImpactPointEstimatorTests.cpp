@@ -267,14 +267,17 @@ BOOST_DATA_TEST_CASE(TimeAtPca, tracksWithoutIPs* vertices, t0, phi, theta, p,
   pOptions.direction =
       Direction::fromScalarZeroAsPositive(intersection.pathLength());
 
+  StraightPropagator::Options<> straightPOptions(geoContext, magFieldContext);
+  straightPOptions.direction = pOptions.direction;
+
   // Propagate to the 2D PCA of the reference point in a constant B field
   auto result = propagator->propagate(params, *refPerigeeSurface, pOptions);
   BOOST_CHECK(result.ok());
   const auto& refParams = *result->endParameters;
 
   // Propagate to the 2D PCA of the reference point when B = 0
-  auto zeroFieldResult =
-      straightLinePropagator->propagate(params, *refPerigeeSurface, pOptions);
+  auto zeroFieldResult = straightLinePropagator->propagate(
+      params, *refPerigeeSurface, straightPOptions);
   BOOST_CHECK(zeroFieldResult.ok());
   const auto& zeroFieldRefParams = *zeroFieldResult->endParameters;
 

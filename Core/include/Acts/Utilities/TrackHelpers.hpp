@@ -412,9 +412,10 @@ void calculateTrackQuantities(track_proxy_t track)
 /// @param trimHoles whether to trim holes
 /// @param trimOutliers whether to trim outliers
 /// @param trimMaterial whether to trim pure material states
+/// @param trimOtherNoneMeasurement whether to trim other, non measurement, states
 template <TrackProxyConcept track_proxy_t>
 void trimTrackFront(track_proxy_t track, bool trimHoles, bool trimOutliers,
-                    bool trimMaterial)
+                    bool trimMaterial, bool trimOtherNoneMeasurement)
   requires(!track_proxy_t::ReadOnly)
 {
   using TrackStateProxy = typename track_proxy_t::TrackStateProxy;
@@ -425,14 +426,23 @@ void trimTrackFront(track_proxy_t track, bool trimHoles, bool trimOutliers,
 
   for (TrackStateProxy trackState : track.trackStatesReversed()) {
     TrackStateType typeFlags = trackState.typeFlags();
-    if (trimHoles && typeFlags.test(TrackStateFlag::HoleFlag)) {
+    bool isHole = typeFlags.test(TrackStateFlag::HoleFlag);
+    bool isOutlier = typeFlags.test(TrackStateFlag::OutlierFlag);
+    bool isMaterial = typeFlags.test(TrackStateFlag::MaterialFlag) &&
+                      !typeFlags.test(TrackStateFlag::MeasurementFlag);
+    bool isOtherNoneMeasurement =
+        !typeFlags.test(TrackStateFlag::MeasurementFlag) && !isHole &&
+        !isOutlier && !isMaterial;
+    if (trimHoles && isHole) {
       continue;
     }
-    if (trimOutliers && typeFlags.test(TrackStateFlag::OutlierFlag)) {
+    if (trimOutliers && isOutlier) {
       continue;
     }
-    if (trimMaterial && typeFlags.test(TrackStateFlag::MaterialFlag) &&
-        !typeFlags.test(TrackStateFlag::MeasurementFlag)) {
+    if (trimMaterial && isMaterial) {
+      continue;
+    }
+    if (trimOtherNoneMeasurement && isOtherNoneMeasurement) {
       continue;
     }
 
@@ -450,9 +460,10 @@ void trimTrackFront(track_proxy_t track, bool trimHoles, bool trimOutliers,
 /// @param trimHoles whether to trim holes
 /// @param trimOutliers whether to trim outliers
 /// @param trimMaterial whether to trim pure material states
+/// @param trimOtherNoneMeasurement whether to trim other, non measurement, states
 template <TrackProxyConcept track_proxy_t>
 void trimTrackBack(track_proxy_t track, bool trimHoles, bool trimOutliers,
-                   bool trimMaterial)
+                   bool trimMaterial, bool trimOtherNoneMeasurement)
   requires(!track_proxy_t::ReadOnly)
 {
   using TrackStateProxy = typename track_proxy_t::TrackStateProxy;
@@ -463,14 +474,23 @@ void trimTrackBack(track_proxy_t track, bool trimHoles, bool trimOutliers,
     back = trackState;
 
     TrackStateType typeFlags = trackState.typeFlags();
-    if (trimHoles && typeFlags.test(TrackStateFlag::HoleFlag)) {
+    bool isHole = typeFlags.test(TrackStateFlag::HoleFlag);
+    bool isOutlier = typeFlags.test(TrackStateFlag::OutlierFlag);
+    bool isMaterial = typeFlags.test(TrackStateFlag::MaterialFlag) &&
+                      !typeFlags.test(TrackStateFlag::MeasurementFlag);
+    bool isOtherNoneMeasurement =
+        !typeFlags.test(TrackStateFlag::MeasurementFlag) && !isHole &&
+        !isOutlier && !isMaterial;
+    if (trimHoles && isHole) {
       continue;
     }
-    if (trimOutliers && typeFlags.test(TrackStateFlag::OutlierFlag)) {
+    if (trimOutliers && isOutlier) {
       continue;
     }
-    if (trimMaterial && typeFlags.test(TrackStateFlag::MaterialFlag) &&
-        !typeFlags.test(TrackStateFlag::MeasurementFlag)) {
+    if (trimMaterial && isMaterial) {
+      continue;
+    }
+    if (trimOtherNoneMeasurement && isOtherNoneMeasurement) {
       continue;
     }
 
@@ -488,13 +508,16 @@ void trimTrackBack(track_proxy_t track, bool trimHoles, bool trimOutliers,
 /// @param trimHoles whether to trim holes
 /// @param trimOutliers whether to trim outliers
 /// @param trimMaterial whether to trim pure material states
+/// @param trimOtherNoneMeasurement whether to trim other, non measurement, states
 template <TrackProxyConcept track_proxy_t>
 void trimTrack(track_proxy_t track, bool trimHoles, bool trimOutliers,
-               bool trimMaterial)
+               bool trimMaterial, bool trimOtherNoneMeasurement)
   requires(!track_proxy_t::ReadOnly)
 {
-  trimTrackFront(track, trimHoles, trimOutliers, trimMaterial);
-  trimTrackBack(track, trimHoles, trimOutliers, trimMaterial);
+  trimTrackFront(track, trimHoles, trimOutliers, trimMaterial,
+                 trimOtherNoneMeasurement);
+  trimTrackBack(track, trimHoles, trimOutliers, trimMaterial,
+                trimOtherNoneMeasurement);
 }
 
 /// Helper function to calculate the predicted residual and its covariance

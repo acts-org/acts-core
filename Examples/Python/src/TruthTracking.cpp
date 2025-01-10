@@ -67,6 +67,7 @@ void addTruthTracking(Context& ctx) {
 
     ACTS_PYTHON_STRUCT_BEGIN(c, Config);
     ACTS_PYTHON_MEMBER(inputParticles);
+    ACTS_PYTHON_MEMBER(inputParticleMeasurementsMap);
     ACTS_PYTHON_MEMBER(outputParticles);
     ACTS_PYTHON_MEMBER(rhoMin);
     ACTS_PYTHON_MEMBER(rhoMax);

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "Acts/Definitions/Algebra.hpp"
 #include "Acts/MagneticField/MagneticFieldProvider.hpp"
 
 #include <memory>
@@ -29,10 +30,6 @@ class DD4hepFieldAdapter : public Acts::MagneticFieldProvider {
 
   Result<Vector3> getField(const Vector3& position,
                            MagneticFieldProvider::Cache& cache) const override;
-
-  Result<Vector3> getFieldGradient(
-      const Vector3& position, SquareMatrix3& derivative,
-      MagneticFieldProvider::Cache& cache) const override;
 
  private:
   double m_fieldConversionFactor;

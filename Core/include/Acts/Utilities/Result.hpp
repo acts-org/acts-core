@@ -43,12 +43,12 @@ class Result {
   Result<T, E>& operator=(const Result<T, E>& other) = delete;
 
   /// Move construction is allowed
-  Result(Result<T, E>&& other) : m_var(std::move(other.m_var)) {}
+  Result(Result<T, E>&& other) noexcept : m_var(std::move(other.m_var)) {}
 
   /// Move assignment is allowed
   /// @param other The other result instance, rvalue reference
   /// @return The assigned instance
-  Result<T, E>& operator=(Result<T, E>&& other) {
+  Result<T, E>& operator=(Result<T, E>&& other) noexcept {
     m_var = std::move(other.m_var);
     return *this;
   }
@@ -357,7 +357,7 @@ class Result<void, E> {
 
   /// Move constructor
   /// @param other The other result object, rvalue ref
-  Result(Result<void, E>&& other) : m_opt(std::move(other.m_opt)) {}
+  Result(Result<void, E>&& other) noexcept : m_opt(std::move(other.m_opt)) {}
 
   /// Move assignment operator
   /// @param other The other result object, rvalue ref

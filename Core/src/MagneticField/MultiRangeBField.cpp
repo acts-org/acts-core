@@ -8,6 +8,8 @@
 
 #include "Acts/MagneticField/MultiRangeBField.hpp"
 
+#include "Acts/MagneticField/MagneticFieldError.hpp"
+
 namespace Acts {
 
 MultiRangeBField::Cache::Cache(const MagneticFieldContext& /*unused*/) {}
@@ -70,9 +72,4 @@ Result<Vector3> MultiRangeBField::getField(
   }
 }
 
-Result<Vector3> MultiRangeBField::getFieldGradient(
-    const Vector3& position, SquareMatrix3& /*unused*/,
-    MagneticFieldProvider::Cache& cache) const {
-  return getField(position, cache);
-}
 }  // namespace Acts

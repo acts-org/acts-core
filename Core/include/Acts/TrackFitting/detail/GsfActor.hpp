@@ -372,12 +372,12 @@ struct GsfActor {
 
     // Evaluate material slab
     auto slab = surface.surfaceMaterial()->materialSlab(
-        old_bound.position(state.stepping.geoContext), state.options.direction,
+        old_bound.position(state.geoContext), state.options.direction,
         MaterialUpdateStage::FullUpdate);
 
     const auto pathCorrection = surface.pathCorrection(
-        state.stepping.geoContext,
-        old_bound.position(state.stepping.geoContext), old_bound.direction());
+        state.geoContext, old_bound.position(state.geoContext),
+        old_bound.direction());
     slab.scaleThickness(pathCorrection);
 
     const double pathXOverX0 = slab.thicknessInX0();

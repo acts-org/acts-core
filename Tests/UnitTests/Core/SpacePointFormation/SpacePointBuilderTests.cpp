@@ -10,10 +10,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
 #include "Acts/EventData/SourceLink.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/EventData/detail/TestSourceLink.hpp"
@@ -25,7 +23,6 @@
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
-#include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/SpacePointFormation/SpacePointBuilder.hpp"
 #include "Acts/SpacePointFormation/SpacePointBuilderConfig.hpp"
 #include "Acts/SpacePointFormation/SpacePointBuilderOptions.hpp"
@@ -34,10 +31,8 @@
 #include "Acts/Tests/CommonHelpers/MeasurementsCreator.hpp"
 #include "Acts/Tests/CommonHelpers/TestSpacePoint.hpp"
 
-#include <algorithm>
 #include <iostream>
 #include <iterator>
-#include <map>
 #include <memory>
 #include <optional>
 #include <random>
@@ -49,11 +44,11 @@ using namespace Acts::UnitLiterals;
 
 namespace Acts::Test {
 
-using StraightPropagator = Propagator<StraightLineStepper, Navigator>;
 using TestSourceLink = detail::Test::TestSourceLink;
 using ConstantFieldStepper = EigenStepper<>;
 using ConstantFieldPropagator = Propagator<ConstantFieldStepper, Navigator>;
-// Construct initial track parameters.
+
+/// Construct initial track parameters.
 CurvilinearTrackParameters makeParameters(double phi, double theta, double p,
                                           double q) {
   // create covariance matrix from reasonable standard deviations

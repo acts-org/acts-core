@@ -9,6 +9,17 @@ variables:
 
   DEPENDENCY_TAG: v7_b7
 
+.ccache_base:
+  cache:
+    - key: ccache-${CI_JOB_NAME}-${CCACHE_KEY_SUFFIX}-${CLONE_URL}_${HEAD_REF}
+      fallback_keys:
+        - ccache-${CI_JOB_NAME}-${CCACHE_KEY_SUFFIX}-https://github.com/acts-project/acts.git-main
+      when: always
+      paths:
+        - ${CCACHE_DIR}
+
+
+
 # clang_tidy:
 #   stage: build
 #   image: ghcr.io/acts-project/ubuntu2404:63
@@ -70,12 +81,7 @@ build_exatrkx_cpu:
     - large
 
   cache:
-    key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
-    fallback_keys:
-      - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
-    when: always
-    paths:
-      - ${CCACHE_DIR}
+   - !reference [.ccache_base, cache]
 
   script:
     - export PATH=/usr/local/sbin:/usr/sbin:/sbin:$PATH
@@ -107,12 +113,7 @@ build_exatrkx:
     - large
 
   cache:
-    key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
-    fallback_keys:
-      - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
-    when: always
-    paths:
-      - ${CCACHE_DIR}
+   - !reference [.ccache_base, cache]
 
   artifacts:
     paths:
@@ -193,24 +194,19 @@ build_linux_ubuntu:
     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
 
   cache:
-    - key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
-      fallback_keys:
-        - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
-      when: always
-      paths:
-        - ${CCACHE_DIR}
-    - key:
-        files:
-          - CI/dependencies/setup_spack.sh
-        prefix: spack_${SPACK_VERSION}
-      paths:
-        - spack
-        - .spack
-    - key:
-        files:
-          - spack_lockfile_cache/digest.txt
-        prefix: spack_lockfile_
-      paths:
+   - !reference [.ccache_base, cache]
+   - key:
+       files:
+        - CI/dependencies/setup_spack.sh
+     prefix: spack_${SPACK_VERSION}
+     paths:
+      - spack
+      - .spack
+   - key:
+       files:
+        - spack_lockfile_cache/digest.txt
+       prefix: spack_lockfile_
+       paths:
         - spack_lockfile_cache
 
   after_script:
@@ -330,12 +326,7 @@ linux_physmon:
   stage: build
 
   cache:
-    key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
-    fallback_keys:
-      - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
-    when: always
-    paths:
-      - ${CCACHE_DIR}
+   - !reference [.ccache_base, cache]
 
   script:
     - git clone $CLONE_URL src
@@ -410,12 +401,7 @@ linux_ubuntu_2204_clang:
     SETUP:
 
   cache:
-    key: ccache-${CI_JOB_NAME}-${CI_COMMIT_REF_SLUG}-${CCACHE_KEY_SUFFIX}
-    fallback_keys:
-      - ccache-${CI_JOB_NAME}-${CI_DEFAULT_BRANCH}-${CCACHE_KEY_SUFFIX}
-    when: always
-    paths:
-      - ${CCACHE_DIR}
+   - !reference [.ccache_base, cache]
 
   before_script:
     - 'echo "LCG_VERSION: ${LCG_VERSION}"'

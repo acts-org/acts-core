@@ -18,7 +18,6 @@
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/EventData/detail/CorrectedTransformationFreeToBound.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
-#include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/MagneticField/NullBField.hpp"
 #include "Acts/Propagator/ConstrainedStep.hpp"
 #include "Acts/Propagator/PropagatorTraits.hpp"
@@ -33,7 +32,6 @@
 #include "Acts/Utilities/Result.hpp"
 
 #include <cmath>
-#include <functional>
 #include <limits>
 #include <string>
 #include <tuple>
@@ -57,6 +55,9 @@ class StraightLineStepper {
   struct Config {};
 
   struct Options : public StepperPlainOptions {
+    Options(const GeometryContext& gctx, const MagneticFieldContext& mctx)
+        : StepperPlainOptions(gctx, mctx) {}
+
     void setPlainOptions(const StepperPlainOptions& options) {
       static_cast<StepperPlainOptions&>(*this) = options;
     }
@@ -65,40 +66,14 @@ class StraightLineStepper {
   /// State for track parameter propagation
   ///
   struct State {
-    State() = delete;
-
     /// Constructor from the initial bound track parameters
     ///
-    /// @param [in] gctx is the context object for the geometry
-    /// @param [in] par The track parameters at start
-    /// @param [in] ssize is the maximum step size
-    /// @param [in] stolerance is the stepping tolerance
+    /// @param [in] optionsIn The options for the stepper
     ///
     /// @note the covariance matrix is copied when needed
-    explicit State(const GeometryContext& gctx,
-                   const MagneticFieldContext& /*mctx*/,
-                   const BoundTrackParameters& par,
-                   double ssize = std::numeric_limits<double>::max(),
-                   double stolerance = s_onSurfaceTolerance)
-        : particleHypothesis(par.particleHypothesis()),
-          stepSize(ssize),
-          tolerance(stolerance),
-          geoContext(gctx) {
-      Vector3 position = par.position(gctx);
-      Vector3 direction = par.direction();
-      pars.template segment<3>(eFreePos0) = position;
-      pars.template segment<3>(eFreeDir0) = direction;
-      pars[eFreeTime] = par.time();
-      pars[eFreeQOverP] = par.parameters()[eBoundQOverP];
-      if (par.covariance()) {
-        // Get the reference surface for navigation
-        const auto& surface = par.referenceSurface();
-        // set the covariance transport flag to true and copy
-        covTransport = true;
-        cov = BoundSquareMatrix(*par.covariance());
-        jacToGlobal = surface.boundToFreeJacobian(gctx, position, direction);
-      }
-    }
+    explicit State(const Options& optionsIn) : options(optionsIn) {}
+
+    Options options;
 
     /// Jacobian from local to the global frame
     BoundToFreeMatrix jacToGlobal = BoundToFreeMatrix::Zero();
@@ -140,21 +115,39 @@ class StraightLineStepper {
     /// The tolerance for the stepping
     double tolerance = s_onSurfaceTolerance;
 
-    // Cache the geometry context of this propagation
-    std::reference_wrapper<const GeometryContext> geoContext;
-
     /// Statistics of the stepper
     StepperStatistics statistics;
   };
 
   StraightLineStepper() = default;
 
-  State makeState(std::reference_wrapper<const GeometryContext> gctx,
-                  std::reference_wrapper<const MagneticFieldContext> mctx,
-                  const BoundTrackParameters& par,
-                  double ssize = std::numeric_limits<double>::max(),
-                  double stolerance = s_onSurfaceTolerance) const {
-    return State{gctx, mctx, par, ssize, stolerance};
+  State makeState(const Options& options,
+                  const BoundTrackParameters& par) const {
+    State state{options};
+
+    state.particleHypothesis = par.particleHypothesis();
+
+    Vector3 position = par.position(options.geoContext);
+    Vector3 direction = par.direction();
+    state.pars.template segment<3>(eFreePos0) = position;
+    state.pars.template segment<3>(eFreeDir0) = direction;
+    state.pars[eFreeTime] = par.time();
+    state.pars[eFreeQOverP] = par.parameters()[eBoundQOverP];
+
+    // Init the jacobian matrix if needed
+    if (par.covariance()) {
+      // Get the reference surface for navigation
+      const auto& surface = par.referenceSurface();
+      // set the covariance transport flag to true and copy
+      state.covTransport = true;
+      state.cov = BoundSquareMatrix(*par.covariance());
+      state.jacToGlobal =
+          surface.boundToFreeJacobian(options.geoContext, position, direction);
+    }
+
+    state.stepSize = ConstrainedStep(options.maxStepSize);
+
+    return state;
   }
 
   /// @brief Resets the state
@@ -240,15 +233,16 @@ class StraightLineStepper {
   /// @param [in] navDir The navigation direction
   /// @param [in] boundaryTolerance The boundary check for this status update
   /// @param [in] surfaceTolerance Surface tolerance used for intersection
+  /// @param [in] stype The step size type to be set
   /// @param [in] logger A logger instance
   IntersectionStatus updateSurfaceStatus(
       State& state, const Surface& surface, std::uint8_t index,
       Direction navDir, const BoundaryTolerance& boundaryTolerance,
-      double surfaceTolerance = s_onSurfaceTolerance,
+      double surfaceTolerance, ConstrainedStep::Type stype,
       const Logger& logger = getDummyLogger()) const {
     return detail::updateSingleSurfaceStatus<StraightLineStepper>(
         *this, state, surface, index, navDir, boundaryTolerance,
-        surfaceTolerance, logger);
+        surfaceTolerance, stype, logger);
   }
 
   /// Update step size
@@ -258,12 +252,14 @@ class StraightLineStepper {
   ///
   /// @param state [in,out] The stepping state (thread-local cache)
   /// @param oIntersection [in] The ObjectIntersection to layer, boundary, etc
-  /// @param release [in] boolean to trigger step size release
+  /// @param direction [in] The propagation direction
+  /// @param stype [in] The step size type to be set
   template <typename object_intersection_t>
   void updateStepSize(State& state, const object_intersection_t& oIntersection,
-                      Direction /*direction*/, bool release = true) const {
-    detail::updateSingleStepSize<StraightLineStepper>(state, oIntersection,
-                                                      release);
+                      Direction direction, ConstrainedStep::Type stype) const {
+    (void)direction;
+    double stepSize = oIntersection.pathLength();
+    updateStepSize(state, stepSize, stype);
   }
 
   /// Update step size - explicitly with a double
@@ -271,12 +267,10 @@ class StraightLineStepper {
   /// @param state [in,out] The stepping state (thread-local cache)
   /// @param stepSize [in] The step size value
   /// @param stype [in] The step size type to be set
-  /// @param release [in] Do we release the step size?
   void updateStepSize(State& state, double stepSize,
-                      ConstrainedStep::Type stype = ConstrainedStep::actor,
-                      bool release = true) const {
+                      ConstrainedStep::Type stype) const {
     state.previousStepSize = state.stepSize.value();
-    state.stepSize.update(stepSize, stype, release);
+    state.stepSize.update(stepSize, stype);
   }
 
   /// Get the step size

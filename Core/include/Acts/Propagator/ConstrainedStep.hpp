@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "Acts/Definitions/Algebra.hpp"
-
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -44,10 +42,10 @@ namespace Acts {
 class ConstrainedStep {
  public:
   /// the types of constraints
-  /// from actor    - this would be a typical navigation step
-  /// from aborter  - this would be a target condition
-  /// from user     - this is user given for what reason ever
-  enum Type : int { actor = 0, aborter = 1, user = 2 };
+  /// from navigator - this would be a navigation step
+  /// from actor     - this would be an actor condition
+  /// from user      - this is user given for what reason ever
+  enum Type : int { navigator = 0, actor = 1, user = 2 };
 
   constexpr ConstrainedStep() = default;
 
@@ -108,11 +106,7 @@ class ConstrainedStep {
   ///
   /// @param value is the new value to be updated
   /// @param type is the constraint type
-  /// @param releaseStep Allow step size to increase again
-  constexpr void update(double value, Type type, bool releaseStep = false) {
-    if (releaseStep) {
-      release(type);
-    }
+  constexpr void update(double value, Type type) {
     // check the current value and set it if appropriate
     // this will also allow signed values due to overstepping
     if (std::abs(value) < std::abs(m_values[type])) {
@@ -137,9 +131,9 @@ class ConstrainedStep {
     os << "(";
     streamValue(m_accuracy);
     os << ", ";
-    streamValue(value(actor));
+    streamValue(value(navigator));
     os << ", ";
-    streamValue(value(aborter));
+    streamValue(value(actor));
     os << ", ";
     streamValue(value(user));
     os << ")";

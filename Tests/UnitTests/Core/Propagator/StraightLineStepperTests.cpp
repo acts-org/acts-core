@@ -10,8 +10,8 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Direction.hpp"
+#include "Acts/Definitions/Tolerance.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
-#include "Acts/EventData/Charge.hpp"
 #include "Acts/EventData/GenericBoundTrackParameters.hpp"
 #include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
@@ -24,17 +24,13 @@
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
-#include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
-#include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/Result.hpp"
 
-#include <functional>
 #include <limits>
 #include <memory>
 #include <optional>
 #include <string>
-#include <tuple>
 #include <utility>
 
 using Acts::VectorHelpers::makeVector4;
@@ -70,7 +66,6 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_state_test) {
   GeometryContext tgContext = GeometryContext();
   MagneticFieldContext mfContext = MagneticFieldContext();
   double stepSize = 123.;
-  double tolerance = 234.;
 
   Vector3 pos(1., 2., 3.);
   Vector3 dir(4., 5., 6.);
@@ -78,13 +73,15 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_state_test) {
   double absMom = 8.;
   double charge = -1.;
 
+  StraightLineStepper::Options slsOptions(tgContext, mfContext);
+  slsOptions.maxStepSize = stepSize;
+
   // Test charged parameters without covariance matrix
   CurvilinearTrackParameters cp(makeVector4(pos, time), dir, charge / absMom,
                                 std::nullopt, ParticleHypothesis::pion());
-  StraightLineStepper::State slsState(tgContext, mfContext, cp, stepSize,
-                                      tolerance);
 
   StraightLineStepper sls;
+  StraightLineStepper::State slsState = sls.makeState(slsOptions, cp);
 
   // Test the result & compare with the input/test for reasonable members
   BOOST_CHECK_EQUAL(slsState.jacToGlobal, BoundToFreeMatrix::Zero());
@@ -100,20 +97,17 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_state_test) {
   BOOST_CHECK_EQUAL(slsState.pathAccumulated, 0.);
   BOOST_CHECK_EQUAL(slsState.stepSize.value(), stepSize);
   BOOST_CHECK_EQUAL(slsState.previousStepSize, 0.);
-  BOOST_CHECK_EQUAL(slsState.tolerance, tolerance);
 
   // Test without charge and covariance matrix
   CurvilinearTrackParameters ncp(makeVector4(pos, time), dir, 1 / absMom,
                                  std::nullopt, ParticleHypothesis::pion0());
-  slsState = StraightLineStepper::State(tgContext, mfContext, ncp, stepSize,
-                                        tolerance);
+  slsState = sls.makeState(slsOptions, ncp);
 
   // Test with covariance matrix
   Covariance cov = 8. * Covariance::Identity();
   ncp = CurvilinearTrackParameters(makeVector4(pos, time), dir, 1 / absMom, cov,
                                    ParticleHypothesis::pion0());
-  slsState = StraightLineStepper::State(tgContext, mfContext, ncp, stepSize,
-                                        tolerance);
+  slsState = sls.makeState(slsOptions, ncp);
   BOOST_CHECK_NE(slsState.jacToGlobal, BoundToFreeMatrix::Zero());
   BOOST_CHECK(slsState.covTransport);
   BOOST_CHECK_EQUAL(slsState.cov, cov);
@@ -127,7 +121,6 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
   MagneticFieldContext mfContext = MagneticFieldContext();
   Direction navDir = Direction::Backward;
   double stepSize = 123.;
-  double tolerance = 234.;
 
   // Construct the parameters
   Vector3 pos(1., 2., 3.);
@@ -139,10 +132,12 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
   CurvilinearTrackParameters cp(makeVector4(pos, time), dir, charge / absMom,
                                 cov, ParticleHypothesis::pion());
 
-  // Build the state and the stepper
-  StraightLineStepper::State slsState(tgContext, mfContext, cp, stepSize,
-                                      tolerance);
+  StraightLineStepper::Options options(tgContext, mfContext);
+  options.maxStepSize = stepSize;
+
+  // Build the stepper and the state
   StraightLineStepper sls;
+  StraightLineStepper::State slsState = sls.makeState(options, cp);
 
   // Test the getters
   CHECK_CLOSE_ABS(sls.position(slsState), pos, 1e-6);
@@ -154,11 +149,11 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
   // Step size modifies
   const std::string originalStepSize = slsState.stepSize.toString();
 
-  sls.updateStepSize(slsState, -1337., ConstrainedStep::actor);
+  sls.updateStepSize(slsState, -1337., ConstrainedStep::navigator);
   BOOST_CHECK_EQUAL(slsState.previousStepSize, stepSize);
   BOOST_CHECK_EQUAL(slsState.stepSize.value(), -1337.);
 
-  sls.releaseStepSize(slsState, ConstrainedStep::actor);
+  sls.releaseStepSize(slsState, ConstrainedStep::navigator);
   BOOST_CHECK_EQUAL(slsState.stepSize.value(), stepSize);
   BOOST_CHECK_EQUAL(sls.outputStepSize(slsState), originalStepSize);
 
@@ -243,7 +238,7 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
   double stepSize2 = -2. * stepSize;
 
   // Reset all possible parameters
-  StraightLineStepper::State slsStateCopy(ps.stepping);
+  StraightLineStepper::State slsStateCopy = ps.stepping;
   sls.resetState(slsStateCopy, cp2.parameters(), *cp2.covariance(),
                  cp2.referenceSurface(), stepSize2);
   // Test all components
@@ -265,7 +260,6 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
   BOOST_CHECK_EQUAL(slsStateCopy.stepSize.value(), navDir * stepSize2);
   BOOST_CHECK_EQUAL(slsStateCopy.previousStepSize,
                     ps.stepping.previousStepSize);
-  BOOST_CHECK_EQUAL(slsStateCopy.tolerance, ps.stepping.tolerance);
 
   // Reset all possible parameters except the step size
   slsStateCopy = ps.stepping;
@@ -291,7 +285,6 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
                     std::numeric_limits<double>::max());
   BOOST_CHECK_EQUAL(slsStateCopy.previousStepSize,
                     ps.stepping.previousStepSize);
-  BOOST_CHECK_EQUAL(slsStateCopy.tolerance, ps.stepping.tolerance);
 
   // Reset the least amount of parameters
   slsStateCopy = ps.stepping;
@@ -317,7 +310,6 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
                     std::numeric_limits<double>::max());
   BOOST_CHECK_EQUAL(slsStateCopy.previousStepSize,
                     ps.stepping.previousStepSize);
-  BOOST_CHECK_EQUAL(slsStateCopy.tolerance, ps.stepping.tolerance);
 
   /// Repeat with surface related methods
   auto plane = CurvilinearSurface(pos, dir).planeSurface();
@@ -325,36 +317,35 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
                 plane, tgContext, makeVector4(pos, time), dir, charge / absMom,
                 cov, ParticleHypothesis::pion())
                 .value();
-  slsState =
-      StraightLineStepper::State(tgContext, mfContext, cp, stepSize, tolerance);
+  slsState = sls.makeState(options, bp);
 
   // Test the intersection in the context of a surface
   auto targetSurface =
       CurvilinearSurface(pos + navDir * 2. * dir, dir).planeSurface();
   sls.updateSurfaceStatus(slsState, *targetSurface, 0, navDir,
-                          BoundaryTolerance::Infinite());
-  CHECK_CLOSE_ABS(slsState.stepSize.value(ConstrainedStep::actor), navDir * 2.,
-                  1e-6);
+                          BoundaryTolerance::Infinite(), s_onSurfaceTolerance,
+                          ConstrainedStep::navigator);
+  CHECK_CLOSE_ABS(slsState.stepSize.value(ConstrainedStep::navigator),
+                  navDir * 2., 1e-6);
 
   // Test the step size modification in the context of a surface
-  sls.updateStepSize(
-      slsState,
-      targetSurface
-          ->intersect(slsState.geoContext, sls.position(slsState),
-                      navDir * sls.direction(slsState),
-                      BoundaryTolerance::Infinite())
-          .closest(),
-      navDir, false);
+  sls.updateStepSize(slsState,
+                     targetSurface
+                         ->intersect(tgContext, sls.position(slsState),
+                                     navDir * sls.direction(slsState),
+                                     BoundaryTolerance::Infinite())
+                         .closest(),
+                     navDir, ConstrainedStep::navigator);
   CHECK_CLOSE_ABS(slsState.stepSize.value(), 2, 1e-6);
   slsState.stepSize.setUser(navDir * stepSize);
-  sls.updateStepSize(
-      slsState,
-      targetSurface
-          ->intersect(slsState.geoContext, sls.position(slsState),
-                      navDir * sls.direction(slsState),
-                      BoundaryTolerance::Infinite())
-          .closest(),
-      navDir, true);
+  sls.releaseStepSize(slsState, ConstrainedStep::navigator);
+  sls.updateStepSize(slsState,
+                     targetSurface
+                         ->intersect(tgContext, sls.position(slsState),
+                                     navDir * sls.direction(slsState),
+                                     BoundaryTolerance::Infinite())
+                         .closest(),
+                     navDir, ConstrainedStep::navigator);
   CHECK_CLOSE_ABS(slsState.stepSize.value(), 2, 1e-6);
 
   // Test the bound state construction

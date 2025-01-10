@@ -10,7 +10,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/EventData/GenericBoundTrackParameters.hpp"
@@ -24,9 +23,7 @@
 #include "Acts/Propagator/ConstrainedStep.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/EigenStepperDenseExtension.hpp"
-#include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
-#include "Acts/Propagator/StandardAborters.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/CylinderBounds.hpp"
@@ -34,11 +31,8 @@
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
-#include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/Result.hpp"
 
-#include <algorithm>
-#include <array>
 #include <cmath>
 #include <cstddef>
 #include <limits>
@@ -46,13 +40,8 @@
 #include <numbers>
 #include <optional>
 #include <random>
-#include <tuple>
 #include <type_traits>
 #include <utility>
-
-namespace Acts {
-class Logger;
-}  // namespace Acts
 
 namespace bdata = boost::unit_test::data;
 using namespace Acts::UnitLiterals;
@@ -120,13 +109,13 @@ struct SurfaceObserver {
               .pathLength();
       // Adjust the step size so that we cannot cross the target surface
       state.stepping.stepSize.update(distance * state.options.direction,
-                                     ConstrainedStep::actor);
+                                     ConstrainedStep::navigator);
       // return true if you fall below tolerance
       if (std::abs(distance) <= tolerance) {
         ++result.surfaces_passed;
         result.surface_passed_r = perp(stepper.position(state.stepping));
         // release the step size, will be re-adjusted
-        state.stepping.stepSize.release(ConstrainedStep::actor);
+        state.stepping.stepSize.release(ConstrainedStep::navigator);
       }
     }
   }
@@ -407,7 +396,6 @@ BOOST_AUTO_TEST_CASE(BasicPropagatorInterface) {
 
   GeometryContext gctx;
   MagneticFieldContext mctx;
-  EigenPropagatorType::Options<> options{gctx, mctx};
 
   {
     Propagator propagator{eigenStepper, navigator};
@@ -415,6 +403,8 @@ BOOST_AUTO_TEST_CASE(BasicPropagatorInterface) {
                   "Propagator does not inherit from BasePropagator");
     const BasePropagator* base =
         static_cast<const BasePropagator*>(&propagator);
+
+    EigenPropagatorType::Options<> options{gctx, mctx};
 
     // Ensure the propagation does the same thing
     auto result =
@@ -446,6 +436,8 @@ BOOST_AUTO_TEST_CASE(BasicPropagatorInterface) {
                   "Propagator does not inherit from BasePropagator");
     const BasePropagator* base =
         static_cast<const BasePropagator*>(&propagator);
+
+    Propagator<StraightLineStepper>::Options<> options{gctx, mctx};
 
     // Ensure the propagation does the same thing
     auto result =

@@ -8,9 +8,7 @@
 
 #pragma once
 
-#include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Direction.hpp"
-#include "Acts/Definitions/Tolerance.hpp"
 #include "Acts/Propagator/ConstrainedStep.hpp"
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/Surface.hpp"
@@ -28,61 +26,53 @@ namespace Acts::detail {
 /// returns the status of the intersection to trigger onSurface in case
 /// the surface is reached.
 ///
+/// @tparam stepper_t The type of stepper used for the propagation
+///
+/// @param stepper [in] The stepper in use
 /// @param state [in,out] The stepping state (thread-local cache)
 /// @param surface [in] The surface provided
+/// @param index [in] The surface intersection index
+/// @param direction [in] The propagation direction
 /// @param boundaryTolerance [in] The boundary check for this status update
+/// @param surfaceTolerance [in] Surface tolerance used for intersection
+/// @param stype [in] The step size type to be set
+/// @param logger [in] A @c Logger instance
 template <typename stepper_t>
 Acts::IntersectionStatus updateSingleSurfaceStatus(
     const stepper_t& stepper, typename stepper_t::State& state,
-    const Surface& surface, std::uint8_t index, Direction navDir,
+    const Surface& surface, std::uint8_t index, Direction direction,
     const BoundaryTolerance& boundaryTolerance, double surfaceTolerance,
-    const Logger& logger) {
+    ConstrainedStep::Type stype, const Logger& logger) {
   ACTS_VERBOSE("Update single surface status for surface: "
                << surface.geometryId() << " index " << static_cast<int>(index));
 
   auto sIntersection =
-      surface.intersect(state.geoContext, stepper.position(state),
-                        navDir * stepper.direction(state), boundaryTolerance,
+      surface.intersect(state.options.geoContext, stepper.position(state),
+                        direction * stepper.direction(state), boundaryTolerance,
                         surfaceTolerance)[index];
 
   // The intersection is on surface already
   if (sIntersection.status() == IntersectionStatus::onSurface) {
     // Release navigation step size
-    state.stepSize.release(ConstrainedStep::actor);
+    state.stepSize.release(stype);
     ACTS_VERBOSE("Intersection: state is ON SURFACE");
     return IntersectionStatus::onSurface;
   }
 
   const double nearLimit = std::numeric_limits<double>::lowest();
-  const double farLimit = state.stepSize.value(ConstrainedStep::aborter);
+  const double farLimit = state.stepSize.value(ConstrainedStep::actor);
 
   if (sIntersection.isValid() &&
       detail::checkPathLength(sIntersection.pathLength(), nearLimit, farLimit,
                               logger)) {
     ACTS_VERBOSE("Surface is reachable");
-    stepper.updateStepSize(state, sIntersection.pathLength(),
-                           ConstrainedStep::actor);
+    stepper.releaseStepSize(state, stype);
+    stepper.updateStepSize(state, sIntersection.pathLength(), stype);
     return IntersectionStatus::reachable;
   }
 
   ACTS_VERBOSE("Surface is NOT reachable");
   return IntersectionStatus::unreachable;
-}
-
-/// Update the Step size - single component
-///
-/// It takes a (valid) object intersection from the compatibleX(...)
-/// calls in the geometry and updates the step size
-///
-/// @param state [in,out] The stepping state (thread-local cache)
-/// @param oIntersection [in] The object that yielded this step size
-/// @param release [in] A release flag
-template <typename stepper_t, typename object_intersection_t>
-void updateSingleStepSize(typename stepper_t::State& state,
-                          const object_intersection_t& oIntersection,
-                          bool release = true) {
-  double stepSize = oIntersection.pathLength();
-  state.stepSize.update(stepSize, ConstrainedStep::actor, release);
 }
 
 }  // namespace Acts::detail

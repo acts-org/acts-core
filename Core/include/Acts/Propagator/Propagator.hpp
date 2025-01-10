@@ -13,13 +13,8 @@
 #include "Acts/Utilities/detail/ReferenceWrapperAnyCompat.hpp"
 // clang-format on
 
-#include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/PdgParticle.hpp"
-#include "Acts/Definitions/Units.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/EventData/TrackParametersConcept.hpp"
-#include "Acts/Geometry/GeometryContext.hpp"
-#include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/PropagatorOptions.hpp"
 #include "Acts/Propagator/PropagatorResult.hpp"
@@ -31,8 +26,6 @@
 #include "Acts/Propagator/detail/ParameterTraits.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/Result.hpp"
-
-#include <optional>
 
 namespace Acts {
 

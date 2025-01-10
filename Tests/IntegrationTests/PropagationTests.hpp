@@ -348,8 +348,7 @@ inline void runToSurfaceTest(
 
 /// Propagate the initial parameters along their trajectory for the given path
 /// length using two different propagators and verify consistent output.
-template <typename cmp_propagator_t, typename ref_propagator_t,
-          typename options_t = typename ref_propagator_t::template Options<>>
+template <typename cmp_propagator_t, typename ref_propagator_t>
 inline void runForwardComparisonTest(
     const cmp_propagator_t& cmpPropagator,
     const ref_propagator_t& refPropagator, const Acts::GeometryContext& geoCtx,
@@ -357,9 +356,9 @@ inline void runForwardComparisonTest(
     const Acts::CurvilinearTrackParameters& initialParams, double pathLength,
     double epsPos, double epsDir, double epsMom, double tolCov) {
   // propagate twice using the two different propagators
-  auto [cmpParams, cmpPath] = transportFreely<cmp_propagator_t, options_t>(
+  auto [cmpParams, cmpPath] = transportFreely<cmp_propagator_t>(
       cmpPropagator, geoCtx, magCtx, initialParams, pathLength);
-  auto [refParams, refPath] = transportFreely<ref_propagator_t, options_t>(
+  auto [refParams, refPath] = transportFreely<ref_propagator_t>(
       refPropagator, geoCtx, magCtx, initialParams, pathLength);
   // check parameter comparison
   checkParametersConsistency(cmpParams, refParams, geoCtx, epsPos, epsDir,
@@ -375,8 +374,7 @@ inline void runForwardComparisonTest(
 /// to define a target plane. Propagate the initial parameters using two
 /// different propagators and verify consistent output.
 template <typename cmp_propagator_t, typename ref_propagator_t,
-          typename surface_builder_t,
-          typename options_t = typename ref_propagator_t::template Options<>>
+          typename surface_builder_t>
 inline void runToSurfaceComparisonTest(
     const cmp_propagator_t& cmpPropagator,
     const ref_propagator_t& refPropagator, const Acts::GeometryContext& geoCtx,
@@ -385,9 +383,8 @@ inline void runToSurfaceComparisonTest(
     surface_builder_t&& buildTargetSurface, double epsPos, double epsDir,
     double epsMom, double tolCov) {
   // free propagation with the reference propagator for the given path length
-  auto [freeParams, freePathLength] =
-      transportFreely<ref_propagator_t, options_t>(
-          refPropagator, geoCtx, magCtx, initialParams, pathLength);
+  auto [freeParams, freePathLength] = transportFreely<ref_propagator_t>(
+      refPropagator, geoCtx, magCtx, initialParams, pathLength);
   CHECK_CLOSE_ABS(freePathLength, pathLength, epsPos);
 
   // build a target surface at the propagated position
@@ -396,9 +393,9 @@ inline void runToSurfaceComparisonTest(
 
   // propagate twice to the surface using the two different propagators
   // increase path length limit to ensure the surface can be reached
-  auto [cmpParams, cmpPath] = transportToSurface<cmp_propagator_t, options_t>(
+  auto [cmpParams, cmpPath] = transportToSurface<cmp_propagator_t>(
       cmpPropagator, geoCtx, magCtx, initialParams, *surface, 1.5 * pathLength);
-  auto [refParams, refPath] = transportToSurface<ref_propagator_t, options_t>(
+  auto [refParams, refPath] = transportToSurface<ref_propagator_t>(
       refPropagator, geoCtx, magCtx, initialParams, *surface, 1.5 * pathLength);
   // check parameter comparison
   checkParametersConsistency(cmpParams, refParams, geoCtx, epsPos, epsDir,

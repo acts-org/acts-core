@@ -11,7 +11,6 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
@@ -27,12 +26,10 @@
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 
-#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <memory>
 #include <optional>
-#include <type_traits>
 #include <utility>
 
 using namespace Acts::UnitLiterals;
@@ -135,11 +132,13 @@ template <typename Parameters>
 void testJacobianToGlobal(const Parameters& pars) {
   // Jacobian creation for Propagator/Steppers
   // a) ATLAS stepper
-  AtlasStepperType::State astepState(tgContext, bField->makeCache(mfContext),
-                                     pars);
+  AtlasStepperType astep(bField);
+  AtlasStepperType::State astepState =
+      astep.makeState(AtlasStepperType::Options(tgContext, mfContext), pars);
   // b) Eigen stepper
-  EigenStepperType::State estepState(tgContext, bField->makeCache(mfContext),
-                                     pars);
+  EigenStepperType estep(bField);
+  EigenStepperType::State estepState =
+      estep.makeState(EigenStepperType::Options(tgContext, mfContext), pars);
 
   // create the matrices
   auto asMatrix = convertToMatrix(astepState.pVector);

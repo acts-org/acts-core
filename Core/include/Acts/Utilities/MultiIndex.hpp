@@ -70,7 +70,7 @@ class MultiIndex {
   MultiIndex(const MultiIndex&) = default;
   MultiIndex(MultiIndex&) = default;
   MultiIndex& operator=(const MultiIndex&) = default;
-  MultiIndex& operator=(MultiIndex&&) = default;
+  MultiIndex& operator=(MultiIndex&&) noexcept = default;
   /// Allow setting the MultiIndex from an already encoded value.
   constexpr MultiIndex& operator=(Value encoded) {
     m_value = encoded;

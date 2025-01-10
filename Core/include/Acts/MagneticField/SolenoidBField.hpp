@@ -14,7 +14,6 @@
 #include "Acts/Utilities/Result.hpp"
 
 #include <cstddef>
-#include <functional>
 
 namespace Acts {
 
@@ -110,14 +109,6 @@ class SolenoidBField final : public MagneticFieldProvider {
   /// @copydoc MagneticFieldProvider::getField(const Vector3&,MagneticFieldProvider::Cache&) const
   Result<Vector3> getField(const Vector3& position,
                            MagneticFieldProvider::Cache& cache) const override;
-
-  /// @copydoc MagneticFieldProvider::getFieldGradient(const Vector3&,SquareMatrix3&,MagneticFieldProvider::Cache&) const
-  ///
-  /// @note currently the derivative is not calculated
-  /// @todo return derivative
-  Result<Vector3> getFieldGradient(
-      const Vector3& position, SquareMatrix3& derivative,
-      MagneticFieldProvider::Cache& cache) const override;
 
  private:
   Config m_cfg;

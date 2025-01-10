@@ -192,7 +192,7 @@ class VectorMultiTrajectoryBase {
     TrackStatePropMask allocMask = TrackStatePropMask::None;
   };
 
-  VectorMultiTrajectoryBase() = default;
+  VectorMultiTrajectoryBase() noexcept = default;
 
   VectorMultiTrajectoryBase(const VectorMultiTrajectoryBase& other)
       : m_index{other.m_index},
@@ -388,7 +388,7 @@ class VectorMultiTrajectory final
   VectorMultiTrajectory(const VectorMultiTrajectory& other)
       : VectorMultiTrajectoryBase{other} {}
 
-  VectorMultiTrajectory(VectorMultiTrajectory&& other)
+  VectorMultiTrajectory(VectorMultiTrajectory&& other) noexcept
       : VectorMultiTrajectoryBase{std::move(other)} {}
 
   Statistics statistics() const {

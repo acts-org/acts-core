@@ -50,10 +50,4 @@ Result<Vector3> DD4hepFieldAdapter::getField(
   return Result<Vector3>::success(result);
 }
 
-Result<Vector3> DD4hepFieldAdapter::getFieldGradient(
-    const Vector3& /*position*/, SquareMatrix3& /*derivative*/,
-    MagneticFieldProvider::Cache& /*cache*/) const {
-  return Result<Vector3>::failure(MagneticFieldError::NotImplemented);
-}
-
 }  // namespace Acts

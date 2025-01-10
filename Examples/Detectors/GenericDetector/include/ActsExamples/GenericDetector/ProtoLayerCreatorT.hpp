@@ -280,14 +280,14 @@ ProtoLayerCreatorT<detector_element_t>::centralProtoLayers(
         auto moduleTransform = std::const_pointer_cast<const Acts::Transform3>(
             mutableModuleTransform);
         // create the module
-        auto module = std::make_shared<detector_element_t>(
+        auto moduleElement = std::make_shared<detector_element_t>(
             moduleIdentifier, moduleTransform, moduleBounds, moduleThickness,
             moduleMaterialPtr);
 
         // put the module into the detector store
-        layerStore.push_back(module);
+        layerStore.push_back(moduleElement);
         // register the surface
-        sVector.push_back(module->surface().getSharedPtr());
+        sVector.push_back(moduleElement->surface().getSharedPtr());
         // IF double modules exist
         // and the backside one (if configured to do so)
         if (!m_cfg.centralModuleBacksideGap.empty()) {
@@ -311,11 +311,11 @@ ProtoLayerCreatorT<detector_element_t>::centralProtoLayers(
           moduleTransform = std::const_pointer_cast<const Acts::Transform3>(
               mutableModuleTransform);
           // create the backseide moulde
-          auto bsmodule = std::make_shared<detector_element_t>(
+          auto bsModuleElement = std::make_shared<detector_element_t>(
               moduleIdentifier, moduleTransform, moduleBounds, moduleThickness,
               moduleMaterialPtr);
           // everything is set for the next module
-          layerStore.push_back(std::move(bsmodule));
+          layerStore.push_back(std::move(bsModuleElement));
         }
       }
 
@@ -456,10 +456,10 @@ ProtoLayerCreatorT<detector_element_t>::createProtoLayers(
               static_cast<GenericDetectorElement::Identifier>(imodule++);
 
           // create the module
-          auto module = std::make_shared<detector_element_t>(
+          auto moduleElement = std::make_shared<detector_element_t>(
               moduleIdentifier, moduleTransform, moduleBounds, moduleThickness,
               moduleMaterialPtr);
-          layerStore.push_back(module);
+          layerStore.push_back(moduleElement);
 
           // now deal with the potential backside
           if (!m_cfg.posnegModuleBacksideGap.empty()) {
@@ -485,14 +485,14 @@ ProtoLayerCreatorT<detector_element_t>::createProtoLayers(
             moduleTransform = std::const_pointer_cast<const Acts::Transform3>(
                 mutableModuleTransform);
             // everything is set for the next module
-            auto bsmodule = std::make_shared<detector_element_t>(
+            auto bsModuleElement = std::make_shared<detector_element_t>(
                 moduleIdentifier, moduleTransform, moduleBounds,
                 moduleThickness, moduleMaterialPtr);
             // Put into the detector store
-            layerStore.push_back(std::move(bsmodule));
+            layerStore.push_back(std::move(bsModuleElement));
           }
           // create the surface
-          esVector.push_back(module->surface().getSharedPtr());
+          esVector.push_back(moduleElement->surface().getSharedPtr());
         }
         // counter of rings
         ++ipnR;

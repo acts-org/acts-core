@@ -89,6 +89,7 @@ BOOST_AUTO_TEST_CASE(CalculateQuantities) {
 BOOST_AUTO_TEST_CASE(TrimTrack) {
   TrackContainer tc{VectorTrackContainer{}, VectorMultiTrajectory{}};
   auto t = createTestTrack(tc, std::vector<std::vector<TrackStateFlag>>{
+                                   {},
                                    {HoleFlag},
                                    {MeasurementFlag},
                                    {OutlierFlag},
@@ -98,34 +99,39 @@ BOOST_AUTO_TEST_CASE(TrimTrack) {
                                    {HoleFlag},
                                    {MeasurementFlag},
                                    {OutlierFlag},
+                                   {},
                                });
 
   calculateTrackQuantities(t);
 
+  BOOST_CHECK_EQUAL(t.nTrackStates(), 11);
   BOOST_CHECK_EQUAL(t.nHoles(), 3);
   BOOST_CHECK_EQUAL(t.nMeasurements(), 3);
   BOOST_CHECK_EQUAL(t.nOutliers(), 3);
   BOOST_CHECK_EQUAL(t.nSharedHits(), 1);
 
-  trimTrackFront(t, true, true, true);
+  trimTrackFront(t, true, true, true, true);
   calculateTrackQuantities(t);
 
+  BOOST_CHECK_EQUAL(t.nTrackStates(), 9);
   BOOST_CHECK_EQUAL(t.nHoles(), 2);
   BOOST_CHECK_EQUAL(t.nMeasurements(), 3);
   BOOST_CHECK_EQUAL(t.nOutliers(), 3);
   BOOST_CHECK_EQUAL(t.nSharedHits(), 1);
 
-  trimTrackBack(t, true, true, true);
+  trimTrackBack(t, true, true, true, true);
   calculateTrackQuantities(t);
 
+  BOOST_CHECK_EQUAL(t.nTrackStates(), 7);
   BOOST_CHECK_EQUAL(t.nHoles(), 2);
   BOOST_CHECK_EQUAL(t.nMeasurements(), 3);
   BOOST_CHECK_EQUAL(t.nOutliers(), 2);
   BOOST_CHECK_EQUAL(t.nSharedHits(), 1);
 
-  trimTrack(t, true, true, true);
+  trimTrack(t, true, true, true, true);
   calculateTrackQuantities(t);
 
+  BOOST_CHECK_EQUAL(t.nTrackStates(), 7);
   BOOST_CHECK_EQUAL(t.nHoles(), 2);
   BOOST_CHECK_EQUAL(t.nMeasurements(), 3);
   BOOST_CHECK_EQUAL(t.nOutliers(), 2);

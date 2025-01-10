@@ -10,10 +10,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/ParticleData.hpp"
-#include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/Navigator.hpp"
+#include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/Tests/CommonHelpers/CylindricalTrackingGeometry.hpp"
 #include "Acts/Utilities/Logger.hpp"

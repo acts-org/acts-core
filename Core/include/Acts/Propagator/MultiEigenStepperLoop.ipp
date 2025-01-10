@@ -34,7 +34,7 @@ auto MultiEigenStepperLoop<E, R>::boundState(
     // onSurface.
     cmpState.pars.template segment<3>(eFreePos0) =
         surface
-            .intersect(state.geoContext,
+            .intersect(state.options.geoContext,
                        cmpState.pars.template segment<3>(eFreePos0),
                        cmpState.pars.template segment<3>(eFreeDir0),
                        BoundaryTolerance::Infinite())
@@ -78,7 +78,7 @@ auto MultiEigenStepperLoop<E, R>::curvilinearState(
         state.components[i].state, transportCov);
 
     cmps.emplace_back(state.components[i].weight,
-                      cp.fourPosition(state.geoContext), cp.direction(),
+                      cp.fourPosition(state.options.geoContext), cp.direction(),
                       cp.qOverP(),
                       cp.covariance().value_or(BoundSquareMatrix::Zero()));
     accumulatedPathLength += state.components[i].weight * pl;

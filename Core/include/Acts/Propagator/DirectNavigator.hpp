@@ -232,7 +232,7 @@ class DirectNavigator {
       // Set the navigation break
       ACTS_VERBOSE("End of surfaces reached, navigation break.");
       state.navigation.navigationBreak = true;
-      stepper.releaseStepSize(state.stepping, ConstrainedStep::actor);
+      stepper.releaseStepSize(state.stepping, ConstrainedStep::navigator);
       // If no externally provided target is given, the target is reached
       if (state.navigation.options.targetSurface == nullptr) {
         state.navigation.targetReached = true;
@@ -256,7 +256,7 @@ class DirectNavigator {
     auto surfaceStatus = stepper.updateSurfaceStatus(
         state.stepping, surface, index, state.options.direction,
         BoundaryTolerance::Infinite(), state.options.surfaceTolerance,
-        *m_logger);
+        ConstrainedStep::navigator, *m_logger);
     if (surfaceStatus == IntersectionStatus::unreachable) {
       ACTS_VERBOSE(
           "Surface not reachable anymore, switching to next one in "
@@ -310,7 +310,7 @@ class DirectNavigator {
     auto surfaceStatus = stepper.updateSurfaceStatus(
         state.stepping, surface, index, state.options.direction,
         BoundaryTolerance::Infinite(), state.options.surfaceTolerance,
-        *m_logger);
+        ConstrainedStep::navigator, *m_logger);
     if (surfaceStatus == IntersectionStatus::onSurface) {
       // Set the current surface
       state.navigation.currentSurface = state.navigation.navSurface();

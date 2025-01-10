@@ -162,11 +162,11 @@ template <typename T>
 inline auto selectModule(const GeometryIdMultiset<T>& container,
                          Acts::GeometryIdentifier::Value volume,
                          Acts::GeometryIdentifier::Value layer,
-                         Acts::GeometryIdentifier::Value module) {
+                         Acts::GeometryIdentifier::Value sensitive) {
   return selectModule(
       container,
       Acts::GeometryIdentifier().setVolume(volume).setLayer(layer).setSensitive(
-          module));
+          sensitive));
 }
 
 /// Select all elements for the lowest non-zero identifier component.
@@ -176,9 +176,9 @@ inline auto selectModule(const GeometryIdMultiset<T>& container,
 /// applies to the lower components and not to intermediate zeros.
 ///
 /// Examples:
-/// - volume=2,layer=0,module=3 -> select all elements in the module
-/// - volume=1,layer=2,module=0 -> select all elements in the layer
-/// - volume=3,layer=0,module=0 -> select all elements in the volume
+/// - volume=2,layer=0,sensitive=3 -> select all elements in the sensitive
+/// - volume=1,layer=2,sensitive=0 -> select all elements in the layer
+/// - volume=3,layer=0,sensitive=0 -> select all elements in the volume
 ///
 /// @note An identifier with all components set to zero selects the whole input
 ///   container.
