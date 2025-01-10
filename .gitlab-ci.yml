@@ -416,7 +416,6 @@ linux_physmon:
 
   after_script:
    - !reference [.spack_cleanup, after_script]
-   - !reference [.spack_cache, cache]
 
 linux_ubuntu_2204:
   extends: .linux_ubuntu_extra
