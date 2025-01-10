@@ -450,7 +450,6 @@ linux_ubuntu_2204_clang:
 
   cache:
    - !reference [.ccache_base, cache]
-   - !reference [.spack_cache, cache]
 
   before_script:
     - 'echo "LCG_VERSION: ${LCG_VERSION}"'
@@ -489,9 +488,6 @@ linux_ubuntu_2204_clang:
     - ccache -s
 
     - ctest --test-dir build -j$(nproc)
-
-  after_script:
-   - !reference [.spack_cleanup, after_script]
 
 
 lcg_105:
