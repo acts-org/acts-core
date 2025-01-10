@@ -31,8 +31,8 @@ variables:
        files:
         - spack_lockfile_cache/digest.txt
        prefix: spack_lockfile_
-       paths:
-        - spack_lockfile_cache
+     paths:
+      - spack_lockfile_cache
 
 .spack_cleanup:
   after_script:
