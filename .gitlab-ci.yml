@@ -22,8 +22,8 @@ variables:
   cache:
    - key:
        files:
-        - CI/dependencies/setup_spack.sh
-     prefix: spack_${SPACK_VERSION}
+         - CI/dependencies/setup_spack.sh
+       prefix: spack_${SPACK_VERSION}
      paths:
       - spack
       - .spack
