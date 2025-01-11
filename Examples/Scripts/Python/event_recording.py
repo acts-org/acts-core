@@ -20,7 +20,9 @@ def runEventRecording(detector, outputDir, s=None):
         os.mkdir(hepmc_dir)
 
     s = s or acts.examples.Sequencer(
-        events=int(os.environ.get("NEVENTS", 100)), numThreads=1
+        events=int(os.environ.get("NEVENTS", 100)),
+        numThreads=1,
+        fpeStackTraceLength=20,
     )
 
     rnd = acts.examples.RandomNumbers(seed=42)
