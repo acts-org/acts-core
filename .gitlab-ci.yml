@@ -413,7 +413,7 @@ linux_ubuntu_2204:
     CXXSTD: 20
     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
     COMPILER: g++
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:71
 
 linux_ubuntu_2204_clang:
   extends: .linux_ubuntu_extra
@@ -421,7 +421,7 @@ linux_ubuntu_2204_clang:
     CXXSTD: 20
     DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
     COMPILER: clang++
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:71
 
 
 ######################
