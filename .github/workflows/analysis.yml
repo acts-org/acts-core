@@ -22,7 +22,7 @@ env:
   CCACHE_MAXSIZE: 1.25G
   CCACHE_KEY_SUFFIX: r2
   ACTS_LOG_FAILURE_THRESHOLD: WARNING
-  DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.v5.tar.zst
+  DEPENDENCY_TAG: v7_b7
 
 # NOTE this only builds core unittests to reduce the output size. if we
 #      found a way to have Github actions not fail regularly with this job
