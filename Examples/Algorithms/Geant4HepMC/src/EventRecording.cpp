@@ -81,7 +81,7 @@ ProcessCode EventRecording::execute(const AlgorithmContext& context) const {
         part);
 
     // Begin with the simulation
-    m_runManager->BeamOn(1);
+    m_runManager->BeamOn(1);  // MARK: fpeMask(FLTINV, 1, #4021)
 
     // Test if the event was aborted
     if (Geant4::HepMC3::SteppingAction::instance()->eventAborted()) {
