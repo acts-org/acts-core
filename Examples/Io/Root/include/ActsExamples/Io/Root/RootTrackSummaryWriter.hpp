@@ -170,6 +170,8 @@ class RootTrackSummaryWriter final : public WriterT<ConstTrackContainer> {
   std::vector<float> m_t_d0;
   /// The extrapolated truth longitudinal impact parameter
   std::vector<float> m_t_z0;
+  /// Production radius of majority particle
+  std::vector<float> m_t_prodR;
 
   /// If the track has fitted parameter
   std::vector<bool> m_hasFittedParams;
