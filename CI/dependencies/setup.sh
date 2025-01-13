@@ -100,10 +100,16 @@ echo "Install destination: $destination"
 
 mkdir -p ${destination}
 
+if [ -n "${GITLAB_CI:-}" ]; then
+    _spack_folder=${CI_PROJECT_DIR}/spack
+else
+    _spack_folder=${PWD}/spack
+fi
 
 start_section "Install spack if not already installed"
 if ! command -v spack &> /dev/null; then
-  "${SCRIPT_DIR}/setup_spack.sh"
+  "${SCRIPT_DIR}/setup_spack.sh" "${_spack_folder}"
+  source "${_spack_folder}/spack/share/spack/setup-env.sh"
 fi
 end_section
 
@@ -113,7 +119,6 @@ if [ -n "${GITLAB_CI:-}" ]; then
   ln -s ${CI_PROJECT_DIR}/.spack ${HOME}/.spack
 fi
 
-source "$(pwd)/spack/share/spack/setup-env.sh"
 
 
 if [ -n "${CI:-}" ]; then
