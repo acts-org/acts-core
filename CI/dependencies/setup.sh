@@ -109,7 +109,7 @@ fi
 start_section "Install spack if not already installed"
 if ! command -v spack &> /dev/null; then
   "${SCRIPT_DIR}/setup_spack.sh" "${_spack_folder}"
-  source "${_spack_folder}/spack/share/spack/setup-env.sh"
+  source "${_spack_folder}/share/spack/setup-env.sh"
 fi
 end_section
 
