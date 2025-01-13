@@ -1,0 +1,61 @@
+name: Docs
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
+      - 'develop/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    env:
+      DOXYGEN_WARN_AS_ERROR: FAIL_ON_WARNINGS
+      DOXYGEN_VERSION: 1.9.8
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache doxygen
+        id: cache-doxygen
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/doxygen
+          key: doxygen_${{ env.DOXYGEN_VERSION }}
+
+      - name: Install doxygen
+        if: steps.cache-doxygen.outputs.cache-hit != 'true'
+        run: >
+          curl -SL https://sourceforge.net/projects/doxygen/files/rel-${{ env.DOXYGEN_VERSION }}/doxygen-${{ env.DOXYGEN_VERSION }}.linux.bin.tar.gz/download | tar -xzC .
+          && mv doxygen-${{ env.DOXYGEN_VERSION }}/bin/doxygen /usr/local/bin/doxygen
+
+      - name: Install dependencies
+        run: >
+          pip3 install --upgrade pip
+          && pip install -r docs/requirements.txt
+
+      - name: Build documentation
+        run: >
+          cd docs
+          && sphinx-build
+          -b html
+          -d _build/doctrees/
+          -j auto
+          -W
+          --keep-going
+          -t run_doxygen
+          -t lazy_autodoc
+          -t white_papers
+          -b linkcheck
+          . _build/html/
+
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: acts-docs
+          path: docs/_build/html/

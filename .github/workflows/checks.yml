@@ -1,0 +1,105 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+      - 'release/**'
+      - 'develop/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      PRE_COMMIT_HOME: '/tmp/pre-commit'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.PRE_COMMIT_HOME }}
+          key: ${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit
+        run: pre-commit run --all-files --show-diff-on-failure
+
+  smearing_config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check
+        run: >
+          CI/check_smearing_config.py .
+
+  missing_includes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clang
+        run: >
+          sudo apt-get install -y clang libeigen3-dev libboost-dev
+      - name: Check
+        run: >
+          CI/missing_include_check.sh
+
+  fpe_masks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: >
+          pip install -r CI/fpe_masks/requirements.txt
+      - name: Check
+        run: >
+          CI/check_fpe_masks.py --token ${{ secrets.GITHUB_TOKEN }}
+
+  unused_files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check
+        run: >
+          CI/check_unused_files.py
+
+  codegen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: >
+          pip install -r codegen/requirements.txt
+      - name: Check
+        run: >
+          CI/check_codegen
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: changed
+          path: changed
