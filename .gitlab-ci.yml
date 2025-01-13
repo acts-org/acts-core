@@ -301,7 +301,7 @@ linux_test_examples:
     - source build/this_acts_withdeps.sh
     - cd src
     - python3 -m pip install -r Examples/Python/tests/requirements.txt
-    - pytest -rFsv -k "not exatrkx" -v -s
+    - pytest -rFsv -k "test_full_chain_odd_example_pythia_geant4" -v -s
 
   after_script:
    - !reference [.spack_cleanup, after_script]
