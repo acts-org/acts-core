@@ -44,7 +44,7 @@ runs:
       env:
         SPACK_VERSION: ${{ inputs.spack_version }}
       run: |
-        CI/dependencies/setup_spack.sh
+        CI/dependencies/setup_spack.sh ${PWD}/spack
         spack/bin/spack list > /dev/null
         rm -rf spack/.git
         mkdir spack_cache
