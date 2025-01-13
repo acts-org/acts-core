@@ -417,7 +417,7 @@ linux_ubuntu_2204_clang:
 ######################
 
 .lcg_base_job:
-  image: registry.cern.ch/ghcr.io/acts-project/${OS}-base:63
+  image: ghcr.io/acts-project/${OS}-base:63
   stage: build
   tags:
     - cvmfs

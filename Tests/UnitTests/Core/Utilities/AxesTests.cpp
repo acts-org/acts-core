@@ -271,6 +271,8 @@ BOOST_AUTO_TEST_CASE(neighborhood) {
               bins_t({8, 9, 10, 1, 2}));
   BOOST_CHECK(a4.neighborHoodIndices(5, 2).collect() ==
               bins_t({3, 4, 5, 6, 7}));
+  BOOST_CHECK(a4.neighborHoodIndices(3, 2).collect() ==
+              bins_t({1, 2, 3, 4, 5}));
 
   Axis<AxisType::Variable, AxisBoundaryType::Bound> a5(
       {0.0, 2.0, 4.0, 9.0, 9.5, 10.0});
@@ -442,6 +444,152 @@ BOOST_AUTO_TEST_CASE(AxisVisit) {
   std::vector<double> edges =
       varClosed.visit([](const auto& axis) { return axis.getBinEdges(); });
   BOOST_CHECK_EQUAL(edges.size(), varClosed.getBinEdges().size());
+
+  // Test return values from visit method with type-dependent values
+  int typeValue = eqOpen.visit([](const auto& axis) {
+    if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                 Axis<Equidistant, Open>>) {
+      return 1;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Bound>>) {
+      return 2;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Closed>>) {
+      return 3;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Open>>) {
+      return 4;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Bound>>) {
+      return 5;
+    } else {
+      return 6;  // Variable, Closed
+    }
+  });
+  BOOST_CHECK_EQUAL(typeValue, 1);  // Should be Equidistant, Open
+
+  typeValue = eqBound.visit([](const auto& axis) {
+    if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                 Axis<Equidistant, Open>>) {
+      return 1;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Bound>>) {
+      return 2;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Closed>>) {
+      return 3;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Open>>) {
+      return 4;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Bound>>) {
+      return 5;
+    } else {
+      return 6;  // Variable, Closed
+    }
+  });
+  BOOST_CHECK_EQUAL(typeValue, 2);  // Should be Equidistant, Bound
+
+  typeValue = eqClosed.visit([](const auto& axis) {
+    if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                 Axis<Equidistant, Open>>) {
+      return 1;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Bound>>) {
+      return 2;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Closed>>) {
+      return 3;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Open>>) {
+      return 4;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Bound>>) {
+      return 5;
+    } else {
+      return 6;  // Variable, Closed
+    }
+  });
+  BOOST_CHECK_EQUAL(typeValue, 3);  // Should be Equidistant, Closed
+
+  typeValue = varOpen.visit([](const auto& axis) {
+    if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                 Axis<Equidistant, Open>>) {
+      return 1;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Bound>>) {
+      return 2;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Closed>>) {
+      return 3;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Open>>) {
+      return 4;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Bound>>) {
+      return 5;
+    } else {
+      return 6;  // Variable, Closed
+    }
+  });
+  BOOST_CHECK_EQUAL(typeValue, 4);  // Should be Variable, Open
+
+  typeValue = varBound.visit([](const auto& axis) {
+    if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                 Axis<Equidistant, Open>>) {
+      return 1;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Bound>>) {
+      return 2;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Closed>>) {
+      return 3;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Open>>) {
+      return 4;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Bound>>) {
+      return 5;
+    } else {
+      return 6;  // Variable, Closed
+    }
+  });
+  BOOST_CHECK_EQUAL(typeValue, 5);  // Should be Variable, Bound
+
+  typeValue = varClosed.visit([](const auto& axis) {
+    if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                 Axis<Equidistant, Open>>) {
+      return 1;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Bound>>) {
+      return 2;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Equidistant, Closed>>) {
+      return 3;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Open>>) {
+      return 4;
+    } else if constexpr (std::is_same_v<std::decay_t<decltype(axis)>,
+                                        Axis<Variable, Bound>>) {
+      return 5;
+    } else {
+      return 6;  // Variable, Closed
+    }
+  });
+  BOOST_CHECK_EQUAL(typeValue, 6);  // Should be Variable, Closed
+
+  // Test return value using axis properties
+  double minValue =
+      eqOpen.visit([](const auto& axis) { return axis.getMin(); });
+  BOOST_CHECK_EQUAL(minValue, 0.0);
+
+  double maxValue =
+      eqBound.visit([](const auto& axis) { return axis.getMax(); });
+  BOOST_CHECK_EQUAL(maxValue, 10.0);
+
+  std::size_t nBins =
+      varClosed.visit([](const auto& axis) { return axis.getNBins(); });
+  BOOST_CHECK_EQUAL(nBins, 4u);
 }
 
 BOOST_AUTO_TEST_CASE(Output) {

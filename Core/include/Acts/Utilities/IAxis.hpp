@@ -63,6 +63,7 @@ class IAxis {
   /// with a const reference to the concrete axis type.
   /// @tparam callable_t the callable type
   /// @param callable the callable object
+  /// @return the value returned by the callable
   template <typename callable_t>
   decltype(auto) visit(const callable_t& callable) const {
     auto switchOnType =
