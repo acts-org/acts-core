@@ -49,8 +49,10 @@ clang_tidy:
       - src/clang-tidy/
     when: always
     expire_in: 1 week
-  variables:
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
+
+  cache:
+   - !reference [.spack_cache, cache]
+
   script:
     - git clone $CLONE_URL src
     - cd src
@@ -97,8 +99,6 @@ clang_tidy:
 build_exatrkx_cpu:
   stage: build
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:63
-  variables:
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
   tags:
     - large
 
@@ -133,8 +133,6 @@ build_exatrkx_cpu:
 build_exatrkx:
   stage: build
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:63
-  variables:
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
   tags:
     - large
 
@@ -178,8 +176,6 @@ test_exatrkx_unittests:
   needs:
     - build_exatrkx
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:63
-  variables:
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
   tags:
     - docker-gpu-nvidia
 
@@ -203,8 +199,6 @@ test_exatrkx_python:
   needs:
     - build_exatrkx
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:63
-  variables:
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
   tags:
     - docker-gpu-nvidia
 
@@ -233,8 +227,6 @@ test_exatrkx_python:
 build_linux_ubuntu:
   stage: build
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
-  variables:
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
 
   cache:
    - !reference [.ccache_base, cache]
@@ -279,8 +271,6 @@ build_linux_ubuntu:
 linux_test_examples:
   stage: test
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
-  variables:
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
   needs: [build_linux_ubuntu]
 
   cache:
@@ -309,8 +299,6 @@ linux_test_examples:
 linux_physmon:
   stage: test
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
-  variables:
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-24.04/deps.$DEPENDENCY_TAG.tar.zst
   needs: [build_linux_ubuntu]
 
   artifacts:
@@ -413,7 +401,6 @@ linux_ubuntu_2204:
   extends: .linux_ubuntu_extra
   variables:
     CXXSTD: 20
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
     COMPILER: g++
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:71
 
@@ -421,7 +408,6 @@ linux_ubuntu_2204_clang:
   extends: .linux_ubuntu_extra
   variables:
     CXXSTD: 20
-    DEPENDENCY_URL: https://acts.web.cern.ch/ACTS/ci/ubuntu-22.04/deps.$DEPENDENCY_TAG.tar.zst
     COMPILER: clang++
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:71
 
