@@ -68,7 +68,7 @@ class CuboidVolumeBounds : public VolumeBounds {
   /// Constructor - from a fixed size array
   ///
   /// @param values iw the bound values
-  CuboidVolumeBounds(const std::array<double, eSize>& values);
+  explicit CuboidVolumeBounds(const std::array<double, eSize>& values);
 
   /// Copy Constructor
   ///

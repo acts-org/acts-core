@@ -98,7 +98,7 @@ class PropagatorMaterialAssigner final : public IAssignmentFinder {
  public:
   /// @brief  Construct with propagator
   /// @param propagator
-  PropagatorMaterialAssigner(propagator_t propagator)
+  explicit PropagatorMaterialAssigner(propagator_t propagator)
       : m_propagator(std::move(propagator)) {}
 
   /// @brief Method for generating assignment candidates for the

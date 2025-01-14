@@ -35,7 +35,7 @@ class ProtoVolumeMaterial : public IVolumeMaterial {
   ///
   /// @param binUtility a BinUtility determining the granularity
   ///        and binning of the material on the volume
-  ProtoVolumeMaterial(const BinUtility& binUtility);
+  explicit ProtoVolumeMaterial(const BinUtility& binUtility);
 
   /// Copy constructor
   ///

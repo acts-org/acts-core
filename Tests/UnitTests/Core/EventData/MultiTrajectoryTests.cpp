@@ -91,12 +91,8 @@ BOOST_AUTO_TEST_CASE(ConstCorrectness) {
     // ctsp.predicted().setRandom();
   }
 
-  // is this something we actually want?
-  ConstVectorMultiTrajectory ct = t;
-  BOOST_CHECK_EQUAL(ct.size(), t.size());
-
   ConstVectorMultiTrajectory ctm{std::move(t)};
-  BOOST_CHECK_EQUAL(ctm.size(), ct.size());
+  BOOST_CHECK_EQUAL(ctm.size(), t.size());
 
   {
     static_assert(
