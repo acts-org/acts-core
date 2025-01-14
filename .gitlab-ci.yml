@@ -268,7 +268,7 @@ build_linux_ubuntu:
     - cmake --build build --target integrationtests
 
     # Install main project
-    - cmake --install build
+    - cmake --install build > install.log
 
     # Downstream configure
     - >
@@ -394,7 +394,7 @@ linux_physmon:
     - cmake --build build --target integrationtests
 
     # Install main project
-    - cmake --install build
+    - cmake --install build > install.log
 
     # Downstream configure
     - >
