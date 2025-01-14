@@ -276,7 +276,6 @@ build_linux_ubuntu:
       -GNinja
       -DCMAKE_BUILD_TYPE=Release
       -DCMAKE_CXX_FLAGS=-Werror
-      -DCMAKE_CXX_COMPILER=clang++
       -DCMAKE_CXX_STANDARD=${CXXSTD}
       -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
 
