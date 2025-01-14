@@ -84,7 +84,7 @@ class DetectorVolume : public std::enable_shared_from_this<DetectorVolume> {
     /// Store constructor
     ///
     /// @param objects are the ones copied into the internal store
-    ObjectStore(std::vector<internal_type> objects)
+    explicit ObjectStore(std::vector<internal_type> objects)
         : internal(std::move(objects)) {
       external = unpack_shared_const_vector(internal);
     }

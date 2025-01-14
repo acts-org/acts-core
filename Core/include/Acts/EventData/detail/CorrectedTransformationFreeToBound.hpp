@@ -72,7 +72,7 @@ struct CorrectedFreeToBoundTransformer {
   /// Construct from a FreeToBoundCorrection
   ///
   /// @param freeToBoundCorrection The freeToBoundCorrection object
-  CorrectedFreeToBoundTransformer(
+  explicit CorrectedFreeToBoundTransformer(
       const FreeToBoundCorrection& freeToBoundCorrection);
 
   /// Default constructors

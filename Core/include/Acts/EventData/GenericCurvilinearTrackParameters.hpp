@@ -91,13 +91,13 @@ class GenericCurvilinearTrackParameters
   GenericCurvilinearTrackParameters() = delete;
   GenericCurvilinearTrackParameters(const GenericCurvilinearTrackParameters&) =
       default;
-  GenericCurvilinearTrackParameters(GenericCurvilinearTrackParameters&&) =
-      default;
+  GenericCurvilinearTrackParameters(
+      GenericCurvilinearTrackParameters&&) noexcept = default;
   ~GenericCurvilinearTrackParameters() = default;
   GenericCurvilinearTrackParameters& operator=(
       const GenericCurvilinearTrackParameters&) = default;
   GenericCurvilinearTrackParameters& operator=(
-      GenericCurvilinearTrackParameters&&) = default;
+      GenericCurvilinearTrackParameters&&) noexcept = default;
 
   using GenericBoundTrackParameters<ParticleHypothesis>::fourPosition;
   using GenericBoundTrackParameters<ParticleHypothesis>::position;

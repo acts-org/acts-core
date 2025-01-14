@@ -130,11 +130,12 @@ class GenericFreeTrackParameters {
   /// Parameters are not default constructible due to the charge type.
   GenericFreeTrackParameters() = delete;
   GenericFreeTrackParameters(const GenericFreeTrackParameters&) = default;
-  GenericFreeTrackParameters(GenericFreeTrackParameters&&) = default;
+  GenericFreeTrackParameters(GenericFreeTrackParameters&&) noexcept = default;
   ~GenericFreeTrackParameters() = default;
   GenericFreeTrackParameters& operator=(const GenericFreeTrackParameters&) =
       default;
-  GenericFreeTrackParameters& operator=(GenericFreeTrackParameters&&) = default;
+  GenericFreeTrackParameters& operator=(GenericFreeTrackParameters&&) noexcept =
+      default;
 
   /// Parameters vector.
   const ParametersVector& parameters() const { return m_params; }

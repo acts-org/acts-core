@@ -21,7 +21,6 @@
 
 namespace ActsAlignment::detail {
 
-using namespace Acts;
 ///
 ///@brief struct to store info needed for track-based alignment
 ///
@@ -36,35 +35,35 @@ struct TrackAlignmentState {
   std::size_t alignmentDof = 0;
 
   // The measurements covariance
-  ActsDynamicMatrix measurementCovariance;
+  Acts::ActsDynamicMatrix measurementCovariance;
 
   // The track parameters covariance
-  ActsDynamicMatrix trackParametersCovariance;
+  Acts::ActsDynamicMatrix trackParametersCovariance;
 
   // The projection matrix
-  ActsDynamicMatrix projectionMatrix;
+  Acts::ActsDynamicMatrix projectionMatrix;
 
   // The residual
-  ActsDynamicVector residual;
+  Acts::ActsDynamicVector residual;
 
   // The covariance of residual
-  ActsDynamicMatrix residualCovariance;
+  Acts::ActsDynamicMatrix residualCovariance;
 
   // The chi2
   double chi2 = 0;
 
   // The derivative of residual w.r.t. alignment parameters
-  ActsDynamicMatrix alignmentToResidualDerivative;
+  Acts::ActsDynamicMatrix alignmentToResidualDerivative;
 
   // The derivative of chi2 w.r.t. alignment parameters
-  ActsDynamicVector alignmentToChi2Derivative;
+  Acts::ActsDynamicVector alignmentToChi2Derivative;
 
   // The second derivative of chi2 w.r.t. alignment parameters
-  ActsDynamicMatrix alignmentToChi2SecondDerivative;
+  Acts::ActsDynamicMatrix alignmentToChi2SecondDerivative;
 
   // The alignable surfaces on the track and their indices in both the global
   // alignable surfaces pool and those relevant with this track
-  std::unordered_map<const Surface*, std::pair<std::size_t, std::size_t>>
+  std::unordered_map<const Acts::Surface*, std::pair<std::size_t, std::size_t>>
       alignedSurfaces;
 };
 
@@ -101,14 +100,15 @@ void resetAlignmentDerivative(Acts::AlignmentToBoundMatrix& alignToBound,
 ///
 /// @return The track alignment state containing fundamental alignment
 /// ingredients
-template <typename traj_t, typename parameters_t = BoundTrackParameters>
+template <typename traj_t, typename parameters_t = Acts::BoundTrackParameters>
 TrackAlignmentState trackAlignmentState(
-    const GeometryContext& gctx, const traj_t& multiTraj,
+    const Acts::GeometryContext& gctx, const traj_t& multiTraj,
     const std::size_t& entryIndex,
-    const std::pair<ActsDynamicMatrix,
+    const std::pair<Acts::ActsDynamicMatrix,
                     std::unordered_map<std::size_t, std::size_t>>&
         globalTrackParamsCov,
-    const std::unordered_map<const Surface*, std::size_t>& idxedAlignSurfaces,
+    const std::unordered_map<const Acts::Surface*, std::size_t>&
+        idxedAlignSurfaces,
     const AlignmentMask& alignMask) {
   using CovMatrix = typename parameters_t::CovarianceMatrix;
 
@@ -136,7 +136,7 @@ TrackAlignmentState trackAlignmentState(
 
     // Only measurement states matter (we can't align non-measurement states,
     // no?)
-    if (!ts.typeFlags().test(TrackStateFlag::MeasurementFlag)) {
+    if (!ts.typeFlags().test(Acts::TrackStateFlag::MeasurementFlag)) {
       return true;
     }
     // Check if the reference surface is to be aligned
@@ -163,26 +163,27 @@ TrackAlignmentState trackAlignmentState(
   }
 
   // The alignment degree of freedom
-  alignState.alignmentDof = eAlignmentSize * nAlignSurfaces;
+  alignState.alignmentDof = Acts::eAlignmentSize * nAlignSurfaces;
   // Dimension of global track parameters (from only measurement states)
-  alignState.trackParametersDim = eBoundSize * measurementStates.size();
+  alignState.trackParametersDim = Acts::eBoundSize * measurementStates.size();
 
   // Initialize the alignment matrices with components from the measurement
   // states
   // The measurement covariance
-  alignState.measurementCovariance = ActsDynamicMatrix::Zero(
+  alignState.measurementCovariance = Acts::ActsDynamicMatrix::Zero(
       alignState.measurementDim, alignState.measurementDim);
   // The bound parameters to measurement projection matrix
-  alignState.projectionMatrix = ActsDynamicMatrix::Zero(
+  alignState.projectionMatrix = Acts::ActsDynamicMatrix::Zero(
       alignState.measurementDim, alignState.trackParametersDim);
   // The derivative of residual w.r.t. alignment parameters
-  alignState.alignmentToResidualDerivative = ActsDynamicMatrix::Zero(
+  alignState.alignmentToResidualDerivative = Acts::ActsDynamicMatrix::Zero(
       alignState.measurementDim, alignState.alignmentDof);
   // The track parameters covariance
-  alignState.trackParametersCovariance = ActsDynamicMatrix::Zero(
+  alignState.trackParametersCovariance = Acts::ActsDynamicMatrix::Zero(
       alignState.trackParametersDim, alignState.trackParametersDim);
   // The residual
-  alignState.residual = ActsDynamicVector::Zero(alignState.measurementDim);
+  alignState.residual =
+      Acts::ActsDynamicVector::Zero(alignState.measurementDim);
 
   // Unpack global track parameters covariance and the starting row/column for
   // all smoothed states.
@@ -200,19 +201,19 @@ TrackAlignmentState trackAlignmentState(
     const std::size_t measdim = state.calibratedSize();
     // Update index of current measurement and parameter
     iMeasurement -= measdim;
-    iParams -= eBoundSize;
+    iParams -= Acts::eBoundSize;
     // (a) Get and fill the measurement covariance matrix
-    const ActsDynamicMatrix measCovariance =
+    const Acts::ActsDynamicMatrix measCovariance =
         state.effectiveCalibratedCovariance();
     alignState.measurementCovariance.block(iMeasurement, iMeasurement, measdim,
                                            measdim) = measCovariance;
 
     // (b) Get and fill the bound parameters to measurement projection matrix
-    const ActsDynamicMatrix H =
+    const Acts::ActsDynamicMatrix H =
         state.projectorSubspaceHelper().fullProjector().topLeftCorner(
-            measdim, eBoundSize);
+            measdim, Acts::eBoundSize);
     alignState.projectionMatrix.block(iMeasurement, iParams, measdim,
-                                      eBoundSize) = H;
+                                      Acts::eBoundSize) = H;
     // (c) Get and fill the residual
     alignState.residual.segment(iMeasurement, measdim) =
         state.effectiveCalibrated() - H * state.smoothed();
@@ -224,21 +225,22 @@ TrackAlignmentState trackAlignmentState(
       const auto surface = &state.referenceSurface();
       alignState.alignedSurfaces.at(surface).second = iSurface;
       // The free parameters transformed from the smoothed parameters
-      const FreeVector freeParams =
+      const Acts::FreeVector freeParams =
           Acts::MultiTrajectoryHelpers::freeSmoothed(gctx, state);
       // The position
-      const Vector3 position = freeParams.segment<3>(eFreePos0);
+      const Acts::Vector3 position = freeParams.segment<3>(Acts::eFreePos0);
       // The direction
-      const Vector3 direction = freeParams.segment<3>(eFreeDir0);
+      const Acts::Vector3 direction = freeParams.segment<3>(Acts::eFreeDir0);
       // The derivative of free parameters w.r.t. path length. @note Here, we
       // assume a linear track model, i.e. neglecting the change of track
       // direction. Otherwise, we need to know the magnetic field at the free
       // parameters
-      FreeVector pathDerivative = FreeVector::Zero();
+      Acts::FreeVector pathDerivative = Acts::FreeVector::Zero();
       pathDerivative.head<3>() = direction;
       // Get the derivative of bound parameters w.r.t. alignment parameters
-      AlignmentToBoundMatrix alignToBound = surface->alignmentToBoundDerivative(
-          gctx, position, direction, pathDerivative);
+      Acts::AlignmentToBoundMatrix alignToBound =
+          surface->alignmentToBoundDerivative(gctx, position, direction,
+                                              pathDerivative);
       // Set the degree of freedom per surface.
       // @Todo: don't allocate memory for fixed degree of freedom and consider surface/layer/volume wise align mask (instead of using global mask as now)
       resetAlignmentDerivative(alignToBound, alignMask);
@@ -246,8 +248,8 @@ TrackAlignmentState trackAlignmentState(
       // Residual is calculated as the (measurement - parameters), thus we need
       // a minus sign below
       alignState.alignmentToResidualDerivative.block(
-          iMeasurement, iSurface * eAlignmentSize, measdim, eAlignmentSize) =
-          -H * (alignToBound);
+          iMeasurement, iSurface * Acts::eAlignmentSize, measdim,
+          Acts::eAlignmentSize) = -H * (alignToBound);
     }
 
     // (e) Extract and fill the track parameters covariance matrix for only
@@ -258,14 +260,15 @@ TrackAlignmentState trackAlignmentState(
       std::size_t colStateIndex = measurementStates.at(iColState).first;
       // Retrieve the block from the source covariance matrix
       CovMatrix correlation =
-          sourceTrackParamsCov.block<eBoundSize, eBoundSize>(
+          sourceTrackParamsCov.block<Acts::eBoundSize, Acts::eBoundSize>(
               stateRowIndices.at(rowStateIndex),
               stateRowIndices.at(colStateIndex));
       // Fill the block of the target covariance matrix
       std::size_t iCol =
-          alignState.trackParametersDim - (iColState + 1) * eBoundSize;
-      alignState.trackParametersCovariance.block<eBoundSize, eBoundSize>(
-          iParams, iCol) = correlation;
+          alignState.trackParametersDim - (iColState + 1) * Acts::eBoundSize;
+      alignState.trackParametersCovariance
+          .block<Acts::eBoundSize, Acts::eBoundSize>(iParams, iCol) =
+          correlation;
     }
   }
 
@@ -274,11 +277,11 @@ TrackAlignmentState trackAlignmentState(
                     alignState.measurementCovariance.inverse() *
                     alignState.residual;
   alignState.alignmentToChi2Derivative =
-      ActsDynamicVector::Zero(alignState.alignmentDof);
-  alignState.alignmentToChi2SecondDerivative =
-      ActsDynamicMatrix::Zero(alignState.alignmentDof, alignState.alignmentDof);
+      Acts::ActsDynamicVector::Zero(alignState.alignmentDof);
+  alignState.alignmentToChi2SecondDerivative = Acts::ActsDynamicMatrix::Zero(
+      alignState.alignmentDof, alignState.alignmentDof);
   // The covariance of residual
-  alignState.residualCovariance = ActsDynamicMatrix::Zero(
+  alignState.residualCovariance = Acts::ActsDynamicMatrix::Zero(
       alignState.measurementDim, alignState.measurementDim);
   alignState.residualCovariance = alignState.measurementCovariance -
                                   alignState.projectionMatrix *

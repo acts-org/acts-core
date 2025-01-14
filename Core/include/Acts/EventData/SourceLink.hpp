@@ -29,9 +29,9 @@ class SourceLink final {
 
  public:
   SourceLink(const SourceLink& other) = default;
-  SourceLink(SourceLink&& other) = default;
+  SourceLink(SourceLink&& other) noexcept = default;
   SourceLink& operator=(const SourceLink& other) = default;
-  SourceLink& operator=(SourceLink&& other) = default;
+  SourceLink& operator=(SourceLink&& other) noexcept = default;
 
   /// Constructor from concrete source link
   /// @tparam T The source link type

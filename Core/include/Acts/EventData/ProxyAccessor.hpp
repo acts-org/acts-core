@@ -70,11 +70,11 @@ struct ProxyAccessorBase {
 
   /// Create the accessor from an already-hashed string key
   /// @param _key the key
-  constexpr ProxyAccessorBase(HashedString _key) : key{_key} {}
+  explicit constexpr ProxyAccessorBase(HashedString _key) : key{_key} {}
 
   /// Create the accessor from a string key
   /// @param _key the key
-  constexpr ProxyAccessorBase(const std::string& _key)
+  explicit constexpr ProxyAccessorBase(const std::string& _key)
       : key{hashStringDynamic(_key)} {}
 
   /// Access the stored key on the proxy given as an argument. Mutable version

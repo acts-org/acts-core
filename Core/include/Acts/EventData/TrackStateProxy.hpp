@@ -42,7 +42,7 @@ template <typename T>
 class TransitiveConstPointer {
  public:
   TransitiveConstPointer() = default;
-  TransitiveConstPointer(T* ptr) : m_ptr{ptr} {}
+  explicit TransitiveConstPointer(T* ptr) : m_ptr{ptr} {}
 
   template <typename U>
   TransitiveConstPointer(const TransitiveConstPointer<U>& other)

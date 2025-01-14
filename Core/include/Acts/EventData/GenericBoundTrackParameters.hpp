@@ -111,12 +111,12 @@ class GenericBoundTrackParameters {
   /// Parameters are not default constructible due to the charge type.
   GenericBoundTrackParameters() = delete;
   GenericBoundTrackParameters(const GenericBoundTrackParameters&) = default;
-  GenericBoundTrackParameters(GenericBoundTrackParameters&&) = default;
+  GenericBoundTrackParameters(GenericBoundTrackParameters&&) noexcept = default;
   ~GenericBoundTrackParameters() = default;
   GenericBoundTrackParameters& operator=(const GenericBoundTrackParameters&) =
       default;
-  GenericBoundTrackParameters& operator=(GenericBoundTrackParameters&&) =
-      default;
+  GenericBoundTrackParameters& operator=(
+      GenericBoundTrackParameters&&) noexcept = default;
 
   /// Parameters vector.
   ParametersVector& parameters() { return m_params; }

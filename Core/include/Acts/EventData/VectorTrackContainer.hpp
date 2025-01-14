@@ -282,13 +282,13 @@ class ConstVectorTrackContainer final
   ConstVectorTrackContainer() : VectorTrackContainerBase{} {}
 
   ConstVectorTrackContainer(const ConstVectorTrackContainer& other) = default;
-  ConstVectorTrackContainer(const VectorTrackContainer& other)
+  explicit ConstVectorTrackContainer(const VectorTrackContainer& other)
       : VectorTrackContainerBase{other} {
     assert(checkConsistency());
   }
 
   ConstVectorTrackContainer(ConstVectorTrackContainer&&) = default;
-  ConstVectorTrackContainer(VectorTrackContainer&& other)
+  explicit ConstVectorTrackContainer(VectorTrackContainer&& other)
       : VectorTrackContainerBase{std::move(other)} {
     assert(checkConsistency());
   }
