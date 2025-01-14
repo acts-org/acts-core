@@ -264,6 +264,25 @@ build_linux_ubuntu:
     - cmake --build build -- -j6
     - ccache -s
 
+    - ctest --test-dir build #-j$(nproc)
+    - cmake --build build --target integrationtests
+
+    # Install main project
+    - cmake --install build
+
+    # Downstream configure
+    - >
+      cmake -B build-downstream -S src/Tests/DownstreamProject
+      -GNinja
+      -DCMAKE_BUILD_TYPE=Release
+      -DCMAKE_CXX_FLAGS=-Werror
+      -DCMAKE_CXX_COMPILER=clang++
+      -DCMAKE_CXX_STANDARD=${CXXSTD}
+      -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
+
+    # Downstream build
+    - cmake --build build-downstream
+
   after_script:
    - !reference [.spack_cleanup, after_script]
 
@@ -372,7 +391,7 @@ linux_physmon:
     - cmake --build build -- -j6
     - ccache -s
 
-    - ctest --test-dir build -j$(nproc)
+    - ctest --test-dir build #-j$(nproc)
     - cmake --build build --target integrationtests
 
     # Install main project
@@ -467,7 +486,7 @@ linux_ubuntu_2204_clang:
     - cmake --build build -- -j6
     - ccache -s
 
-    - ctest --test-dir build -j$(nproc)
+    - ctest --test-dir build #-j$(nproc)
 
 
 lcg_105:
