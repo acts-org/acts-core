@@ -9,7 +9,6 @@
 #pragma once
 
 #include "Acts/Detector/ProtoDetector.hpp"
-#include "Acts/Plugins/Json/UtilitiesJsonConverter.hpp"
 
 #include <nlohmann/json.hpp>
 

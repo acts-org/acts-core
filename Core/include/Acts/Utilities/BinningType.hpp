@@ -12,6 +12,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 namespace Acts {
 
 /// @enum BinningType, BinningOption & BinningAccess
@@ -45,6 +47,16 @@ enum class BinningValue : int {
   binEta = 7,
   binMag = 8
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(BinningValue, {{BinningValue::binX, "binX"},
+                                            {BinningValue::binY, "binY"},
+                                            {BinningValue::binZ, "binZ"},
+                                            {BinningValue::binR, "binR"},
+                                            {BinningValue::binPhi, "binPhi"},
+                                            {BinningValue::binRPhi, "binRPhi"},
+                                            {BinningValue::binH, "binH"},
+                                            {BinningValue::binEta, "binEta"},
+                                            {BinningValue::binMag, "binMag"}})
 
 /// Get all possible binning values
 /// @return the binning values

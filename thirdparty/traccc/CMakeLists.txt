@@ -15,7 +15,12 @@ message(STATUS "Building traccc as part of the Acts project")
 set(TRACCC_VERSION "${_acts_traccc_version}")
 
 # Declare where to get traccc from.
-FetchContent_Declare(traccc ${ACTS_TRACCC_SOURCE})
+FetchContent_Declare(
+    traccc
+    ${ACTS_TRACCC_SOURCE}
+    PATCH_COMMAND
+        patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/remove-json-include.diff
+)
 
 set(ACTS_TRACCC_SCALARTYPE "double")
 

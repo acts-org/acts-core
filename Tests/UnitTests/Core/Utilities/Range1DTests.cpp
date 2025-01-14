@@ -8,6 +8,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 #include "Acts/Utilities/RangeXD.hpp"
 
 #include <limits>
@@ -607,6 +608,18 @@ BOOST_AUTO_TEST_CASE(range_exclusive_right) {
   BOOST_CHECK(r.contains(19));
   BOOST_CHECK(!r.contains(20));
   BOOST_CHECK(!r.contains(21));
+}
+
+BOOST_AUTO_TEST_CASE(Range1DRoundTrip) {
+  Acts::Range1D<double> r(-10., 100.);
+
+  nlohmann::json jrange;
+  jrange["range"] = r;
+
+  Acts::Range1D<double> rIn = jrange["range"];
+
+  CHECK_CLOSE_ABS(rIn.min(), -10., 10e-5);
+  CHECK_CLOSE_ABS(rIn.max(), 100., 10e-5);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

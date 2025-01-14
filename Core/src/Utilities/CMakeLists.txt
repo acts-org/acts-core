@@ -6,6 +6,8 @@ target_sources(
         SpacePointUtility.cpp
         TrackHelpers.cpp
         BinningType.cpp
+        BinningData.cpp
+        BinningUtility.cpp
         Intersection.cpp
         GraphViz.cpp
 )

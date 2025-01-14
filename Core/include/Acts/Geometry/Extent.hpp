@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace Acts {
 
 using Envelope = std::array<double, 2>;
@@ -325,6 +327,10 @@ class Extent {
   /// (Optional) Value histograms for bin detection
   std::array<std::vector<double>, numBinningValues()> m_valueHistograms;
 };
+
+void to_json(nlohmann::json& j, const Extent& e);
+
+void from_json(const nlohmann::json& j, Extent& e);
 
 inline Range1D<double> Acts::Extent::range(BinningValue bValue) const {
   return m_range[toUnderlying(bValue)];

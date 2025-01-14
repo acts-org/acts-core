@@ -15,6 +15,8 @@
 #include <sstream>
 #include <string>
 
+#include <nlohmann/json.hpp>
+
 namespace Acts {
 /// @brief An orthogonal range in an arbitrary number of dimensions
 ///
@@ -634,5 +636,17 @@ class RangeXD {
 template <typename Type,
           template <typename, std::size_t> typename Vector = std::array>
 using Range1D = RangeXD<1, Type, Vector>;
+
+template <typename Type>
+void to_json(nlohmann::json& j, const Range1D<Type>& r) {
+  j["min"] = r.min();
+  j["max"] = r.max();
+}
+
+template <typename Type>
+void from_json(const nlohmann::json& j, Range1D<Type>& r) {
+  r.setMin(j.at("min").template get<Type>());
+  r.setMax(j.at("max").template get<Type>());
+}
 
 }  // namespace Acts

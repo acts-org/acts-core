@@ -1,0 +1,12 @@
+diff --git a/io/src/read_digitization_config.cpp b/io/src/read_digitization_config.cpp
+index fbba17ae..defe89c5 100644
+--- a/io/src/read_digitization_config.cpp
++++ b/io/src/read_digitization_config.cpp
+@@ -13,7 +13,6 @@
+ // Acts include(s).
+ #include <Acts/Plugins/Json/ActsJson.hpp>
+ #include <Acts/Plugins/Json/GeometryHierarchyMapJsonConverter.hpp>
+-#include <Acts/Plugins/Json/UtilitiesJsonConverter.hpp>
+
+ // System include(s).
+ #include <algorithm>

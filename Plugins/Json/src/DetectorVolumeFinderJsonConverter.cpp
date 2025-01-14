@@ -12,7 +12,6 @@
 #include "Acts/Navigation/NavigationDelegates.hpp"
 #include "Acts/Navigation/PortalNavigation.hpp"
 #include "Acts/Plugins/Json/GridJsonConverter.hpp"
-#include "Acts/Plugins/Json/UtilitiesJsonConverter.hpp"
 #include "Acts/Utilities/GridAxisGenerators.hpp"
 
 #include <array>
