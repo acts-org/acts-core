@@ -94,7 +94,7 @@ jobs:
   build_performance:
     runs-on: ubuntu-latest
     container: ghcr.io/acts-project/ubuntu2404:63
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 

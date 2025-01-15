@@ -1,4 +1,7 @@
 #!/bin/bash
+# This file locates the the OpenGL library and adds it to the packages.yaml file.
+# OpenGL needs to be supplied to spack as an *external*, which means that spack uses
+# it in dependency resolution, but does not attempt to build it.
 
 set -u
 set -e

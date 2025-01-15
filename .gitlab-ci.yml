@@ -382,7 +382,7 @@ linux_physmon:
     - >
       cmake -B build -S src
       --preset=gitlab-ci
-      -DCMAKE_CXX_COMPILER=clang++
+      -DCMAKE_CXX_COMPILER=${COMPILER}
       -DCMAKE_CXX_STANDARD=${CXXSTD}
 
     - ccache -z
@@ -401,7 +401,7 @@ linux_physmon:
       -GNinja
       -DCMAKE_BUILD_TYPE=Release
       -DCMAKE_CXX_FLAGS=-Werror
-      -DCMAKE_CXX_COMPILER=clang++
+      -DCMAKE_CXX_COMPILER=${COMPILER}
       -DCMAKE_CXX_STANDARD=${CXXSTD}
       -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
 
