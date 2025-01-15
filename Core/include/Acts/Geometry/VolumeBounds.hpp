@@ -12,7 +12,7 @@
 #include "Acts/Definitions/Direction.hpp"
 #include "Acts/Geometry/Volume.hpp"
 #include "Acts/Surfaces/RegularSurface.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -121,32 +121,32 @@ class VolumeBounds {
       const Transform3* trf = nullptr, const Vector3& envelope = {0, 0, 0},
       const Volume* entity = nullptr) const = 0;
 
-  /// Get the canonical binning values, i.e. the binning values
-  /// for that fully describe the shape's extent
+  /// Get the canonical axis direction
+  /// that fully describe the shape's extent
   ///
-  /// @return vector of canonical binning values
+  /// @return vector of canonical axis directions
   ///
   /// @note This is the default implementation that
   /// returns the bounding box binning. Individual shapes
   /// should override this method
-  virtual std::vector<Acts::BinningValue> canonicalBinning() const {
-    return {Acts::BinningValue::binX, Acts::BinningValue::binY,
-            Acts::BinningValue::binZ};
+  virtual std::vector<AxisDirection> canonicalAxes() const {
+    using enum AxisDirection;
+    return {AxisX, AxisY, AxisZ};
   };
 
   /// Binning offset - overloaded for some R-binning types
   ///
-  /// @param bValue is the binning schema used
+  /// @param aDir is the binning schema used
   ///
   /// @return vector 3D to be used for the binning
-  virtual Vector3 binningOffset(BinningValue bValue) const;
+  virtual Vector3 referenceOffset(AxisDirection aDir) const;
 
   /// Binning borders in double
   ///
-  /// @param bValue is the binning schema used
+  /// @param aDir is the binning schema used
   ///
   /// @return float offset to be used for the binning
-  virtual double binningBorder(BinningValue bValue) const;
+  virtual double referenceBorder(AxisDirection aDir) const;
 
   /// Output Method for std::ostream, to be overloaded by child classes
   ///
@@ -155,12 +155,12 @@ class VolumeBounds {
 };
 
 /// Binning offset - overloaded for some R-binning types
-inline Vector3 VolumeBounds::binningOffset(
-    BinningValue /*bValue*/) const {  // standard offset is 0.,0.,0.
+inline Vector3 VolumeBounds::referenceOffset(
+    AxisDirection /*aDir*/) const {  // standard offset is 0.,0.,0.
   return Vector3(0., 0., 0.);
 }
 
-inline double VolumeBounds::binningBorder(BinningValue /*bValue*/) const {
+inline double VolumeBounds::referenceBorder(AxisDirection /*aDir*/) const {
   return 0.;
 }
 

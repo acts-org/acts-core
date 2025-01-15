@@ -12,7 +12,7 @@
 #include "Acts/Geometry/BlueprintOptions.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/NavigationPolicyFactory.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/TransformRange.hpp"
 
@@ -192,7 +192,7 @@ class BlueprintNode {
   ///                  @ref Acts::CylinderVolumeStack for details.
   /// @param callback An optional callback that receives the node as an argument
   CylinderContainerBlueprintNode& addCylinderContainer(
-      const std::string& name, BinningValue direction,
+      const std::string& name, AxisDirection direction,
       const std::function<void(CylinderContainerBlueprintNode& cylinder)>&
           callback = {});
 

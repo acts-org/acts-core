@@ -13,7 +13,7 @@
 #include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Geometry/Extent.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
-#include "Acts/Utilities/BinningData.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/StringHelpers.hpp"
 
 #include <map>
@@ -47,11 +47,11 @@ struct Node final {
   /// @param t the transform
   /// @param bt the boundary type
   /// @param bv the boundary values
-  /// @param bss the binning values
+  /// @param bss the axis directions for the binning
   /// @param cs the children of the node
   /// @param e the estimated extent of the node (optional)
   Node(const std::string& n, const Transform3& t, VolumeBounds::BoundsType bt,
-       const std::vector<double>& bv, const std::vector<BinningValue>& bss,
+       const std::vector<double>& bv, const std::vector<AxisDirection>& bss,
        std::vector<std::unique_ptr<Node>> cs = {}, const Extent& e = Extent())
       : name(n),
         transform(t),
@@ -96,7 +96,7 @@ struct Node final {
   /// Branch definitions: children
   std::vector<std::unique_ptr<Node>> children = {};
   /// Branch definition binning
-  std::vector<BinningValue> binning = {};
+  std::vector<AxisDirection> binning = {};
 
   /// Portal proto material binning
   std::map<unsigned int, BinningDescription> portalMaterialBinning = {};

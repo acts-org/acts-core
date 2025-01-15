@@ -34,7 +34,7 @@ class Portal;
 /// gathered from the sub volumes, the binning description
 using PortalReplacement =
     std::tuple<std::shared_ptr<Experimental::Portal>, unsigned int, Direction,
-               std::vector<double>, BinningValue>;
+               std::vector<double>, AxisDirection>;
 
 namespace detail::PortalHelper {
 
@@ -63,7 +63,7 @@ void attachDetectorVolumesUpdater(
     const GeometryContext& gctx, Portal& portal,
     const std::vector<std::shared_ptr<DetectorVolume>>& volumes,
     const Direction& direction, const std::vector<double>& boundaries,
-    const BinningValue& binning);
+    const AxisDirection& binning);
 
 /// @brief Create and attach the multi link updator, the portal will get
 /// a volume updator attached, that points to the different sub volumes

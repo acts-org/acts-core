@@ -16,7 +16,7 @@
 namespace Acts {
 
 std::unique_ptr<GridPortalLink> TrivialPortalLink::makeGrid(
-    BinningValue direction) const {
+    AxisDirection direction) const {
   return GridPortalLink::make(m_surface, *m_volume, direction);
 }
 

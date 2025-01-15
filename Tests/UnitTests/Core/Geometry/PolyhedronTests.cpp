@@ -83,18 +83,18 @@ BOOST_AUTO_TEST_CASE(PolyhedronExtent) {
   Polyhedron rectangle(rvertices, rfaces, rmesh);
 
   auto rExtent = rectangle.extent();
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binX), -1., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binX), 1., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binY), -2., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binY), -1., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binZ), 0., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binZ), 0., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binR), 1., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binR),
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisX), -1., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisX), 1., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisY), -2., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisY), -1., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisZ), 0., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisZ), 0., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisR), 1., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisR),
                   VectorHelpers::perp(rvertices[0]), 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binPhi),
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisPhi),
                   VectorHelpers::phi(rvertices[3]), 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binPhi),
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisPhi),
                   VectorHelpers::phi(rvertices[2]), 1e-6);
 
   // Now shift the Extent
@@ -102,12 +102,12 @@ BOOST_AUTO_TEST_CASE(PolyhedronExtent) {
   Transform3 shiftedTransform = Transform3::Identity();
   shiftedTransform.pretranslate(shift);
   rExtent = rectangle.extent(shiftedTransform);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binX), -2., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binX), 0., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binY), -2., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binY), -1., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binZ), 1., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binZ), 1., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisX), -2., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisX), 0., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisY), -2., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisY), -1., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisZ), 1., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisZ), 1., 1e-6);
 
   // Test a rectangle in yz - pane (at x == 3)
   rvertices = {Vector3(3_mm, -5_mm, -10_mm), Vector3(3_mm, 5_mm, -10_mm),
@@ -115,14 +115,14 @@ BOOST_AUTO_TEST_CASE(PolyhedronExtent) {
 
   rectangle = Polyhedron(rvertices, rfaces, rmesh);
   rExtent = rectangle.extent();
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binX), 3., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binX), 3., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binY), -5., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binY), 5., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binZ), -10., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binZ), 10., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.min(BinningValue::binR), 3., 1e-6);
-  CHECK_CLOSE_ABS(rExtent.max(BinningValue::binR), std::sqrt(9. + 25.), 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisX), 3., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisX), 3., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisY), -5., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisY), 5., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisZ), -10., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisZ), 10., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.min(AxisDirection::AxisR), 3., 1e-6);
+  CHECK_CLOSE_ABS(rExtent.max(AxisDirection::AxisR), std::sqrt(9. + 25.), 1e-6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

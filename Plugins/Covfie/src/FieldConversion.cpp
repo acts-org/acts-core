@@ -8,10 +8,6 @@
 
 #include "Acts/Plugins/Covfie/FieldConversion.hpp"
 
-#include "Acts/Utilities/Axis.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
-#include "Acts/Utilities/Grid.hpp"
-
 #include <cmath>
 #include <stdexcept>
 #include <type_traits>

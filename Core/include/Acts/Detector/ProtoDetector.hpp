@@ -98,12 +98,12 @@ struct ProtoVolume {
   void extendUp(ProtoVolume& ptVolume);
 
   /// Extend the tracking volume with its own constituents
-  /// @param bValue the binning value that is propagated
-  void propagateMinDown(BinningValue bValue);
+  /// @param aDir the axis direction that is propagated
+  void propagateMinDown(AxisDirection aDir);
 
   /// Extend the tracking volume with its own constituents
-  /// @param bValue the binning value that is propagated
-  void propagateMaxDown(BinningValue bValue);
+  /// @param aDir the axis direction that is propagated
+  void propagateMaxDown(AxisDirection aDir);
 
   /// Constrain the daughter volumes with this volume
   ///

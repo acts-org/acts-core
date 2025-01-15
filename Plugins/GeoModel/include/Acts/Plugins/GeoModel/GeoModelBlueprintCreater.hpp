@@ -39,7 +39,7 @@ class GeoModelBlueprintCreater {
     /// with a kdtree sorting structure
     std::vector<std::shared_ptr<Surface>> detectorSurfaces = {};
     /// The binning values for the KDTree sorting
-    std::vector<BinningValue> kdtBinning = {};
+    std::vector<AxisDirection> kdtBinning = {};
     /// Polyhedron approximation: number of segments per circlequarter
     unsigned int quarterSegments = 1u;
   };
@@ -140,7 +140,7 @@ class GeoModelBlueprintCreater {
   createInternalStructureBuilder(
       Cache& cache, const GeometryContext& gctx, const TableEntry& entry,
       const Extent& externalExtent = Extent(),
-      const std::vector<BinningValue>& internalConstraints = {}) const;
+      const std::vector<AxisDirection>& internalConstraints = {}) const;
 
   /// @brief Parse bound value string from the database
   ///

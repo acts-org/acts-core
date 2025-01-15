@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(VolumeTest) {
 
   // Binning test
   GeometryContext gctx;
-  BOOST_CHECK_EQUAL(volume.binningPosition(gctx, BinningValue::binX),
+  BOOST_CHECK_EQUAL(volume.referencePosition(gctx, AxisDirection::AxisX),
                     volume.center());
 }
 

@@ -13,7 +13,7 @@
 
 namespace Acts {
 
-struct MultiStepperSurfaceReached : public SurfaceReached {
+struct MultiStepperSurfaceReached : public ForcedSurfaceReached {
   /// If this is set, we are also happy if the mean of the components is on the
   /// surface. How the averaging is performed depends on the stepper
   /// implementation
@@ -25,7 +25,6 @@ struct MultiStepperSurfaceReached : public SurfaceReached {
   double averageOnSurfaceTolerance = 0.2;
 
   MultiStepperSurfaceReached() = default;
-  explicit MultiStepperSurfaceReached(double oLimit) : SurfaceReached(oLimit) {}
 
   /// boolean operator for abort condition without using the result
   ///
@@ -82,9 +81,8 @@ struct MultiStepperSurfaceReached : public SurfaceReached {
       auto singleState = cmp.singleState(state);
       const auto& singleStepper = cmp.singleStepper(stepper);
 
-      if (!SurfaceReached::checkAbort(singleState, singleStepper, navigator,
-                                      logger)) {
-        cmp.status() = Acts::IntersectionStatus::reachable;
+      if (!ForcedSurfaceReached::checkAbort(singleState, singleStepper,
+                                            navigator, logger)) {
         reached = false;
       } else {
         cmp.status() = Acts::IntersectionStatus::onSurface;

@@ -19,6 +19,7 @@
 #include <Acts/Material/BinnedSurfaceMaterial.hpp>
 #include <Acts/Material/HomogeneousSurfaceMaterial.hpp>
 #include <Acts/Material/HomogeneousVolumeMaterial.hpp>
+#include <Acts/Utilities/AxisDefinitions.hpp>
 #include <Acts/Utilities/BinUtility.hpp>
 #include <Acts/Utilities/BinningType.hpp>
 
@@ -183,10 +184,8 @@ ActsExamples::RootMaterialDecorator::RootMaterialDecorator(
           Acts::BinUtility bUtility;
           for (int ib = 1; ib < n->GetNbinsX() + 1; ++ib) {
             std::size_t nbins = static_cast<std::size_t>(n->GetBinContent(ib));
-            Acts::BinningValue val =
-                static_cast<Acts::BinningValue>(v->GetBinContent(ib));
-            Acts::BinningOption opt =
-                static_cast<Acts::BinningOption>(o->GetBinContent(ib));
+            auto val = static_cast<Acts::AxisDirection>(v->GetBinContent(ib));
+            auto opt = static_cast<Acts::BinningOption>(o->GetBinContent(ib));
             float rmin = min->GetBinContent(ib);
             float rmax = max->GetBinContent(ib);
             bUtility += Acts::BinUtility(nbins, rmin, rmax, opt, val);
@@ -268,8 +267,8 @@ ActsExamples::RootMaterialDecorator::RootMaterialDecorator(
           Acts::BinUtility bUtility;
           for (int ib = 1; ib < dim + 1; ++ib) {
             std::size_t nbins = static_cast<std::size_t>(n->GetBinContent(ib));
-            Acts::BinningValue val =
-                static_cast<Acts::BinningValue>(v->GetBinContent(ib));
+            Acts::AxisDirection val =
+                static_cast<Acts::AxisDirection>(v->GetBinContent(ib));
             Acts::BinningOption opt =
                 static_cast<Acts::BinningOption>(o->GetBinContent(ib));
             float rmin = min->GetBinContent(ib);

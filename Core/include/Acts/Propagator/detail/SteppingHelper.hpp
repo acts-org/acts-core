@@ -53,14 +53,14 @@ Acts::IntersectionStatus updateSingleSurfaceStatus(
 
   // The intersection is on surface already
   if (sIntersection.status() == IntersectionStatus::onSurface) {
-    // Release navigation step size
-    state.stepSize.release(stype);
     ACTS_VERBOSE("Intersection: state is ON SURFACE");
+    state.stepSize.release(stype);
+    stepper.updateStepSize(state, sIntersection.pathLength(), stype);
     return IntersectionStatus::onSurface;
   }
 
   const double nearLimit = std::numeric_limits<double>::lowest();
-  const double farLimit = state.stepSize.value(ConstrainedStep::actor);
+  const double farLimit = std::numeric_limits<double>::max();
 
   if (sIntersection.isValid() &&
       detail::checkPathLength(sIntersection.pathLength(), nearLimit, farLimit,

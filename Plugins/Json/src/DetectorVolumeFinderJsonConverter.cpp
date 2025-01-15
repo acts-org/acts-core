@@ -37,7 +37,7 @@ struct IndexedVolumesGenerator {
   template <typename grid_type>
   Acts::Experimental::ExternalNavigationDelegate createUpdater(
       grid_type&& grid,
-      const std::array<Acts::BinningValue, grid_type::DIM>& bv,
+      const std::array<Acts::AxisDirection, grid_type::DIM>& bv,
       const Acts::Transform3& transform) {
     using IndexedDetectorVolumesImpl =
         Acts::Experimental::IndexedGridNavigation<

@@ -25,7 +25,7 @@ class BoostTrackBuilding final : public Acts::TrackBuildingBase {
   std::vector<std::vector<int>> operator()(
       std::any nodes, std::any edges, std::any edge_weights,
       std::vector<int> &spacepointIDs,
-      torch::Device device = torch::Device(torch::kCPU)) override;
+      const ExecutionContext &execContext = {}) override;
   torch::Device device() const override { return m_device; };
 
  private:

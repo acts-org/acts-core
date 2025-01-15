@@ -44,7 +44,7 @@ ActsExamples::buildTelescopeDetector(
     const std::vector<double>& stereoAngles,
     const std::array<double, 2>& offsets, const std::array<double, 2>& bounds,
     double thickness, TelescopeSurfaceType surfaceType,
-    Acts::BinningValue binValue) {
+    Acts::AxisDirection binValue) {
   using namespace Acts::UnitLiterals;
 
   // The rectangle bounds for plane surface
@@ -62,14 +62,14 @@ ActsExamples::buildTelescopeDetector(
       std::make_shared<Acts::HomogeneousSurfaceMaterial>(matProp);
 
   // Construct the rotation
-  // This assumes the binValue is binX, binY or binZ. No reset is necessary in
-  // case of binZ
+  // This assumes the direction is AxisX, AxisY or AxisZ. No reset is necessary
+  // in case of AxisZ
   Acts::RotationMatrix3 rotation = Acts::RotationMatrix3::Identity();
-  if (binValue == Acts::BinningValue::binX) {
+  if (binValue == Acts::AxisDirection::AxisX) {
     rotation.col(0) = Acts::Vector3(0, 0, -1);
     rotation.col(1) = Acts::Vector3(0, 1, 0);
     rotation.col(2) = Acts::Vector3(1, 0, 0);
-  } else if (binValue == Acts::BinningValue::binY) {
+  } else if (binValue == Acts::AxisDirection::AxisY) {
     rotation.col(0) = Acts::Vector3(1, 0, 0);
     rotation.col(1) = Acts::Vector3(0, 0, -1);
     rotation.col(2) = Acts::Vector3(0, 1, 0);

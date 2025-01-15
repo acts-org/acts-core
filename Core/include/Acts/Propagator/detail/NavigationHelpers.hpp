@@ -37,22 +37,19 @@ struct NavigationObjectCandidate {
   std::pair<SurfaceMultiIntersection, AnyIntersectionObject> intersect(
       const GeometryContext& gctx, const Vector3& position,
       const Vector3& direction, double tolerance) const {
+    auto intersection = representation->intersect(gctx, position, direction,
+                                                  boundaryTolerance, tolerance);
+
     if (std::holds_alternative<const Surface*>(object)) {
       const auto& surface = std::get<const Surface*>(object);
-      auto intersection = representation->intersect(
-          gctx, position, direction, boundaryTolerance, tolerance);
       return {intersection, surface};
     }
     if (std::holds_alternative<const Layer*>(object)) {
       const auto& layer = std::get<const Layer*>(object);
-      auto intersection = representation->intersect(
-          gctx, position, direction, boundaryTolerance, tolerance);
       return {intersection, layer};
     }
     if (std::holds_alternative<const BoundarySurface*>(object)) {
       const auto& boundary = std::get<const BoundarySurface*>(object);
-      auto intersection = representation->intersect(
-          gctx, position, direction, boundaryTolerance, tolerance);
       return {intersection, boundary};
     }
     throw std::runtime_error("unknown type");
@@ -61,14 +58,14 @@ struct NavigationObjectCandidate {
 
 /// Composes an intersection and a bounds check into a navigation candidate.
 /// This is used to consistently update intersections after creation.
-struct IntersectionCandidate {
+struct IntersectedNavigationObject {
   SurfaceIntersection intersection;
-  detail::AnyIntersectionObject anyObject;
+  AnyIntersectionObject anyObject;
   BoundaryTolerance boundaryTolerance;
 
-  IntersectionCandidate(SurfaceIntersection _intersection,
-                        detail::AnyIntersectionObject _anyObject,
-                        BoundaryTolerance _boundaryTolerance)
+  IntersectedNavigationObject(SurfaceIntersection _intersection,
+                              AnyIntersectionObject _anyObject,
+                              BoundaryTolerance _boundaryTolerance)
       : intersection(std::move(_intersection)),
         anyObject(_anyObject),
         boundaryTolerance(std::move(_boundaryTolerance)) {}
@@ -83,8 +80,8 @@ struct IntersectionCandidate {
     return std::get<const object_t*>(anyObject);
   }
 
-  static bool forwardOrder(const IntersectionCandidate& aCandidate,
-                           const IntersectionCandidate& bCandidate) {
+  static bool forwardOrder(const IntersectedNavigationObject& aCandidate,
+                           const IntersectedNavigationObject& bCandidate) {
     return Intersection3D::pathLengthOrder(
         aCandidate.intersection.intersection(),
         bCandidate.intersection.intersection());
@@ -93,7 +90,7 @@ struct IntersectionCandidate {
 
 /// @brief Emplace all navigation candidates for a given volume
 inline void emplaceAllVolumeCandidates(
-    std::vector<detail::NavigationObjectCandidate>& candidates,
+    std::vector<NavigationObjectCandidate>& candidates,
     const TrackingVolume& volume, bool resolveSensitive, bool resolveMaterial,
     bool resolvePassive,
     const BoundaryTolerance& boundaryToleranceSurfaceApproach,

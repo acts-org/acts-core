@@ -13,7 +13,7 @@
 #include "Acts/Navigation/NavigationState.hpp"
 #include "Acts/Navigation/NavigationStateFillers.hpp"
 #include "Acts/Navigation/NavigationStateUpdaters.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/IAxis.hpp"
 
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(AllPortalsGrid1DSurfaces) {
       Acts::Experimental::IndexedSurfacesExtractor,
       Acts::Experimental::SurfacesFiller>;
   auto grid1DSurfaces =
-      Grid1DSurfacesProvider(std::move(grid), {Acts::BinningValue::binR});
+      Grid1DSurfacesProvider(std::move(grid), {Acts::AxisDirection::AxisR});
 
   auto allPortalsGrid1DSurfaces = Acts::Experimental::ChainedNavigation<
       Acts::Experimental::IInternalNavigation, AllPortalsProvider,
@@ -295,7 +295,8 @@ BOOST_AUTO_TEST_CASE(AllPortalsGrid2DSurfaces) {
       Acts::Experimental::IndexedSurfacesExtractor,
       Acts::Experimental::SurfacesFiller>;
   auto grid2DSurfaces = Grid2DSurfacesProvider(
-      std::move(grid), {Acts::BinningValue::binR, Acts::BinningValue::binZ});
+      std::move(grid),
+      {Acts::AxisDirection::AxisR, Acts::AxisDirection::AxisZ});
 
   auto allPortalsGrid2DSurfaces = Acts::Experimental::ChainedNavigation<
       Acts::Experimental::IInternalNavigation, AllPortalsProvider,

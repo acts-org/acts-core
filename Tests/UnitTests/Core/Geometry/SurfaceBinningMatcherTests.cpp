@@ -58,25 +58,25 @@ BOOST_AUTO_TEST_CASE(PlaneSurfaceMatcher) {
       Surface::makeShared<DiscSurface>(identity, similarPhiBounds);
 
   SurfaceBinningMatcher sbm;
-  sbm.tolerances[toUnderlying(BinningValue::binR)] = {rMinTol, rMaxTol};
-  sbm.tolerances[toUnderlying(BinningValue::binPhi)] = {phiTol, phiTol};
+  sbm.tolerances[toUnderlying(AxisDirection::AxisR)] = {rMinTol, rMaxTol};
+  sbm.tolerances[toUnderlying(AxisDirection::AxisPhi)] = {phiTol, phiTol};
 
   // Always true
-  for (BinningValue ib : allBinningValues()) {
+  for (AxisDirection ib : allAxisDirections()) {
     BOOST_CHECK(sbm(tgContext, ib, oneSurface.get(), oneSurface.get()));
   }
   // Not matching in R
-  BOOST_CHECK(!sbm(tgContext, BinningValue::binR, oneSurface.get(),
+  BOOST_CHECK(!sbm(tgContext, AxisDirection::AxisR, oneSurface.get(),
                    otherSurface.get()));
   // Not matching in phi
-  BOOST_CHECK(!sbm(tgContext, BinningValue::binPhi, oneSurface.get(),
+  BOOST_CHECK(!sbm(tgContext, AxisDirection::AxisPhi, oneSurface.get(),
                    otherSurface.get()));
 
   // Good enough matching in R
-  BOOST_CHECK(sbm(tgContext, BinningValue::binR, oneSurface.get(),
+  BOOST_CHECK(sbm(tgContext, AxisDirection::AxisR, oneSurface.get(),
                   similarRSurface.get()));
   // Good enough matching in phi
-  BOOST_CHECK(sbm(tgContext, BinningValue::binPhi, oneSurface.get(),
+  BOOST_CHECK(sbm(tgContext, AxisDirection::AxisPhi, oneSurface.get(),
                   similarPhiSurface.get()));
 }
 

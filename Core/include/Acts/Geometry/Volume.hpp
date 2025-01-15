@@ -11,7 +11,6 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/GeometryObject.hpp"
-#include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/BoundingBox.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
@@ -112,11 +111,10 @@ class Volume : public GeometryObject {
   /// - as default the center is given, but may be overloaded
   ///
   /// @param gctx The current geometry context object, e.g. alignment
-  /// @param bValue is the binning value schema
-  ///
+  /// @param aDir is the axis direction for the reference position
   /// @return vector 3D that can be used for the binning
-  Vector3 binningPosition(const GeometryContext& gctx,
-                          BinningValue bValue) const override;
+  Vector3 referencePosition(const GeometryContext& gctx,
+                            AxisDirection aDir) const override;
 
   bool operator==(const Volume& other) const;
 

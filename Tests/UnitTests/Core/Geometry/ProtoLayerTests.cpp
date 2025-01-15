@@ -36,7 +36,7 @@ GeometryContext tgContext = GeometryContext();
 BOOST_AUTO_TEST_SUITE(Geometry)
 
 BOOST_AUTO_TEST_CASE(ProtoLayerTests) {
-  using enum BinningValue;
+  using enum AxisDirection;
 
   // Create a proto layer with 4 surfaces on the x/y grid
   auto recBounds = std::make_shared<RectangleBounds>(3., 6.);
@@ -111,20 +111,20 @@ BOOST_AUTO_TEST_CASE(ProtoLayerTests) {
   // Test 1 - identity transform
   auto protoLayer = createProtoLayer(Transform3::Identity());
 
-  CHECK_CLOSE_ABS(protoLayer.range(binX), 12., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.medium(binX), 0., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.min(binX), -6., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.max(binX), 6., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.range(binY), 6., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.medium(binY), 0., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.min(binY), -3., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.max(binY), 3., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.range(binZ), 12., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.medium(binZ), 0., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.min(binZ), -6., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.max(binZ), 6., 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.max(binR), std::hypot(3, 6), 1e-8);
-  CHECK_CLOSE_ABS(protoLayer.min(binR), 3., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.range(AxisX), 12., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.medium(AxisX), 0., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.min(AxisX), -6., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.max(AxisX), 6., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.range(AxisY), 6., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.medium(AxisY), 0., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.min(AxisY), -3., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.max(AxisY), 3., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.range(AxisZ), 12., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.medium(AxisZ), 0., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.min(AxisZ), -6., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.max(AxisZ), 6., 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.max(AxisR), std::hypot(3, 6), 1e-8);
+  CHECK_CLOSE_ABS(protoLayer.min(AxisR), 3., 1e-8);
 
   // Test 1a
 
@@ -133,35 +133,35 @@ BOOST_AUTO_TEST_CASE(ProtoLayerTests) {
   auto protoLayerRot = createProtoLayer(AngleAxis3(-0.345, Vector3::UnitZ()) *
                                         Transform3::Identity());
 
-  BOOST_CHECK_NE(protoLayer.min(binX), -6.);
-  CHECK_CLOSE_ABS(protoLayerRot.medium(binX), 0., 1e-8);
-  CHECK_CLOSE_ABS(protoLayerRot.medium(binY), 0., 1e-8);
-  CHECK_CLOSE_ABS(protoLayerRot.range(binZ), 12., 1e-8);
-  CHECK_CLOSE_ABS(protoLayerRot.medium(binZ), 0., 1e-8);
-  CHECK_CLOSE_ABS(protoLayerRot.min(binZ), -6., 1e-8);
-  CHECK_CLOSE_ABS(protoLayerRot.max(binZ), 6., 1e-8);
-  CHECK_CLOSE_ABS(protoLayerRot.min(binR), 3., 1e-8);
-  CHECK_CLOSE_ABS(protoLayerRot.max(binR), std::hypot(3, 6), 1e-8);
+  BOOST_CHECK_NE(protoLayer.min(AxisX), -6.);
+  CHECK_CLOSE_ABS(protoLayerRot.medium(AxisX), 0., 1e-8);
+  CHECK_CLOSE_ABS(protoLayerRot.medium(AxisY), 0., 1e-8);
+  CHECK_CLOSE_ABS(protoLayerRot.range(AxisZ), 12., 1e-8);
+  CHECK_CLOSE_ABS(protoLayerRot.medium(AxisZ), 0., 1e-8);
+  CHECK_CLOSE_ABS(protoLayerRot.min(AxisZ), -6., 1e-8);
+  CHECK_CLOSE_ABS(protoLayerRot.max(AxisZ), 6., 1e-8);
+  CHECK_CLOSE_ABS(protoLayerRot.min(AxisR), 3., 1e-8);
+  CHECK_CLOSE_ABS(protoLayerRot.max(AxisR), std::hypot(3, 6), 1e-8);
 
   std::stringstream sstream;
   protoLayerRot.toStream(sstream);
   std::string oString = R"(ProtoLayer with dimensions (min/max)
 Extent in space :
-  - value :      binX | range = [-6.66104, 6.66104]
-  - value :      binY | range = [-4.85241, 4.85241]
-  - value :      binZ | range = [-6, 6]
-  - value :      binR | range = [3, 6.7082]
-  - value :    binPhi | range = [-3.02295, 2.33295]
-  - value :   binRPhi | range = [-20.2785, 15.6499]
-  - value :      binH | range = [0.61548, 2.52611]
-  - value :    binEta | range = [-1.14622, 1.14622]
-  - value :    binMag | range = [7.34847, 7.34847]
+  - value :     AxisX | range = [-6.66104, 6.66104]
+  - value :     AxisY | range = [-4.85241, 4.85241]
+  - value :     AxisZ | range = [-6, 6]
+  - value :     AxisR | range = [3, 6.7082]
+  - value :   AxisPhi | range = [-3.02295, 2.33295]
+  - value :  AxisRPhi | range = [-20.2785, 15.6499]
+  - value : AxisTheta | range = [0.61548, 2.52611]
+  - value :   AxisEta | range = [-1.14622, 1.14622]
+  - value :   AxisMag | range = [7.34847, 7.34847]
 )";
   BOOST_CHECK_EQUAL(sstream.str(), oString);
 }
 
 BOOST_AUTO_TEST_CASE(OrientedLayer) {
-  using enum BinningValue;
+  using enum AxisDirection;
   using namespace Acts::UnitLiterals;
 
   Transform3 base = Transform3::Identity();
@@ -197,14 +197,14 @@ BOOST_AUTO_TEST_CASE(OrientedLayer) {
   ProtoLayer protoLayer(tgContext, surfaces);
 
   BOOST_CHECK_EQUAL(protoLayer.surfaces().size(), 8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binX), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binX), 23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binY), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binY), 23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binZ), 0_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binZ), 0_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binR), 17_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binR), 23.769728648_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisX), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisX), 23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisY), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisY), 23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisZ), 0_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisZ), 0_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisR), 17_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisR), 23.769728648_mm, 1e-8);
 
   surfaces = makeFan(45_degree);
 
@@ -212,41 +212,41 @@ BOOST_AUTO_TEST_CASE(OrientedLayer) {
   protoLayer = {tgContext, surfaces};
 
   BOOST_CHECK_EQUAL(protoLayer.surfaces().size(), 8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binX), -16.26345596_mm, 1e-4);
-  BOOST_CHECK_CLOSE(protoLayer.max(binX), 16.26345596_mm, 1e-4);
-  BOOST_CHECK_CLOSE(protoLayer.min(binY), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binY), 23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binZ), -16.26345596_mm, 1e-4);
-  BOOST_CHECK_CLOSE(protoLayer.max(binZ), 16.26345596_mm, 1e-4);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisX), -16.26345596_mm, 1e-4);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisX), 16.26345596_mm, 1e-4);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisY), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisY), 23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisZ), -16.26345596_mm, 1e-4);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisZ), 16.26345596_mm, 1e-4);
 
   protoLayer = {tgContext, surfaces,
                 Transform3{AngleAxis3{45_degree, Vector3::UnitY()}}.inverse()};
 
   BOOST_CHECK_EQUAL(protoLayer.surfaces().size(), 8);
-  BOOST_CHECK_CLOSE(protoLayer.range(binX), 46_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binX), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binX), 23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.range(binY), 46_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binY), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binY), 23_mm, 1e-8);
-  CHECK_SMALL(protoLayer.range(binZ), 1e-14);
-  CHECK_SMALL(protoLayer.min(binZ), 1e-14);
-  CHECK_SMALL(protoLayer.max(binZ), 1e-14);
+  BOOST_CHECK_CLOSE(protoLayer.range(AxisX), 46_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisX), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisX), 23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.range(AxisY), 46_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisY), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisY), 23_mm, 1e-8);
+  CHECK_SMALL(protoLayer.range(AxisZ), 1e-14);
+  CHECK_SMALL(protoLayer.min(AxisZ), 1e-14);
+  CHECK_SMALL(protoLayer.max(AxisZ), 1e-14);
 
   surfaces = makeFan(0_degree, 10_mm);
 
   protoLayer = {tgContext, surfaces};
 
   BOOST_CHECK_EQUAL(protoLayer.surfaces().size(), 8);
-  BOOST_CHECK_CLOSE(protoLayer.range(binX), 46_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binX), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binX), 23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.range(binY), 46_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binY), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binY), 23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.range(binZ), 10_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binZ), -5_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binZ), 5_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.range(AxisX), 46_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisX), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisX), 23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.range(AxisY), 46_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisY), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisY), 23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.range(AxisZ), 10_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisZ), -5_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisZ), 5_mm, 1e-8);
 
   surfaces = makeFan(45_degree, 10_mm);
 
@@ -254,15 +254,15 @@ BOOST_AUTO_TEST_CASE(OrientedLayer) {
                 Transform3{AngleAxis3{45_degree, Vector3::UnitY()}}.inverse()};
 
   BOOST_CHECK_EQUAL(protoLayer.surfaces().size(), 8);
-  BOOST_CHECK_CLOSE(protoLayer.range(binX), 46_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binX), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binX), 23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.range(binY), 46_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binY), -23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binY), 23_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.range(binZ), 10_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.min(binZ), -5_mm, 1e-8);
-  BOOST_CHECK_CLOSE(protoLayer.max(binZ), 5_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.range(AxisX), 46_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisX), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisX), 23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.range(AxisY), 46_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisY), -23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisY), 23_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.range(AxisZ), 10_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.min(AxisZ), -5_mm, 1e-8);
+  BOOST_CHECK_CLOSE(protoLayer.max(AxisZ), 5_mm, 1e-8);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

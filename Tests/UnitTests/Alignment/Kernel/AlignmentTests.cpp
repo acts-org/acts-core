@@ -158,7 +158,7 @@ struct TelescopeDetector {
     // Create the layer array
     std::unique_ptr<const LayerArray> layArr(layArrCreator.layerArray(
         geoContext, layVec, positions.front() - 2._mm, positions.back() + 2._mm,
-        BinningType::arbitrary, BinningValue::binX));
+        BinningType::arbitrary, AxisDirection::AxisX));
 
     // Build the tracking volume
     auto trackVolume = std::make_shared<TrackingVolume>(

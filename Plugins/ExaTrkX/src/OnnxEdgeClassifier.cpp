@@ -90,7 +90,8 @@ std::ostream &operator<<(std::ostream &os, Ort::Value &v) {
 
 std::tuple<std::any, std::any, std::any, std::any>
 OnnxEdgeClassifier::operator()(std::any inputNodes, std::any inputEdges,
-                               std::any inEdgeFeatures, torch::Device) {
+                               std::any inEdgeFeatures,
+                               const ExecutionContext & /*unused*/) {
   auto torchDevice = torch::kCPU;
   Ort::MemoryInfo memoryInfo("Cpu", OrtArenaAllocator, /*device_id*/ 0,
                              OrtMemTypeDefault);

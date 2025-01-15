@@ -10,7 +10,7 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 
 #include <memory>
 #include <string>
@@ -69,7 +69,7 @@ struct TGeoParser {
     /// Scaling from TGeo to ROOT
     double unit = 1 * UnitConstants::cm;
     /// Parse restrictions, several can apply
-    std::vector<std::pair<BinningValue, ParseRange> > parseRanges = {};
+    std::vector<std::pair<AxisDirection, ParseRange> > parseRanges = {};
   };
 
   /// The parsing module, it takes the top Volume and recursively steps down

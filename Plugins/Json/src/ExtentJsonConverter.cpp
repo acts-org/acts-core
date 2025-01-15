@@ -22,9 +22,9 @@ void Acts::to_json(nlohmann::json& j, const Acts::Extent& e) {
   {
     nlohmann::json jrange;
     const auto& xrange = e.range();
-    for (auto ibv : allBinningValues()) {
+    for (auto ibv : allAxisDirections()) {
       if (e.constrains(ibv)) {
-        jrange[binningValueName(ibv)] = xrange[toUnderlying(ibv)];
+        jrange[axisDirectionName(ibv)] = xrange[toUnderlying(ibv)];
       }
     }
     j["range"] = jrange;
@@ -33,9 +33,9 @@ void Acts::to_json(nlohmann::json& j, const Acts::Extent& e) {
   {
     nlohmann::json jenvelope;
     const auto& envelope = e.envelope();
-    for (auto ibv : allBinningValues()) {
+    for (auto ibv : allAxisDirections()) {
       if (envelope[ibv] != zeroEnvelope) {
-        jenvelope[binningValueName(ibv)] =
+        jenvelope[axisDirectionName(ibv)] =
             Range1D<double>(envelope[ibv][0], envelope[ibv][1]);
       }
     }
@@ -49,7 +49,7 @@ void Acts::from_json(const nlohmann::json& j, Acts::Extent& e) {
   const auto& jrange = j["range"];
 
   for (const auto& [key, value] : jrange.items()) {
-    BinningValue bval = binningValueFromName(key);
+    AxisDirection bval = axisDirectionFromName(key);
     e.set(bval, value["min"], value["max"]);
   }
 
@@ -58,7 +58,7 @@ void Acts::from_json(const nlohmann::json& j, Acts::Extent& e) {
     ExtentEnvelope envelope;
 
     for (const auto& [key, value] : jenvelope.items()) {
-      BinningValue bval = binningValueFromName(key);
+      AxisDirection bval = axisDirectionFromName(key);
       envelope[bval] = {value["min"], value["max"]};
     }
 

@@ -13,7 +13,7 @@
 #include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Detector/interface/IDetectorComponentBuilder.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <map>
@@ -39,17 +39,17 @@ class IGeometryIdGenerator;
 /// @note the builder expects a fully consistent set of sub volume builders
 /// that will be executed in a chain
 ///
-/// @note allowed BinningValue(s) for the cylindrical container builder are
-/// {binZ}, {binR}, {binPhi}, {binZ, binR}, whereas the last option indicates
-/// a wrapping setup.
+/// @note allowed AxisDirection(s) for the cylindrical container builder are
+/// {AxisZ}, {AxisR}, {AxisPhi}, {AxisZ, AxisR}, whereas the last option
+/// indicates a wrapping setup.
 class CylindricalContainerBuilder : public IDetectorComponentBuilder {
  public:
   /// Nested configuration object
   struct Config {
     /// The configured volume builders
     std::vector<std::shared_ptr<const IDetectorComponentBuilder>> builders = {};
-    /// Binning prescription of attachment
-    std::vector<BinningValue> binning = {};
+    /// The axis direction for the binning
+    std::vector<AxisDirection> binning = {};
     /// The root volume finder
     std::shared_ptr<const IRootVolumeFinderBuilder> rootVolumeFinderBuilder =
         nullptr;

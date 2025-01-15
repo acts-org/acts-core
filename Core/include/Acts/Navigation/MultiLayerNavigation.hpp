@@ -12,6 +12,7 @@
 #include "Acts/Navigation/NavigationDelegates.hpp"
 #include "Acts/Navigation/NavigationStateFillers.hpp"
 #include "Acts/Navigation/NavigationStateUpdaters.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
 
 #include <algorithm>
@@ -34,7 +35,7 @@ class MultiLayerNavigation : public IInternalNavigation {
   path_generator pgenerator;
 
   /// These are the cast parameters - copied from constructor
-  std::array<BinningValue, grid_type::DIM> casts{};
+  std::array<AxisDirection, grid_type::DIM> casts{};
 
   /// An inverse transform to be applied to the position
   Transform3 transform = Transform3::Identity();
@@ -44,7 +45,7 @@ class MultiLayerNavigation : public IInternalNavigation {
   /// @param icasts is the cast values array
   /// @param itr a transform applied to the global position
   MultiLayerNavigation(grid_type igrid,
-                       const std::array<BinningValue, grid_type::DIM>& icasts,
+                       const std::array<AxisDirection, grid_type::DIM>& icasts,
                        const Transform3& itr = Transform3::Identity())
       : grid(std::move(igrid)), casts(icasts), transform(itr) {}
 

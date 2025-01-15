@@ -11,7 +11,7 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Geometry/CylinderVolumeBounds.hpp"
 #include "Acts/Geometry/Volume.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <vector>
@@ -73,7 +73,7 @@ class CylinderVolumeStack : public Volume {
   ///      and cannot have a @f$\phi@f$ sector or bevels.
   /// @note Preconditions are checked on construction
   CylinderVolumeStack(
-      std::vector<Volume*>& volumes, BinningValue direction,
+      std::vector<Volume*>& volumes, AxisDirection direction,
       AttachmentStrategy strategy = AttachmentStrategy::Midpoint,
       ResizeStrategy resizeStrategy = ResizeStrategy::Expand,
       const Logger& logger = Acts::getDummyLogger());
@@ -108,7 +108,7 @@ class CylinderVolumeStack : public Volume {
   /// @param direction is the binning direction
   /// @param strategy is the attachment strategy
   /// @param logger is the logger
-  void initializeOuterVolume(BinningValue direction,
+  void initializeOuterVolume(AxisDirection direction,
                              AttachmentStrategy strategy, const Logger& logger);
 
   struct VolumeTuple;
@@ -126,7 +126,7 @@ class CylinderVolumeStack : public Volume {
   /// @param a is the first volume
   /// @param b is the second volume
   /// @param logger is the logger
-  static void overlapPrint(BinningValue direction, const VolumeTuple& a,
+  static void overlapPrint(AxisDirection direction, const VolumeTuple& a,
                            const VolumeTuple& b, const Logger& logger);
 
   /// Helper function that checks if volumes are properly aligned
@@ -182,7 +182,7 @@ class CylinderVolumeStack : public Volume {
   std::shared_ptr<Volume> addGapVolume(
       const Transform3& transform, const std::shared_ptr<VolumeBounds>& bounds);
 
-  BinningValue m_direction{};
+  AxisDirection m_direction{};
   ResizeStrategy m_resizeStrategy{};
   Transform3 m_groupTransform{};
   std::vector<std::shared_ptr<Volume>> m_gaps{};

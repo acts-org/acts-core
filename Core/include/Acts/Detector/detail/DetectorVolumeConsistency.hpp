@@ -48,7 +48,7 @@ void checkRotationAlignment(
 std::vector<double> checkCenterAlignment(
     const GeometryContext& gctx,
     const std::vector<std::shared_ptr<Experimental::DetectorVolume>>& volumes,
-    BinningValue axisValue);
+    AxisDirection axisValue);
 
 }  // namespace detail::DetectorVolumeConsistency
 }  // namespace Acts::Experimental

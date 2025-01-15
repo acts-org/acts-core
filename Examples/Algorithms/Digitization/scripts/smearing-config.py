@@ -145,7 +145,7 @@ def block_to_json(args):
 
             data["bindata"] = [
                 0,  # Acts::Open,
-                0,  # Acts::BinningValue::binX,
+                0,  # Acts::AxisDirection::AxisX,
                 (high - low) / pitch,
                 low,
                 high,

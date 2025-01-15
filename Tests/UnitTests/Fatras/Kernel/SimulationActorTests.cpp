@@ -16,7 +16,6 @@
 #include "Acts/Material/HomogeneousSurfaceMaterial.hpp"
 #include "Acts/Material/MaterialSlab.hpp"
 #include "Acts/Propagator/ConstrainedStep.hpp"
-#include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Surfaces/Surface.hpp"
@@ -119,23 +118,16 @@ struct MockStepper {
   }
   void updateStepSize(State & /*state*/, double /*stepSize*/,
                       Acts::ConstrainedStep::Type /*stype*/) const {}
+  void releaseStepSize(State & /*state*/,
+                       Acts::ConstrainedStep::Type /*stype*/) const {}
 };
 
 struct MockNavigatorState {
-  bool targetReached = false;
   Acts::Surface *startSurface = nullptr;
   Acts::Surface *currentSurface = nullptr;
 };
 
 struct MockNavigator {
-  bool targetReached(const MockNavigatorState &state) const {
-    return state.targetReached;
-  }
-
-  void targetReached(MockNavigatorState &state, bool reached) const {
-    state.targetReached = reached;
-  }
-
   const Acts::Surface *startSurface(const MockNavigatorState &state) const {
     return state.startSurface;
   }

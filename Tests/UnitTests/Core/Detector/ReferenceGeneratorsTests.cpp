@@ -41,10 +41,10 @@ BOOST_AUTO_TEST_CASE(CenterReference) {
 BOOST_AUTO_TEST_CASE(BinningPositionReference) {
   // Simply return binning position, we test only the behavior of the generator
   // not the output
-  auto binningPosition =
-      BinningValueReferenceGenerator<Acts::BinningValue::binZ>{}.references(
+  auto referencePosition =
+      AxisDirectionReferenceGenerator<Acts::AxisDirection::AxisZ>{}.references(
           tContext, *pSurface);
-  BOOST_CHECK_EQUAL(binningPosition.size(), 1u);
+  BOOST_CHECK_EQUAL(referencePosition.size(), 1u);
 }
 
 BOOST_AUTO_TEST_CASE(PolyhedronReference) {

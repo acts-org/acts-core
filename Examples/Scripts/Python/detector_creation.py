@@ -70,7 +70,7 @@ if "__main__" == __name__:
     volumeOptions.surfaceOptions = surfaceOptions
 
     # Transverse view
-    xyRange = acts.Extent([[acts.BinningValue.binZ, [-50, 50]]])
+    xyRange = acts.Extent([[acts.AxisDirection.AxisZ, [-50, 50]]])
     xyView = acts.svg.drawDetector(
         geoContext,
         detector,
@@ -83,7 +83,7 @@ if "__main__" == __name__:
     xyFile.write("odd_xy.svg")
 
     # Longitudinal view
-    zrRange = acts.Extent([[acts.BinningValue.binPhi, [-0.1, 0.1]]])
+    zrRange = acts.Extent([[acts.AxisDirection.AxisPhi, [-0.1, 0.1]]])
     zrView = acts.svg.drawDetector(
         geoContext,
         detector,

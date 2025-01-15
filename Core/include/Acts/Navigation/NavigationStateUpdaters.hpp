@@ -14,7 +14,7 @@
 #include "Acts/Navigation/NavigationDelegates.hpp"
 #include "Acts/Navigation/NavigationState.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
 #include "Acts/Utilities/GridAccessHelpers.hpp"
 #include "Acts/Utilities/IAxis.hpp"
@@ -195,7 +195,7 @@ class IndexedGridNavigation : public navigation_type {
   grid_type grid;
 
   /// These are the cast parameters - copied from constructor
-  std::array<BinningValue, grid_type::DIM> casts{};
+  std::array<AxisDirection, grid_type::DIM> casts{};
 
   /// A transform to be applied to the position
   Transform3 transform = Transform3::Identity();
@@ -205,7 +205,7 @@ class IndexedGridNavigation : public navigation_type {
   /// @param icasts is the cast values array
   /// @param itr a transform applied to the global position
   IndexedGridNavigation(grid_type&& igrid,
-                        const std::array<BinningValue, grid_type::DIM>& icasts,
+                        const std::array<AxisDirection, grid_type::DIM>& icasts,
                         const Transform3& itr = Transform3::Identity())
       : grid(std::move(igrid)), casts(icasts), transform(itr) {}
 

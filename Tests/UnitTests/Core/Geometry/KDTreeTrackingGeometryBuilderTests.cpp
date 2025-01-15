@@ -100,35 +100,35 @@ BOOST_AUTO_TEST_CASE(KDTreeTrackingGeometryBuilder_simple) {
   // Make a proto detectpr description
   Acts::ProtoVolume beamPipeContainer;
   beamPipeContainer.name = "odd-beam-pipe";
-  beamPipeContainer.extent.set(Acts::BinningValue::binR, 0., 17);
+  beamPipeContainer.extent.set(Acts::AxisDirection::AxisR, 0., 17);
   Acts::ProtoVolume beamPipe;
   beamPipe.name = "odd-beam-pipe-l";
-  beamPipe.extent.set(Acts::BinningValue::binR, 2., 16.);
+  beamPipe.extent.set(Acts::AxisDirection::AxisR, 2., 16.);
   beamPipe.internal = Acts::ProtoVolume::InternalStructure{
       Acts::Surface::SurfaceType::Cylinder};
   beamPipeContainer.container = Acts::ProtoVolume::ContainerStructure{
       {beamPipe},
-      {Acts::BinningData(Acts::open, Acts::BinningValue::binR, {0., 1.})},
+      {Acts::BinningData(Acts::open, Acts::AxisDirection::AxisR, {0., 1.})},
       true};
 
   // Pixel section
   Acts::ProtoVolume pixelContainer;
   pixelContainer.name = "odd-pixel";
-  pixelContainer.extent.set(Acts::BinningValue::binR, 18., 200);
+  pixelContainer.extent.set(Acts::AxisDirection::AxisR, 18., 200);
 
   Acts::ProtoVolume pixelNec;
   pixelNec.name = "odd-pixel-nec";
-  pixelNec.extent.set(Acts::BinningValue::binZ, -1000., -580);
+  pixelNec.extent.set(Acts::AxisDirection::AxisZ, -1000., -580);
 
   Acts::ProtoVolume pixNecD1;
   pixNecD1.name = "odd-pixel-nec-d1";
-  pixNecD1.extent.set(Acts::BinningValue::binZ, -720., -680);
+  pixNecD1.extent.set(Acts::AxisDirection::AxisZ, -720., -680);
   Acts::ProtoVolume pixNecD0;
   pixNecD0.name = "odd-pixel-nec-d0";
-  pixNecD0.extent.set(Acts::BinningValue::binZ, -620., -580);
+  pixNecD0.extent.set(Acts::AxisDirection::AxisZ, -620., -580);
   pixelNec.container = Acts::ProtoVolume::ContainerStructure{
       {pixNecD1, pixNecD0},
-      {Acts::BinningData(Acts::open, Acts::BinningValue::binZ, {0., 1.})},
+      {Acts::BinningData(Acts::open, Acts::AxisDirection::AxisZ, {0., 1.})},
       true};
   for (auto& cv : pixelNec.container.value().constituentVolumes) {
     cv.internal =
@@ -137,52 +137,52 @@ BOOST_AUTO_TEST_CASE(KDTreeTrackingGeometryBuilder_simple) {
 
   Acts::ProtoVolume pixelBarrel;
   pixelBarrel.name = "odd-pixel-barrel";
-  pixelBarrel.extent.set(Acts::BinningValue::binZ, -580., 580);
+  pixelBarrel.extent.set(Acts::AxisDirection::AxisZ, -580., 580);
 
   Acts::ProtoVolume pixBarrelL0;
   pixBarrelL0.name = "odd-pixel-barrel-l0";
-  pixBarrelL0.extent.set(Acts::BinningValue::binR, 28., 48.);
-  pixBarrelL0.extent.set(Acts::BinningValue::binZ, -580., 580);
+  pixBarrelL0.extent.set(Acts::AxisDirection::AxisR, 28., 48.);
+  pixBarrelL0.extent.set(Acts::AxisDirection::AxisZ, -580., 580);
   pixBarrelL0.internal = Acts::ProtoVolume::InternalStructure{
       Acts::Surface::SurfaceType::Cylinder};
   Acts::ProtoVolume pixBarrelL1;
   pixBarrelL1.name = "odd-pixel-barrel-l1";
-  pixBarrelL1.extent.set(Acts::BinningValue::binR, 62., 76);
-  pixBarrelL1.extent.set(Acts::BinningValue::binZ, -580., 580);
+  pixBarrelL1.extent.set(Acts::AxisDirection::AxisR, 62., 76);
+  pixBarrelL1.extent.set(Acts::AxisDirection::AxisZ, -580., 580);
   pixBarrelL1.internal = Acts::ProtoVolume::InternalStructure{
       Acts::Surface::SurfaceType::Cylinder};
   Acts::ProtoVolume pixBarrelL2;
   pixBarrelL2.name = "odd-pixel-barrel-l2";
-  pixBarrelL2.extent.set(Acts::BinningValue::binR, 100., 120.);
-  pixBarrelL2.extent.set(Acts::BinningValue::binZ, -580., 580);
+  pixBarrelL2.extent.set(Acts::AxisDirection::AxisR, 100., 120.);
+  pixBarrelL2.extent.set(Acts::AxisDirection::AxisZ, -580., 580);
   pixBarrelL2.internal = Acts::ProtoVolume::InternalStructure{
       Acts::Surface::SurfaceType::Cylinder};
   Acts::ProtoVolume pixBarrelL3;
   pixBarrelL3.name = "odd-pixel-barrel-l3";
-  pixBarrelL3.extent.set(Acts::BinningValue::binR, 160., 180.);
-  pixBarrelL3.extent.set(Acts::BinningValue::binZ, -580., 580);
+  pixBarrelL3.extent.set(Acts::AxisDirection::AxisR, 160., 180.);
+  pixBarrelL3.extent.set(Acts::AxisDirection::AxisZ, -580., 580);
   pixBarrelL3.internal = Acts::ProtoVolume::InternalStructure{
       Acts::Surface::SurfaceType::Cylinder};
 
   pixelBarrel.container = Acts::ProtoVolume::ContainerStructure{
       {pixBarrelL0, pixBarrelL1, pixBarrelL2, pixBarrelL3},
-      {Acts::BinningData(Acts::open, Acts::BinningValue::binR, {0., 1})},
+      {Acts::BinningData(Acts::open, Acts::AxisDirection::AxisR, {0., 1})},
       true};
 
   Acts::ProtoVolume pixelPec;
   pixelPec.name = "odd-pixel-pec";
-  pixelPec.extent.set(Acts::BinningValue::binZ, 580., 1000.);
+  pixelPec.extent.set(Acts::AxisDirection::AxisZ, 580., 1000.);
 
   Acts::ProtoVolume pixPecD0;
   pixPecD0.name = "odd-pixel-pec-d0";
-  pixPecD0.extent.set(Acts::BinningValue::binZ, 580., 620);
+  pixPecD0.extent.set(Acts::AxisDirection::AxisZ, 580., 620);
   Acts::ProtoVolume pixPecD1;
   pixPecD1.name = "odd-pixel-pec-d1";
-  pixPecD1.extent.set(Acts::BinningValue::binZ, 680., 720);
+  pixPecD1.extent.set(Acts::AxisDirection::AxisZ, 680., 720);
 
   pixelPec.container = Acts::ProtoVolume::ContainerStructure{
       {pixPecD0, pixPecD1},
-      {Acts::BinningData(Acts::open, Acts::BinningValue::binZ, {0., 1})},
+      {Acts::BinningData(Acts::open, Acts::AxisDirection::AxisZ, {0., 1})},
       true};
   for (auto& cv : pixelPec.container.value().constituentVolumes) {
     cv.internal =
@@ -191,15 +191,15 @@ BOOST_AUTO_TEST_CASE(KDTreeTrackingGeometryBuilder_simple) {
 
   pixelContainer.container = Acts::ProtoVolume::ContainerStructure{
       {pixelNec, pixelBarrel, pixelPec},
-      {Acts::BinningData(Acts::open, Acts::BinningValue::binZ,
+      {Acts::BinningData(Acts::open, Acts::AxisDirection::AxisZ,
                          {-1000., -580., 580., 1000.})}};
 
   Acts::ProtoVolume detectorContainer;
   detectorContainer.name = "odd-detector";
-  detectorContainer.extent.set(Acts::BinningValue::binR, 0., 200);
+  detectorContainer.extent.set(Acts::AxisDirection::AxisR, 0., 200);
   detectorContainer.container = Acts::ProtoVolume::ContainerStructure{
       {beamPipeContainer, pixelContainer},
-      {Acts::BinningData(Acts::open, Acts::BinningValue::binR,
+      {Acts::BinningData(Acts::open, Acts::AxisDirection::AxisR,
                          {0., 17.5, 200.})}};
 
   Acts::ProtoDetector detector;

@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE(CylindricalSupportCase) {
   // phi max = 2pi
 
   Acts::Extent lExtent;
-  lExtent.set(Acts::BinningValue::binR, 100., 110.);
-  lExtent.set(Acts::BinningValue::binZ, -400., 400.);
+  lExtent.set(Acts::AxisDirection::AxisR, 100., 110.);
+  lExtent.set(Acts::AxisDirection::AxisZ, -400., 400.);
 
   // Test creation of surface components
   CylindricalSupport csCreator{10., {1., 1.}};
@@ -101,8 +101,8 @@ BOOST_AUTO_TEST_CASE(DiscSupportCase) {
   // phi min = 0
   // phi max = 2pi
   Acts::Extent lExtent;
-  lExtent.set(Acts::BinningValue::binR, 100., 400.);
-  lExtent.set(Acts::BinningValue::binZ, -405., -395.);
+  lExtent.set(Acts::AxisDirection::AxisR, 100., 400.);
+  lExtent.set(Acts::AxisDirection::AxisZ, -405., -395.);
 
   // Test creation of surface components
   DiscSupport dsCreator{0., {1., 1.}};
@@ -162,14 +162,14 @@ BOOST_AUTO_TEST_CASE(RectangularSupportCase) {
   // dy = [-200,200]
   // dz = [-50, -60]
   Acts::Extent lExtent;
-  lExtent.set(Acts::BinningValue::binX, -100., 100.);
-  lExtent.set(Acts::BinningValue::binY, -200., 200.);
-  lExtent.set(Acts::BinningValue::binZ, -60., -50.);
+  lExtent.set(Acts::AxisDirection::AxisX, -100., 100.);
+  lExtent.set(Acts::AxisDirection::AxisY, -200., 200.);
+  lExtent.set(Acts::AxisDirection::AxisZ, -60., -50.);
 
   // place in Z with offset 2_mm
   // Asymmetric clearances in x an y for testing
   RectangularSupport rsCreator{
-      Acts::BinningValue::binZ, 2., {1., 2.}, {3., 4.}};
+      Acts::AxisDirection::AxisZ, 2., {1., 2.}, {3., 4.}};
   auto rsComponents = rsCreator(lExtent);
   auto& [rsType, rsValues, rsTransform] = rsComponents;
 
@@ -192,8 +192,8 @@ BOOST_AUTO_TEST_CASE(RectangularSupportCase) {
 
   // Invalid / runtime checks
   Acts::Extent invalid;
-  invalid.set(Acts::BinningValue::binX, -100., 100.);
-  invalid.set(Acts::BinningValue::binY, -200., 200.);
+  invalid.set(Acts::AxisDirection::AxisX, -100., 100.);
+  invalid.set(Acts::AxisDirection::AxisY, -200., 200.);
   BOOST_CHECK_THROW(rsCreator(invalid), std::invalid_argument);
 }
 
@@ -209,8 +209,8 @@ BOOST_AUTO_TEST_CASE(addCylinderSupportCase) {
   // -> did yield and extend of 100 < r 110
   // The volume would give an extend of -400 < z < 400
   Acts::Extent lExtent;
-  lExtent.set(Acts::BinningValue::binR, 100., 110.);
-  lExtent.set(Acts::BinningValue::binZ, -400., 400.);
+  lExtent.set(Acts::AxisDirection::AxisR, 100., 110.);
+  lExtent.set(Acts::AxisDirection::AxisZ, -400., 400.);
 
   // Cylinder support
   CylindricalSupport csCreator{10., {1., 1.}};
@@ -249,8 +249,8 @@ BOOST_AUTO_TEST_CASE(addDiscSupportCase) {
 
   // The Extent
   Acts::Extent lExtent;
-  lExtent.set(Acts::BinningValue::binR, 100., 400.);
-  lExtent.set(Acts::BinningValue::binZ, -110., -100.);
+  lExtent.set(Acts::AxisDirection::AxisR, 100., 400.);
+  lExtent.set(Acts::AxisDirection::AxisZ, -110., -100.);
 
   // Disc support: this would set the disc at the center
   DiscSupport dsCreator{0., {1., 1.}};
@@ -291,14 +291,14 @@ BOOST_AUTO_TEST_CASE(addRectangularSupportCase) {
   // dy = [-200,200]
   // dz = [-50, -60]
   Acts::Extent lExtent;
-  lExtent.set(Acts::BinningValue::binX, -100., 100.);
-  lExtent.set(Acts::BinningValue::binY, -200., 200.);
-  lExtent.set(Acts::BinningValue::binZ, -60., -50.);
+  lExtent.set(Acts::AxisDirection::AxisX, -100., 100.);
+  lExtent.set(Acts::AxisDirection::AxisY, -200., 200.);
+  lExtent.set(Acts::AxisDirection::AxisZ, -60., -50.);
 
   // place in Z with offset 2_mm
   // Asymmetric clearances in x an y for testing
   RectangularSupport rsCreator{
-      Acts::BinningValue::binZ, 2., {1., 2.}, {3., 4.}};
+      Acts::AxisDirection::AxisZ, 2., {1., 2.}, {3., 4.}};
 
   // Add a single disc as a support surface
   Acts::Experimental::detail::SupportSurfacesHelper::addSupport(
@@ -337,8 +337,8 @@ BOOST_AUTO_TEST_CASE(addMisconfiguredSupportCase) {
       std::invalid_argument);
 
   // The Extent
-  lExtent.set(Acts::BinningValue::binR, 100., 400.);
-  lExtent.set(Acts::BinningValue::binZ, -110., -100.);
+  lExtent.set(Acts::AxisDirection::AxisR, 100., 400.);
+  lExtent.set(Acts::AxisDirection::AxisZ, -110., -100.);
 
   // Wrong surface type
   struct InvalidCreator {

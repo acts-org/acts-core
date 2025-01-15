@@ -51,8 +51,8 @@ BOOST_AUTO_TEST_CASE(RzVolumes) {
   grid.atPosition(p22) = 22u;
   grid.atPosition(p23) = 23u;
 
-  auto casts = std::array<Acts::BinningValue, 2u>{Acts::BinningValue::binZ,
-                                                  Acts::BinningValue::binR};
+  auto casts = std::array<Acts::AxisDirection, 2u>{Acts::AxisDirection::AxisZ,
+                                                   Acts::AxisDirection::AxisR};
 
   using IndexedDetectorVolumesImpl = Acts::Experimental::IndexedGridNavigation<
       Acts::Experimental::IExternalNavigation, GridType,

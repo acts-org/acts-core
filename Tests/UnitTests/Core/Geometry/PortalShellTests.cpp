@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE(PortalAssignment) {
       oCyl->getLink(Direction::OppositeNormal));
   BOOST_REQUIRE_NE(oCylLink, nullptr);
 
-  auto grid = oCylLink->makeGrid(BinningValue::binZ);
+  auto grid = oCylLink->makeGrid(AxisDirection::AxisZ);
 
   auto portal2 =
       std::make_shared<Portal>(Direction::OppositeNormal, std::move(grid));
@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE(PortalAssignment) {
       nDisc->getLink(Direction::AlongNormal));
   BOOST_REQUIRE_NE(nDiscLink, nullptr);
 
-  grid = nDiscLink->makeGrid(BinningValue::binR);
+  grid = nDiscLink->makeGrid(AxisDirection::AxisR);
 
   auto portal3 =
       std::make_shared<Portal>(Direction::AlongNormal, std::move(grid));
@@ -366,7 +366,7 @@ BOOST_AUTO_TEST_CASE(ZDirection) {
     BOOST_CHECK_NE(shell1.portal(PositiveDisc), shell2.portal(NegativeDisc));
 
     CylinderStackPortalShell stack{
-        gctx, {&shell1, &shell2}, BinningValue::binZ};
+        gctx, {&shell1, &shell2}, AxisDirection::AxisZ};
     BOOST_CHECK_EQUAL(stack.size(), 4);
 
     const auto* iCyl = stack.portal(InnerCylinder);
@@ -392,9 +392,9 @@ BOOST_AUTO_TEST_CASE(ZDirection) {
     shell1 = SingleCylinderPortalShell{vol1};
     shell2 = SingleCylinderPortalShell{vol2};
 
-    BOOST_CHECK_THROW(
-        CylinderStackPortalShell(gctx, {&shell1, &shell2}, BinningValue::binR),
-        SurfaceMergingException);
+    BOOST_CHECK_THROW(CylinderStackPortalShell(gctx, {&shell1, &shell2},
+                                               AxisDirection::AxisR),
+                      SurfaceMergingException);
   }
 
   BOOST_TEST_CONTEXT("rMin==0") {
@@ -415,7 +415,7 @@ BOOST_AUTO_TEST_CASE(ZDirection) {
     BOOST_CHECK_NE(shell1.portal(PositiveDisc), shell2.portal(NegativeDisc));
 
     CylinderStackPortalShell stack{
-        gctx, {&shell1, &shell2}, BinningValue::binZ};
+        gctx, {&shell1, &shell2}, AxisDirection::AxisZ};
     BOOST_CHECK_EQUAL(stack.size(), 3);
 
     // Disc portals have been fused
@@ -440,9 +440,9 @@ BOOST_AUTO_TEST_CASE(ZDirection) {
     shell1 = SingleCylinderPortalShell{vol1};
     shell2 = SingleCylinderPortalShell{vol2};
 
-    BOOST_CHECK_THROW(
-        CylinderStackPortalShell(gctx, {&shell1, &shell2}, BinningValue::binR),
-        SurfaceMergingException);
+    BOOST_CHECK_THROW(CylinderStackPortalShell(gctx, {&shell1, &shell2},
+                                               AxisDirection::AxisR),
+                      SurfaceMergingException);
   }
 }
 
@@ -463,7 +463,7 @@ BOOST_AUTO_TEST_CASE(RDirection) {
     BOOST_CHECK_NE(shell1.portal(OuterCylinder), shell2.portal(InnerCylinder));
 
     CylinderStackPortalShell stack{
-        gctx, {&shell1, &shell2}, BinningValue::binR};
+        gctx, {&shell1, &shell2}, AxisDirection::AxisR};
     BOOST_CHECK_EQUAL(stack.size(), 4);
 
     // Internal cylinder portals have been fused
@@ -492,9 +492,9 @@ BOOST_AUTO_TEST_CASE(RDirection) {
     shell1 = SingleCylinderPortalShell{vol1};
     shell2 = SingleCylinderPortalShell{vol2};
 
-    BOOST_CHECK_THROW(
-        CylinderStackPortalShell(gctx, {&shell1, &shell2}, BinningValue::binZ),
-        SurfaceMergingException);
+    BOOST_CHECK_THROW(CylinderStackPortalShell(gctx, {&shell1, &shell2},
+                                               AxisDirection::AxisZ),
+                      SurfaceMergingException);
   }
 
   BOOST_TEST_CONTEXT("rMin==0") {
@@ -513,7 +513,7 @@ BOOST_AUTO_TEST_CASE(RDirection) {
     BOOST_CHECK_NE(shell1.portal(OuterCylinder), shell2.portal(InnerCylinder));
 
     CylinderStackPortalShell stack{
-        gctx, {&shell1, &shell2}, BinningValue::binR};
+        gctx, {&shell1, &shell2}, AxisDirection::AxisR};
     BOOST_CHECK_EQUAL(stack.size(), 4);
 
     // Internal cylinder portals have been fused
@@ -541,9 +541,9 @@ BOOST_AUTO_TEST_CASE(RDirection) {
     shell1 = SingleCylinderPortalShell{vol1};
     shell2 = SingleCylinderPortalShell{vol2};
 
-    BOOST_CHECK_THROW(
-        CylinderStackPortalShell(gctx, {&shell1, &shell2}, BinningValue::binZ),
-        std::invalid_argument);
+    BOOST_CHECK_THROW(CylinderStackPortalShell(gctx, {&shell1, &shell2},
+                                               AxisDirection::AxisZ),
+                      std::invalid_argument);
   }
 }
 
@@ -599,7 +599,7 @@ BOOST_AUTO_TEST_CASE(NestedStacks) {
   BOOST_CHECK(shell2.isValid());
 
   CylinderStackPortalShell stack{
-      gctx, {&shell1, &gapShell, &shell2}, BinningValue::binR};
+      gctx, {&shell1, &gapShell, &shell2}, AxisDirection::AxisR};
 
   BOOST_CHECK(stack.isValid());
 
@@ -607,7 +607,7 @@ BOOST_AUTO_TEST_CASE(NestedStacks) {
   BOOST_CHECK(shell3.isValid());
 
   CylinderStackPortalShell stack2{
-      gctx, {&stack, &shell3}, BinningValue::binZ, *logger};
+      gctx, {&stack, &shell3}, AxisDirection::AxisZ, *logger};
   BOOST_CHECK(stack2.isValid());
 
   using enum CylinderVolumeBounds::Face;

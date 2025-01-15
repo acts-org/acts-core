@@ -81,17 +81,17 @@ void ActsExamples::DigitizationConfigurator::operator()(
           // The module is a rectangle module
           case Acts::SurfaceBounds::eRectangle: {
             if (inputSegmentation.binningData()[0].binvalue ==
-                Acts::BinningValue::binX) {
+                Acts::AxisDirection::AxisX) {
               double minX = boundValues[Acts::RectangleBounds::eMinX];
               double maxX = boundValues[Acts::RectangleBounds::eMaxX];
               unsigned int nBins = static_cast<unsigned int>(std::round(
                   (maxX - minX) / inputSegmentation.binningData()[0].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, static_cast<float>(minX), static_cast<float>(maxX),
-                  Acts::open, Acts::BinningValue::binX);
+                  Acts::open, Acts::AxisDirection::AxisX);
             }
             if (inputSegmentation.binningData()[0].binvalue ==
-                    Acts::BinningValue::binY ||
+                    Acts::AxisDirection::AxisY ||
                 inputSegmentation.dimensions() == 2) {
               unsigned int accessBin =
                   inputSegmentation.dimensions() == 2 ? 1 : 0;
@@ -102,14 +102,14 @@ void ActsExamples::DigitizationConfigurator::operator()(
                              inputSegmentation.binningData()[accessBin].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, static_cast<float>(minY), static_cast<float>(maxY),
-                  Acts::open, Acts::BinningValue::binY);
+                  Acts::open, Acts::AxisDirection::AxisY);
             }
           } break;
 
           // The module is a trapezoid module
           case Acts::SurfaceBounds::eTrapezoid: {
             if (inputSegmentation.binningData()[0].binvalue ==
-                Acts::BinningValue::binX) {
+                Acts::AxisDirection::AxisX) {
               double maxX = std::max(
                   boundValues[Acts::TrapezoidBounds::eHalfLengthXnegY],
                   boundValues[Acts::TrapezoidBounds::eHalfLengthXposY]);
@@ -117,10 +117,10 @@ void ActsExamples::DigitizationConfigurator::operator()(
                   2 * maxX / inputSegmentation.binningData()[0].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, -static_cast<float>(maxX), static_cast<float>(maxX),
-                  Acts::open, Acts::BinningValue::binX);
+                  Acts::open, Acts::AxisDirection::AxisX);
             }
             if (inputSegmentation.binningData()[0].binvalue ==
-                    Acts::BinningValue::binY ||
+                    Acts::AxisDirection::AxisY ||
                 inputSegmentation.dimensions() == 2) {
               unsigned int accessBin =
                   inputSegmentation.dimensions() == 2 ? 1 : 0;
@@ -130,24 +130,24 @@ void ActsExamples::DigitizationConfigurator::operator()(
                              inputSegmentation.binningData()[accessBin].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, -static_cast<float>(maxY), static_cast<float>(maxY),
-                  Acts::open, Acts::BinningValue::binY);
+                  Acts::open, Acts::AxisDirection::AxisY);
             }
           } break;
 
           // The module is an annulus module
           case Acts::SurfaceBounds::eAnnulus: {
             if (inputSegmentation.binningData()[0].binvalue ==
-                Acts::BinningValue::binR) {
+                Acts::AxisDirection::AxisR) {
               double minR = boundValues[Acts::AnnulusBounds::eMinR];
               double maxR = boundValues[Acts::AnnulusBounds::eMaxR];
               unsigned int nBins = static_cast<unsigned int>(std::round(
                   (maxR - minR) / inputSegmentation.binningData()[0].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, static_cast<float>(minR), static_cast<float>(maxR),
-                  Acts::open, Acts::BinningValue::binR);
+                  Acts::open, Acts::AxisDirection::AxisR);
             }
             if (inputSegmentation.binningData()[0].binvalue ==
-                    Acts::BinningValue::binPhi ||
+                    Acts::AxisDirection::AxisPhi ||
                 inputSegmentation.dimensions() == 2) {
               unsigned int accessBin =
                   inputSegmentation.dimensions() == 2 ? 1 : 0;
@@ -161,7 +161,7 @@ void ActsExamples::DigitizationConfigurator::operator()(
                              inputSegmentation.binningData()[accessBin].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, static_cast<float>(minPhi), static_cast<float>(maxPhi),
-                  Acts::open, Acts::BinningValue::binPhi);
+                  Acts::open, Acts::AxisDirection::AxisPhi);
             }
 
           } break;
@@ -172,15 +172,15 @@ void ActsExamples::DigitizationConfigurator::operator()(
             double maxR = boundValues[Acts::DiscTrapezoidBounds::eMaxR];
 
             if (inputSegmentation.binningData()[0].binvalue ==
-                Acts::BinningValue::binR) {
+                Acts::AxisDirection::AxisR) {
               unsigned int nBins = static_cast<unsigned int>(std::round(
                   (maxR - minR) / inputSegmentation.binningData()[0].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, static_cast<float>(minR), static_cast<float>(maxR),
-                  Acts::open, Acts::BinningValue::binR);
+                  Acts::open, Acts::AxisDirection::AxisR);
             }
             if (inputSegmentation.binningData()[0].binvalue ==
-                    Acts::BinningValue::binPhi ||
+                    Acts::AxisDirection::AxisPhi ||
                 inputSegmentation.dimensions() == 2) {
               unsigned int accessBin =
                   inputSegmentation.dimensions() == 2 ? 1 : 0;
@@ -199,24 +199,24 @@ void ActsExamples::DigitizationConfigurator::operator()(
               outputSegmentation += Acts::BinUtility(
                   nBins, static_cast<float>(averagePhi - alpha),
                   static_cast<float>(averagePhi + alpha), Acts::open,
-                  Acts::BinningValue::binPhi);
+                  Acts::AxisDirection::AxisPhi);
             }
 
           } break;
 
           case Acts::SurfaceBounds::eDisc: {
             if (inputSegmentation.binningData()[0].binvalue ==
-                Acts::BinningValue::binR) {
+                Acts::AxisDirection::AxisR) {
               double minR = boundValues[Acts::RadialBounds::eMinR];
               double maxR = boundValues[Acts::RadialBounds::eMaxR];
               unsigned int nBins = static_cast<unsigned int>(std::round(
                   (maxR - minR) / inputSegmentation.binningData()[0].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, static_cast<float>(minR), static_cast<float>(maxR),
-                  Acts::open, Acts::BinningValue::binR);
+                  Acts::open, Acts::AxisDirection::AxisR);
             }
             if (inputSegmentation.binningData()[0].binvalue ==
-                    Acts::BinningValue::binPhi ||
+                    Acts::AxisDirection::AxisPhi ||
                 inputSegmentation.dimensions() == 2) {
               unsigned int accessBin =
                   inputSegmentation.dimensions() == 2 ? 1 : 0;
@@ -232,7 +232,7 @@ void ActsExamples::DigitizationConfigurator::operator()(
                              inputSegmentation.binningData()[accessBin].step));
               outputSegmentation += Acts::BinUtility(
                   nBins, static_cast<float>(minPhi), static_cast<float>(maxPhi),
-                  Acts::open, Acts::BinningValue::binPhi);
+                  Acts::open, Acts::AxisDirection::AxisPhi);
             }
 
           } break;

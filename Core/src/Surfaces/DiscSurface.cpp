@@ -337,9 +337,9 @@ Vector3 DiscSurface::normal(const GeometryContext& gctx) const {
   return Vector3(tMatrix(0, 2), tMatrix(1, 2), tMatrix(2, 2));
 }
 
-Vector3 DiscSurface::binningPosition(const GeometryContext& gctx,
-                                     BinningValue bValue) const {
-  if (bValue == BinningValue::binR || bValue == BinningValue::binPhi) {
+Vector3 DiscSurface::referencePosition(const GeometryContext& gctx,
+                                       AxisDirection aDir) const {
+  if (aDir == AxisDirection::AxisR || aDir == AxisDirection::AxisPhi) {
     double r = m_bounds->binningValueR();
     double phi = m_bounds->binningValuePhi();
     return localToGlobal(gctx, Vector2{r, phi}, Vector3{});
@@ -347,16 +347,16 @@ Vector3 DiscSurface::binningPosition(const GeometryContext& gctx,
   return center(gctx);
 }
 
-double DiscSurface::binningPositionValue(const GeometryContext& gctx,
-                                         BinningValue bValue) const {
-  if (bValue == BinningValue::binR) {
-    return VectorHelpers::perp(binningPosition(gctx, bValue));
+double DiscSurface::referencePositionValue(const GeometryContext& gctx,
+                                           AxisDirection aDir) const {
+  if (aDir == AxisDirection::AxisR) {
+    return VectorHelpers::perp(referencePosition(gctx, aDir));
   }
-  if (bValue == BinningValue::binPhi) {
-    return VectorHelpers::phi(binningPosition(gctx, bValue));
+  if (aDir == AxisDirection::AxisPhi) {
+    return VectorHelpers::phi(referencePosition(gctx, aDir));
   }
 
-  return GeometryObject::binningPositionValue(gctx, bValue);
+  return GeometryObject::referencePositionValue(gctx, aDir);
 }
 
 double DiscSurface::pathCorrection(const GeometryContext& gctx,
@@ -367,7 +367,7 @@ double DiscSurface::pathCorrection(const GeometryContext& gctx,
 }
 
 std::pair<std::shared_ptr<DiscSurface>, bool> DiscSurface::mergedWith(
-    const DiscSurface& other, BinningValue direction, bool externalRotation,
+    const DiscSurface& other, AxisDirection direction, bool externalRotation,
     const Logger& logger) const {
   using namespace UnitLiterals;
 
@@ -443,7 +443,7 @@ std::pair<std::shared_ptr<DiscSurface>, bool> DiscSurface::mergedWith(
                                 << otherAvgPhi / 1_degree << " +- "
                                 << otherHlPhi / 1_degree);
 
-  if (direction == BinningValue::binR) {
+  if (direction == AxisDirection::AxisR) {
     if (std::abs(otherLocal.linear().col(eY)[eX]) >= tolerance &&
         (!bounds->coversFullAzimuth() || !otherBounds->coversFullAzimuth())) {
       throw SurfaceMergingException(getSharedPtr(), other.getSharedPtr(),
@@ -483,7 +483,7 @@ std::pair<std::shared_ptr<DiscSurface>, bool> DiscSurface::mergedWith(
     return {Surface::makeShared<DiscSurface>(*m_transform, newBounds),
             minR > otherMinR};
 
-  } else if (direction == BinningValue::binPhi) {
+  } else if (direction == AxisDirection::AxisPhi) {
     if (std::abs(maxR - otherMaxR) > tolerance ||
         std::abs(minR - otherMinR) > tolerance) {
       ACTS_ERROR("DiscSurface::merge: surfaces don't have same r bounds");
@@ -535,9 +535,9 @@ std::pair<std::shared_ptr<DiscSurface>, bool> DiscSurface::mergedWith(
   } else {
     ACTS_ERROR("DiscSurface::merge: invalid direction " << direction);
 
-    throw SurfaceMergingException(
-        getSharedPtr(), other.getSharedPtr(),
-        "DiscSurface::merge: invalid direction " + binningValueName(direction));
+    throw SurfaceMergingException(getSharedPtr(), other.getSharedPtr(),
+                                  "DiscSurface::merge: invalid direction " +
+                                      axisDirectionName(direction));
   }
 }
 

@@ -8,15 +8,12 @@
 
 #include "Acts/Geometry/TrackingGeometry.hpp"
 
+#include "Acts/Definitions/Tolerance.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Geometry/TrackingVolume.hpp"
-#include "Acts/Surfaces/PerigeeSurface.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "Acts/Surfaces/SurfaceArray.hpp"
 
-#include <algorithm>
 #include <cstddef>
-#include <vector>
 
 Acts::TrackingGeometry::TrackingGeometry(
     const MutableTrackingVolumePtr& highestVolume,
@@ -41,7 +38,7 @@ Acts::TrackingGeometry::~TrackingGeometry() = default;
 
 const Acts::TrackingVolume* Acts::TrackingGeometry::lowestTrackingVolume(
     const GeometryContext& gctx, const Acts::Vector3& gp) const {
-  return m_world->lowestTrackingVolume(gctx, gp);
+  return m_world->lowestTrackingVolume(gctx, gp, s_onSurfaceTolerance);
 }
 
 const Acts::TrackingVolume* Acts::TrackingGeometry::highestTrackingVolume()

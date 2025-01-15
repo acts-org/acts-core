@@ -77,7 +77,7 @@ detray::axis::bounds convertBinningOption(BinningOption bOption);
 /// @param bValue the binning value
 ///
 /// @return a detray binning value
-detray::axis::label convertBinningValue(BinningValue bValue);
+detray::axis::label convertAxisDirection(AxisDirection bValue);
 
 /// Convert the binning type
 ///

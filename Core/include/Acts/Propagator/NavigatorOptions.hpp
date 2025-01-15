@@ -8,11 +8,21 @@
 
 #pragma once
 
+#include <functional>
+
 namespace Acts {
 
+class GeometryContext;
 class Surface;
 
 struct NavigatorPlainOptions {
+  /// NavigatorPlainOptions with context
+  explicit NavigatorPlainOptions(const GeometryContext &gctx)
+      : geoContext(gctx) {}
+
+  /// Context object for the geometry
+  std::reference_wrapper<const GeometryContext> geoContext;
+
   const Surface *startSurface{};
   const Surface *targetSurface{};
 };

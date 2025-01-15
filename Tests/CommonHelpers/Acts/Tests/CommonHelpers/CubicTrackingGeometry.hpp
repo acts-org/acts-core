@@ -134,7 +134,7 @@ struct CubicTrackingGeometry {
     layVec.push_back(layers[1]);
     std::unique_ptr<const LayerArray> layArr1(layArrCreator.layerArray(
         geoContext, layVec, -2_m - 1._mm, -1._m + 1._mm, BinningType::arbitrary,
-        BinningValue::binX));
+        AxisDirection::AxisX));
 
     auto trackVolume1 = std::make_shared<TrackingVolume>(
         trafoVol1, boundsVol, nullptr, std::move(layArr1), nullptr,
@@ -150,7 +150,7 @@ struct CubicTrackingGeometry {
     }
     std::unique_ptr<const LayerArray> layArr2(
         layArrCreator.layerArray(geoContext, layVec, 1._m - 2._mm, 2._m + 2._mm,
-                                 BinningType::arbitrary, BinningValue::binX));
+                                 BinningType::arbitrary, AxisDirection::AxisX));
 
     auto trackVolume2 = std::make_shared<TrackingVolume>(
         trafoVol2, boundsVol, nullptr, std::move(layArr2), nullptr,
@@ -178,7 +178,8 @@ struct CubicTrackingGeometry {
 
     std::vector<float> binBoundaries = {-3._m, 0., 3._m};
 
-    BinningData binData(BinningOption::open, BinningValue::binX, binBoundaries);
+    BinningData binData(BinningOption::open, AxisDirection::AxisX,
+                        binBoundaries);
     std::unique_ptr<const BinUtility> bu(new BinUtility(binData));
 
     std::shared_ptr<const TrackingVolumeArray> trVolArr(

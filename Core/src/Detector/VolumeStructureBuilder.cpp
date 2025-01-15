@@ -74,15 +74,16 @@ Acts::Experimental::VolumeStructureBuilder::construct(
       if (boundValues.empty() && m_cfg.extent.has_value()) {
         ACTS_VERBOSE("Cuboid: estimate parameters from Extent.");
         const auto& vExtent = m_cfg.extent.value();
-        if (vExtent.constrains(BinningValue::binX) &&
-            vExtent.constrains(BinningValue::binY) &&
-            vExtent.constrains(BinningValue::binZ)) {
-          eTransform.pretranslate(Vector3(vExtent.medium(BinningValue::binX),
-                                          vExtent.medium(BinningValue::binY),
-                                          vExtent.medium(BinningValue::binZ)));
-          boundValues = {0.5 * vExtent.interval(BinningValue::binX),
-                         0.5 * vExtent.interval(BinningValue::binY),
-                         0.5 * vExtent.interval(BinningValue::binZ)};
+        if (vExtent.constrains(AxisDirection::AxisX) &&
+            vExtent.constrains(AxisDirection::AxisY) &&
+            vExtent.constrains(AxisDirection::AxisZ)) {
+          eTransform.pretranslate(
+              Vector3(vExtent.medium(AxisDirection::AxisX),
+                      vExtent.medium(AxisDirection::AxisY),
+                      vExtent.medium(AxisDirection::AxisZ)));
+          boundValues = {0.5 * vExtent.interval(AxisDirection::AxisX),
+                         0.5 * vExtent.interval(AxisDirection::AxisY),
+                         0.5 * vExtent.interval(AxisDirection::AxisZ)};
 
         } else {
           throw std::runtime_error(
@@ -119,16 +120,17 @@ Acts::Experimental::VolumeStructureBuilder::construct(
       if (boundValues.empty() && m_cfg.extent.has_value()) {
         ACTS_VERBOSE("Cylinder: estimate parameters from Extent.");
         const auto& vExtent = m_cfg.extent.value();
-        if (vExtent.constrains(BinningValue::binR) &&
-            vExtent.constrains(BinningValue::binZ)) {
+        if (vExtent.constrains(AxisDirection::AxisR) &&
+            vExtent.constrains(AxisDirection::AxisZ)) {
           eTransform.pretranslate(
-              Vector3(0., 0., vExtent.medium(BinningValue::binZ)));
-          boundValues = {vExtent.min(BinningValue::binR),
-                         vExtent.max(BinningValue::binR),
-                         0.5 * vExtent.interval(BinningValue::binZ)};
-          if (vExtent.constrains(BinningValue::binPhi)) {
-            boundValues.push_back(0.5 * vExtent.interval(BinningValue::binPhi));
-            boundValues.push_back(vExtent.medium(BinningValue::binPhi));
+              Vector3(0., 0., vExtent.medium(AxisDirection::AxisZ)));
+          boundValues = {vExtent.min(AxisDirection::AxisR),
+                         vExtent.max(AxisDirection::AxisR),
+                         0.5 * vExtent.interval(AxisDirection::AxisZ)};
+          if (vExtent.constrains(AxisDirection::AxisPhi)) {
+            boundValues.push_back(0.5 *
+                                  vExtent.interval(AxisDirection::AxisPhi));
+            boundValues.push_back(vExtent.medium(AxisDirection::AxisPhi));
           }
         } else {
           throw std::runtime_error(

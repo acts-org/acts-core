@@ -157,13 +157,13 @@ Acts::PortalJsonConverter::toJsonDetray(
       std::array<double, 2u> clipRange = {0., 0.};
       std::vector<double> boundValues = surfaceAdjusted->bounds().values();
       if (surfaceType == Surface::SurfaceType::Cylinder &&
-          cast == BinningValue::binZ) {
+          cast == AxisDirection::AxisZ) {
         double zPosition = surfaceAdjusted->center(gctx).z();
         clipRange = {
             zPosition - boundValues[CylinderBounds::BoundValues::eHalfLengthZ],
             zPosition + boundValues[CylinderBounds::BoundValues::eHalfLengthZ]};
       } else if (surfaceType == Surface::SurfaceType::Disc &&
-                 cast == BinningValue::binR) {
+                 cast == AxisDirection::AxisR) {
         clipRange = {boundValues[RadialBounds::BoundValues::eMinR],
                      boundValues[RadialBounds::BoundValues::eMaxR]};
       } else {
@@ -332,7 +332,7 @@ std::shared_ptr<Acts::Experimental::Portal> Acts::PortalJsonConverter::fromJson(
       // Resolve the multi link 1D
       auto jMultiLink = vl["multi_1D"];
       auto boundaries = jMultiLink["boundaries"].get<std::vector<double>>();
-      auto binning = jMultiLink["binning"].get<BinningValue>();
+      auto binning = jMultiLink["binning"].get<AxisDirection>();
       auto targets = jMultiLink["targets"].get<std::vector<unsigned int>>();
       std::vector<std::shared_ptr<Experimental::DetectorVolume>> targetVolumes;
       for (const auto t : targets) {

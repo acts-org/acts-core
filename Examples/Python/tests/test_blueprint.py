@@ -6,7 +6,7 @@ mm = acts.UnitConstants.mm
 m = acts.UnitConstants.m
 degree = acts.UnitConstants.degree
 
-bv = acts.BinningValue
+bv = acts.AxisDirection
 
 gctx = acts.GeometryContext()
 logLevel = acts.logging.VERBOSE
@@ -25,7 +25,7 @@ def test_zdirection_container_blueprint(tmp_path):
     root = acts.Blueprint(envelope=acts.ExtentEnvelope(r=[10 * mm, 10 * mm]))
     assert root.depth == 0
 
-    barrel = root.addCylinderContainer("Barrel", direction=bv.binR)
+    barrel = root.addCylinderContainer("Barrel", direction=bv.AxisR)
 
     assert barrel.depth == 1
 
@@ -42,11 +42,11 @@ def test_zdirection_container_blueprint(tmp_path):
 
     assert barrel.depth == 0
 
-    det = root.addCylinderContainer("Detector", direction=bv.binZ)
+    det = root.addCylinderContainer("Detector", direction=bv.AxisZ)
 
     assert det.depth == 1
 
-    with det.CylinderContainer("nEC", direction=bv.binZ) as ec:
+    with det.CylinderContainer("nEC", direction=bv.AxisZ) as ec:
         assert ec.depth == 2
         z = -200
         for i in range(1, 3):
@@ -65,7 +65,7 @@ def test_zdirection_container_blueprint(tmp_path):
 
     write(det, 3)
 
-    with det.CylinderContainer("pEC", direction=bv.binZ) as ec:
+    with det.CylinderContainer("pEC", direction=bv.AxisZ) as ec:
         assert ec.depth == 2
         z = 200
         for i in range(1, 3):

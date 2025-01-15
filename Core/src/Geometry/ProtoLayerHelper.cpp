@@ -69,7 +69,7 @@ std::vector<Acts::ProtoLayer> Acts::ProtoLayerHelper::protoLayers(
   std::vector<std::vector<const Surface*>> sortSurfaces = {surfaces};
   for (const auto& sorting : sortings) {
     ACTS_VERBOSE("-> Sorting a set of " << sortSurfaces.size() << " in "
-                                        << binningValueName(sorting.first));
+                                        << axisDirectionName(sorting.first));
     std::vector<std::vector<const Surface*>> subSurfaces;
     for (const auto& ssurfaces : sortSurfaces) {
       ACTS_VERBOSE("-> Surfaces for this sorting step: " << ssurfaces.size());

@@ -134,7 +134,7 @@ std::string SingleCylinderPortalShell::label() const {
 
 CylinderStackPortalShell::CylinderStackPortalShell(
     const GeometryContext& gctx, std::vector<CylinderPortalShell*> shells,
-    BinningValue direction, const Logger& logger)
+    AxisDirection direction, const Logger& logger)
     : m_direction{direction}, m_shells{std::move(shells)} {
   ACTS_VERBOSE("Making cylinder stack shell in " << m_direction
                                                  << " direction");
@@ -198,7 +198,7 @@ CylinderStackPortalShell::CylinderStackPortalShell(
     }
   };
 
-  if (direction == BinningValue::binR) {
+  if (direction == AxisDirection::AxisR) {
     ACTS_VERBOSE("Merging portals at positive and negative discs");
     merge(PositiveDisc);
     merge(NegativeDisc);
@@ -206,7 +206,7 @@ CylinderStackPortalShell::CylinderStackPortalShell(
     ACTS_VERBOSE("Fusing portals at outer and inner cylinders");
     fuse(OuterCylinder, InnerCylinder);
 
-  } else if (direction == BinningValue::binZ) {
+  } else if (direction == AxisDirection::AxisZ) {
     bool allHaveInnerCylinders = std::ranges::all_of(
         m_shells, [](const auto* shell) { return shell->size() == 4; });
 
@@ -250,7 +250,7 @@ Portal* CylinderStackPortalShell::portal(Face face) {
 }
 
 std::shared_ptr<Portal> CylinderStackPortalShell::portalPtr(Face face) {
-  if (m_direction == BinningValue::binR) {
+  if (m_direction == AxisDirection::AxisR) {
     switch (face) {
       case NegativeDisc:
         return m_shells.front()->portalPtr(NegativeDisc);
@@ -296,7 +296,7 @@ void CylinderStackPortalShell::setPortal(std::shared_ptr<Portal> portal,
                                          Face face) {
   assert(portal != nullptr);
 
-  if (m_direction == BinningValue::binR) {
+  if (m_direction == AxisDirection::AxisR) {
     switch (face) {
       case NegativeDisc:
         [[fallthrough]];

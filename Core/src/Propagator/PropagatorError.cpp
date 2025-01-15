@@ -24,10 +24,11 @@ class PropagatorErrorCategory : public std::error_category {
     switch (static_cast<PropagatorError>(c)) {
       case PropagatorError::Failure:
         return "Propagation failed";
-      case PropagatorError::WrongDirection:
-        return "Propagation occurred in the wrong direction";
       case PropagatorError::StepCountLimitReached:
         return "Propagation reached the configured maximum number of steps";
+      case PropagatorError::NextTargetLimitReached:
+        return "Propagation reached the configured maximum number of next "
+               "target calls";
       default:
         return "unknown";
     }

@@ -114,7 +114,7 @@ StaticBlueprintNode& BlueprintNode::addStaticVolume(
 }
 
 CylinderContainerBlueprintNode& BlueprintNode::addCylinderContainer(
-    const std::string& name, BinningValue direction,
+    const std::string& name, AxisDirection direction,
     const std::function<void(CylinderContainerBlueprintNode& cylinder)>&
         callback) {
   auto cylinder =

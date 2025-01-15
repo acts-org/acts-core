@@ -107,9 +107,9 @@ BOOST_AUTO_TEST_CASE(VolumeStructureBuilderCuboid) {
 
   // Cuboid volume from extent
   Extent cuboidExtent;
-  cuboidExtent.set(BinningValue::binX, -100, 100);
-  cuboidExtent.set(BinningValue::binY, -200, 200);
-  cuboidExtent.set(BinningValue::binZ, -300, 300);
+  cuboidExtent.set(AxisDirection::AxisX, -100, 100);
+  cuboidExtent.set(AxisDirection::AxisY, -200, 200);
+  cuboidExtent.set(AxisDirection::AxisZ, -300, 300);
 
   VolumeStructureBuilder::Config cuboidExtentConfig;
   cuboidExtentConfig.boundsType = VolumeBounds::BoundsType::eCuboid;
@@ -224,8 +224,8 @@ BOOST_AUTO_TEST_CASE(VolumeStructureBuilderCylinder) {
 
   // Cylinder volume from extent
   Extent cylinderExtent;
-  cylinderExtent.set(BinningValue::binR, 100., 200.);
-  cylinderExtent.set(BinningValue::binZ, -800., 0.);
+  cylinderExtent.set(AxisDirection::AxisR, 100., 200.);
+  cylinderExtent.set(AxisDirection::AxisZ, -800., 0.);
 
   VolumeStructureBuilder::Config cylExtentConfig;
   cylExtentConfig.extent = cylinderExtent;

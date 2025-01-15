@@ -76,9 +76,9 @@ BOOST_AUTO_TEST_CASE(Navigation_in_Indexed_Surfaces) {
   mlCfg.mlSurfaces = strawSurfaces;
 
   mlCfg.mlBinning = {
-      ProtoBinning(Acts::BinningValue::binX, Acts::AxisBoundaryType::Bound,
+      ProtoBinning(Acts::AxisDirection::AxisX, Acts::AxisBoundaryType::Bound,
                    -vBounds[0], vBounds[0], nSurfacesX, 1u),
-      ProtoBinning(Acts::BinningValue::binY, Acts::AxisBoundaryType::Bound,
+      ProtoBinning(Acts::AxisDirection::AxisY, Acts::AxisBoundaryType::Bound,
                    -vBounds[1], vBounds[1], nSurfacesY, 0u)};
   mlCfg.mlBounds = vBounds;
 

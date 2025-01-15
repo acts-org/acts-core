@@ -192,12 +192,19 @@ void computePosteriorWeights(
         state.predictedCovariance(), state.projectorSubspaceIndices(),
         state.calibratedSize());
 
+    if (detR <= 0) {
+      // If the determinant is not positive, just leave the weight as it is
+      continue;
+    }
+
     const auto factor = std::sqrt(1. / detR) * safeExp(-0.5 * chi2);
 
-    // If something is not finite here, just leave the weight as it is
-    if (std::isfinite(factor)) {
-      weights.at(tip) *= factor;
+    if (!std::isfinite(factor)) {
+      // If something is not finite here, just leave the weight as it is
+      continue;
     }
+
+    weights.at(tip) *= factor;
   }
 }
 

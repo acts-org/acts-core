@@ -40,9 +40,9 @@ struct Helper {
     float max = 200_um;
     int bins = static_cast<int>((max - min) / pitchSize);
     segmentation = Acts::BinUtility(bins, min, max, Acts::BinningOption::open,
-                                    Acts::BinningValue::binX);
+                                    Acts::AxisDirection::AxisX);
     segmentation += Acts::BinUtility(bins, min, max, Acts::BinningOption::open,
-                                     Acts::BinningValue::binY);
+                                     Acts::AxisDirection::AxisY);
   }
 
   auto channelize(const Acts::Vector3 &pos3, const Acts::Vector3 &dir3) const {

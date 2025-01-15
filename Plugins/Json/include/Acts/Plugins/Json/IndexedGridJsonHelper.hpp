@@ -11,7 +11,7 @@
 #include "Acts/Plugins/Json/AlgebraJsonConverter.hpp"
 #include "Acts/Plugins/Json/GridJsonConverter.hpp"
 #include "Acts/Plugins/Json/UtilitiesJsonConverter.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Grid.hpp"
 #include "Acts/Utilities/GridAxisGenerators.hpp"
 
@@ -46,8 +46,8 @@ nlohmann::json convertImpl(const index_grid& indexGrid, bool detray = false,
     jCasts.push_back(indexGrid.casts[0u]);
     jCasts.push_back(indexGrid.casts[1u]);
     // Check for axis swap (detray version)
-    swapAxes = checkSwap && (indexGrid.casts[0u] == BinningValue::binZ &&
-                             indexGrid.casts[1u] == BinningValue::binPhi);
+    swapAxes = checkSwap && (indexGrid.casts[0u] == AxisDirection::AxisZ &&
+                             indexGrid.casts[1u] == AxisDirection::AxisPhi);
   }
   jIndexedGrid["casts"] = jCasts;
   jIndexedGrid["transform"] =
@@ -99,12 +99,12 @@ updator_type generateFromJson(const nlohmann::json& jUpdater,
       Transform3 transform =
           Transform3JsonConverter::fromJson(jUpdater["transform"]);
       auto jGrid = jUpdater["grid"];
-      auto jCasts = jUpdater["casts"].get<std::vector<BinningValue>>();
+      auto jCasts = jUpdater["casts"].get<std::vector<AxisDirection>>();
       auto jAxes = jGrid["axes"];
 
       // 1D cases
       if (jAxes.size() == 1u) {
-        BinningValue bValue = jCasts[0u];
+        AxisDirection bValue = jCasts[0u];
         auto jAxis = jAxes[0u];
 
         AxisType axisType = jAxis["type"];
@@ -146,8 +146,8 @@ updator_type generateFromJson(const nlohmann::json& jUpdater,
         // This currently writes out only the main options of 2D grids
         // nota bene: it assumes if one axis is closed, it is axis B
 
-        BinningValue bValueA = jCasts[0u];
-        BinningValue bValueB = jCasts[1u];
+        AxisDirection bValueA = jCasts[0u];
+        AxisDirection bValueB = jCasts[1u];
         auto jAxisA = jAxes[0u];
         auto jAxisB = jAxes[1u];
 

@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   double pixelZ = 10;
 
   // Create  root node
-  std::vector<Acts::BinningValue> detectorBins = {Acts::BinningValue::binX};
+  std::vector<Acts::AxisDirection> detectorBins = {Acts::AxisDirection::AxisX};
   std::vector<double> detectorBounds = {detectorX, detectorY, detectorZ};
 
   // The root node - detector
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   // Left arm
   std::vector<double> leftArmBounds = {detectorX * 0.5, detectorY, detectorZ};
 
-  std::vector<Acts::BinningValue> leftArmBins = {Acts::BinningValue::binZ};
+  std::vector<Acts::AxisDirection> leftArmBins = {Acts::AxisDirection::AxisZ};
 
   Acts::Transform3 leftArmTransform =
       Acts::Transform3::Identity() *
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   // Right arm
   std::vector<double> rightArmBounds = {detectorX * 0.5, detectorY, detectorZ};
 
-  std::vector<Acts::BinningValue> rightArmBins = {Acts::BinningValue::binZ};
+  std::vector<Acts::AxisDirection> rightArmBins = {Acts::AxisDirection::AxisZ};
 
   Acts::Transform3 rightArmTransform =
       Acts::Transform3::Identity() * Acts::Translation3(detectorX * 0.5, 0., 0);
@@ -258,76 +258,76 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   double internalStretchLeftZ =
       detector->volumes()[0]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)] +
       detector->volumes()[1]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)] +
       detector->volumes()[2]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)] +
       detector->volumes()[3]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)] +
       detector->volumes()[4]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)];
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)];
 
   double internalStretchRightZ =
       detector->volumes()[5]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)] +
       detector->volumes()[6]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)] +
       detector->volumes()[7]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)] +
       detector->volumes()[8]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)] +
       detector->volumes()[9]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binZ)];
+          .values()[toUnderlying(Acts::AxisDirection::AxisZ)];
 
   double internalStretchX1 =
       detector->volumes()[0]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)] +
       detector->volumes()[5]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)];
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)];
 
   double internalStretchX2 =
       detector->volumes()[1]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)] +
       detector->volumes()[6]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)];
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)];
 
   double internalStretchX3 =
       detector->volumes()[2]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)] +
       detector->volumes()[7]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)];
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)];
 
   double internalStretchX4 =
       detector->volumes()[3]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)] +
       detector->volumes()[8]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)];
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)];
 
   double internalStretchX5 =
       detector->volumes()[4]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)] +
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)] +
       detector->volumes()[9]
           ->volumeBounds()
-          .values()[toUnderlying(Acts::BinningValue::binX)];
+          .values()[toUnderlying(Acts::AxisDirection::AxisX)];
 
   BOOST_CHECK_EQUAL(internalStretchLeftZ, detectorZ);
   BOOST_CHECK_EQUAL(internalStretchRightZ, detectorZ);
@@ -338,9 +338,9 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   BOOST_CHECK_EQUAL(internalStretchX5, detectorX);
 
   for (auto& volume : detector->volumes()) {
-    BOOST_CHECK_EQUAL(
-        volume->volumeBounds().values()[toUnderlying(Acts::BinningValue::binY)],
-        detectorY);
+    BOOST_CHECK_EQUAL(volume->volumeBounds()
+                          .values()[toUnderlying(Acts::AxisDirection::AxisY)],
+                      detectorY);
   }
 
   // There should be surfaces inside the pixel

@@ -54,8 +54,8 @@ Acts::GeoModelBlueprintCreater::create(const GeometryContext& gctx,
   // Prepare the KdtSurfaces if configured to do so
   //
   if (!m_cfg.detectorSurfaces.empty()) {
-    std::array<BinningValue, 3u> kdtBinning = {
-        BinningValue::binX, BinningValue::binY, BinningValue::binZ};
+    std::array<AxisDirection, 3u> kdtBinning = {
+        AxisDirection::AxisX, AxisDirection::AxisY, AxisDirection::AxisZ};
     if (m_cfg.kdtBinning.empty()) {
       throw std::invalid_argument(
           "GeoModelBlueprintCreater: At least one binning value for KDTree "
@@ -152,10 +152,10 @@ Acts::GeoModelBlueprintCreater::createNode(
 
   // Peak into the volume entry to understand which one should be constraint
   // by the internals building
-  std::vector<BinningValue> internalConstraints =
+  std::vector<AxisDirection> internalConstraints =
       detail::GeoModelExentHelper::readBoundsConstaints(entry.bounds, "i");
   // Check if the binnning will also use the internal constraints
-  std::vector<BinningValue> binningConstraints =
+  std::vector<AxisDirection> binningConstraints =
       detail::GeoModelExentHelper::readBinningConstraints(entry.binnings);
   // Concatenate the binning constraints
   for (const auto& bc : binningConstraints) {
@@ -168,7 +168,7 @@ Acts::GeoModelBlueprintCreater::createNode(
     ACTS_VERBOSE("Found " << internalConstraints.size()
                           << " internal constraints to check for: ");
     for (const auto& ic : internalConstraints) {
-      ACTS_VERBOSE("- " << binningValueName(ic));
+      ACTS_VERBOSE("- " << axisDirectionName(ic));
     }
   }
 
@@ -263,11 +263,11 @@ Acts::GeoModelBlueprintCreater::createNode(
     }
 
     // Create the binnings
-    std::vector<Acts::BinningValue> binnings;
+    std::vector<Acts::AxisDirection> binnings;
     std::for_each(
         entry.binnings.begin(), entry.binnings.end(),
         [&binnings](const std::string& b) {
-          binnings.push_back(detail::GeoModelBinningHelper::toBinningValue(b));
+          binnings.push_back(detail::GeoModelBinningHelper::toAxisDirection(b));
         });
 
     // Complete the children
@@ -317,7 +317,7 @@ std::tuple<std::shared_ptr<const Acts::Experimental::IInternalStructureBuilder>,
 Acts::GeoModelBlueprintCreater::createInternalStructureBuilder(
     Cache& cache, const GeometryContext& gctx, const TableEntry& entry,
     const Extent& externalExtent,
-    const std::vector<BinningValue>& internalConstraints) const {
+    const std::vector<AxisDirection>& internalConstraints) const {
   // Check if the internals entry is empty
   if (entry.internals.empty()) {
     return {nullptr, Extent()};
@@ -351,7 +351,7 @@ Acts::GeoModelBlueprintCreater::createInternalStructureBuilder(
       // Fill what we have - follow the convention to fill up with the last
       for (std::size_t ibv = 0; ibv < 3u; ++ibv) {
         if (ibv < m_cfg.kdtBinning.size()) {
-          BinningValue v = m_cfg.kdtBinning[ibv];
+          AxisDirection v = m_cfg.kdtBinning[ibv];
           mins[ibv] = rangeExtent.min(v);
           maxs[ibv] = rangeExtent.max(v);
           continue;
@@ -424,10 +424,10 @@ Acts::GeoModelBlueprintCreater::parseBounds(
   // Switch on the bounds type
   if (boundsType == VolumeBounds::BoundsType::eCylinder) {
     // Create the translation & bound values
-    translation = Acts::Vector3(0., 0., extent.medium(BinningValue::binZ));
-    boundValues = {extent.min(BinningValue::binR),
-                   extent.max(BinningValue::binR),
-                   0.5 * extent.interval(BinningValue::binZ)};
+    translation = Acts::Vector3(0., 0., extent.medium(AxisDirection::AxisZ));
+    boundValues = {extent.min(AxisDirection::AxisR),
+                   extent.max(AxisDirection::AxisR),
+                   0.5 * extent.interval(AxisDirection::AxisZ)};
   } else {
     throw std::invalid_argument(
         "GeoModelBlueprintCreater: Unknown bounds type, only 'cyl' is "

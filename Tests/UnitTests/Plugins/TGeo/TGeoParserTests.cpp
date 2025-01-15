@@ -78,8 +78,8 @@ BOOST_AUTO_TEST_CASE(TGeoParser_Pixel_SelectInnermost) {
     tgpOptions.volumeNames = {volumeName};
     tgpOptions.targetNames = {"PixelActiveo2", "PixelActiveo4", "PixelActiveo5",
                               "PixelActiveo6"};
-    tgpOptions.parseRanges.push_back({BinningValue::binR, {0., 40.}});
-    tgpOptions.parseRanges.push_back({BinningValue::binZ, {-60., 15.}});
+    tgpOptions.parseRanges.push_back({AxisDirection::AxisR, {0., 40.}});
+    tgpOptions.parseRanges.push_back({AxisDirection::AxisZ, {-60., 15.}});
     tgpOptions.unit = 10.;
 
     std::string axes = "XYZ";

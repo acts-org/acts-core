@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Acts/Geometry/TrackingGeometry.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 
 #include <array>
 #include <memory>
@@ -51,6 +51,6 @@ std::unique_ptr<const Acts::TrackingGeometry> buildTelescopeDetector(
     const std::vector<double>& stereoAngles,
     const std::array<double, 2>& offsets, const std::array<double, 2>& bounds,
     double thickness, TelescopeSurfaceType surfaceType,
-    Acts::BinningValue binValue = Acts::BinningValue::binZ);
+    Acts::AxisDirection binValue = Acts::AxisDirection::AxisZ);
 
 }  // namespace ActsExamples

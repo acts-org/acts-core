@@ -20,7 +20,8 @@ namespace Acts {
 struct SurfaceBinningMatcher {
   /// The binning tolerance parameters
   using Range = std::pair<double, double>;
-  std::vector<Range> tolerances{static_cast<int>(numBinningValues()), {0., 0.}};
+  std::vector<Range> tolerances{static_cast<int>(numAxisDirections()),
+                                {0., 0.}};
 
   SurfaceBinningMatcher() = default;
 
@@ -30,10 +31,10 @@ struct SurfaceBinningMatcher {
   /// Check function for surface equivalent
   ///
   /// @param gctx [in] gctx the geometry context for this check
-  /// @param bValue the binning value for the binning
+  /// @param aDir the axis direction value for the binning
   /// @param one first surface for checking
   /// @param other second surface for checking
-  bool operator()(const Acts::GeometryContext& gctx, Acts::BinningValue bValue,
+  bool operator()(const Acts::GeometryContext& gctx, Acts::AxisDirection aDir,
                   const Acts::Surface* one, const Acts::Surface* other) const {
     // Fast exit
     if (one == other) {
@@ -43,15 +44,15 @@ struct SurfaceBinningMatcher {
     auto oneExt = one->polyhedronRepresentation(gctx, 1).extent();
     auto otherExt = other->polyhedronRepresentation(gctx, 1).extent();
 
-    double oneMin = oneExt.min(bValue);
-    double oneMax = oneExt.max(bValue);
+    double oneMin = oneExt.min(aDir);
+    double oneMax = oneExt.max(aDir);
 
-    double otherMin = otherExt.min(bValue);
-    double otherMax = otherExt.max(bValue);
+    double otherMin = otherExt.min(aDir);
+    double otherMax = otherExt.max(aDir);
 
     return (
-        std::abs(oneMin - otherMin) <= tolerances[toUnderlying(bValue)].first &&
-        std::abs(oneMax - otherMax) <= tolerances[toUnderlying(bValue)].second);
+        std::abs(oneMin - otherMin) <= tolerances[toUnderlying(aDir)].first &&
+        std::abs(oneMax - otherMax) <= tolerances[toUnderlying(aDir)].second);
   }
 };
 

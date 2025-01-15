@@ -25,12 +25,14 @@
 #include "Acts/Propagator/EigenStepperDenseExtension.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
+#include "Acts/Propagator/VoidNavigator.hpp"
 #include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Surfaces/CylinderBounds.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
+#include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/Result.hpp"
 
 #include <cmath>
@@ -81,7 +83,7 @@ struct SurfaceObserver {
   // the surface to be intersected
   const Surface* surface = nullptr;
   // the tolerance for intersection
-  double tolerance = 1.e-5;
+  double tolerance = 1e-5;
 
   /// Simple result struct to be returned
   struct this_result {
@@ -91,32 +93,34 @@ struct SurfaceObserver {
 
   using result_type = this_result;
 
-  SurfaceObserver() = default;
-
   template <typename propagator_state_t, typename stepper_t,
             typename navigator_t>
   void act(propagator_state_t& state, const stepper_t& stepper,
            const navigator_t& /*navigator*/, result_type& result,
            const Logger& /*logger*/) const {
-    if (surface && !result.surfaces_passed) {
-      // calculate the distance to the surface
-      const double distance =
-          surface
-              ->intersect(state.geoContext, stepper.position(state.stepping),
-                          stepper.direction(state.stepping),
-                          BoundaryTolerance::None())
-              .closest()
-              .pathLength();
-      // Adjust the step size so that we cannot cross the target surface
-      state.stepping.stepSize.update(distance * state.options.direction,
-                                     ConstrainedStep::navigator);
-      // return true if you fall below tolerance
-      if (std::abs(distance) <= tolerance) {
-        ++result.surfaces_passed;
-        result.surface_passed_r = perp(stepper.position(state.stepping));
-        // release the step size, will be re-adjusted
-        state.stepping.stepSize.release(ConstrainedStep::navigator);
-      }
+    if (surface == nullptr || result.surfaces_passed != 0) {
+      return;
+    }
+
+    // calculate the distance to the surface
+    const double distance =
+        surface
+            ->intersect(state.geoContext, stepper.position(state.stepping),
+                        stepper.direction(state.stepping),
+                        BoundaryTolerance::None())
+            .closest()
+            .pathLength();
+
+    // Adjust the step size so that we cannot cross the target surface
+    state.stepping.stepSize.release(ConstrainedStep::actor);
+    state.stepping.stepSize.update(distance * state.options.direction,
+                                   ConstrainedStep::actor);
+
+    // return true if you fall below tolerance
+    if (std::abs(distance) <= tolerance) {
+      ++result.surfaces_passed;
+      result.surface_passed_r = perp(stepper.position(state.stepping));
+      state.stepping.stepSize.release(ConstrainedStep::actor);
     }
   }
 };
@@ -129,7 +133,8 @@ using EigenPropagatorType = Propagator<EigenStepperType>;
 const double Bz = 2_T;
 auto bField = std::make_shared<BFieldType>(Vector3{0, 0, Bz});
 EigenStepperType estepper(bField);
-EigenPropagatorType epropagator(std::move(estepper));
+EigenPropagatorType epropagator(std::move(estepper), VoidNavigator(),
+                                getDefaultLogger("prop", Logging::VERBOSE));
 
 auto mCylinder = std::make_shared<CylinderBounds>(10_mm, 1000_mm);
 auto mSurface =
@@ -398,13 +403,13 @@ BOOST_AUTO_TEST_CASE(BasicPropagatorInterface) {
   MagneticFieldContext mctx;
 
   {
+    EigenPropagatorType::Options<> options{gctx, mctx};
+
     Propagator propagator{eigenStepper, navigator};
     static_assert(std::is_base_of_v<BasePropagator, decltype(propagator)>,
                   "Propagator does not inherit from BasePropagator");
     const BasePropagator* base =
         static_cast<const BasePropagator*>(&propagator);
-
-    EigenPropagatorType::Options<> options{gctx, mctx};
 
     // Ensure the propagation does the same thing
     auto result =
@@ -431,13 +436,13 @@ BOOST_AUTO_TEST_CASE(BasicPropagatorInterface) {
 
   StraightLineStepper slStepper{};
   {
+    Propagator<StraightLineStepper>::Options<> options{gctx, mctx};
+
     Propagator propagator{slStepper, navigator};
     static_assert(std::is_base_of_v<BasePropagator, decltype(propagator)>,
                   "Propagator does not inherit from BasePropagator");
     const BasePropagator* base =
         static_cast<const BasePropagator*>(&propagator);
-
-    Propagator<StraightLineStepper>::Options<> options{gctx, mctx};
 
     // Ensure the propagation does the same thing
     auto result =

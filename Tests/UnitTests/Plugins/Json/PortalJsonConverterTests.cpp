@@ -129,7 +129,8 @@ BOOST_AUTO_TEST_CASE(PortalMultiConnected) {
 
   Acts::Experimental::detail::PortalHelper::attachDetectorVolumesUpdater(
       tContext, *portal, {forwardVolumeA, forwardVolumeB, forwardVolumeC},
-      Acts::Direction::Forward, {-100, 10, 20, 200}, Acts::BinningValue::binX);
+      Acts::Direction::Forward, {-100, 10, 20, 200},
+      Acts::AxisDirection::AxisX);
 
   std::vector<const Acts::Experimental::DetectorVolume*> detectorVolumes = {
       forwardVolumeA.get(), forwardVolumeB.get(), forwardVolumeC.get(),

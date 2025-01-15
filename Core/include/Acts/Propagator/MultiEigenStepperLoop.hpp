@@ -221,7 +221,7 @@ class MultiEigenStepperLoop : public EigenStepper<extension_t> {
 
     /// Constructor from the initial bound track parameters
     ///
-    /// @param [in] optionsIn The options for the stepper
+    /// @param [in] optionsIn is the options object for the stepper
     ///
     /// @note the covariance matrix is copied when needed
     explicit State(const Options& optionsIn) : options(optionsIn) {}

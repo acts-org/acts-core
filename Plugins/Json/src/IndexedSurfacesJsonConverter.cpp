@@ -37,7 +37,7 @@ struct IndexedSurfacesGenerator {
   template <typename grid_type>
   Acts::Experimental::InternalNavigationDelegate createUpdater(
       grid_type&& grid,
-      const std::array<Acts::BinningValue, grid_type::DIM>& bv,
+      const std::array<Acts::AxisDirection, grid_type::DIM>& bv,
       const Acts::Transform3& transform) {
     Acts::Experimental::IndexedSurfacesNavigation<grid_type> indexedSurfaces(
         std::forward<grid_type>(grid), bv, transform);

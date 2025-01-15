@@ -20,7 +20,7 @@
 #include "Acts/Surfaces/RadialBounds.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Tests/CommonHelpers/CylindricalTrackingGeometry.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Delegate.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(RingDisc1D) {
                                           55., 0., 2., 22u);
 
   IndexedSurfacesGenerator<decltype(rSurfaces), IndexedSurfacesNavigation>
-      irSurfaces{rSurfaces, {}, {BinningValue::binPhi}};
+      irSurfaces{rSurfaces, {}, {AxisDirection::AxisPhi}};
 
   GridAxisGenerators::EqClosed aGenerator{{-std::numbers::pi, std::numbers::pi},
                                           44u};
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(RingDisc1DWithSupport) {
   rSurfaces.push_back(dSurface.get());
 
   IndexedSurfacesGenerator<decltype(rSurfaces), IndexedSurfacesNavigation>
-      irSurfaces{rSurfaces, {rSurfaces.size() - 1u}, {BinningValue::binPhi}};
+      irSurfaces{rSurfaces, {rSurfaces.size() - 1u}, {AxisDirection::AxisPhi}};
 
   GridAxisGenerators::EqClosed aGenerator{{-std::numbers::pi, std::numbers::pi},
                                           44u};
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(RingDisc2D) {
   rSurfaces.insert(rSurfaces.end(), rSurfacesR1.begin(), rSurfacesR1.end());
 
   IndexedSurfacesGenerator<decltype(rSurfaces), IndexedSurfacesNavigation>
-      irSurfaces{rSurfaces, {}, {BinningValue::binR, BinningValue::binPhi}};
+      irSurfaces{rSurfaces, {}, {AxisDirection::AxisR, AxisDirection::AxisPhi}};
 
   GridAxisGenerators::VarBoundEqClosed aGenerator{
       {24., 74., 110.}, {-std::numbers::pi, std::numbers::pi}, 44u};
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(RingDisc2DFine) {
   rSurfaces.insert(rSurfaces.end(), rSurfacesR2.begin(), rSurfacesR2.end());
 
   IndexedSurfacesGenerator<decltype(rSurfaces), IndexedSurfacesNavigation>
-      irSurfaces{rSurfaces, {}, {BinningValue::binR, BinningValue::binPhi}};
+      irSurfaces{rSurfaces, {}, {AxisDirection::AxisR, AxisDirection::AxisPhi}};
 
   GridAxisGenerators::EqBoundEqClosed aGenerator{
       {24., 152}, 8u, {-std::numbers::pi, std::numbers::pi}, 88u};
@@ -241,8 +241,10 @@ BOOST_AUTO_TEST_CASE(RingDisc2DFineExpanded) {
   rSurfaces.insert(rSurfaces.end(), rSurfacesR2.begin(), rSurfacesR2.end());
 
   IndexedSurfacesGenerator<decltype(rSurfaces), IndexedSurfacesNavigation>
-      irSurfaces{
-          rSurfaces, {}, {BinningValue::binR, BinningValue::binPhi}, {2u, 4u}};
+      irSurfaces{rSurfaces,
+                 {},
+                 {AxisDirection::AxisR, AxisDirection::AxisPhi},
+                 {2u, 4u}};
 
   GridAxisGenerators::EqBoundEqClosed aGenerator{
       {24., 152}, 8u, {-std::numbers::pi, std::numbers::pi}, 88u};
@@ -276,8 +278,10 @@ BOOST_AUTO_TEST_CASE(Cylinder2D) {
                                              116., 3., 2., {52, 14});
 
   IndexedSurfacesGenerator<decltype(surfaces), IndexedSurfacesNavigation>
-      icSurfaces{
-          surfaces, {}, {BinningValue::binZ, BinningValue::binPhi}, {1u, 1u}};
+      icSurfaces{surfaces,
+                 {},
+                 {AxisDirection::AxisZ, AxisDirection::AxisPhi},
+                 {1u, 1u}};
 
   GridAxisGenerators::EqBoundEqClosed aGenerator{
       {-500., 500}, 28, {-std::numbers::pi, std::numbers::pi}, 52u};

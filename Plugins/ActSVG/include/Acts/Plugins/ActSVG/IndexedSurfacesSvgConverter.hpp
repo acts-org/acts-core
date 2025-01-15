@@ -72,10 +72,10 @@ ProtoIndexedSurfaceGrid convertImpl(const GeometryContext& gctx,
   // - for 1D phi
   // - for 2D z-phi or phi-z
   bool estimateR = (index_grid::grid_type::DIM == 1 &&
-                    indexGrid.casts[0u] == BinningValue::binPhi) ||
+                    indexGrid.casts[0u] == AxisDirection::AxisPhi) ||
                    (index_grid::grid_type::DIM == 2 &&
-                    (indexGrid.casts[0u] == BinningValue::binPhi ||
-                     indexGrid.casts[1u] == BinningValue::binPhi));
+                    (indexGrid.casts[0u] == AxisDirection::AxisPhi ||
+                     indexGrid.casts[1u] == AxisDirection::AxisPhi));
 
   for (auto [is, s] : enumerate(surfaces)) {
     // Create the surface converter options
@@ -91,9 +91,9 @@ ProtoIndexedSurfaceGrid convertImpl(const GeometryContext& gctx,
       auto sExtent = s->polyhedronRepresentation(gctx, 4u).extent();
       if constexpr (index_grid::grid_type::DIM == 2u) {
         pSurface._radii[0u] =
-            static_cast<float>(sExtent.medium(BinningValue::binR));
+            static_cast<float>(sExtent.medium(AxisDirection::AxisR));
       }
-      constrain.extend(sExtent, {BinningValue::binR});
+      constrain.extend(sExtent, {AxisDirection::AxisR});
     }
     // Add center info
     std::string centerInfo = " - center = (";
@@ -113,10 +113,10 @@ ProtoIndexedSurfaceGrid convertImpl(const GeometryContext& gctx,
 
   // Adjust the grid options
   if constexpr (index_grid::grid_type::DIM == 1u) {
-    if (indexGrid.casts[0u] == BinningValue::binPhi) {
-      auto estRangeR = constrain.range(BinningValue::binR);
+    if (indexGrid.casts[0u] == AxisDirection::AxisPhi) {
+      auto estRangeR = constrain.range(AxisDirection::AxisR);
       std::array<double, 2u> rRange = {estRangeR.min(), estRangeR.max()};
-      gridOptions.optionalBound = {rRange, BinningValue::binR};
+      gridOptions.optionalBound = {rRange, AxisDirection::AxisR};
     }
   }
 
@@ -165,7 +165,7 @@ ProtoIndexedSurfaceGrid convertImpl(const GeometryContext& gctx,
         pGrid._bin_ids.push_back(binInfo);
         if (estimateR) {
           pGrid._reference_r =
-              static_cast<float>(constrain.medium(BinningValue::binR));
+              static_cast<float>(constrain.medium(AxisDirection::AxisR));
         }
       }
     }

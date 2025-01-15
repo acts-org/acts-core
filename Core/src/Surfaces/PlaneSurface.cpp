@@ -145,8 +145,8 @@ Vector3 PlaneSurface::normal(const GeometryContext& gctx) const {
   return transform(gctx).linear().col(2);
 }
 
-Vector3 PlaneSurface::binningPosition(const GeometryContext& gctx,
-                                      BinningValue /*bValue*/) const {
+Vector3 PlaneSurface::referencePosition(const GeometryContext& gctx,
+                                        AxisDirection /*aDir*/) const {
   return center(gctx);
 }
 

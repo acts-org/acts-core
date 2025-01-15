@@ -25,15 +25,15 @@ namespace Acts::detail::GeoModelExentHelper {
 /// @param ctype the type of the constraint as string from the database
 ///
 /// @return a vector
-std::vector<BinningValue> readBoundsConstaints(const std::string& boundsEntry,
-                                               const std::string& ctype = "i");
+std::vector<AxisDirection> readBoundsConstaints(const std::string& boundsEntry,
+                                                const std::string& ctype = "i");
 
 /// @brief Helper function to find out which ones are constraint needed for binning
 ///
 /// @param binningEntry the bounds entry from the database
 ///
 /// @return a vector
-std::vector<BinningValue> readBinningConstraints(
+std::vector<AxisDirection> readBinningConstraints(
     const std::vector<std::string>& binningEntry);
 
 /// @brief Helper function to create the extent from database volume entry

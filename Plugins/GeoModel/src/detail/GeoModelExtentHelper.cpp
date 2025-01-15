@@ -14,7 +14,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-std::vector<Acts::BinningValue>
+std::vector<Acts::AxisDirection>
 Acts::detail::GeoModelExentHelper::readBoundsConstaints(
     const std::string& boundsEntry, const std::string& ctype) {
   std::vector<std::string> boundsEntrySplit;
@@ -24,7 +24,7 @@ Acts::detail::GeoModelExentHelper::readBoundsConstaints(
         "GeoModelBlueprintCreater: Bounds entry has to have at least 2 "
         "entries (type, values)");
   }
-  std::set<Acts::BinningValue> constraints;
+  std::set<Acts::AxisDirection> constraints;
   // Switch on the bounds type
   if (boundsEntrySplit[0u] == "cyl") {
     // Capture the values
@@ -36,9 +36,9 @@ Acts::detail::GeoModelExentHelper::readBoundsConstaints(
           "least 4 entries (rmin, rmax, zmin, zmax)");
     }
     // Raw database values to extent entries
-    constexpr std::array<BinningValue, 6u> bvCyl = {
-        BinningValue::binR, BinningValue::binR,   BinningValue::binZ,
-        BinningValue::binZ, BinningValue::binPhi, BinningValue::binPhi};
+    constexpr std::array<AxisDirection, 6u> bvCyl = {
+        AxisDirection::AxisR, AxisDirection::AxisR,   AxisDirection::AxisZ,
+        AxisDirection::AxisZ, AxisDirection::AxisPhi, AxisDirection::AxisPhi};
 
     for (auto [iv, value] : enumerate(valuesEntry)) {
       if (value == ctype || value[0u] == ctype[0u]) {
@@ -49,10 +49,10 @@ Acts::detail::GeoModelExentHelper::readBoundsConstaints(
   return {constraints.begin(), constraints.end()};
 }
 
-std::vector<Acts::BinningValue>
+std::vector<Acts::AxisDirection>
 Acts::detail::GeoModelExentHelper::readBinningConstraints(
     const std::vector<std::string>& binningEntry) {
-  std::set<BinningValue> constraints;
+  std::set<AxisDirection> constraints;
   // Loop over the single binning Entries
   for (const auto& sbe : binningEntry) {
     if (sbe.empty()) {
@@ -60,8 +60,8 @@ Acts::detail::GeoModelExentHelper::readBinningConstraints(
     }
     std::vector<std::string> sbTokens;
     boost::split(sbTokens, sbe, boost::is_any_of(","));
-    BinningValue bv =
-        Acts::detail::GeoModelBinningHelper::toBinningValue(sbTokens[0]);
+    AxisDirection bv =
+        Acts::detail::GeoModelBinningHelper::toAxisDirection(sbTokens[0]);
     if (sbTokens.size() > 1u) {
       std::vector<std::string> valueTokens = {sbTokens.begin() + 1,
                                               sbTokens.end()};
@@ -103,12 +103,12 @@ Acts::detail::GeoModelExentHelper::extentFromTable(
           "least 4 entries (rmin, rmax, zmin, zmax)");
     }
     // Raw database values to extent entries
-    constexpr std::array<BinningValue, 6u> bvCyl = {
-        BinningValue::binR, BinningValue::binR,   BinningValue::binZ,
-        BinningValue::binZ, BinningValue::binPhi, BinningValue::binPhi};
+    constexpr std::array<AxisDirection, 6u> bvCyl = {
+        AxisDirection::AxisR, AxisDirection::AxisR,   AxisDirection::AxisZ,
+        AxisDirection::AxisZ, AxisDirection::AxisPhi, AxisDirection::AxisPhi};
     for (auto [iv, value] : enumerate(valuesEntry)) {
       // Get the binning value
-      BinningValue bValue = bvCyl.at(iv);
+      AxisDirection bValue = bvCyl.at(iv);
       double val = std::numeric_limits<double>::max();
       bool isMin = (iv % 2 == 0);
       // Case "e" : external extent
@@ -149,7 +149,7 @@ Acts::detail::GeoModelExentHelper::extentFromTable(
   }
   // Round up / down if configured
   if (roundInternalExtent) {
-    for (const auto& bv : allBinningValues()) {
+    for (const auto& bv : allAxisDirections()) {
       if (internalExtent.constrains(bv)) {
         extent.setMin(bv, std::floor(extent.min(bv)));
         extent.setMax(bv, std::ceil(extent.max(bv)));

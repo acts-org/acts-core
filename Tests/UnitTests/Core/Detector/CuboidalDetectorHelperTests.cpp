@@ -50,15 +50,15 @@ BOOST_AUTO_TEST_CASE(CubicVolumeExceptions) {
       volumeA, volumeB};
 
   BOOST_CHECK_THROW(Acts::Experimental::detail::CuboidalDetectorHelper::connect(
-                        tContext, volumes, Acts::BinningValue::binX, {},
+                        tContext, volumes, Acts::AxisDirection::AxisX, {},
                         Acts::Logging::VERBOSE),
                     std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(SimpleBoxConnection) {
-  std::array<Acts::BinningValue, 3> binningValues = {Acts::BinningValue::binX,
-                                                     Acts::BinningValue::binY,
-                                                     Acts::BinningValue::binZ};
+  std::array<Acts::AxisDirection, 3> binningValues = {
+      Acts::AxisDirection::AxisX, Acts::AxisDirection::AxisY,
+      Acts::AxisDirection::AxisZ};
   for (auto bVal : binningValues) {
     // A perfect box shape
     auto box = std::make_shared<Acts::CuboidVolumeBounds>(10, 10, 10);
@@ -91,15 +91,15 @@ BOOST_AUTO_TEST_CASE(SimpleBoxConnection) {
     Acts::ObjVisualization3D obj;
     Acts::GeometryView3D::drawDetectorVolume(obj, *volumeA, tContext);
     Acts::GeometryView3D::drawDetectorVolume(obj, *volumeB, tContext);
-    obj.write("ConnectectBoxesRegular_" + Acts::binningValueName(bVal) +
+    obj.write("ConnectectBoxesRegular_" + Acts::axisDirectionName(bVal) +
               ".obj");
   }
 }
 
 BOOST_AUTO_TEST_CASE(IrregularBoxConnectionInZ) {
-  std::vector<Acts::BinningValue> binningValues = {Acts::BinningValue::binX,
-                                                   Acts::BinningValue::binY,
-                                                   Acts::BinningValue::binZ};
+  std::vector<Acts::AxisDirection> binningValues = {Acts::AxisDirection::AxisX,
+                                                    Acts::AxisDirection::AxisY,
+                                                    Acts::AxisDirection::AxisZ};
 
   using HlPos = std::array<double, 2u>;
   using VolHlPos = std::array<HlPos, 3u>;
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(IrregularBoxConnectionInZ) {
       Acts::GeometryView3D::drawDetectorVolume(obj, *volumeA, tContext);
       Acts::GeometryView3D::drawDetectorVolume(obj, *volumeB, tContext);
       Acts::GeometryView3D::drawDetectorVolume(obj, *volumeC, tContext);
-      obj.write("ConnectectBoxesIrregular_" + Acts::binningValueName(bVal) +
+      obj.write("ConnectectBoxesIrregular_" + Acts::axisDirectionName(bVal) +
                 trstr + ".obj");
     }
   }
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(ContainerConnection) {
   // Move it into the bval direction
   auto transformB = Acts::Transform3::Identity();
   Acts::Vector3 translationB = Acts::Vector3::Zero();
-  translationB[toUnderlying(Acts::BinningValue::binX)] = 20;
+  translationB[toUnderlying(Acts::AxisDirection::AxisX)] = 20;
   transformB.pretranslate(translationB);
   // Create volume B
   auto volumeB = Acts::Experimental::DetectorVolumeFactory::construct(
@@ -201,14 +201,14 @@ BOOST_AUTO_TEST_CASE(ContainerConnection) {
       volumeA, volumeB};
   auto containerAB =
       Acts::Experimental::detail::CuboidalDetectorHelper::connect(
-          tContext, volumes, Acts::BinningValue::binX, {},
+          tContext, volumes, Acts::AxisDirection::AxisX, {},
           Acts::Logging::VERBOSE);
 
   // Create a CD container
 
   auto transformC = Acts::Transform3::Identity();
   Acts::Vector3 translationC = Acts::Vector3::Zero();
-  translationC[toUnderlying(Acts::BinningValue::binY)] = 20;
+  translationC[toUnderlying(Acts::AxisDirection::AxisY)] = 20;
   transformC.pretranslate(translationC);
 
   auto volumeC = Acts::Experimental::DetectorVolumeFactory::construct(
@@ -217,8 +217,8 @@ BOOST_AUTO_TEST_CASE(ContainerConnection) {
 
   auto transformD = Acts::Transform3::Identity();
   Acts::Vector3 translationD = Acts::Vector3::Zero();
-  translationD[toUnderlying(Acts::BinningValue::binX)] = 20;
-  translationD[toUnderlying(Acts::BinningValue::binY)] = 20;
+  translationD[toUnderlying(Acts::AxisDirection::AxisX)] = 20;
+  translationD[toUnderlying(Acts::AxisDirection::AxisY)] = 20;
   transformD.pretranslate(translationD);
 
   auto volumeD = Acts::Experimental::DetectorVolumeFactory::construct(
@@ -228,12 +228,12 @@ BOOST_AUTO_TEST_CASE(ContainerConnection) {
   volumes = {volumeC, volumeD};
   auto containerCD =
       Acts::Experimental::detail::CuboidalDetectorHelper::connect(
-          tContext, volumes, Acts::BinningValue::binX, {},
+          tContext, volumes, Acts::AxisDirection::AxisX, {},
           Acts::Logging::VERBOSE);
 
   auto containerABCD =
       Acts::Experimental::detail::CuboidalDetectorHelper::connect(
-          tContext, {containerAB, containerCD}, Acts::BinningValue::binY, {},
+          tContext, {containerAB, containerCD}, Acts::AxisDirection::AxisY, {},
           Acts::Logging::VERBOSE);
 
   // Check the container is constructed

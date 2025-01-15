@@ -17,7 +17,7 @@
 #include "Acts/Geometry/StaticBlueprintNode.hpp"
 #include "Acts/Navigation/NavigationStream.hpp"
 #include "Acts/Plugins/Python/Utilities.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <fstream>
@@ -338,7 +338,7 @@ void addBlueprint(Context& ctx) {
       py::class_<Acts::CylinderContainerBlueprintNode, Acts::BlueprintNode,
                  std::shared_ptr<Acts::CylinderContainerBlueprintNode>>(
           m, "CylinderContainerBlueprintNode")
-          .def(py::init<const std::string&, BinningValue,
+          .def(py::init<const std::string&, AxisDirection,
                         CylinderVolumeStack::AttachmentStrategy,
                         CylinderVolumeStack::ResizeStrategy>(),
                py::arg("name"), py::arg("direction"),
@@ -362,7 +362,8 @@ void addBlueprint(Context& ctx) {
 
   addNodeMethods(
       "CylinderContainer",
-      [](BlueprintNode& self, const std::string& name, BinningValue direction) {
+      [](BlueprintNode& self, const std::string& name,
+         AxisDirection direction) {
         auto cylinder =
             std::make_shared<CylinderContainerBlueprintNode>(name, direction);
         self.addChild(cylinder);

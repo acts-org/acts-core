@@ -10,7 +10,7 @@ degree = acts.UnitConstants.degree
 root = acts.Blueprint(envelope=acts.ExtentEnvelope(r=[10 * mm, 10 * mm]))
 
 
-pixel = root.addCylinderContainer(direction=acts.BinningValue.binZ, name="Pixel")
+pixel = root.addCylinderContainer(direction=acts.AxisDirection.AxisZ, name="Pixel")
 print(repr(pixel))
 
 trf = acts.Transform3.Identity() * acts.Translation3(acts.Vector3(0, 0, 0 * mm))
@@ -19,7 +19,7 @@ trf = acts.Transform3.Identity() * acts.Translation3(acts.Vector3(0, 0, 0 * mm))
 if True:
     barrel = acts.CylinderContainerBlueprintNode(
         "PixelBarrel",
-        acts.BinningValue.binR,
+        acts.AxisDirection.AxisR,
         attachmentStrategy=acts.CylinderVolumeStack.AttachmentStrategy.Gap,
         resizeStrategy=acts.CylinderVolumeStack.ResizeStrategy.Gap,
     )
@@ -37,7 +37,7 @@ if True:
 
 if True:
 
-    with pixel.CylinderContainer("PixelPosEndcap", acts.BinningValue.binZ) as ec:
+    with pixel.CylinderContainer("PixelPosEndcap", acts.AxisDirection.AxisZ) as ec:
         print("Positive Endcap")
 
         ec.attachmentStrategy = acts.CylinderVolumeStack.AttachmentStrategy.Gap
@@ -60,7 +60,7 @@ if True:
 if True:
     with pixel.Material() as mat:
         with mat.CylinderContainer(
-            direction=acts.BinningValue.binZ, name="PixelNegEndcap"
+            direction=acts.AxisDirection.AxisZ, name="PixelNegEndcap"
         ) as ec:
             ec.attachmentStrategy = acts.CylinderVolumeStack.AttachmentStrategy.Gap
 

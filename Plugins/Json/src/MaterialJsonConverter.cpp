@@ -686,14 +686,14 @@ nlohmann::json Acts::MaterialJsonConverter::toJsonDetray(
     BinUtility bUtility = binnedMaterial->binUtility();
     // Turn the bin value into a 2D grid
     if (bUtility.dimensions() == 1u) {
-      if (bUtility.binningData()[0u].binvalue == BinningValue::binR) {
+      if (bUtility.binningData()[0u].binvalue == AxisDirection::AxisR) {
         // Turn to R-Phi
         bUtility += BinUtility(1u, -std::numbers::pi, std::numbers::pi, closed,
-                               BinningValue::binPhi);
-      } else if (bUtility.binningData()[0u].binvalue == BinningValue::binZ) {
+                               AxisDirection::AxisPhi);
+      } else if (bUtility.binningData()[0u].binvalue == AxisDirection::AxisZ) {
         // Turn to Phi-Z - swap needed
         BinUtility nbUtility(1u, -std::numbers::pi, std::numbers::pi, closed,
-                             BinningValue::binPhi);
+                             AxisDirection::AxisPhi);
         nbUtility += bUtility;
         bUtility = std::move(nbUtility);
         swapped = true;
@@ -701,24 +701,25 @@ nlohmann::json Acts::MaterialJsonConverter::toJsonDetray(
         std::runtime_error("Unsupported binning for Detray");
       }
     } else if (bUtility.dimensions() == 2u &&
-               bUtility.binningData()[0u].binvalue == BinningValue::binZ &&
-               bUtility.binningData()[1u].binvalue == BinningValue::binPhi) {
+               bUtility.binningData()[0u].binvalue == AxisDirection::AxisZ &&
+               bUtility.binningData()[1u].binvalue == AxisDirection::AxisPhi) {
       BinUtility nbUtility(bUtility.binningData()[1u]);
       nbUtility += BinUtility{bUtility.binningData()[0u]};
       bUtility = std::move(nbUtility);
       swapped = true;
     }
 
-    BinningValue bVal0 = bUtility.binningData()[0u].binvalue;
-    BinningValue bVal1 = bUtility.binningData()[1u].binvalue;
+    AxisDirection bVal0 = bUtility.binningData()[0u].binvalue;
+    AxisDirection bVal1 = bUtility.binningData()[1u].binvalue;
 
     // Translate into grid index type
     int gridIndexType = 0;
-    if (bVal0 == BinningValue::binR && bVal1 == BinningValue::binPhi) {
+    if (bVal0 == AxisDirection::AxisR && bVal1 == AxisDirection::AxisPhi) {
       gridIndexType = 0;
-    } else if (bVal0 == BinningValue::binPhi && bVal1 == BinningValue::binZ) {
+    } else if (bVal0 == AxisDirection::AxisPhi &&
+               bVal1 == AxisDirection::AxisZ) {
       gridIndexType = 3;
-    } else if (bVal0 == BinningValue::binX && bVal1 == BinningValue::binY) {
+    } else if (bVal0 == AxisDirection::AxisX && bVal1 == AxisDirection::AxisY) {
       gridIndexType = 2;
     } else {
       std::runtime_error("Unsupported binning for Detray");
@@ -801,7 +802,7 @@ nlohmann::json Acts::MaterialJsonConverter::toJsonDetray(
     jAxis["label"] = ib;
     jAxis["bins"] = bData.bins();
     double offset = 0;
-    if (bData.binvalue == BinningValue::binZ) {
+    if (bData.binvalue == AxisDirection::AxisZ) {
       offset = surface.center(Acts::GeometryContext{}).z();
     }
     jAxis["edges"] =

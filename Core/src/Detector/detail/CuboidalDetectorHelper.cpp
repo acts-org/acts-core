@@ -28,23 +28,23 @@ Acts::Experimental::DetectorComponent::PortalContainer
 Acts::Experimental::detail::CuboidalDetectorHelper::connect(
     const GeometryContext& gctx,
     std::vector<std::shared_ptr<Experimental::DetectorVolume>>& volumes,
-    BinningValue bValue, const std::vector<unsigned int>& selectedOnly,
+    AxisDirection bValue, const std::vector<unsigned int>& selectedOnly,
     Acts::Logging::Level logLevel) {
   ACTS_LOCAL_LOGGER(getDefaultLogger("CuboidalDetectorHelper", logLevel));
 
   ACTS_DEBUG("Connect " << volumes.size() << " detector volumes in "
-                        << binningValueName(bValue) << ".");
+                        << axisDirectionName(bValue) << ".");
 
   // Check transform for consistency
   auto centerDistances =
       DetectorVolumeConsistency::checkCenterAlignment(gctx, volumes, bValue);
 
   // Assign the portal indices according to the volume bounds definition
-  std::array<BinningValue, 3u> possibleValues = {
-      BinningValue::binX, BinningValue::binY, BinningValue::binZ};
-  // 1 -> [ 2,3 ] for binX connection (cylclic one step)
-  // 2 -> [ 4,5 ] for binY connection (cylclic two steps)
-  // 0 -> [ 0,1 ] for binZ connection (to be in line with cylinder covnention)
+  std::array<AxisDirection, 3u> possibleValues = {
+      AxisDirection::AxisX, AxisDirection::AxisY, AxisDirection::AxisZ};
+  // 1 -> [ 2,3 ] for AxisX connection (cylclic one step)
+  // 2 -> [ 4,5 ] for AxisY connection (cylclic two steps)
+  // 0 -> [ 0,1 ] for AxisZ connection (to be in line with cylinder covnention)
   using PortalSet = std::array<std::size_t, 2u>;
   std::vector<PortalSet> portalSets = {
       {PortalSet{2, 3}, PortalSet{4, 5}, PortalSet{0, 1}}};
@@ -61,7 +61,7 @@ Acts::Experimental::detail::CuboidalDetectorHelper::connect(
   };
 
   // Pick the counter part value
-  auto counterPart = [&](BinningValue mValue) -> BinningValue {
+  auto counterPart = [&](AxisDirection mValue) -> AxisDirection {
     for (auto cValue : possibleValues) {
       if (cValue != mValue && cValue != bValue) {
         return cValue;
@@ -169,14 +169,14 @@ Acts::Experimental::detail::CuboidalDetectorHelper::connect(
     // - this is an anticyclic swap
     bool mergedInX = true;
     switch (bValue) {
-      case BinningValue::binZ: {
-        mergedInX = (mergeValue == BinningValue::binY);
+      case AxisDirection::AxisZ: {
+        mergedInX = (mergeValue == AxisDirection::AxisY);
       } break;
-      case BinningValue::binY: {
-        mergedInX = (mergeValue == BinningValue::binX);
+      case AxisDirection::AxisY: {
+        mergedInX = (mergeValue == AxisDirection::AxisX);
       } break;
-      case BinningValue::binX: {
-        mergedInX = (mergeValue == BinningValue::binZ);
+      case AxisDirection::AxisX: {
+        mergedInX = (mergeValue == AxisDirection::AxisZ);
       } break;
       default:
         break;
@@ -213,7 +213,7 @@ Acts::Experimental::detail::CuboidalDetectorHelper::connect(
       // Make the stitch boundaries
       pReplacements.push_back(PortalReplacement(
           portal, index, dir, stitchBoundaries,
-          (mergedInX ? BinningValue::binX : BinningValue::binY)));
+          (mergedInX ? AxisDirection::AxisX : AxisDirection::AxisY)));
     }
   }
 
@@ -243,20 +243,20 @@ Acts::Experimental::DetectorComponent::PortalContainer
 Acts::Experimental::detail::CuboidalDetectorHelper::connect(
     const GeometryContext& /*gctx*/,
     const std::vector<DetectorComponent::PortalContainer>& containers,
-    BinningValue bValue, const std::vector<unsigned int>& /*unused */,
+    AxisDirection bValue, const std::vector<unsigned int>& /*unused */,
     Acts::Logging::Level logLevel) noexcept(false) {
   // The local logger
   ACTS_LOCAL_LOGGER(getDefaultLogger("CuboidalDetectorHelper", logLevel));
 
   ACTS_DEBUG("Connect " << containers.size() << " containers in "
-                        << binningValueName(bValue) << ".");
+                        << axisDirectionName(bValue) << ".");
 
   // Return the new container
   DetectorComponent::PortalContainer dShell;
 
   // The possible bin values
-  std::array<BinningValue, 3u> possibleValues = {
-      BinningValue::binX, BinningValue::binY, BinningValue::binZ};
+  std::array<AxisDirection, 3u> possibleValues = {
+      AxisDirection::AxisX, AxisDirection::AxisY, AxisDirection::AxisZ};
   // And their associated portal sets, see above
   using PortalSet = std::array<std::size_t, 2u>;
   std::vector<PortalSet> portalSets = {

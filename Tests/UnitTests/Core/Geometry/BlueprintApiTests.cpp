@@ -254,28 +254,28 @@ BOOST_AUTO_TEST_CASE(NodeApiTestContainers) {
   };
 
   Blueprint::Config cfg;
-  cfg.envelope[BinningValue::binZ] = {20_mm, 20_mm};
-  cfg.envelope[BinningValue::binR] = {0_mm, 20_mm};
+  cfg.envelope[AxisDirection::AxisZ] = {20_mm, 20_mm};
+  cfg.envelope[AxisDirection::AxisR] = {0_mm, 20_mm};
   auto root = std::make_unique<Blueprint>(cfg);
 
   root->addMaterial("GlobalMaterial", [&](MaterialDesignatorBlueprintNode&
                                               mat) {
-    Experimental::ProtoBinning zBinning{BinningValue::binZ,
+    Experimental::ProtoBinning zBinning{AxisDirection::AxisZ,
                                         AxisBoundaryType::Bound, 20};
 
-    Experimental::ProtoBinning rPhiBinning{BinningValue::binRPhi,
+    Experimental::ProtoBinning rPhiBinning{AxisDirection::AxisRPhi,
                                            AxisBoundaryType::Bound, 20};
 
     mat.setBinning(std::vector{std::tuple{
         CylinderVolumeBounds::Face::OuterCylinder, rPhiBinning, zBinning}});
 
-    mat.addCylinderContainer("Detector", BinningValue::binR, [&](auto& det) {
-      det.addCylinderContainer("Pixel", BinningValue::binZ, [&](auto& cyl) {
+    mat.addCylinderContainer("Detector", AxisDirection::AxisR, [&](auto& det) {
+      det.addCylinderContainer("Pixel", AxisDirection::AxisZ, [&](auto& cyl) {
         cyl.setAttachmentStrategy(CylinderVolumeStack::AttachmentStrategy::Gap)
             .setResizeStrategy(CylinderVolumeStack::ResizeStrategy::Gap);
 
         cyl.addCylinderContainer(
-            "PixelNegativeEndcap", BinningValue::binZ, [&](auto& ec) {
+            "PixelNegativeEndcap", AxisDirection::AxisZ, [&](auto& ec) {
               ec.setAttachmentStrategy(
                   CylinderVolumeStack::AttachmentStrategy::Gap);
 
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE(NodeApiTestContainers) {
             });
 
         cyl.addCylinderContainer(
-            "PixelBarrel", BinningValue::binR, [&](auto& brl) {
+            "PixelBarrel", AxisDirection::AxisR, [&](auto& brl) {
               brl.setAttachmentStrategy(
                      CylinderVolumeStack::AttachmentStrategy::Gap)
                   .setResizeStrategy(CylinderVolumeStack::ResizeStrategy::Gap);
@@ -342,7 +342,7 @@ BOOST_AUTO_TEST_CASE(NodeApiTestContainers) {
             });
 
         auto& ec =
-            cyl.addCylinderContainer("PixelPosWrapper", BinningValue::binR);
+            cyl.addCylinderContainer("PixelPosWrapper", AxisDirection::AxisR);
         ec.setResizeStrategy(CylinderVolumeStack::ResizeStrategy::Gap);
         ec.addStaticVolume(std::make_unique<TrackingVolume>(
             base * Translation3{Vector3{0, 0, 600_mm}},

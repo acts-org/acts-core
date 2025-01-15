@@ -99,12 +99,12 @@ BOOST_AUTO_TEST_CASE(KdtSurfacesProvider) {
 
   using KDTS = Acts::Experimental::KdtSurfaces<>;
   auto skdt = std::make_shared<KDTS>(
-      KDTS(tContext, pSurfaces, {BinningValue::binZ, BinningValue::binR}));
+      KDTS(tContext, pSurfaces, {AxisDirection::AxisZ, AxisDirection::AxisR}));
 
   // query: Negative disc 3, it should yield 22 surfaces
   Acts::Extent regionND3;
-  regionND3.set(BinningValue::binZ, -820, -780);
-  regionND3.set(BinningValue::binR, 0., 200.);
+  regionND3.set(AxisDirection::AxisZ, -820, -780);
+  regionND3.set(AxisDirection::AxisR, 0., 200.);
   Acts::Experimental::KdtSurfacesProvider<> end3(skdt, regionND3);
 
   auto nd3 = end3.surfaces(tContext);
@@ -112,8 +112,8 @@ BOOST_AUTO_TEST_CASE(KdtSurfacesProvider) {
 
   // query: 2nd Pixel barrel
   Acts::Extent regionB1;
-  regionB1.set(BinningValue::binZ, -580, 580);
-  regionB1.set(BinningValue::binR, 60., 80.);
+  regionB1.set(AxisDirection::AxisZ, -580, 580);
+  regionB1.set(AxisDirection::AxisR, 60., 80.);
 
   Acts::Experimental::KdtSurfacesProvider<> ba1(skdt, regionB1);
 

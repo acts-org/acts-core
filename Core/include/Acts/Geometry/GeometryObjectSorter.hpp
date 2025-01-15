@@ -15,6 +15,7 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/VectorHelpers.hpp"
 
 #include <functional>
@@ -27,8 +28,8 @@ class ObjectSorterT {
  public:
   /// Constructor from a binning value
   ///
-  /// @param bValue is the value in which the binning is done
-  ObjectSorterT(BinningValue bValue) : m_binningValue(bValue) {}
+  /// @param aDir is the direction in which the sorting is done
+  explicit ObjectSorterT(AxisDirection aDir) : m_sortingDirection(aDir) {}
 
   /// Comparison operator
   ///
@@ -37,32 +38,33 @@ class ObjectSorterT {
   ///
   /// @return boolean indicator
   bool operator()(T one, T two) const {
-    using Acts::VectorHelpers::eta;
-    using Acts::VectorHelpers::perp;
-    using Acts::VectorHelpers::phi;
-    switch (m_binningValue) {
+    using VectorHelpers::eta;
+    using VectorHelpers::perp;
+    using VectorHelpers::phi;
+    using enum AxisDirection;
+    switch (m_sortingDirection) {
       // compare on x
-      case BinningValue::binX: {
+      case AxisX: {
         return one.x() < two.x();
       }
       // compare on y
-      case BinningValue::binY: {
+      case AxisY: {
         return one.y() < two.y();
       }
       // compare on z
-      case BinningValue::binZ: {
+      case AxisZ: {
         return one.z() < two.z();
       }
       // compare on r
-      case BinningValue::binR: {
+      case AxisR: {
         return perp(one) < perp(two);
       }
       // compare on phi
-      case BinningValue::binPhi: {
+      case AxisPhi: {
         return phi(one) < phi(two);
       }
       // compare on eta
-      case BinningValue::binEta: {
+      case AxisEta: {
         return eta(one) < eta(two);
       }
       // default for the moment
@@ -72,10 +74,10 @@ class ObjectSorterT {
     }
   }
 
-  BinningValue binningValue() const { return m_binningValue; }
+  AxisDirection sortingDirection() const { return m_sortingDirection; }
 
  private:
-  BinningValue m_binningValue;  ///< the binning value
+  AxisDirection m_sortingDirection;  ///< the binning value
 };
 
 /// This will check on absolute distance
@@ -84,10 +86,10 @@ class DistanceSorterT {
  public:
   /// Constructor from a binning value
   ///
-  /// @param bValue is the value in which the binning is done
+  /// @param aDir is the value in which the sorting is done
   /// @param reference is the reference point
-  DistanceSorterT(BinningValue bValue, Vector3 reference)
-      : m_binningValue(bValue),
+  DistanceSorterT(AxisDirection aDir, Vector3 reference)
+      : m_sortingDirection(aDir),
         m_reference(reference),
         m_refR(VectorHelpers::perp(reference)),
         m_refPhi(VectorHelpers::phi(reference)),
@@ -103,41 +105,41 @@ class DistanceSorterT {
     using Acts::VectorHelpers::eta;
     using Acts::VectorHelpers::perp;
     using Acts::VectorHelpers::phi;
-    // switch the binning value
-    // - binX, binY, binZ, binR, binPhi, binRPhi, binH, binEta
-    switch (m_binningValue) {
+    // switch the sorting value
+    // - AxisX, AxisY, AxisZ, AxisR, AxisPhi, AxisRPhi, AxisTheta, AxisEta
+    switch (m_sortingDirection) {
       // compare on diff x
-      case BinningValue::binX: {
+      case AxisDirection::AxisX: {
         double diffOneX = one.x() - m_reference.x();
         double diffTwoX = two.x() - m_reference.x();
         return std::abs(diffOneX) < std::abs(diffTwoX);
       }
       // compare on diff y
-      case BinningValue::binY: {
+      case AxisDirection::AxisY: {
         double diffOneY = one.y() - m_reference.y();
         double diffTwoY = two.y() - m_reference.y();
         return std::abs(diffOneY) < std::abs(diffTwoY);
       }
       // compare on diff z
-      case BinningValue::binZ: {
+      case AxisDirection::AxisZ: {
         double diffOneZ = one.z() - m_reference.z();
         double diffTwoZ = two.z() - m_reference.z();
         return std::abs(diffOneZ) < std::abs(diffTwoZ);
       }
       // compare on r
-      case BinningValue::binR: {
+      case AxisDirection::AxisR: {
         double diffOneR = perp(one) - m_refR;
         double diffTwoR = perp(two) - m_refR;
         return std::abs(diffOneR) < std::abs(diffTwoR);
       }
       // compare on phi /// @todo add cyclic value
-      case BinningValue::binPhi: {
+      case AxisDirection::AxisPhi: {
         double diffOnePhi = phi(one) - m_refPhi;
         double diffTwoPhi = phi(two) - m_refPhi;
         return std::abs(diffOnePhi) < std::abs(diffTwoPhi);
       }
       // compare on eta
-      case BinningValue::binEta: {
+      case AxisDirection::AxisEta: {
         double diffOneEta = eta(one) - m_refEta;
         double diffTwoEta = eta(two) - m_refEta;
         return std::abs(diffOneEta) < std::abs(diffTwoEta);
@@ -152,7 +154,7 @@ class DistanceSorterT {
   }
 
  private:
-  BinningValue m_binningValue;  ///< the binning value
+  AxisDirection m_sortingDirection;  ///< the sorting direction
   T m_reference;
   double m_refR;
   double m_refPhi;
@@ -162,35 +164,37 @@ class DistanceSorterT {
 template <class T>
 class GeometryObjectSorterT {
  public:
-  /// Constructor from a binning value
+  /// Constructor from a sorting direction
   ///
   /// @param gctx The geometry context to use
-  /// @param bValue is the value in which the binning is done
+  /// @param aDir is the direction in which the sorting is done
   /// @param transform is an optional transform to be performed
-  GeometryObjectSorterT(const GeometryContext& gctx, BinningValue bValue,
+  GeometryObjectSorterT(const GeometryContext& gctx, AxisDirection aDir,
                         std::shared_ptr<const Transform3> transform = nullptr)
       : m_context(gctx),
-        m_objectSorter(bValue),
+        m_objectSorter(aDir),
         m_transform(std::move(transform)) {}
 
   /// Comparison operator
   ///
-  /// @tparam one first object
-  /// @tparam two second object
+  /// @tparam one is the first object
+  /// @tparam two is the second object
   ///
   /// @return boolean indicator
   bool operator()(T one, T two) const {
     // get the pos one / pos two
-    Vector3 posOne =
-        m_transform
-            ? m_transform->inverse() *
-                  one->binningPosition(m_context, m_objectSorter.binningValue())
-            : one->binningPosition(m_context, m_objectSorter.binningValue());
-    Vector3 posTwo =
-        m_transform
-            ? m_transform->inverse() *
-                  two->binningPosition(m_context, m_objectSorter.binningValue())
-            : two->binningPosition(m_context, m_objectSorter.binningValue());
+    Vector3 posOne = m_transform
+                         ? m_transform->inverse() *
+                               one->referencePosition(
+                                   m_context, m_objectSorter.sortingDirection())
+                         : one->referencePosition(
+                               m_context, m_objectSorter.sortingDirection());
+    Vector3 posTwo = m_transform
+                         ? m_transform->inverse() *
+                               two->referencePosition(
+                                   m_context, m_objectSorter.sortingDirection())
+                         : two->referencePosition(
+                               m_context, m_objectSorter.sortingDirection());
     // now call the distance sorter
     return m_objectSorter.operator()(posOne, posTwo);
   }

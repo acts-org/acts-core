@@ -18,7 +18,7 @@
 #include "Acts/Navigation/DetectorVolumeFinders.hpp"
 #include "Acts/Navigation/NavigationDelegates.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
 #include "Acts/Utilities/Grid.hpp"
@@ -53,8 +53,8 @@ void adaptBinningRange(std::vector<Acts::Experimental::ProtoBinning>& pBinning,
     // Get the number of bins
     std::size_t nBins = pb.bins();
     // Check if extent overwrites that
-    if (extent.constrains(pb.binValue)) {
-      const auto& range = extent.range(pb.binValue);
+    if (extent.constrains(pb.axisDir)) {
+      const auto& range = extent.range(pb.axisDir);
       // Patch the edges values from the range
       vmin = range.min();
       vmax = range.max();
@@ -99,7 +99,7 @@ Acts::Experimental::InternalNavigationDelegate createUpdater(
       decltype(lSurfaces), Acts::Experimental::IndexedSurfacesNavigation>
       isg{std::move(lSurfaces),
           std::move(assignToAll),
-          {binning.binValue},
+          {binning.axisDir},
           {binning.expansion}};
   if (binning.axisType == Acts::AxisType::Equidistant) {
     // Equidistant
@@ -141,7 +141,7 @@ Acts::Experimental::InternalNavigationDelegate createUpdater(
       decltype(lSurfaces), Acts::Experimental::IndexedSurfacesNavigation>
       isg{lSurfaces,
           assignToAll,
-          {aBinning.binValue, bBinning.binValue},
+          {aBinning.axisDir, bBinning.axisDir},
           {aBinning.expansion, bBinning.expansion}};
   // Run through the cases
   if (aBinning.axisType == Acts::AxisType::Equidistant &&
@@ -242,11 +242,11 @@ Acts::Experimental::LayerStructureBuilder::construct(
       Extent supportExtent;
       // Let us start with an eventually existing volume extent, but only pick
       // the binning value that are not constrained by the internal surfaces
-      for (const auto& bv : allBinningValues()) {
+      for (const auto& bv : allAxisDirections()) {
         if (support.volumeExtent.constrains(bv) &&
             !rangeContainsValue(support.internalConstraints, bv)) {
           ACTS_VERBOSE("  Support surface is constrained by volume extent in "
-                       << binningValueName(bv));
+                       << axisDirectionName(bv));
           supportExtent.set(bv, support.volumeExtent.min(bv),
                             support.volumeExtent.max(bv));
         }
@@ -266,27 +266,27 @@ Acts::Experimental::LayerStructureBuilder::construct(
       // Add cylindrical support
       if (support.type == Surface::SurfaceType::Cylinder) {
         detail::SupportSurfacesHelper::CylindricalSupport cSupport{
-            support.offset, support.volumeClearance[BinningValue::binZ],
-            support.volumeClearance[BinningValue::binPhi]};
+            support.offset, support.volumeClearance[AxisDirection::AxisZ],
+            support.volumeClearance[AxisDirection::AxisPhi]};
         detail::SupportSurfacesHelper::addSupport(internalSurfaces, assignToAll,
                                                   supportExtent, cSupport,
                                                   support.splits);
       } else if (support.type == Surface::SurfaceType::Disc) {
         // Add disc support
         detail::SupportSurfacesHelper::DiscSupport dSupport{
-            support.offset, support.volumeClearance[BinningValue::binR],
-            support.volumeClearance[BinningValue::binPhi]};
+            support.offset, support.volumeClearance[AxisDirection::AxisR],
+            support.volumeClearance[AxisDirection::AxisPhi]};
         detail::SupportSurfacesHelper::addSupport(internalSurfaces, assignToAll,
                                                   supportExtent, dSupport,
                                                   support.splits);
       } else if (support.type == Surface::SurfaceType::Plane) {
         // Set the local coordinates - cyclic permutation
-        std::array<BinningValue, 2> locals = {BinningValue::binX,
-                                              BinningValue::binY};
-        if (support.pPlacement == BinningValue::binX) {
-          locals = {BinningValue::binY, BinningValue::binZ};
-        } else if (support.pPlacement == BinningValue::binY) {
-          locals = {BinningValue::binZ, BinningValue::binX};
+        std::array<AxisDirection, 2> locals = {AxisDirection::AxisX,
+                                               AxisDirection::AxisY};
+        if (support.pPlacement == AxisDirection::AxisX) {
+          locals = {AxisDirection::AxisY, AxisDirection::AxisZ};
+        } else if (support.pPlacement == AxisDirection::AxisY) {
+          locals = {AxisDirection::AxisZ, AxisDirection::AxisX};
         }
         // Add rectangular support
         detail::SupportSurfacesHelper::RectangularSupport rSupport{
@@ -340,7 +340,7 @@ Acts::Experimental::LayerStructureBuilder::construct(
         adaptBinningRange(binnings, m_cfg.extent.value());
       }
       // Sort the binning for conventions
-      std::ranges::sort(binnings, {}, [](const auto& b) { return b.binValue; });
+      std::ranges::sort(binnings, {}, [](const auto& b) { return b.axisDir; });
 
       ACTS_DEBUG("- 2-dimensional surface binning detected.");
       // Capture the binnings

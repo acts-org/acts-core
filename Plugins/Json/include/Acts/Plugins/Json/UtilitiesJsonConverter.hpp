@@ -42,14 +42,15 @@ void from_json(const nlohmann::json& j, Range1D<Type>& r) {
   r.setMax(static_cast<Type>(j["max"]));
 }
 
-NLOHMANN_JSON_SERIALIZE_ENUM(BinningValue, {{BinningValue::binX, "binX"},
-                                            {BinningValue::binY, "binY"},
-                                            {BinningValue::binZ, "binZ"},
-                                            {BinningValue::binR, "binR"},
-                                            {BinningValue::binPhi, "binPhi"},
-                                            {BinningValue::binRPhi, "binRPhi"},
-                                            {BinningValue::binH, "binH"},
-                                            {BinningValue::binEta, "binEta"},
-                                            {BinningValue::binMag, "binMag"}})
+NLOHMANN_JSON_SERIALIZE_ENUM(AxisDirection,
+                             {{AxisDirection::AxisX, "AxisX"},
+                              {AxisDirection::AxisY, "AxisY"},
+                              {AxisDirection::AxisZ, "AxisZ"},
+                              {AxisDirection::AxisR, "AxisR"},
+                              {AxisDirection::AxisPhi, "AxisPhi"},
+                              {AxisDirection::AxisRPhi, "AxisRPhi"},
+                              {AxisDirection::AxisTheta, "AxisTheta"},
+                              {AxisDirection::AxisEta, "AxisEta"},
+                              {AxisDirection::AxisMag, "AxisMag"}})
 
 }  // namespace Acts

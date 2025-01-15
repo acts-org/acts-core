@@ -304,7 +304,7 @@ struct CylindricalTrackingGeometry {
 
       // create the layer and store it
       ProtoLayer protoLayer(geoContext, layerSurfaces);
-      protoLayer.envelope[BinningValue::binR] = {0.5, 0.5};
+      protoLayer.envelope[AxisDirection::AxisR] = {0.5, 0.5};
       auto pLayer = layerCreator->cylinderLayer(
           geoContext, std::move(layerSurfacePtrs), pLayerBinning[ilp].first,
           pLayerBinning[ilp].second, protoLayer);
@@ -319,7 +319,7 @@ struct CylindricalTrackingGeometry {
 
     // layer array
     auto pLayerArray = layerArrayCreator->layerArray(
-        geoContext, pLayers, 25., 300., arbitrary, BinningValue::binR);
+        geoContext, pLayers, 25., 300., arbitrary, AxisDirection::AxisR);
     auto pVolumeBounds =
         std::make_shared<CylinderVolumeBounds>(25., 300., 1100.);
     // create the Tracking volume

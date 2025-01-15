@@ -76,18 +76,18 @@ CylinderSurface& CylinderSurface::operator=(const CylinderSurface& other) {
 }
 
 // return the binning position for ordering in the BinnedArray
-Vector3 CylinderSurface::binningPosition(const GeometryContext& gctx,
-                                         BinningValue bValue) const {
+Vector3 CylinderSurface::referencePosition(const GeometryContext& gctx,
+                                           AxisDirection aDir) const {
   // special binning type for R-type methods
-  if (bValue == BinningValue::binR || bValue == BinningValue::binRPhi) {
+  if (aDir == AxisDirection::AxisR || aDir == AxisDirection::AxisRPhi) {
     double R = bounds().get(CylinderBounds::eR);
     double phi = bounds().get(CylinderBounds::eAveragePhi);
     return localToGlobal(gctx, Vector2{phi * R, 0}, Vector3{});
   }
   // give the center as default for all of these binning types
-  // BinningValue::binX, BinningValue::binY, BinningValue::binZ,
-  // BinningValue::binR, BinningValue::binPhi, BinningValue::binRPhi,
-  // BinningValue::binH, BinningValue::binEta
+  // AxisDirection::AxisX, AxisDirection::AxisY, AxisDirection::AxisZ,
+  // AxisDirection::AxisR, AxisDirection::AxisPhi, AxisDirection::AxisRPhi,
+  // AxisDirection::AxisTheta, AxisDirection::AxisEta
   return center(gctx);
 }
 
@@ -355,11 +355,11 @@ ActsMatrix<2, 3> CylinderSurface::localCartesianToBoundLocalDerivative(
 }
 
 std::pair<std::shared_ptr<CylinderSurface>, bool> CylinderSurface::mergedWith(
-    const CylinderSurface& other, BinningValue direction, bool externalRotation,
-    const Logger& logger) const {
+    const CylinderSurface& other, AxisDirection direction,
+    bool externalRotation, const Logger& logger) const {
   using namespace UnitLiterals;
 
-  ACTS_VERBOSE("Merging cylinder surfaces in " << binningValueName(direction)
+  ACTS_VERBOSE("Merging cylinder surfaces in " << axisDirectionName(direction)
                                                << " direction");
 
   if (m_associatedDetElement != nullptr ||
@@ -448,7 +448,7 @@ std::pair<std::shared_ptr<CylinderSurface>, bool> CylinderSurface::mergedWith(
   double otherHlPhi = other.bounds().get(CylinderBounds::eHalfPhiSector);
   double otherAvgPhi = other.bounds().get(CylinderBounds::eAveragePhi);
 
-  if (direction == BinningValue::binZ) {
+  if (direction == AxisDirection::AxisZ) {
     // z shift must match the bounds
 
     if (std::abs(otherLocal.linear().col(eY)[eX]) >= tolerance &&
@@ -495,7 +495,7 @@ std::pair<std::shared_ptr<CylinderSurface>, bool> CylinderSurface::mergedWith(
     return {Surface::makeShared<CylinderSurface>(newTransform, newBounds),
             zShift < 0};
 
-  } else if (direction == BinningValue::binRPhi) {
+  } else if (direction == AxisDirection::AxisRPhi) {
     // no z shift is allowed
     if (std::abs(translation[2]) > tolerance) {
       ACTS_ERROR(
@@ -555,7 +555,7 @@ std::pair<std::shared_ptr<CylinderSurface>, bool> CylinderSurface::mergedWith(
   } else {
     throw SurfaceMergingException(getSharedPtr(), other.getSharedPtr(),
                                   "CylinderSurface::merge: invalid direction " +
-                                      binningValueName(direction));
+                                      axisDirectionName(direction));
   }
 }
 

@@ -19,7 +19,7 @@
 #include "Acts/Navigation/InternalNavigation.hpp"
 #include "Acts/Navigation/NavigationState.hpp"
 #include "Acts/Utilities/Axis.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Grid.hpp"
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(IndexedDetectorVolumeFinder) {
   g.atPosition(std::array<double, 1u>{150.}) = 2u;
 
   Acts::Experimental::IndexedDetectorVolumesImpl<decltype(g)> idv(
-      std::move(g), {Acts::BinningValue::binR});
+      std::move(g), {Acts::AxisDirection::AxisR});
 
   // Cylinder 0
   nState.position = Acts::Vector3(5., 0., 0.);

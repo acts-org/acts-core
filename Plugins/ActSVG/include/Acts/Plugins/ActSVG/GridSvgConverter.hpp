@@ -31,7 +31,7 @@ using ProtoGrid = actsvg::proto::grid;
 namespace GridConverter {
 
 // An optional range and binning value
-using AxisBound = std::tuple<std::array<double, 2u>, BinningValue>;
+using AxisBound = std::tuple<std::array<double, 2u>, AxisDirection>;
 
 /// Nested Options struct
 struct Options {
@@ -43,19 +43,19 @@ struct Options {
 
 /// Convert an ACTS grid into a actsvg protogrid, it currently works with
 ///
-/// - 1D: [ binX ] , [ binY ], [ binR ] , [ binPhi ]
-/// - 2D: [ binX, binY ], [ binZ, binPhi ], [ binR, binPhi ]
+/// - 1D: [ AxisX ] , [ AxisY ], [ AxisR ] , [ AxisPhi ]
+/// - 2D: [ AxisX, AxisY ], [ AxisZ, AxisPhi ], [ AxisR, AxisPhi ]
 ///
 /// @tparam grid_type is the type of the grid to be converted
 ///
 /// @param grid the grid to be converted
-/// @param bValues the binning values identifying the axes
+/// @param aDirs the axis directions of the grid
 /// @param cOptions the conversion options
 ///
 /// @return an ACTSVG proto grid for displaying
 template <typename grid_type>
 ProtoGrid convert(const grid_type& grid,
-                  const std::array<BinningValue, grid_type::DIM>& bValues,
+                  const std::array<AxisDirection, grid_type::DIM>& aDirs,
                   const GridConverter::Options& cOptions) {
   // The return object
   ProtoGrid pGrid;
@@ -70,7 +70,7 @@ ProtoGrid convert(const grid_type& grid,
 
   // 1D case (more to be filled in later)
   if constexpr (grid_type::DIM == 1u) {
-    if (bValues[0u] == BinningValue::binPhi &&
+    if (aDirs[0u] == AxisDirection::AxisPhi &&
         axes[0]->getBoundaryType() == AxisBoundaryType::Closed) {
       // swap     needed
       edges1 = axes[0]->getBinEdges();
@@ -78,7 +78,7 @@ ProtoGrid convert(const grid_type& grid,
     }
     if (cOptions.optionalBound.has_value()) {
       auto [boundRange, boundValue] = cOptions.optionalBound.value();
-      if (boundValue == BinningValue::binR) {
+      if (boundValue == AxisDirection::AxisR) {
         // good - no swap needed
         edges0 = {boundRange[0u], boundRange[1u]};
       }
@@ -89,26 +89,26 @@ ProtoGrid convert(const grid_type& grid,
     // Assign
     edges0 = axes[0]->getBinEdges();
     edges1 = axes[1]->getBinEdges();
-    if (bValues[0] == BinningValue::binPhi &&
-        bValues[1] == BinningValue::binZ) {
+    if (aDirs[0] == AxisDirection::AxisPhi &&
+        aDirs[1] == AxisDirection::AxisZ) {
       //  swap needed
       std::swap(edges0, edges1);
       pGrid._type = actsvg::proto::grid::e_z_phi;
-    } else if (bValues[0] == BinningValue::binPhi &&
-               bValues[1] == BinningValue::binR) {
+    } else if (aDirs[0] == AxisDirection::AxisPhi &&
+               aDirs[1] == AxisDirection::AxisR) {
       // swap needed
       std::swap(edges0, edges1);
       pGrid._type = actsvg::proto::grid::e_r_phi;
-    } else if (bValues[0] == BinningValue::binZ &&
-               bValues[1] == BinningValue::binPhi) {
+    } else if (aDirs[0] == AxisDirection::AxisZ &&
+               aDirs[1] == AxisDirection::AxisPhi) {
       // good - no swap needed
       pGrid._type = actsvg::proto::grid::e_z_phi;
-    } else if (bValues[0] == BinningValue::binR &&
-               bValues[1] == BinningValue::binPhi) {
+    } else if (aDirs[0] == AxisDirection::AxisR &&
+               aDirs[1] == AxisDirection::AxisPhi) {
       // good - no swap needed
       pGrid._type = actsvg::proto::grid::e_r_phi;
-    } else if (bValues[0] == BinningValue::binX &&
-               bValues[1] == BinningValue::binY) {
+    } else if (aDirs[0] == AxisDirection::AxisX &&
+               aDirs[1] == AxisDirection::AxisY) {
       // good - no swap needed
       pGrid._type = actsvg::proto::grid::e_x_y;
     }

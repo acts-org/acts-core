@@ -10,6 +10,7 @@
 
 #include "Acts/Definitions/Tolerance.hpp"
 #include "Acts/Geometry/PortalLinkBase.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 
 namespace Acts {
 
@@ -29,9 +30,9 @@ class TrivialPortalLink final : public PortalLinkBase {
 
   /// Make a 1D grid portal link from this trivial portal link
   /// The grid size is automatically determined from the surface bounds.
-  /// @param direction The binning direction
+  /// @param direction The axis direction of the grid
   /// @return A grid
-  std::unique_ptr<GridPortalLink> makeGrid(BinningValue direction) const;
+  std::unique_ptr<GridPortalLink> makeGrid(AxisDirection direction) const;
 
   /// Print the portal link to a stream
   /// @param os output stream

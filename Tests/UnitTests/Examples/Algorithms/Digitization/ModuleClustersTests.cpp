@@ -47,10 +47,10 @@ DigitizedParameters makeDigitizationParameters(const Vector2 &position,
 auto testDigitizedParametersWithTwoClusters(bool merge, const Vector2 &firstHit,
                                             const Vector2 &secondHit) {
   BinUtility binUtility;
-  binUtility += BinUtility{
-      BinningData(BinningOption::open, BinningValue::binX, 20, -10.0f, 10.0f)};
-  binUtility += BinUtility{
-      BinningData(BinningOption::open, BinningValue::binY, 20, -10.0f, 10.0f)};
+  binUtility += BinUtility(BinningData(
+      BinningOption::open, AxisDirection::AxisX, 20, -10.0f, 10.0f));
+  binUtility += BinUtility(BinningData(
+      BinningOption::open, AxisDirection::AxisY, 20, -10.0f, 10.0f));
   std::vector<Acts::BoundIndices> boundIndices = {eBoundLoc0, eBoundLoc1};
   double nsigma = 1;
   bool commonCorner = true;

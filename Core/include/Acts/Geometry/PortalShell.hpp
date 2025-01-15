@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Acts/Geometry/CylinderVolumeBounds.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <array>
@@ -179,7 +179,7 @@ class CylinderStackPortalShell : public CylinderPortalShell {
   /// @param logger A logging instance for debugging
   CylinderStackPortalShell(const GeometryContext& gctx,
                            std::vector<CylinderPortalShell*> shells,
-                           BinningValue direction,
+                           AxisDirection direction,
                            const Logger& logger = getDummyLogger());
 
   /// @copydoc PortalShellBase::size
@@ -205,7 +205,7 @@ class CylinderStackPortalShell : public CylinderPortalShell {
   std::string label() const override;
 
  private:
-  BinningValue m_direction;
+  AxisDirection m_direction;
   std::vector<CylinderPortalShell*> m_shells;
   bool m_hasInnerCylinder{true};
 };

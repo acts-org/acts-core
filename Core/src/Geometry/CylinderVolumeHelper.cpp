@@ -102,7 +102,7 @@ Acts::CylinderVolumeHelper::createTrackingVolume(
     double zMinRaw = 0.;
     double zMaxRaw = 0.;
 
-    BinningValue bValue = BinningValue::binR;
+    AxisDirection bValue = AxisDirection::AxisR;
 
     // check the dimension and fill raw data
     if (!estimateAndCheckDimension(gctx, layers, cylinderBounds, transform,
@@ -139,7 +139,7 @@ Acts::CylinderVolumeHelper::createTrackingVolume(
         << bValue);
 
     // create the Layer Array
-    layerArray = (bValue == BinningValue::binR)
+    layerArray = (bValue == AxisDirection::AxisR)
                      ? m_cfg.layerArrayCreator->layerArray(gctx, layers, rMin,
                                                            rMax, bType, bValue)
                      : m_cfg.layerArrayCreator->layerArray(gctx, layers, zMin,
@@ -383,9 +383,9 @@ Acts::CylinderVolumeHelper::createContainerTrackingVolume(
   // create the volume array with the ITrackingVolumeArrayCreator
   std::shared_ptr<const TrackingVolumeArray> volumeArray =
       (rCase) ? m_cfg.trackingVolumeArrayCreator->trackingVolumeArray(
-                    gctx, volumes, BinningValue::binR)
+                    gctx, volumes, AxisDirection::AxisR)
               : m_cfg.trackingVolumeArrayCreator->trackingVolumeArray(
-                    gctx, volumes, BinningValue::binZ);
+                    gctx, volumes, AxisDirection::AxisZ);
   if (volumeArray == nullptr) {
     ACTS_WARNING(
         "Creation of TrackingVolume array did not succeed - returning 0 ");
@@ -417,7 +417,7 @@ bool Acts::CylinderVolumeHelper::estimateAndCheckDimension(
     const GeometryContext& gctx, const LayerVector& layers,
     std::shared_ptr<CylinderVolumeBounds>& cylinderVolumeBounds,
     const Transform3& transform, double& rMinClean, double& rMaxClean,
-    double& zMinClean, double& zMaxClean, BinningValue& bValue,
+    double& zMinClean, double& zMaxClean, AxisDirection& bValue,
     BinningType /*bType*/) const {
   // some verbose output
 
@@ -490,7 +490,7 @@ bool Acts::CylinderVolumeHelper::estimateAndCheckDimension(
   }
 
   // set the binning value
-  bValue = radial ? BinningValue::binR : BinningValue::binZ;
+  bValue = radial ? AxisDirection::AxisR : AxisDirection::AxisZ;
 
   ACTS_VERBOSE(
       "Estimate/check CylinderVolumeBounds from/w.r.t. enclosed "
@@ -681,7 +681,7 @@ bool Acts::CylinderVolumeHelper::interGlueTrackingVolume(
       // create the outside volume array
       std::shared_ptr<const TrackingVolumeArray> glueVolumesNegativeFaceArray =
           m_cfg.trackingVolumeArrayCreator->trackingVolumeArray(
-              gctx, glueVolumesNegativeFace, BinningValue::binR);
+              gctx, glueVolumesNegativeFace, AxisDirection::AxisR);
       // register the glue voluems
       glueDescr.registerGlueVolumes(negativeFaceXY,
                                     glueVolumesNegativeFaceArray);
@@ -690,7 +690,7 @@ bool Acts::CylinderVolumeHelper::interGlueTrackingVolume(
       // create the outside volume array
       std::shared_ptr<const TrackingVolumeArray> glueVolumesPositiveFaceArray =
           m_cfg.trackingVolumeArrayCreator->trackingVolumeArray(
-              gctx, glueVolumesPositiveFace, BinningValue::binR);
+              gctx, glueVolumesPositiveFace, AxisDirection::AxisR);
       // register the glue voluems
       glueDescr.registerGlueVolumes(positiveFaceXY,
                                     glueVolumesPositiveFaceArray);
@@ -699,7 +699,7 @@ bool Acts::CylinderVolumeHelper::interGlueTrackingVolume(
       // create the outside volume array
       std::shared_ptr<const TrackingVolumeArray> glueVolumesInnerTubeArray =
           m_cfg.trackingVolumeArrayCreator->trackingVolumeArray(
-              gctx, glueVolumesInnerTube, BinningValue::binZ);
+              gctx, glueVolumesInnerTube, AxisDirection::AxisZ);
       // register the glue voluems
       glueDescr.registerGlueVolumes(tubeInnerCover, glueVolumesInnerTubeArray);
     }
@@ -707,7 +707,7 @@ bool Acts::CylinderVolumeHelper::interGlueTrackingVolume(
       // create the outside volume array
       std::shared_ptr<const TrackingVolumeArray> glueVolumesOuterTubeArray =
           m_cfg.trackingVolumeArrayCreator->trackingVolumeArray(
-              gctx, glueVolumesOuterTube, BinningValue::binZ);
+              gctx, glueVolumesOuterTube, AxisDirection::AxisZ);
       // register the glue voluems
       glueDescr.registerGlueVolumes(tubeOuterCover, glueVolumesOuterTubeArray);
     }
@@ -961,7 +961,7 @@ Acts::CylinderVolumeHelper::createCylinderLayer(double z, double r,
 
   // z-binning
   BinUtility layerBinUtility(binsZ, z - halflengthZ, z + halflengthZ, open,
-                             BinningValue::binZ);
+                             AxisDirection::AxisZ);
   if (binsPhi == 1) {
     // the BinUtility for the material
     // ---------------------> create material for the layer surface
@@ -972,7 +972,7 @@ Acts::CylinderVolumeHelper::createCylinderLayer(double z, double r,
     // update the BinUtility: local position on Cylinder is rPhi, z
     BinUtility layerBinUtilityPhiZ(binsPhi, -r * std::numbers::pi,
                                    r * std::numbers::pi, closed,
-                                   BinningValue::binPhi);
+                                   AxisDirection::AxisPhi);
     layerBinUtilityPhiZ += layerBinUtility;
     // ---------------------> create material for the layer surface
     ACTS_VERBOSE(" -> Preparing the binned material with "
@@ -997,7 +997,7 @@ std::shared_ptr<const Acts::Layer> Acts::CylinderVolumeHelper::createDiscLayer(
   const Transform3 transform(Translation3(0., 0., z));
 
   // R is the primary binning for the material
-  BinUtility materialBinUtility(binsR, rMin, rMax, open, BinningValue::binR);
+  BinUtility materialBinUtility(binsR, rMin, rMax, open, AxisDirection::AxisR);
   if (binsPhi == 1) {
     ACTS_VERBOSE(" -> Preparing the binned material with " << binsR
                                                            << " bins in R. ");
@@ -1005,7 +1005,7 @@ std::shared_ptr<const Acts::Layer> Acts::CylinderVolumeHelper::createDiscLayer(
     // also binning in phi chosen
     materialBinUtility +=
         BinUtility(binsPhi, -std::numbers::pi_v<float>,
-                   std::numbers::pi_v<float>, closed, BinningValue::binPhi);
+                   std::numbers::pi_v<float>, closed, AxisDirection::AxisPhi);
     ACTS_VERBOSE(" -> Preparing the binned material with "
                  << binsPhi << " / " << binsR << " bins in phi / R. ");
   }

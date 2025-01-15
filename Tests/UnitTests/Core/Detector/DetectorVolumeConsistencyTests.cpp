@@ -33,8 +33,8 @@ BOOST_AUTO_TEST_CASE(DetectorVolumeConsistencyFail) {
   // Move it into the bval direction
   auto transformB = Acts::Transform3::Identity();
   Acts::Vector3 translationB = Acts::Vector3::Zero();
-  translationB[toUnderlying(Acts::BinningValue::binX)] = 20;
-  translationB[toUnderlying(Acts::BinningValue::binY)] = 5;
+  translationB[toUnderlying(Acts::AxisDirection::AxisX)] = 20;
+  translationB[toUnderlying(Acts::AxisDirection::AxisY)] = 5;
   transformB.pretranslate(translationB);
   // Create volume B
   auto volumeB = Acts::Experimental::DetectorVolumeFactory::construct(
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(DetectorVolumeConsistencyFail) {
 
   BOOST_CHECK_THROW(Acts::Experimental::detail::DetectorVolumeConsistency::
                         checkCenterAlignment(tContext, {volumeA, volumeB},
-                                             Acts::BinningValue::binX),
+                                             Acts::AxisDirection::AxisX),
                     std::invalid_argument);
 }
 
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(DetectorVolumeConsistencyPass) {
   // Move it into the bval direction
   auto transformB = Acts::Transform3::Identity();
   Acts::Vector3 translationB = Acts::Vector3::Zero();
-  translationB[toUnderlying(Acts::BinningValue::binX)] = 20;
+  translationB[toUnderlying(Acts::AxisDirection::AxisX)] = 20;
   transformB.pretranslate(translationB);
   // Create volume B
   auto volumeB = Acts::Experimental::DetectorVolumeFactory::construct(
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(DetectorVolumeConsistencyPass) {
 
   BOOST_CHECK_NO_THROW(Acts::Experimental::detail::DetectorVolumeConsistency::
                            checkCenterAlignment(tContext, {volumeA, volumeB},
-                                                Acts::BinningValue::binX));
+                                                Acts::AxisDirection::AxisX));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

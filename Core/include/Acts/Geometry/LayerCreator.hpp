@@ -13,6 +13,7 @@
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/ProtoLayer.hpp"
 #include "Acts/Surfaces/SurfaceArray.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
@@ -174,7 +175,7 @@ class LayerCreator {
   /// bValue
   /// @param [in] bins2 is the number of bins in the orthogonal direction to @p
   /// bValue
-  /// @param [in] bValue Direction of the aligned surfaces
+  /// @param [in] aDir Direction of the aligned surfaces
   /// @param [in] transform is the (optional) transform of the layer
   /// @param [in] _protoLayer (optional) proto layer specifying the dimensions
   /// and
@@ -187,7 +188,7 @@ class LayerCreator {
   MutableLayerPtr planeLayer(
       const GeometryContext& gctx,
       std::vector<std::shared_ptr<const Surface>> surfaces, std::size_t bins1,
-      std::size_t bins2, BinningValue bValue,
+      std::size_t bins2, AxisDirection aDir,
       std::optional<ProtoLayer> _protoLayer = std::nullopt,
       const Transform3& transform = Transform3::Identity(),
       std::unique_ptr<ApproachDescriptor> ad = nullptr) const;

@@ -182,7 +182,7 @@ RegularSurface& Portal::surface() {
 }
 
 Portal Portal::merge(const GeometryContext& gctx, Portal& aPortal,
-                     Portal& bPortal, BinningValue direction,
+                     Portal& bPortal, AxisDirection direction,
                      const Logger& logger) {
   ACTS_VERBOSE("Merging two portals along " << direction);
 

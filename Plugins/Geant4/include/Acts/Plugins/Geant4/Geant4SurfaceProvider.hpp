@@ -69,7 +69,7 @@ class Geant4SurfaceProvider : public Acts::Experimental::ISurfacesProvider {
     Acts::RangeXD<kDim, double> range;
 
     /// A set of binning values to perform the separation
-    std::array<Acts::BinningValue, kDim> binningValues;
+    std::array<Acts::AxisDirection, kDim> binningValues;
 
     /// The maximum number of surfaces per leaf
     std::size_t leafSize = bSize;

@@ -17,7 +17,7 @@ Acts::detail::GeoModelBinningHelper::toProtoBinning(
     const std::string& binning, const std::optional<Extent>& extent) {
   std::vector<std::string> binningTokens;
   boost::split(binningTokens, binning, boost::is_any_of(","));
-  BinningValue bValue = toBinningValue(binningTokens[0]);
+  AxisDirection bValue = toAxisDirection(binningTokens[0]);
 
   std::vector<std::string> binningDetails = {binningTokens.begin() + 1,
                                              binningTokens.end()};
@@ -47,7 +47,7 @@ Acts::detail::GeoModelBinningHelper::toProtoBinning(
   // The Range
   double rangeMin = 0.;
   double rangeMax = 0.;
-  if (bValue == BinningValue::binPhi &&
+  if (bValue == AxisDirection::AxisPhi &&
       boundaryType == AxisBoundaryType::Closed) {
     rangeMin = -std::numbers::pi;
     rangeMax = std::numbers::pi;

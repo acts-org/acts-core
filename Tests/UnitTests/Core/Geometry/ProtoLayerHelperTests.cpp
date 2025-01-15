@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(ProtoLayerHelperTests) {
   // Sort into ProtoLayers
   auto radialLayers = plHelper.protoLayers(
       tgContext, cylinderSurfaces,
-      ProtoLayerHelper::SortingConfig(BinningValue::binR, 5.));
+      ProtoLayerHelper::SortingConfig(AxisDirection::AxisR, 5.));
 
   BOOST_CHECK_EQUAL(radialLayers.size(), 4);
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(ProtoLayerHelperTests) {
 
   // Sort into ProtoLayers
   auto discLayersZ =
-      plHelper.protoLayers(tgContext, discSurfaces, {BinningValue::binZ, 5.});
+      plHelper.protoLayers(tgContext, discSurfaces, {AxisDirection::AxisZ, 5.});
 
   BOOST_CHECK_EQUAL(discLayersZ.size(), 4);
 
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(ProtoLayerHelperTests) {
   // First: Sort into ProtoLayers radially
   auto rSorted = plHelper.protoLayers(
       tgContext, ringSurfaces,
-      ProtoLayerHelper::SortingConfig(BinningValue::binR, 1.));
+      ProtoLayerHelper::SortingConfig(AxisDirection::AxisR, 1.));
   BOOST_CHECK_EQUAL(rSorted.size(), 3);
 
   Color dColor = {0, 0, 0};
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(ProtoLayerHelperTests) {
   for (auto& rBatch : rSorted) {
     auto lSorted = plHelper.protoLayers(
         tgContext, rBatch.surfaces(),
-        ProtoLayerHelper::SortingConfig(BinningValue::binZ, 5.));
+        ProtoLayerHelper::SortingConfig(AxisDirection::AxisZ, 5.));
     il = 0;
     dColor[ir] = 256;
     for (auto& layer : lSorted) {
@@ -206,9 +206,9 @@ BOOST_AUTO_TEST_CASE(ProtoLayerHelperTests) {
   objVis.write("ProtoLayerHelper_RingLayers_sorted");
 
   // Perform the split at once
-  auto rzSorted =
-      plHelper.protoLayers(tgContext, ringSurfaces,
-                           {{BinningValue::binR, 1.}, {BinningValue::binZ, 5}});
+  auto rzSorted = plHelper.protoLayers(
+      tgContext, ringSurfaces,
+      {{AxisDirection::AxisR, 1.}, {AxisDirection::AxisZ, 5}});
 
   std::size_t irz = 0;
   for (auto& layer : rzSorted) {

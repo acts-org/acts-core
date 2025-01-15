@@ -10,7 +10,7 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Direction.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/Result.hpp"
 
@@ -163,7 +163,7 @@ class Portal {
   /// @param direction The direction of the merge (e.g. along z)
   /// @param logger The logger to push output to
   static Portal merge(const GeometryContext& gctx, Portal& aPortal,
-                      Portal& bPortal, BinningValue direction,
+                      Portal& bPortal, AxisDirection direction,
                       const Logger& logger = getDummyLogger());
 
   /// Resolve the volume for a 3D position and a direction

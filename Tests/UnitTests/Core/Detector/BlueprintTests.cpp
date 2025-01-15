@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(BlueprintTest) {
   std::vector<double> bValues = {0., 10., 100.};
 
   // Create  root node
-  std::vector<Acts::BinningValue> binning = {Acts::BinningValue::binR};
+  std::vector<Acts::AxisDirection> binning = {Acts::AxisDirection::AxisR};
   auto root = std::make_unique<Acts::Experimental::Blueprint::Node>(
       "detector", Acts::Transform3::Identity(), Acts::VolumeBounds::eOther,
       bValues, binning);

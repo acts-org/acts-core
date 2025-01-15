@@ -68,22 +68,22 @@ std::vector<Acts::Svg::ProtoLink> convertMultiLink(
     Acts::Vector3 position = refPosition;
     if constexpr (decltype(multiLink.indexedUpdater)::grid_type::DIM == 1u) {
       // Get the binning value
-      Acts::BinningValue bValue = casts[0u];
+      Acts::AxisDirection bValue = casts[0u];
       // Get the boundaries - take care, they are in local coordinates
       const auto& boundaries =
           multiLink.indexedUpdater.grid.axes()[0u]->getBinEdges();
 
       double refC = 0.5 * (boundaries[il + 1u] + boundaries[il]);
 
-      if (bValue == Acts::BinningValue::binR) {
+      if (bValue == Acts::AxisDirection::AxisR) {
         double phi = Acts::VectorHelpers::phi(refPosition);
         position = Acts::Vector3(refC * std::cos(phi), refC * std::sin(phi),
                                  refPosition.z());
-      } else if (bValue == Acts::BinningValue::binZ) {
+      } else if (bValue == Acts::AxisDirection::AxisZ) {
         // correct to global
         refC += surface.transform(gctx).translation().z();
         position[2] = refC;
-      } else if (bValue == Acts::BinningValue::binPhi) {
+      } else if (bValue == Acts::AxisDirection::AxisPhi) {
         double r = Acts::VectorHelpers::perp(refPosition);
         position = Acts::Vector3(r * std::cos(refC), r * std::sin(refC),
                                  refPosition.z());

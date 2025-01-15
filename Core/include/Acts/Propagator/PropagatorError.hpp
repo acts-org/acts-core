@@ -16,8 +16,8 @@ namespace Acts {
 enum class PropagatorError {
   // ensure all values are non-zero
   Failure = 1,
-  WrongDirection,
   StepCountLimitReached,
+  NextTargetLimitReached,
 };
 
 std::error_code make_error_code(Acts::PropagatorError e);

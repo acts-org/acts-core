@@ -101,7 +101,7 @@ class DD4hepBlueprintFactory {
   ///
   /// @return a tuple of the bounds type, values and binning, auxiliary data
   std::tuple<Transform3, VolumeBounds::BoundsType, std::vector<double>,
-             std::vector<BinningValue>, std::string>
+             std::vector<AxisDirection>, std::string>
   extractExternals([[maybe_unused]] const GeometryContext& gctx,
                    const dd4hep::DetElement& dd4hepElement,
                    const std::string& baseName,

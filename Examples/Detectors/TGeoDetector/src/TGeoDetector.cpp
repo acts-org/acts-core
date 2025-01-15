@@ -63,14 +63,14 @@ std::vector<Acts::TGeoLayerBuilder::Config> makeLayerBuilderConfigs(
 
     // configure surface autobinning
     std::vector<std::pair<double, double>> binTolerances(
-        Acts::numBinningValues(), {0., 0.});
-    binTolerances[toUnderlying(Acts::BinningValue::binR)] = {
+        Acts::numAxisDirections(), {0., 0.});
+    binTolerances[toUnderlying(Acts::AxisDirection::AxisR)] = {
         volume.binToleranceR.lower.value_or(0.),
         volume.binToleranceR.upper.value_or(0.)};
-    binTolerances[toUnderlying(Acts::BinningValue::binZ)] = {
+    binTolerances[toUnderlying(Acts::AxisDirection::AxisZ)] = {
         volume.binToleranceZ.lower.value_or(0.),
         volume.binToleranceZ.upper.value_or(0.)};
-    binTolerances[toUnderlying(Acts::BinningValue::binPhi)] = {
+    binTolerances[toUnderlying(Acts::AxisDirection::AxisPhi)] = {
         volume.binTolerancePhi.lower.value_or(0.),
         volume.binTolerancePhi.upper.value_or(0.)};
 
@@ -101,18 +101,18 @@ std::vector<Acts::TGeoLayerBuilder::Config> makeLayerBuilderConfigs(
       auto zMin = zR.lower.value_or(-std::numeric_limits<double>::max());
       auto zMax = zR.upper.value_or(std::numeric_limits<double>::max());
       lConfig.parseRanges = {
-          {Acts::BinningValue::binR, {rMin, rMax}},
-          {Acts::BinningValue::binZ, {zMin, zMax}},
+          {Acts::AxisDirection::AxisR, {rMin, rMax}},
+          {Acts::AxisDirection::AxisZ, {zMin, zMax}},
       };
 
       // Fill the layer splitting parameters in r/z
       auto str = volume.splitTolR.at(ncp);
       auto stz = volume.splitTolZ.at(ncp);
       if (0 < str) {
-        lConfig.splitConfigs.emplace_back(Acts::BinningValue::binR, str);
+        lConfig.splitConfigs.emplace_back(Acts::AxisDirection::AxisR, str);
       }
       if (0 < stz) {
-        lConfig.splitConfigs.emplace_back(Acts::BinningValue::binZ, stz);
+        lConfig.splitConfigs.emplace_back(Acts::AxisDirection::AxisZ, stz);
       }
       lConfig.binning0 = volume.binning0.at(ncp);
       lConfig.binning1 = volume.binning1.at(ncp);
@@ -284,7 +284,7 @@ std::shared_ptr<const Acts::TrackingGeometry> buildTGeoDetector(
         -> void {
       for (const auto& lcfg : lConfigs) {
         for (const auto& scfg : lcfg.splitConfigs) {
-          if (scfg.first == Acts::BinningValue::binR && scfg.second > 0.) {
+          if (scfg.first == Acts::AxisDirection::AxisR && scfg.second > 0.) {
             volumeConfig.ringTolerance =
                 std::max(volumeConfig.ringTolerance, scfg.second);
             volumeConfig.checkRingLayout = true;

@@ -44,7 +44,7 @@ TelescopeDetector::TelescopeDetector(const Config& cfg)
       m_nominalGeometryContext, m_detectorStore, m_cfg.positions, m_cfg.stereos,
       m_cfg.offsets, m_cfg.bounds, m_cfg.thickness,
       static_cast<TelescopeSurfaceType>(m_cfg.surfaceType),
-      static_cast<Acts::BinningValue>(m_cfg.binValue));
+      static_cast<Acts::AxisDirection>(m_cfg.binValue));
 }
 
 }  // namespace ActsExamples

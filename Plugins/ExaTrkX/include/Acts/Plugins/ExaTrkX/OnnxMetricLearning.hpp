@@ -39,7 +39,7 @@ class OnnxMetricLearning final : public Acts::GraphConstructionBase {
   std::tuple<std::any, std::any, std::any> operator()(
       std::vector<float>& inputValues, std::size_t numNodes,
       const std::vector<std::uint64_t>& moduleIds,
-      torch::Device device = torch::Device(torch::kCPU)) override;
+      const ExecutionContext& execContext = {}) override;
 
   Config config() const { return m_cfg; }
   torch::Device device() const override { return m_device; };

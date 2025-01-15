@@ -21,7 +21,7 @@ namespace Acts {
 
 void PortalLinkBase::checkMergePreconditions(const PortalLinkBase& a,
                                              const PortalLinkBase& b,
-                                             BinningValue direction) {
+                                             AxisDirection direction) {
   const auto& surfaceA = a.surface();
   const auto& surfaceB = b.surface();
 
@@ -40,17 +40,17 @@ void PortalLinkBase::checkMergePreconditions(const PortalLinkBase& a,
     throw_assert(cylB != nullptr,
                  "Cannot merge CylinderSurface with "
                  "non-CylinderSurface");
-    throw_assert(
-        direction == BinningValue::binZ || direction == BinningValue::binRPhi,
-        "Invalid binning direction: " + binningValueName(direction));
+    throw_assert(direction == AxisDirection::AxisZ ||
+                     direction == AxisDirection::AxisRPhi,
+                 "Invalid binning direction: " + axisDirectionName(direction));
   } else if (const auto* discA = dynamic_cast<const DiscSurface*>(&surfaceA);
              discA != nullptr) {
     const auto* discB = dynamic_cast<const DiscSurface*>(&surfaceB);
     throw_assert(discB != nullptr,
                  "Cannot merge DiscSurface with non-DiscSurface");
-    throw_assert(
-        direction == BinningValue::binR || direction == BinningValue::binPhi,
-        "Invalid binning direction: " + binningValueName(direction));
+    throw_assert(direction == AxisDirection::AxisR ||
+                     direction == AxisDirection::AxisPhi,
+                 "Invalid binning direction: " + axisDirectionName(direction));
 
     throw_assert(dynamic_cast<const RadialBounds*>(&discA->bounds()) &&
                      dynamic_cast<const RadialBounds*>(&discB->bounds()),
@@ -63,7 +63,7 @@ void PortalLinkBase::checkMergePreconditions(const PortalLinkBase& a,
 
 std::unique_ptr<PortalLinkBase> PortalLinkBase::merge(
     std::unique_ptr<PortalLinkBase> a, std::unique_ptr<PortalLinkBase> b,
-    BinningValue direction, const Logger& logger) {
+    AxisDirection direction, const Logger& logger) {
   ACTS_VERBOSE("Merging two arbitrary portals");
 
   ACTS_VERBOSE(" - a: " << *a);

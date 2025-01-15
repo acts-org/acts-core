@@ -23,7 +23,8 @@ BOOST_AUTO_TEST_SUITE(Experimental)
 
 BOOST_AUTO_TEST_CASE(BlueprintHelperSorting) {
   // Create  root node
-  std::vector<Acts::BinningValue> detectorBinning = {Acts::BinningValue::binR};
+  std::vector<Acts::AxisDirection> detectorBinning = {
+      Acts::AxisDirection::AxisR};
   std::vector<double> detectorBoundaries = {0., 50., 100.};
   auto detector = std::make_unique<Acts::Experimental::Blueprint::Node>(
       "detector", Acts::Transform3::Identity(), Acts::VolumeBounds::eCylinder,
@@ -33,7 +34,7 @@ BOOST_AUTO_TEST_CASE(BlueprintHelperSorting) {
   BOOST_CHECK(detector->children.empty());
   BOOST_CHECK_EQUAL(detector->name, "detector");
 
-  std::vector<Acts::BinningValue> pixelsBinning = {Acts::BinningValue::binZ};
+  std::vector<Acts::AxisDirection> pixelsBinning = {Acts::AxisDirection::AxisZ};
   std::vector<double> pixelsBoundaries = {20., 50., 100.};
 
   auto pixels = std::make_unique<Acts::Experimental::Blueprint::Node>(
@@ -105,7 +106,8 @@ BOOST_AUTO_TEST_CASE(BlueprintCylindricalGapFilling) {
       std::make_shared<Acts::Experimental::IInternalStructureBuilder>();
 
   // Create  root node
-  std::vector<Acts::BinningValue> detectorBinning = {Acts::BinningValue::binR};
+  std::vector<Acts::AxisDirection> detectorBinning = {
+      Acts::AxisDirection::AxisR};
   std::vector<double> detectorBoundaries = {detectorIr, detectorOr, detectorHz};
 
   // The root node - detector
@@ -122,14 +124,15 @@ BOOST_AUTO_TEST_CASE(BlueprintCylindricalGapFilling) {
 
   // A pixel system
   std::vector<double> pixelBoundaries = {pixelIr, pixelOr, detectorHz};
-  std::vector<Acts::BinningValue> pixelBinning = {Acts::BinningValue::binZ};
+  std::vector<Acts::AxisDirection> pixelBinning = {Acts::AxisDirection::AxisZ};
   auto pixel = std::make_unique<Acts::Experimental::Blueprint::Node>(
       "pixel", Acts::Transform3::Identity(), Acts::VolumeBounds::eCylinder,
       pixelBoundaries, pixelBinning);
 
   // Nec: Small differences to check if the adjustments are made
   std::vector<double> pixelEcBoundaries = {pixelIr, pixelOr - 5., pixelEcHz};
-  std::vector<Acts::BinningValue> pixelEcBinning = {Acts::BinningValue::binZ};
+  std::vector<Acts::AxisDirection> pixelEcBinning = {
+      Acts::AxisDirection::AxisZ};
 
   auto pixelNec = std::make_unique<Acts::Experimental::Blueprint::Node>(
       "pixelNec",
@@ -150,8 +153,8 @@ BOOST_AUTO_TEST_CASE(BlueprintCylindricalGapFilling) {
   // Barrel
   std::vector<double> pixelBarrelBoundaries = {pixelIr + 1, pixelOr - 1.,
                                                detectorHz - 2 * pixelEcHz};
-  std::vector<Acts::BinningValue> pixelBarrelBinning = {
-      Acts::BinningValue::binR};
+  std::vector<Acts::AxisDirection> pixelBarrelBinning = {
+      Acts::AxisDirection::AxisR};
 
   auto pixelBarrel = std::make_unique<Acts::Experimental::Blueprint::Node>(
       "pixelBarrel", Acts::Transform3::Identity(),
@@ -260,7 +263,8 @@ BOOST_AUTO_TEST_CASE(BlueprintCylindricalGapException) {
 
   // The root node - detector
   std::vector<double> detectorBoundaries = {0., 50., 100.};
-  std::vector<Acts::BinningValue> detectorBinning = {Acts::BinningValue::binX};
+  std::vector<Acts::AxisDirection> detectorBinning = {
+      Acts::AxisDirection::AxisX};
   auto detector = std::make_unique<Acts::Experimental::Blueprint::Node>(
       "detector", Acts::Transform3::Identity(), Acts::VolumeBounds::eCylinder,
       detectorBoundaries, detectorBinning);

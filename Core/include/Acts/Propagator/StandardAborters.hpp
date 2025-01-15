@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/Propagator/ConstrainedStep.hpp"
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
@@ -18,9 +16,6 @@
 #include "Acts/Utilities/Logger.hpp"
 
 #include <limits>
-#include <optional>
-#include <sstream>
-#include <string>
 
 namespace Acts {
 

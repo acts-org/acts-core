@@ -23,7 +23,7 @@
 namespace Acts {
 
 CylinderContainerBlueprintNode::CylinderContainerBlueprintNode(
-    const std::string& name, BinningValue direction,
+    const std::string& name, AxisDirection direction,
     CylinderVolumeStack::AttachmentStrategy attachmentStrategy,
     CylinderVolumeStack::ResizeStrategy resizeStrategy)
     : m_name(name),
@@ -197,7 +197,7 @@ bool CylinderContainerBlueprintNode::isGapVolume(const Volume& volume) const {
 }
 
 CylinderContainerBlueprintNode& CylinderContainerBlueprintNode::setDirection(
-    BinningValue direction) {
+    AxisDirection direction) {
   if (m_stack != nullptr) {
     throw std::runtime_error("Cannot change direction after build");
   }
@@ -240,7 +240,7 @@ void CylinderContainerBlueprintNode::addToGraphviz(std::ostream& os) const {
   }
 }
 
-BinningValue CylinderContainerBlueprintNode::direction() const {
+AxisDirection CylinderContainerBlueprintNode::direction() const {
   return m_direction;
 }
 

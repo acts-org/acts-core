@@ -311,7 +311,8 @@ BOOST_AUTO_TEST_CASE(CylinderVolumeOrientedBoundaries) {
   Vector3 zaxis(0., 0., 1.);
 
   for (auto& os : cvbOrientedSurfaces) {
-    auto onSurface = os.surface->binningPosition(geoCtx, BinningValue::binR);
+    auto onSurface =
+        os.surface->referencePosition(geoCtx, AxisDirection::AxisR);
     auto locPos =
         os.surface->globalToLocal(geoCtx, onSurface, Vector3::Zero()).value();
     auto osNormal = os.surface->normal(geoCtx, locPos);

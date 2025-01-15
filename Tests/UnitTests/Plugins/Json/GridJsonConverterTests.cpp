@@ -363,12 +363,13 @@ void checkGlobalSubspaceTuple(const SubspactTuple& sstuple) {
 
 BOOST_AUTO_TEST_CASE(GlobalSubSpaceTests1D) {
   // One dimensional sub spaces
-  const std::tuple<Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binX>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binY>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binZ>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binR>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binPhi>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binEta>>
+  const std::tuple<
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisX>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisY>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisZ>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisR>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisPhi>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisEta>>
       sspace1D;
 
   // Check the tuple for 1D
@@ -377,26 +378,27 @@ BOOST_AUTO_TEST_CASE(GlobalSubSpaceTests1D) {
 
 BOOST_AUTO_TEST_CASE(GlobalSubSpaceTests2D) {
   // Two dimensional sub spaces
-  const std::tuple<Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binX,
-                                                    Acts::BinningValue::binY>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binY,
-                                                    Acts::BinningValue::binX>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binX,
-                                                    Acts::BinningValue::binZ>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binZ,
-                                                    Acts::BinningValue::binX>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binY,
-                                                    Acts::BinningValue::binZ>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binZ,
-                                                    Acts::BinningValue::binY>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binR,
-                                                    Acts::BinningValue::binPhi>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binPhi,
-                                                    Acts::BinningValue::binR>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binZ,
-                                                    Acts::BinningValue::binPhi>,
-                   Acts::GridAccess::GlobalSubspace<Acts::BinningValue::binPhi,
-                                                    Acts::BinningValue::binZ>>
+  const std::tuple<
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisX,
+                                       Acts::AxisDirection::AxisY>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisY,
+                                       Acts::AxisDirection::AxisX>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisX,
+                                       Acts::AxisDirection::AxisZ>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisZ,
+                                       Acts::AxisDirection::AxisX>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisY,
+                                       Acts::AxisDirection::AxisZ>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisZ,
+                                       Acts::AxisDirection::AxisY>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisR,
+                                       Acts::AxisDirection::AxisPhi>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisPhi,
+                                       Acts::AxisDirection::AxisR>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisZ,
+                                       Acts::AxisDirection::AxisPhi>,
+      Acts::GridAccess::GlobalSubspace<Acts::AxisDirection::AxisPhi,
+                                       Acts::AxisDirection::AxisZ>>
       sspace2D = {};
 
   // Check the tuple for 2D

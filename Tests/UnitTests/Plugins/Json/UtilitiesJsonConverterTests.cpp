@@ -31,7 +31,7 @@ using namespace Acts;
 BOOST_AUTO_TEST_SUITE(UtilitiesJsonConverter)
 
 BOOST_AUTO_TEST_CASE(BinUtilityRoundTripTests) {
-  BinUtility reference(2, 0., 4., open, BinningValue::binR);
+  BinUtility reference(2, 0., 4., open, AxisDirection::AxisR);
 
   std::ofstream out;
 
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(BinUtilityRoundTripTests) {
 
   // Increase to two dimensions
   reference += BinUtility(10., -std::numbers::pi, std::numbers::pi, closed,
-                          BinningValue::binPhi);
+                          AxisDirection::AxisPhi);
   nlohmann::json jtwoDimOut;
   to_json(jtwoDimOut, reference);
   out.open("BinUtility_2D.json");
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(BinUtilityRoundTripTests) {
 
   // Increase to three dimensions
   std::vector<float> boundaries = {-4., -1.5, 0., 10.};
-  reference += BinUtility(boundaries, open, BinningValue::binZ);
+  reference += BinUtility(boundaries, open, AxisDirection::AxisZ);
   nlohmann::json jthreeDimOut;
   to_json(jthreeDimOut, reference);
   out.open("BinUtility_3D.json");

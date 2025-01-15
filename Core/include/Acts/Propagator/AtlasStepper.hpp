@@ -28,10 +28,11 @@
 
 #include <cmath>
 
-// This is based original stepper code from the ATLAS RungeKuttaPropagator
 namespace Acts {
 
 /// @brief the AtlasStepper implementation for the
+///
+/// This is based original stepper code from the ATLAS RungeKuttaPropagator
 class AtlasStepper {
  public:
   using Jacobian = BoundMatrix;
@@ -78,7 +79,7 @@ class AtlasStepper {
     bool needgradient = false;
     bool newfield = true;
     // internal parameters to be used
-    Vector3 field;
+    Vector3 field = Vector3::Zero();
     std::array<double, 60> pVector{};
 
     /// Storage pattern of pVector
@@ -115,9 +116,6 @@ class AtlasStepper {
     // Previous step size for overstep estimation
     double previousStepSize = 0.;
 
-    /// The tolerance for the stepping
-    double tolerance = s_onSurfaceTolerance;
-
     /// It caches the current magnetic field cell and stays (and interpolates)
     ///  within as long as this is valid. See step() code for details.
     MagneticFieldProvider::Cache fieldCache;
@@ -143,11 +141,13 @@ class AtlasStepper {
                   const BoundTrackParameters& par) const {
     State state{options, m_bField->makeCache(options.magFieldContext)};
 
+    state.particleHypothesis = par.particleHypothesis();
+
     // The rest of this constructor is copy&paste of AtlasStepper::update() -
     // this is a nasty but working solution for the stepper state without
     // functions
 
-    const auto pos = par.position(state.options.geoContext);
+    const auto pos = par.position(options.geoContext);
     const auto Vp = par.parameters();
 
     double Sf = std::sin(Vp[eBoundPhi]);
@@ -179,7 +179,7 @@ class AtlasStepper {
       state.covTransport = true;
       state.useJacobian = true;
       const auto transform = par.referenceSurface().referenceFrame(
-          state.options.geoContext, pos, par.direction());
+          options.geoContext, pos, par.direction());
 
       pVector[8] = transform(0, eBoundLoc0);
       pVector[16] = transform(0, eBoundLoc1);

@@ -21,6 +21,7 @@
 #include "Acts/Propagator/StepperOptions.hpp"
 #include "Acts/Propagator/StepperStatistics.hpp"
 #include "Acts/Propagator/detail/SteppingHelper.hpp"
+#include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 #include "Acts/Utilities/Result.hpp"
 
@@ -71,7 +72,7 @@ class EigenStepper {
   struct State {
     /// Constructor from the initial bound track parameters
     ///
-    /// @param [in] optionsIn The stepper options
+    /// @param [in] optionsIn is the options object for the stepper
     /// @param [in] fieldCacheIn is the cache object for the magnetic field
     ///
     /// @note the covariance matrix is copied when needed

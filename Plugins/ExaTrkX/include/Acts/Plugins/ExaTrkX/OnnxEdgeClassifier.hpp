@@ -35,7 +35,7 @@ class OnnxEdgeClassifier final : public Acts::EdgeClassificationBase {
 
   std::tuple<std::any, std::any, std::any, std::any> operator()(
       std::any nodeFeatures, std::any edgeIndex, std::any edgeFeatures = {},
-      torch::Device device = torch::Device(torch::kCPU)) override;
+      const ExecutionContext &execContext = {}) override;
 
   Config config() const { return m_cfg; }
   torch::Device device() const override { return m_device; };

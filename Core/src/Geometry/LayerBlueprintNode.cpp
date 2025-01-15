@@ -52,23 +52,23 @@ Volume& LayerBlueprintNode::build(const BlueprintOptions& options,
 void LayerBlueprintNode::buildVolume(const Extent& extent,
                                      const Logger& logger) {
   ACTS_VERBOSE(prefix() << "Building volume for layer " << name());
-  using enum BinningValue;
+  using enum AxisDirection;
   using enum LayerType;
 
   std::shared_ptr<VolumeBounds> bounds;
   switch (m_layerType) {
     case Cylinder:
     case Disc: {
-      double minR = extent.min(binR);
-      double maxR = extent.max(binR);
-      double hlZ = extent.interval(binZ) / 2.0;
+      double minR = extent.min(AxisR);
+      double maxR = extent.max(AxisR);
+      double hlZ = extent.interval(AxisZ) / 2.0;
       bounds = std::make_shared<CylinderVolumeBounds>(minR, maxR, hlZ);
       break;
     }
     case Plane: {
-      double hlX = extent.interval(binX) / 2.0;
-      double hlY = extent.interval(binY) / 2.0;
-      double hlZ = extent.interval(binZ) / 2.0;
+      double hlX = extent.interval(AxisX) / 2.0;
+      double hlY = extent.interval(AxisY) / 2.0;
+      double hlZ = extent.interval(AxisZ) / 2.0;
       bounds = std::make_shared<CuboidVolumeBounds>(hlX, hlY, hlZ);
       break;
     }
@@ -80,7 +80,7 @@ void LayerBlueprintNode::buildVolume(const Extent& extent,
 
   Transform3 transform = m_transform;
   transform.translation() =
-      Vector3{extent.medium(binX), extent.medium(binY), extent.medium(binZ)};
+      Vector3{extent.medium(AxisX), extent.medium(AxisY), extent.medium(AxisZ)};
 
   ACTS_VERBOSE(prefix() << " -> adjusted transform:\n" << transform.matrix());
 

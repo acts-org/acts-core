@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(FindSurfaceIntersectionsTrackingGeometry) {
   LayerArrayCreator::Config lacConfig;
   LayerArrayCreator lac = LayerArrayCreator(lacConfig);
   auto layers = lac.layerArray(tContext, {pCylinderLayer}, rMin, rMid,
-                               arbitrary, BinningValue::binR);
+                               arbitrary, AxisDirection::AxisR);
 
   auto innerVolume = std::make_shared<TrackingVolume>(
       Transform3::Identity(), vCylinderInner, nullptr, std::move(layers),
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(FindSurfaceIntersectionsTrackingGeometry) {
   TrackingVolumeArrayCreator tvac = TrackingVolumeArrayCreator(tvacConfig);
 
   auto volumes = tvac.trackingVolumeArray(tContext, {innerVolume, outerVolume},
-                                          BinningValue::binR);
+                                          AxisDirection::AxisR);
 
   auto vCylinderTop = std::make_shared<CylinderVolumeBounds>(rMin, rMax, 110.);
 

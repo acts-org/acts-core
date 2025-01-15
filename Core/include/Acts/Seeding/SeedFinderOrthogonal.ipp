@@ -11,7 +11,7 @@
 #include "Acts/Seeding/SeedFinder.hpp"
 #include "Acts/Seeding/SeedFinderOrthogonalConfig.hpp"
 #include "Acts/Seeding/SeedFinderUtils.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -756,9 +756,9 @@ void SeedFinderOrthogonal<external_spacepoint_t>::createSeeds(
 
   // variable middle SP radial region of interest
   const Acts::Range1D<float> rMiddleSPRange(
-      std::floor(rRangeSPExtent.min(Acts::BinningValue::binR) / 2) * 2 +
+      std::floor(rRangeSPExtent.min(Acts::AxisDirection::AxisR) / 2) * 2 +
           m_config.deltaRMiddleMinSPRange,
-      std::floor(rRangeSPExtent.max(Acts::BinningValue::binR) / 2) * 2 -
+      std::floor(rRangeSPExtent.max(Acts::AxisDirection::AxisR) / 2) * 2 -
           m_config.deltaRMiddleMaxSPRange);
 
   /*

@@ -30,7 +30,7 @@ namespace Acts {
 namespace {
 std::shared_ptr<RegularSurface> mergedSurface(const Surface& a,
                                               const Surface& b,
-                                              BinningValue direction) {
+                                              AxisDirection direction) {
   if (a.type() != b.type()) {
     throw std::invalid_argument{"Cannot merge surfaces of different types"};
   }
@@ -56,7 +56,7 @@ std::shared_ptr<RegularSurface> mergedSurface(const Surface& a,
 
 std::shared_ptr<RegularSurface> mergePortalLinks(
     const std::vector<std::unique_ptr<PortalLinkBase>>& links,
-    BinningValue direction) {
+    AxisDirection direction) {
   assert(std::ranges::all_of(links,
                              [](const auto& link) { return link != nullptr; }));
   assert(!links.empty());
@@ -73,7 +73,7 @@ std::shared_ptr<RegularSurface> mergePortalLinks(
 
 CompositePortalLink::CompositePortalLink(std::unique_ptr<PortalLinkBase> a,
                                          std::unique_ptr<PortalLinkBase> b,
-                                         BinningValue direction, bool flatten)
+                                         AxisDirection direction, bool flatten)
     : PortalLinkBase(mergedSurface(a->surface(), b->surface(), direction)),
       m_direction{direction} {
   if (!flatten) {
@@ -99,7 +99,7 @@ CompositePortalLink::CompositePortalLink(std::unique_ptr<PortalLinkBase> a,
 }
 
 CompositePortalLink::CompositePortalLink(
-    std::vector<std::unique_ptr<PortalLinkBase>> links, BinningValue direction,
+    std::vector<std::unique_ptr<PortalLinkBase>> links, AxisDirection direction,
     bool flatten)
     : PortalLinkBase(mergePortalLinks(links, direction)),
       m_direction(direction) {
@@ -207,7 +207,7 @@ std::unique_ptr<GridPortalLink> CompositePortalLink::makeGrid(
   if (surface().type() == Surface::SurfaceType::Cylinder) {
     ACTS_VERBOSE("Combining composite into cylinder grid");
 
-    if (m_direction != BinningValue::binZ) {
+    if (m_direction != AxisDirection::AxisZ) {
       ACTS_ERROR("Cylinder grid only supports binning in Z direction");
       throw std::runtime_error{"Unsupported binning direction"};
     }
@@ -251,7 +251,7 @@ std::unique_ptr<GridPortalLink> CompositePortalLink::makeGrid(
   } else if (surface().type() == Surface::SurfaceType::Disc) {
     ACTS_VERBOSE("Combining composite into disc grid");
 
-    if (m_direction != BinningValue::binR) {
+    if (m_direction != AxisDirection::AxisR) {
       ACTS_ERROR("Disc grid only supports binning in R direction");
       throw std::runtime_error{"Unsupported binning direction"};
     }

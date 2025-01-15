@@ -32,17 +32,17 @@
 /// @brief Convert Acts binning value to Geant4 axis
 /// as Geant4 uses a different axis convention
 /// @param bv the Acts binning value
-EAxis binToGeant4Axis(const Acts::BinningValue& bv) {
+EAxis binToGeant4Axis(const Acts::AxisDirection& bv) {
   switch (bv) {
-    case Acts::BinningValue::binX:
+    case Acts::AxisDirection::AxisX:
       return EAxis::kXAxis;
-    case Acts::BinningValue::binY:
+    case Acts::AxisDirection::AxisY:
       return EAxis::kYAxis;
-    case Acts::BinningValue::binZ:
+    case Acts::AxisDirection::AxisZ:
       return EAxis::kZAxis;
-    case Acts::BinningValue::binR:
+    case Acts::AxisDirection::AxisR:
       return EAxis::kRho;
-    case Acts::BinningValue::binPhi:
+    case Acts::AxisDirection::AxisPhi:
       return EAxis::kPhi;
     default:
       throw std::invalid_argument(
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE(Geant4SurfaceProviderRanges) {
   auto kdt1DOpt = Acts::Experimental::Geant4SurfaceProvider<1>::kdtOptions();
   kdt1DOpt.range = Acts::RangeXD<1, double>();
   kdt1DOpt.range[0].set(8, 12);
-  kdt1DOpt.binningValues = {Acts::BinningValue::binZ};
+  kdt1DOpt.binningValues = {Acts::AxisDirection::AxisZ};
 
   auto sp1D = std::make_shared<Acts::Experimental::Geant4SurfaceProvider<1>>(
       sp1DCfg, kdt1DOpt);
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(Geant4SurfaceProviderRanges) {
   kdt2DOpt.range = Acts::RangeXD<2, double>();
   kdt2DOpt.range[0].set(8, 12);
   kdt2DOpt.range[1].set(armOffset - 5, armOffset + 100);
-  kdt2DOpt.binningValues = {Acts::BinningValue::binZ};
+  kdt2DOpt.binningValues = {Acts::AxisDirection::AxisZ};
 
   auto sp2D = std::make_shared<Acts::Experimental::Geant4SurfaceProvider<2>>(
       sp2DCfg, kdt2DOpt);
@@ -289,8 +289,8 @@ BOOST_AUTO_TEST_CASE(Geant4SurfaceProviderRanges) {
   std::map<unsigned int, std::tuple<double, double>> ranges;
 
   std::array<unsigned int, 3> g4Axes{0};
-  for (auto& bv : {Acts::BinningValue::binX, Acts::BinningValue::binY,
-                   Acts::BinningValue::binZ}) {
+  for (auto& bv : {Acts::AxisDirection::AxisX, Acts::AxisDirection::AxisY,
+                   Acts::AxisDirection::AxisZ}) {
     g4Axes[toUnderlying(bv)] = binToGeant4Axis(bv);
   }
 
@@ -390,7 +390,7 @@ BOOST_AUTO_TEST_CASE(Geant4RectangleFromGDML) {
   auto kdt1DOpt = Acts::Experimental::Geant4SurfaceProvider<1>::kdtOptions();
   kdt1DOpt.range = Acts::RangeXD<1, double>();
   kdt1DOpt.range[0].set(-100, 100);
-  kdt1DOpt.binningValues = {Acts::BinningValue::binZ};
+  kdt1DOpt.binningValues = {Acts::AxisDirection::AxisZ};
 
   auto tContext = Acts::GeometryContext();
 

@@ -36,7 +36,7 @@ std::shared_ptr<Acts::ProtoSurfaceMaterial> Acts::createProtoMaterial(
   Acts::BinUtility bu;
   // Loop over the bins
   for (auto& bin : binning) {
-    BinningValue bval = binningValueFromName(bin.first);
+    AxisDirection bval = axisDirectionFromName(bin.first);
     Acts::BinningOption bopt = bin.second;
     double min = 0.;
     double max = 0.;

@@ -10,9 +10,8 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Common.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinUtility.hpp"
-#include "Acts/Utilities/BinningType.hpp"
 
 #include <sstream>
 #include <stdexcept>
@@ -27,8 +26,8 @@ namespace Acts::Experimental {
 /// only for convenience that the binning can be defined and then
 /// translated into concrete axis types
 struct ProtoBinning {
-  /// The binning value of this
-  BinningValue binValue;
+  /// The axis direction
+  AxisDirection axisDir;
   /// The axis type: equidistant or variable
   Acts::AxisType axisType = Acts::AxisType::Equidistant;
   /// The axis boundary type: Open, Bound or Closed
@@ -42,13 +41,13 @@ struct ProtoBinning {
 
   /// Convenience constructors - for variable binning
   ///
-  /// @param bValue the value/cast in which this is binned
+  /// @param aDir the value/cast in which this is binned
   /// @param bType the axis boundary type
   /// @param e the bin edges (variable binning)
   /// @param exp the expansion (in bins)
-  ProtoBinning(BinningValue bValue, Acts::AxisBoundaryType bType,
+  ProtoBinning(AxisDirection aDir, Acts::AxisBoundaryType bType,
                const std::vector<double>& e, std::size_t exp = 0u)
-      : binValue(bValue),
+      : axisDir(aDir),
         axisType(Acts::AxisType::Variable),
         boundaryType(bType),
         edges(e),
@@ -61,18 +60,18 @@ struct ProtoBinning {
 
   /// Convenience constructors - for equidistant binning
   ///
-  /// @param bValue the value/cast in which this is binned
+  /// @param aDir the value/cast in which this is binned
   /// @param bType the axis boundary type
   /// @param minE the lowest edge of the binning
   /// @param maxE the highest edge of the binning
   /// @param nbins the number of bins
   /// @param exp the expansion (in bins)
-  ProtoBinning(BinningValue bValue, Acts::AxisBoundaryType bType, double minE,
+  ProtoBinning(AxisDirection aDir, Acts::AxisBoundaryType bType, double minE,
                double maxE, std::size_t nbins, std::size_t exp = 0u)
-      : binValue(bValue), boundaryType(bType), expansion(exp) {
+      : axisDir(aDir), boundaryType(bType), expansion(exp) {
     if (minE >= maxE) {
-      std::string msg = "ProtoBinning: Invalid binning for value '";
-      msg += binningValueName(bValue);
+      std::string msg = "ProtoBinning: Invalid axis range for direction '";
+      msg += axisDirectionName(axisDir);
       msg += "', min edge (" + std::to_string(minE) + ") ";
       msg += " needs to be smaller than max edge (";
       msg += std::to_string(maxE) + ").";
@@ -96,13 +95,13 @@ struct ProtoBinning {
   /// when the actual extent is not yet evaluated, only works
   /// for equidistant binning obviously
   ///
-  /// @param bValue the value/cast in which this is binned
+  /// @param aDir the value/cast in which this is binned
   /// @param bType the axis boundary type
   /// @param nbins the number of bins
   /// @param exp the expansion (in bins)
-  ProtoBinning(BinningValue bValue, Acts::AxisBoundaryType bType,
+  ProtoBinning(AxisDirection aDir, Acts::AxisBoundaryType bType,
                std::size_t nbins, std::size_t exp = 0u)
-      : binValue(bValue),
+      : axisDir(aDir),
         boundaryType(bType),
         edges(nbins + 1, 0.),
         expansion(exp),
@@ -115,7 +114,7 @@ struct ProtoBinning {
   std::string toString() const {
     std::stringstream ss;
     ss << "ProtoBinning: " << bins() << " bins in "
-       << binningValueName(binValue);
+       << axisDirectionName(axisDir);
     ss << (axisType == Acts::AxisType::Variable ? ", variable "
                                                 : ", equidistant ");
     if (!autorange) {
@@ -165,12 +164,12 @@ struct BinningDescription {
                                                           : Acts::closed;
       if (b.axisType == Acts::AxisType::Equidistant) {
         binUtility += BinUtility(b.bins(), b.edges.front(), b.edges.back(),
-                                 bOption, b.binValue);
+                                 bOption, b.axisDir);
       } else {
         std::vector<float> edges;
         std::for_each(b.edges.begin(), b.edges.end(),
                       [&](double edge) { edges.push_back(edge); });
-        binUtility += BinUtility(edges, bOption, b.binValue);
+        binUtility += BinUtility(edges, bOption, b.axisDir);
       }
     }
     return binUtility;

@@ -93,9 +93,9 @@ std::shared_ptr<const Acts::Layer> Acts::CuboidVolumeBuilder::buildLayer(
   lCfg.surfaceArrayCreator = std::make_shared<const SurfaceArrayCreator>();
   LayerCreator layerCreator(lCfg);
   ProtoLayer pl{gctx, cfg.surfaces};
-  pl.envelope[BinningValue::binX] = cfg.envelopeX;
-  pl.envelope[BinningValue::binY] = cfg.envelopeY;
-  pl.envelope[BinningValue::binZ] = cfg.envelopeZ;
+  pl.envelope[AxisDirection::AxisX] = cfg.envelopeX;
+  pl.envelope[AxisDirection::AxisY] = cfg.envelopeY;
+  pl.envelope[AxisDirection::AxisZ] = cfg.envelopeZ;
   return layerCreator.planeLayer(gctx, cfg.surfaces, cfg.binsY, cfg.binsZ,
                                  cfg.binningDimension, pl, trafo);
 }
@@ -249,7 +249,7 @@ Acts::MutableTrackingVolumePtr Acts::CuboidVolumeBuilder::trackingVolume(
   }
 
   // Build binning
-  BinningData binData(BinningOption::open, BinningValue::binX, binBoundaries);
+  BinningData binData(BinningOption::open, AxisDirection::AxisX, binBoundaries);
   auto bu = std::make_unique<const BinUtility>(binData);
 
   // Build TrackingVolume array

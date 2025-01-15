@@ -18,8 +18,8 @@ namespace Acts::Test {
 
 /// Test the constructors
 BOOST_AUTO_TEST_CASE(ProtoSurfaceMaterial_construction_test) {
-  BinUtility smpBU(10, -10., 10., open, BinningValue::binX);
-  smpBU += BinUtility(10, -10., 10., open, BinningValue::binY);
+  BinUtility smpBU(10, -10., 10., open, AxisDirection::AxisX);
+  smpBU += BinUtility(10, -10., 10., open, AxisDirection::AxisY);
 
   // Constructor from arguments
   ProtoSurfaceMaterial smp(smpBU);

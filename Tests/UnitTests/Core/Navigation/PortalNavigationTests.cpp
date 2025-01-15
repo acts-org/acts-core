@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(VolumeArrayUpdate) {
   std::vector<const Acts::Experimental::DetectorVolume*> volumes = {
       volumeA.get(), volumeB.get(), volumeC.get(), volumeD.get()};
   Acts::Experimental::BoundVolumesGrid1Navigation bvg(
-      zArray, Acts::BinningValue::binZ, volumes);
+      zArray, Acts::AxisDirection::AxisZ, volumes);
   // Reset the navigation state
   nState.currentVolume = nullptr;
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(VolumeArrayUpdate) {
   shift300.pretranslate(Acts::Vector3(0, 0, 300));
 
   Acts::Experimental::BoundVolumesGrid1Navigation bvgs(
-      zArray, Acts::BinningValue::binZ, volumes, shift300.inverse());
+      zArray, Acts::AxisDirection::AxisZ, volumes, shift300.inverse());
 
   // 150 (-300) -> transforms to -150, hence it yields A
   nState.position = Acts::Vector3(0., 0., 150.);

@@ -18,16 +18,16 @@
 namespace {
 
 std::array<Acts::Vector3, 2u> endPointsXYZ(
-    const Acts::Experimental::Blueprint::Node& node, Acts::BinningValue bVal) {
+    const Acts::Experimental::Blueprint::Node& node, Acts::AxisDirection bVal) {
   unsigned int bIdx = 0;
   switch (bVal) {
-    case Acts::BinningValue::binX:
+    case Acts::AxisDirection::AxisX:
       bIdx = 0;
       break;
-    case Acts::BinningValue::binY:
+    case Acts::AxisDirection::AxisY:
       bIdx = 1;
       break;
-    case Acts::BinningValue::binZ:
+    case Acts::AxisDirection::AxisZ:
       bIdx = 2;
       break;
     default:
@@ -52,14 +52,14 @@ void Acts::Experimental::detail::BlueprintHelper::sort(Blueprint::Node& node,
   if (node.binning.size() == 1) {
     auto bVal = node.binning.front();
     // x,y,z binning along the axis
-    if (bVal == BinningValue::binX || bVal == BinningValue::binY ||
-        bVal == BinningValue::binZ) {
+    if (bVal == AxisDirection::AxisX || bVal == AxisDirection::AxisY ||
+        bVal == AxisDirection::AxisZ) {
       Vector3 nodeCenter = node.transform.translation();
       Vector3 nodeSortAxis = node.transform.rotation().col(toUnderlying(bVal));
       std::ranges::sort(node.children, {}, [&](const auto& c) {
         return (c->transform.translation() - nodeCenter).dot(nodeSortAxis);
       });
-    } else if (bVal == BinningValue::binR &&
+    } else if (bVal == AxisDirection::AxisR &&
                node.boundsType == VolumeBounds::eCylinder) {
       std::ranges::sort(node.children, {}, [](const auto& c) {
         return c->boundaryValues[0] + c->boundaryValues[1];
@@ -108,7 +108,7 @@ void Acts::Experimental::detail::BlueprintHelper::fillGapsCylindrical(
 
   std::vector<std::unique_ptr<Blueprint::Node>> gaps;
   // Only 1D binning implemented for the moment
-  if (BinningValue bVal = node.binning.front(); bVal == BinningValue::binZ) {
+  if (AxisDirection bVal = node.binning.front(); bVal == AxisDirection::AxisZ) {
     // adjust inner/outer radius
     if (adjustToParent) {
       std::for_each(node.children.begin(), node.children.end(),
@@ -152,7 +152,7 @@ void Acts::Experimental::detail::BlueprintHelper::fillGapsCylindrical(
       gaps.push_back(std::move(gap));
     }
 
-  } else if (bVal == BinningValue::binR) {
+  } else if (bVal == AxisDirection::AxisR) {
     // We have binning in R present
     if (adjustToParent) {
       std::for_each(node.children.begin(), node.children.end(),
@@ -208,8 +208,8 @@ void Acts::Experimental::detail::BlueprintHelper::fillGapsCuboidal(
   sort(node, false);
 
   // Cuboidal detector binnings
-  std::array<Acts::BinningValue, 3u> allowedBinVals = {
-      BinningValue::binX, BinningValue::binY, BinningValue::binZ};
+  std::array<Acts::AxisDirection, 3u> allowedBinVals = {
+      AxisDirection::AxisX, AxisDirection::AxisY, AxisDirection::AxisZ};
 
   std::vector<std::unique_ptr<Blueprint::Node>> gaps;
   auto binVal = node.binning.front();

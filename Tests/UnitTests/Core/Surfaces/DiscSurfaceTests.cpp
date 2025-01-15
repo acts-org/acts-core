@@ -106,9 +106,9 @@ BOOST_AUTO_TEST_CASE(DiscSurfaceProperties) {
   Vector2 lpos(2., 0.05);
   BOOST_CHECK_EQUAL(discSurfaceObject->normal(tgContext, lpos), zAxis);
 
-  /// Test binningPosition
+  /// Test referencePosition
   BOOST_CHECK_EQUAL(
-      discSurfaceObject->binningPosition(tgContext, BinningValue::binRPhi),
+      discSurfaceObject->referencePosition(tgContext, AxisDirection::AxisRPhi),
       origin3D);
 
   /// Test bounds
@@ -248,46 +248,46 @@ BOOST_AUTO_TEST_CASE(DiscSurfaceExtent) {
       Surface::makeShared<DiscSurface>(Transform3::Identity(), 0., rMax);
   auto pDiscExtent = pDisc->polyhedronRepresentation(tgContext, 1).extent();
 
-  CHECK_CLOSE_ABS(0., pDiscExtent.min(BinningValue::binZ),
+  CHECK_CLOSE_ABS(0., pDiscExtent.min(AxisDirection::AxisZ),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(0., pDiscExtent.max(BinningValue::binZ),
+  CHECK_CLOSE_ABS(0., pDiscExtent.max(AxisDirection::AxisZ),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(0., pDiscExtent.min(BinningValue::binR),
+  CHECK_CLOSE_ABS(0., pDiscExtent.min(AxisDirection::AxisR),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(rMax, pDiscExtent.max(BinningValue::binR),
+  CHECK_CLOSE_ABS(rMax, pDiscExtent.max(AxisDirection::AxisR),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(-rMax, pDiscExtent.min(BinningValue::binX),
+  CHECK_CLOSE_ABS(-rMax, pDiscExtent.min(AxisDirection::AxisX),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(rMax, pDiscExtent.max(BinningValue::binX),
+  CHECK_CLOSE_ABS(rMax, pDiscExtent.max(AxisDirection::AxisX),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(-rMax, pDiscExtent.min(BinningValue::binY),
+  CHECK_CLOSE_ABS(-rMax, pDiscExtent.min(AxisDirection::AxisY),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(rMax, pDiscExtent.max(BinningValue::binY),
+  CHECK_CLOSE_ABS(rMax, pDiscExtent.max(AxisDirection::AxisY),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(-std::numbers::pi, pDiscExtent.min(BinningValue::binPhi),
+  CHECK_CLOSE_ABS(-std::numbers::pi, pDiscExtent.min(AxisDirection::AxisPhi),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(std::numbers::pi, pDiscExtent.max(BinningValue::binPhi),
+  CHECK_CLOSE_ABS(std::numbers::pi, pDiscExtent.max(AxisDirection::AxisPhi),
                   s_onSurfaceTolerance);
 
   auto pRing =
       Surface::makeShared<DiscSurface>(Transform3::Identity(), rMin, rMax);
   auto pRingExtent = pRing->polyhedronRepresentation(tgContext, 1).extent();
 
-  CHECK_CLOSE_ABS(0., pRingExtent.min(BinningValue::binZ),
+  CHECK_CLOSE_ABS(0., pRingExtent.min(AxisDirection::AxisZ),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(0., pRingExtent.max(BinningValue::binZ),
+  CHECK_CLOSE_ABS(0., pRingExtent.max(AxisDirection::AxisZ),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(rMin, pRingExtent.min(BinningValue::binR),
+  CHECK_CLOSE_ABS(rMin, pRingExtent.min(AxisDirection::AxisR),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(rMax, pRingExtent.max(BinningValue::binR),
+  CHECK_CLOSE_ABS(rMax, pRingExtent.max(AxisDirection::AxisR),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(-rMax, pRingExtent.min(BinningValue::binX),
+  CHECK_CLOSE_ABS(-rMax, pRingExtent.min(AxisDirection::AxisX),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(rMax, pRingExtent.max(BinningValue::binX),
+  CHECK_CLOSE_ABS(rMax, pRingExtent.max(AxisDirection::AxisX),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(-rMax, pRingExtent.min(BinningValue::binY),
+  CHECK_CLOSE_ABS(-rMax, pRingExtent.min(AxisDirection::AxisY),
                   s_onSurfaceTolerance);
-  CHECK_CLOSE_ABS(rMax, pRingExtent.max(BinningValue::binY),
+  CHECK_CLOSE_ABS(rMax, pRingExtent.max(AxisDirection::AxisY),
                   s_onSurfaceTolerance);
 }
 
@@ -349,27 +349,29 @@ BOOST_AUTO_TEST_CASE(DiscSurfaceBinningPosition) {
         std::make_shared<RadialBounds>(minR, maxR, std::numbers::pi / 8, 0.1);
     auto disc = Acts::Surface::makeShared<Acts::DiscSurface>(trf, bounds);
 
-    Vector3 bp = disc->binningPosition(tgContext, BinningValue::binR);
+    Vector3 bp = disc->referencePosition(tgContext, AxisDirection::AxisR);
     double r = (bounds->rMax() + bounds->rMin()) / 2.0;
     double phi = bounds->get(RadialBounds::eAveragePhi);
     Vector3 exp = Vector3{r * std::cos(phi), r * std::sin(phi), 0};
     exp = trf * exp;
 
     BOOST_CHECK_EQUAL(bp, exp);
-    BOOST_CHECK_EQUAL(disc->binningPositionValue(tgContext, BinningValue::binR),
-                      VectorHelpers::perp(exp));
+    BOOST_CHECK_EQUAL(
+        disc->referencePositionValue(tgContext, AxisDirection::AxisR),
+        VectorHelpers::perp(exp));
 
-    bp = disc->binningPosition(tgContext, BinningValue::binPhi);
+    bp = disc->referencePosition(tgContext, AxisDirection::AxisPhi);
     BOOST_CHECK_EQUAL(bp, exp);
     BOOST_CHECK_EQUAL(
-        disc->binningPositionValue(tgContext, BinningValue::binPhi),
+        disc->referencePositionValue(tgContext, AxisDirection::AxisPhi),
         VectorHelpers::phi(exp));
 
-    for (auto b : {BinningValue::binX, BinningValue::binY, BinningValue::binZ,
-                   BinningValue::binEta, BinningValue::binRPhi,
-                   BinningValue::binH, BinningValue::binMag}) {
+    for (auto b :
+         {AxisDirection::AxisX, AxisDirection::AxisY, AxisDirection::AxisZ,
+          AxisDirection::AxisEta, AxisDirection::AxisRPhi,
+          AxisDirection::AxisTheta, AxisDirection::AxisMag}) {
       BOOST_TEST_CONTEXT("binValue: " << b) {
-        BOOST_CHECK_EQUAL(disc->binningPosition(tgContext, b),
+        BOOST_CHECK_EQUAL(disc->referencePosition(tgContext, b),
                           disc->center(tgContext));
       }
     }
@@ -385,7 +387,7 @@ BOOST_AUTO_TEST_CASE(DiscSurfaceBinningPosition) {
 
     auto disc = Acts::Surface::makeShared<Acts::DiscSurface>(trf, bounds);
 
-    Vector3 bp = disc->binningPosition(tgContext, BinningValue::binR);
+    Vector3 bp = disc->referencePosition(tgContext, AxisDirection::AxisR);
     double r = (bounds->rMax() + bounds->rMin()) / 2.0;
     double phi = bounds->get(AnnulusBounds::eAveragePhi);
     Vector3 exp = Vector3{r * std::cos(phi), r * std::sin(phi), 0};
@@ -393,14 +395,15 @@ BOOST_AUTO_TEST_CASE(DiscSurfaceBinningPosition) {
 
     BOOST_CHECK_EQUAL(bp, exp);
 
-    bp = disc->binningPosition(tgContext, BinningValue::binPhi);
+    bp = disc->referencePosition(tgContext, AxisDirection::AxisPhi);
     BOOST_CHECK_EQUAL(bp, exp);
 
-    for (auto b : {BinningValue::binX, BinningValue::binY, BinningValue::binZ,
-                   BinningValue::binEta, BinningValue::binRPhi,
-                   BinningValue::binH, BinningValue::binMag}) {
+    for (auto b :
+         {AxisDirection::AxisX, AxisDirection::AxisY, AxisDirection::AxisZ,
+          AxisDirection::AxisEta, AxisDirection::AxisRPhi,
+          AxisDirection::AxisTheta, AxisDirection::AxisMag}) {
       BOOST_TEST_CONTEXT("binValue: " << b) {
-        BOOST_CHECK_EQUAL(disc->binningPosition(tgContext, b),
+        BOOST_CHECK_EQUAL(disc->referencePosition(tgContext, b),
                           disc->center(tgContext));
       }
     }
@@ -430,12 +433,12 @@ BOOST_AUTO_TEST_CASE(IncompatibleBounds) {
       Surface::makeShared<DiscSurface>(base, 20_mm, 40_mm, 30_mm, 100_mm);
 
   BOOST_CHECK_THROW(
-      discRadial->mergedWith(*discTrap, BinningValue::binR, false, *logger),
+      discRadial->mergedWith(*discTrap, AxisDirection::AxisR, false, *logger),
 
       SurfaceMergingException);
 
   BOOST_CHECK_THROW(
-      discTrap2->mergedWith(*discTrap, BinningValue::binR, false, *logger),
+      discTrap2->mergedWith(*discTrap, AxisDirection::AxisR, false, *logger),
       SurfaceMergingException);
 }
 
@@ -449,7 +452,7 @@ BOOST_AUTO_TEST_CASE(InvalidDetectorElement) {
   auto disc2 = Surface::makeShared<DiscSurface>(bounds2, detElem);
 
   BOOST_CHECK_THROW(
-      disc1->mergedWith(*disc2, BinningValue::binR, false, *logger),
+      disc1->mergedWith(*disc2, AxisDirection::AxisR, false, *logger),
       SurfaceMergingException);
 }
 
@@ -470,50 +473,50 @@ BOOST_DATA_TEST_CASE(IncompatibleRDirection,
 
   // Disc with overlap in r
   auto discOverlap = makeDisc(base, 90_mm, 150_mm);
-  BOOST_CHECK_THROW(
-      disc->mergedWith(*discOverlap, Acts::BinningValue::binR, false, *logger),
-      SurfaceMergingException);
+  BOOST_CHECK_THROW(disc->mergedWith(*discOverlap, Acts::AxisDirection::AxisR,
+                                     false, *logger),
+                    SurfaceMergingException);
 
   // Disc with gap in r
   auto discGap = makeDisc(base, 110_mm, 150_mm);
   BOOST_CHECK_THROW(
-      disc->mergedWith(*discGap, Acts::BinningValue::binR, false, *logger),
+      disc->mergedWith(*discGap, Acts::AxisDirection::AxisR, false, *logger),
       SurfaceMergingException);
 
   auto discShiftedZ = Surface::makeShared<DiscSurface>(
       base * Translation3{Vector3::UnitZ() * 10_mm}, 100_mm, 150_mm);
-  BOOST_CHECK_THROW(
-      disc->mergedWith(*discShiftedZ, Acts::BinningValue::binR, false, *logger),
-      SurfaceMergingException);
+  BOOST_CHECK_THROW(disc->mergedWith(*discShiftedZ, Acts::AxisDirection::AxisR,
+                                     false, *logger),
+                    SurfaceMergingException);
 
   auto discShiftedXy = makeDisc(
       base * Translation3{Vector3{1_mm, 2_mm, 200_mm}}, 100_mm, 150_mm);
-  BOOST_CHECK_THROW(disc->mergedWith(*discShiftedXy, Acts::BinningValue::binZ,
+  BOOST_CHECK_THROW(disc->mergedWith(*discShiftedXy, Acts::AxisDirection::AxisZ,
                                      false, *logger),
                     SurfaceMergingException);
 
   auto discRotatedZ = makeDisc(base * AngleAxis3{10_degree, Vector3::UnitZ()},
                                100_mm, 150_mm, 60_degree, 0_degree);
-  BOOST_CHECK_THROW(
-      disc->mergedWith(*discRotatedZ, Acts::BinningValue::binR, false, *logger),
-      SurfaceMergingException);
+  BOOST_CHECK_THROW(disc->mergedWith(*discRotatedZ, Acts::AxisDirection::AxisR,
+                                     false, *logger),
+                    SurfaceMergingException);
 
   auto discRotatedX =
       makeDisc(base * AngleAxis3{10_degree, Vector3::UnitX()}, 100_mm, 150_mm);
-  BOOST_CHECK_THROW(
-      disc->mergedWith(*discRotatedX, Acts::BinningValue::binR, false, *logger),
-      SurfaceMergingException);
+  BOOST_CHECK_THROW(disc->mergedWith(*discRotatedX, Acts::AxisDirection::AxisR,
+                                     false, *logger),
+                    SurfaceMergingException);
 
   // Test not same phi sector
   auto discPhi1 = makeDisc(base, 30_mm, 100_mm, 10_degree, 40_degree);
   auto discPhi2 = makeDisc(base, 100_mm, 160_mm, 20_degree, 40_degree);
   auto discPhi3 = makeDisc(base, 100_mm, 160_mm, 10_degree, 50_degree);
   BOOST_CHECK_THROW(
-      discPhi1->mergedWith(*discPhi2, BinningValue::binR, false, *logger),
+      discPhi1->mergedWith(*discPhi2, AxisDirection::AxisR, false, *logger),
       SurfaceMergingException);
 
   BOOST_CHECK_THROW(
-      discPhi1->mergedWith(*discPhi3, BinningValue::binR, false, *logger),
+      discPhi1->mergedWith(*discPhi3, AxisDirection::AxisR, false, *logger),
       SurfaceMergingException);
 }
 
@@ -534,12 +537,12 @@ BOOST_DATA_TEST_CASE(RDirection,
       makeDisc(base * AngleAxis3(14_degree, Vector3::UnitZ()), 100_mm, 150_mm);
 
   auto [disc3, reversed] =
-      disc->mergedWith(*disc2, Acts::BinningValue::binR, false, *logger);
+      disc->mergedWith(*disc2, Acts::AxisDirection::AxisR, false, *logger);
   BOOST_REQUIRE_NE(disc3, nullptr);
   BOOST_CHECK(!reversed);
 
   auto [disc3Reversed, reversed2] =
-      disc2->mergedWith(*disc, Acts::BinningValue::binR, false, *logger);
+      disc2->mergedWith(*disc, Acts::AxisDirection::AxisR, false, *logger);
   BOOST_REQUIRE_NE(disc3Reversed, nullptr);
   BOOST_CHECK(disc3->bounds() == disc3Reversed->bounds());
   BOOST_CHECK(reversed2);
@@ -565,7 +568,7 @@ BOOST_DATA_TEST_CASE(RDirection,
   auto discPhi1 = makeDisc(base, 30_mm, 100_mm, 10_degree, 40_degree);
   auto discPhi2 = makeDisc(base, 100_mm, 160_mm, 10_degree, 40_degree);
   auto [discPhi12, reversedPhi12] =
-      discPhi1->mergedWith(*discPhi2, BinningValue::binR, false, *logger);
+      discPhi1->mergedWith(*discPhi2, AxisDirection::AxisR, false, *logger);
   BOOST_REQUIRE_NE(discPhi12, nullptr);
 
   const auto* boundsPhi12 =
@@ -598,26 +601,26 @@ BOOST_DATA_TEST_CASE(IncompatiblePhiDirection,
 
   // Disc with overlap in phi
   auto discPhi2 = makeDisc(base, 30_mm, 100_mm, 45_degree, a(85_degree));
-  BOOST_CHECK_THROW(discPhi->mergedWith(*discPhi2, Acts::BinningValue::binPhi,
+  BOOST_CHECK_THROW(discPhi->mergedWith(*discPhi2, Acts::AxisDirection::AxisPhi,
                                         false, *logger),
                     SurfaceMergingException);
 
   // Disc with gap in phi
   auto discPhi3 = makeDisc(base, 30_mm, 100_mm, 45_degree, a(105_degree));
-  BOOST_CHECK_THROW(discPhi->mergedWith(*discPhi3, Acts::BinningValue::binPhi,
+  BOOST_CHECK_THROW(discPhi->mergedWith(*discPhi3, Acts::AxisDirection::AxisPhi,
                                         false, *logger),
                     SurfaceMergingException);
 
   // Disc with a z shift
   auto discPhi4 = makeDisc(base * Translation3{Vector3::UnitZ() * 20_mm}, 30_mm,
                            100_mm, 45_degree, a(95_degree));
-  BOOST_CHECK_THROW(discPhi->mergedWith(*discPhi4, Acts::BinningValue::binPhi,
+  BOOST_CHECK_THROW(discPhi->mergedWith(*discPhi4, Acts::AxisDirection::AxisPhi,
                                         false, *logger),
                     SurfaceMergingException);
 
   // Disc with different r bounds: could be merged in r but not in phi
   auto discPhi5 = makeDisc(base, 100_mm, 150_mm, 45_degree, a(95_degree));
-  BOOST_CHECK_THROW(discPhi->mergedWith(*discPhi5, Acts::BinningValue::binPhi,
+  BOOST_CHECK_THROW(discPhi->mergedWith(*discPhi5, Acts::AxisDirection::AxisPhi,
                                         false, *logger),
                     SurfaceMergingException);
 }
@@ -643,13 +646,13 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     auto disc2 = makeDisc(base, 30_mm, 100_mm, 45_degree, a(95_degree));
 
     auto [disc3, reversed] =
-        disc->mergedWith(*disc2, Acts::BinningValue::binPhi, false, *logger);
+        disc->mergedWith(*disc2, Acts::AxisDirection::AxisPhi, false, *logger);
     BOOST_REQUIRE_NE(disc3, nullptr);
     BOOST_CHECK_EQUAL(base.matrix(), disc3->transform(tgContext).matrix());
     BOOST_CHECK(reversed);
 
     auto [disc3Reversed, reversed2] =
-        disc2->mergedWith(*disc, Acts::BinningValue::binPhi, false, *logger);
+        disc2->mergedWith(*disc, Acts::AxisDirection::AxisPhi, false, *logger);
     BOOST_REQUIRE_NE(disc3Reversed, nullptr);
     BOOST_CHECK(*disc3 == *disc3Reversed);
     BOOST_CHECK(!reversed2);
@@ -667,13 +670,13 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     auto disc4 = makeDisc(base, 30_mm, 100_mm, 20_degree, a(170_degree));
     auto disc5 = makeDisc(base, 30_mm, 100_mm, 10_degree, a(-160_degree));
     auto [disc45, reversed45] =
-        disc4->mergedWith(*disc5, Acts::BinningValue::binPhi, false, *logger);
+        disc4->mergedWith(*disc5, Acts::AxisDirection::AxisPhi, false, *logger);
     BOOST_REQUIRE_NE(disc45, nullptr);
     BOOST_CHECK_EQUAL(base.matrix(), disc45->transform(tgContext).matrix());
     BOOST_CHECK(reversed45);
 
     auto [disc54, reversed54] =
-        disc5->mergedWith(*disc4, Acts::BinningValue::binPhi, false, *logger);
+        disc5->mergedWith(*disc4, Acts::AxisDirection::AxisPhi, false, *logger);
     BOOST_REQUIRE_NE(disc54, nullptr);
     BOOST_CHECK(!reversed54);
 
@@ -693,14 +696,14 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     auto disc7 = makeDisc(base, 30_mm, 100_mm, 90_degree, a(180_degree));
 
     auto [disc67, reversed67] =
-        disc6->mergedWith(*disc7, Acts::BinningValue::binPhi, false, *logger);
+        disc6->mergedWith(*disc7, Acts::AxisDirection::AxisPhi, false, *logger);
     BOOST_REQUIRE_NE(disc67, nullptr);
     CHECK_CLOSE_OR_SMALL(disc67->transform(tgContext).matrix(), base.matrix(),
                          1e-6, 1e-10);
     BOOST_CHECK(!reversed67);
 
     auto [disc76, reversed76] =
-        disc7->mergedWith(*disc6, Acts::BinningValue::binPhi, false, *logger);
+        disc7->mergedWith(*disc6, Acts::AxisDirection::AxisPhi, false, *logger);
     BOOST_REQUIRE_NE(disc76, nullptr);
     // surfaces are not equal because bounds are not equal
     BOOST_CHECK(*disc76 != *disc67);
@@ -729,7 +732,7 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     auto disc2 = makeDisc(trf2, 30_mm, 100_mm, 45_degree, 0_degree);
 
     auto [disc3, reversed] =
-        disc->mergedWith(*disc2, Acts::BinningValue::binPhi, true, *logger);
+        disc->mergedWith(*disc2, Acts::AxisDirection::AxisPhi, true, *logger);
     BOOST_REQUIRE_NE(disc3, nullptr);
     Transform3 trfExpected12 =
         base * AngleAxis3(a(85_degree), Vector3::UnitZ());
@@ -738,7 +741,7 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     BOOST_CHECK(reversed);
 
     auto [disc3Reversed, reversed2] =
-        disc2->mergedWith(*disc, Acts::BinningValue::binPhi, true, *logger);
+        disc2->mergedWith(*disc, Acts::AxisDirection::AxisPhi, true, *logger);
     BOOST_REQUIRE_NE(disc3Reversed, nullptr);
     BOOST_CHECK(*disc3 == *disc3Reversed);
     BOOST_CHECK(!reversed2);
@@ -755,7 +758,7 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     Transform3 trf5 = base * AngleAxis3(a(-160_degree), Vector3::UnitZ());
     auto disc5 = makeDisc(trf5, 30_mm, 100_mm, 10_degree, 0_degree);
     auto [disc45, reversed45] =
-        disc4->mergedWith(*disc5, Acts::BinningValue::binPhi, true, *logger);
+        disc4->mergedWith(*disc5, Acts::AxisDirection::AxisPhi, true, *logger);
     BOOST_REQUIRE_NE(disc45, nullptr);
     Transform3 trfExpected45 =
         base * AngleAxis3(a(180_degree), Vector3::UnitZ());
@@ -764,7 +767,7 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     BOOST_CHECK(reversed45);
 
     auto [disc54, reversed54] =
-        disc5->mergedWith(*disc4, Acts::BinningValue::binPhi, true, *logger);
+        disc5->mergedWith(*disc4, Acts::AxisDirection::AxisPhi, true, *logger);
     BOOST_REQUIRE_NE(disc54, nullptr);
     BOOST_CHECK(!reversed54);
 
@@ -782,7 +785,7 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     Transform3 trf7 = base * AngleAxis3(a(180_degree), Vector3::UnitZ());
     auto disc7 = makeDisc(trf7, 30_mm, 100_mm, 90_degree, 0_degree);
     auto [disc67, reversed67] =
-        disc6->mergedWith(*disc7, Acts::BinningValue::binPhi, true, *logger);
+        disc6->mergedWith(*disc7, Acts::AxisDirection::AxisPhi, true, *logger);
     BOOST_REQUIRE_NE(disc67, nullptr);
     Transform3 trfExpected67 =
         base * AngleAxis3(a(90_degree), Vector3::UnitZ());
@@ -791,7 +794,7 @@ BOOST_DATA_TEST_CASE(PhiDirection,
     BOOST_CHECK(!reversed67);
 
     auto [disc76, reversed76] =
-        disc7->mergedWith(*disc6, Acts::BinningValue::binPhi, true, *logger);
+        disc7->mergedWith(*disc6, Acts::AxisDirection::AxisPhi, true, *logger);
     BOOST_REQUIRE_NE(disc76, nullptr);
     // surfaces are not equal due to different transforms
     BOOST_CHECK(*disc76 != *disc67);

@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(Cylinder) {
   //                               |
   //                               v
   BOOST_CHECK_THROW(
-      Portal::merge(gctx, portal1, portal4, BinningValue::binZ, *logger),
+      Portal::merge(gctx, portal1, portal4, AxisDirection::AxisZ, *logger),
       PortalMergingException);
 
   // This call leaves both valid because the exception is thrown before the
@@ -146,9 +146,9 @@ BOOST_AUTO_TEST_CASE(Cylinder) {
           .value(),
       nullptr);
 
-  // Cannot merge in binRPhi
+  // Cannot merge in AxisRPhi
   BOOST_CHECK_THROW(
-      Portal::merge(gctx, portal1, portal2, BinningValue::binRPhi, *logger),
+      Portal::merge(gctx, portal1, portal2, AxisDirection::AxisRPhi, *logger),
       SurfaceMergingException);
 
   // The call above leaves both portals invalid because the exception is thrown
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(Cylinder) {
   portal2 = Portal{gctx, {.alongNormal = {cyl2, *vol2}}};
 
   Portal merged12 =
-      Portal::merge(gctx, portal1, portal2, BinningValue::binZ, *logger);
+      Portal::merge(gctx, portal1, portal2, AxisDirection::AxisZ, *logger);
   BOOST_CHECK_NE(merged12.getLink(Direction::AlongNormal), nullptr);
   BOOST_CHECK_EQUAL(merged12.getLink(Direction::OppositeNormal), nullptr);
 
@@ -204,14 +204,14 @@ BOOST_AUTO_TEST_CASE(Cylinder) {
 
   // Can't merge with self
   BOOST_CHECK_THROW(
-      Portal::merge(gctx, portal1, portal1, BinningValue::binZ, *logger),
+      Portal::merge(gctx, portal1, portal1, AxisDirection::AxisZ, *logger),
       PortalMergingException);
 
   // Can't merge because the surfaces are the same
   portal1 = Portal{gctx, {.alongNormal = {cyl1, *vol1}}};
   portal2 = Portal{gctx, {.alongNormal = {cyl1, *vol2}}};
   BOOST_CHECK_THROW(
-      Portal::merge(gctx, portal1, portal2, BinningValue::binZ, *logger),
+      Portal::merge(gctx, portal1, portal2, AxisDirection::AxisZ, *logger),
       AssertionFailureException);
 
   // Can't merge because surface has material
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(Cylinder) {
   portal1 = Portal{gctx, {.alongNormal = {cyl1, *vol1}}};
   portal2 = Portal{gctx, {.alongNormal = {cyl2, *vol2}}};
   BOOST_CHECK_THROW(
-      Portal::merge(gctx, portal1, portal2, BinningValue::binZ, *logger),
+      Portal::merge(gctx, portal1, portal2, AxisDirection::AxisZ, *logger),
       PortalMergingException);
 }
 
@@ -270,14 +270,14 @@ BOOST_AUTO_TEST_CASE(Disc) {
       vol4.get());
 
   BOOST_CHECK_THROW(
-      Portal::merge(gctx, portal1, portal2, BinningValue::binZ, *logger),
+      Portal::merge(gctx, portal1, portal2, AxisDirection::AxisZ, *logger),
       AssertionFailureException);
 
   BOOST_CHECK(portal1.isValid());
   BOOST_CHECK(portal2.isValid());
 
   BOOST_CHECK_THROW(
-      Portal::merge(gctx, portal1, portal2, BinningValue::binPhi, *logger),
+      Portal::merge(gctx, portal1, portal2, AxisDirection::AxisPhi, *logger),
       SurfaceMergingException);
 
   // Portals not valid anymore because they were moved before the exception was
@@ -302,7 +302,7 @@ BOOST_AUTO_TEST_CASE(Disc) {
   //         |                     |
   //         v                     v
   Portal merged12 =
-      Portal::merge(gctx, portal1, portal2, BinningValue::binR, *logger);
+      Portal::merge(gctx, portal1, portal2, AxisDirection::AxisR, *logger);
 
   BOOST_CHECK_EQUAL(
       merged12.resolveVolume(gctx, Vector3{55_mm, 0_mm, 0_mm}, Vector3::UnitZ())
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_CASE(Disc) {
   portal2 = Portal{
       gctx, {.alongNormal = {disc2, *vol3}, .oppositeNormal = {disc2, *vol4}}};
   BOOST_CHECK_THROW(
-      Portal::merge(gctx, portal1, portal2, BinningValue::binR, *logger),
+      Portal::merge(gctx, portal1, portal2, AxisDirection::AxisR, *logger),
       PortalMergingException);
 }
 
@@ -565,7 +565,7 @@ BOOST_AUTO_TEST_CASE(GridCreationOnFuse) {
   links.push_back(std::move(trivial3));
 
   auto composite = std::make_unique<CompositePortalLink>(std::move(links),
-                                                         BinningValue::binR);
+                                                         AxisDirection::AxisR);
 
   auto discOpposite =
       Surface::makeShared<DiscSurface>(Transform3::Identity(), 30_mm, 120_mm);

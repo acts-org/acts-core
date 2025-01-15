@@ -11,7 +11,7 @@
 #include "Acts/Geometry/Extent.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 
 #include <iostream>
 #include <memory>
@@ -79,24 +79,24 @@ struct ProtoLayer {
   ProtoLayer() = default;
 
   /// Get the parameters : min
-  /// @param bval The accessed binning value
+  /// @param aDir The accessed axis direction
   /// @param addenv The steering if enevlope is added or not
-  double min(BinningValue bval, bool addenv = true) const;
+  double min(AxisDirection aDir, bool addenv = true) const;
 
   // Get the  parameters : max
-  /// @param bval The accessed binning value
+  /// @param aDir The accessed axis direction
   /// @param addenv The steering if enevlope is added or not
-  double max(BinningValue bval, bool addenv = true) const;
+  double max(AxisDirection aDir, bool addenv = true) const;
 
   // Get the  parameters : max
-  /// @param bval The accessed binning value
+  /// @param aDir The accessed axis direction
   /// @param addenv The steering if enevlope is added or not
-  double medium(BinningValue bval, bool addenv = true) const;
+  double medium(AxisDirection aDir, bool addenv = true) const;
 
   // Get the  parameters : max
-  /// @param bval The accessed binning value
+  /// @param aDir The accessed axis direction
   /// @param addenv The steering if enevlope is added or not
-  double range(BinningValue bval, bool addenv = true) const;
+  double range(AxisDirection aDir, bool addenv = true) const;
 
   /// Output to ostream
   /// @param sl the input ostream

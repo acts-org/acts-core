@@ -39,15 +39,15 @@ Acts::DD4hepBinningHelpers::convertBinning(
         } else {
           // Equidistant binning
           double minDefault =
-              bVal == BinningValue::binPhi ? -std::numbers::pi : 0.;
+              bVal == AxisDirection::AxisPhi ? -std::numbers::pi : 0.;
           double maxDefault =
-              bVal == BinningValue::binPhi ? std::numbers::pi : 0.;
+              bVal == AxisDirection::AxisPhi ? std::numbers::pi : 0.;
           auto min = getParamOr<double>(bname + "_" + ab + "_min",
                                         dd4hepElement, minDefault);
           auto max = getParamOr<double>(bname + "_" + ab + "_max",
                                         dd4hepElement, maxDefault);
           // Check for closed phi binning
-          if (bVal == BinningValue::binPhi &&
+          if (bVal == AxisDirection::AxisPhi &&
               (max - min) > 1.9 * std::numbers::pi) {
             bType = Acts::AxisBoundaryType::Closed;
           }
@@ -62,7 +62,7 @@ Acts::DD4hepBinningHelpers::convertBinning(
               bname + "_" + ab + "_b" + std::to_string(ib), dd4hepElement, 0.));
         }
         // Check for closed phi binning
-        if (bVal == BinningValue::binPhi &&
+        if (bVal == AxisDirection::AxisPhi &&
             (edges.back() - edges.front()) > 1.9 * std::numbers::pi) {
           bType = Acts::AxisBoundaryType::Closed;
         }

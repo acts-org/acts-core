@@ -185,10 +185,10 @@ BOOST_AUTO_TEST_CASE(CylindricalDetectorVolumePortals) {
 
   // Check the extent
   auto volumeExtent = tubeCylinderVolume->extent(tContext, 1);
-  CHECK_CLOSE_ABS(volumeExtent.min(Acts::BinningValue::binR), 10., 10e-5);
-  CHECK_CLOSE_ABS(volumeExtent.max(Acts::BinningValue::binR), 100., 10e-5);
-  CHECK_CLOSE_ABS(volumeExtent.min(Acts::BinningValue::binZ), -200., 10e-5);
-  CHECK_CLOSE_ABS(volumeExtent.max(Acts::BinningValue::binZ), 200., 10e-5);
+  CHECK_CLOSE_ABS(volumeExtent.min(Acts::AxisDirection::AxisR), 10., 10e-5);
+  CHECK_CLOSE_ABS(volumeExtent.max(Acts::AxisDirection::AxisR), 100., 10e-5);
+  CHECK_CLOSE_ABS(volumeExtent.min(Acts::AxisDirection::AxisZ), -200., 10e-5);
+  CHECK_CLOSE_ABS(volumeExtent.max(Acts::AxisDirection::AxisZ), 200., 10e-5);
 }
 
 BOOST_AUTO_TEST_CASE(UpdatePortal) {

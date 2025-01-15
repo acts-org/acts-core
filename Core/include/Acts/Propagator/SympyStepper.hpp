@@ -53,7 +53,7 @@ class SympyStepper {
   struct State {
     /// Constructor from the initial bound track parameters
     ///
-    /// @param [in] optionsIn The stepper options
+    /// @param [in] optionsIn is the configuration of the stepper
     /// @param [in] fieldCacheIn is the cache object for the magnetic field
     ///
     /// @note the covariance matrix is copied when needed

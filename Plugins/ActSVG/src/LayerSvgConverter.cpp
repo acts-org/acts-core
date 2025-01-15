@@ -86,7 +86,7 @@ std::vector<actsvg::svg::object> Acts::Svg::LayerConverter::convert(
     for (const auto& sf : layer.surfaceArray()->surfaces()) {
       // Surface center
       const Acts::Vector3 rCenter =
-          sf->binningPosition(gctx, Acts::BinningValue::binR);
+          sf->referencePosition(gctx, Acts::AxisDirection::AxisR);
       const Acts::Vector3 sfCenter = sf->center(gctx);
       double radius = Acts::VectorHelpers::perp(rCenter);
       double phi = Acts::VectorHelpers::phi(rCenter);

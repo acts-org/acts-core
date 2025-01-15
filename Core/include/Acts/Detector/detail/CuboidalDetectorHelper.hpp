@@ -33,7 +33,7 @@ namespace detail::CuboidalDetectorHelper {
 ///
 /// @param gctx The geometry context
 /// @param volumes the volumes
-/// @param bValue the binning value  (allowed are binX, binY, binZ)
+/// @param bValue the binning value  (allowed are AxisX, AxisY, AxisZ)
 /// @param selectedOnly switch only selected boundaries
 /// @param logLevel is the screen logging level
 ///
@@ -43,7 +43,7 @@ namespace detail::CuboidalDetectorHelper {
 /// @return a proto container with the outside portals
 DetectorComponent::PortalContainer connect(
     const GeometryContext& gctx,
-    std::vector<std::shared_ptr<DetectorVolume>>& volumes, BinningValue bValue,
+    std::vector<std::shared_ptr<DetectorVolume>>& volumes, AxisDirection bValue,
     const std::vector<unsigned int>& selectedOnly = {},
     Acts::Logging::Level logLevel = Acts::Logging::INFO);
 
@@ -51,7 +51,7 @@ DetectorComponent::PortalContainer connect(
 ///
 /// @param gctx The geometry context
 /// @param containers the containers
-/// @param bValue the binning value  (allowed are binX, binY, binZ)
+/// @param bValue the binning value  (allowed are AxisX, AxisY, AxisZ)
 /// @param selectedOnly switch only selected boundaries
 /// @param logLevel is the screen logging level
 ///
@@ -62,7 +62,7 @@ DetectorComponent::PortalContainer connect(
 DetectorComponent::PortalContainer connect(
     const GeometryContext& gctx,
     const std::vector<DetectorComponent::PortalContainer>& containers,
-    BinningValue bValue, const std::vector<unsigned int>& selectedOnly = {},
+    AxisDirection bValue, const std::vector<unsigned int>& selectedOnly = {},
     Acts::Logging::Level logLevel = Acts::Logging::INFO);
 
 /// @brief Helper method to extract r,z,phi boundaries for

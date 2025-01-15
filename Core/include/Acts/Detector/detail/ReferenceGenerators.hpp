@@ -41,8 +41,8 @@ struct CenterReferenceGenerator {
 ///
 /// This generator will provide only one filling point and hence
 /// only a single bin in the indexed grid.
-template <BinningValue bVAL>
-struct BinningValueReferenceGenerator {
+template <AxisDirection bVAL>
+struct AxisDirectionReferenceGenerator {
   /// Helper to access a reference position based on binning value
   ///
   /// @param gctx the geometry context of this operation
@@ -51,7 +51,7 @@ struct BinningValueReferenceGenerator {
   /// @return a vector of reference points for filling
   const std::vector<Vector3> references(const GeometryContext& gctx,
                                         const Surface& surface) const {
-    return {surface.binningPosition(gctx, bVAL)};
+    return {surface.referencePosition(gctx, bVAL)};
   }
 };
 

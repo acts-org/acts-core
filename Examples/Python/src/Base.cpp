@@ -13,7 +13,7 @@
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Plugins/Python/Utilities.hpp"
 #include "Acts/Utilities/Any.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 #include "Acts/Utilities/CalibrationContext.hpp"
 #include "Acts/Utilities/Logger.hpp"
@@ -359,16 +359,16 @@ void addAlgebra(Acts::Python::Context& ctx) {
 void addBinning(Context& ctx) {
   auto& m = ctx.get("main");
 
-  auto binningValue = py::enum_<Acts::BinningValue>(m, "BinningValue")
-                          .value("binX", Acts::BinningValue::binX)
-                          .value("binY", Acts::BinningValue::binY)
-                          .value("binZ", Acts::BinningValue::binZ)
-                          .value("binR", Acts::BinningValue::binR)
-                          .value("binPhi", Acts::BinningValue::binPhi)
-                          .value("binRPhi", Acts::BinningValue::binRPhi)
-                          .value("binH", Acts::BinningValue::binH)
-                          .value("binEta", Acts::BinningValue::binEta)
-                          .value("binMag", Acts::BinningValue::binMag);
+  auto binningValue = py::enum_<Acts::AxisDirection>(m, "AxisDirection")
+                          .value("AxisX", Acts::AxisDirection::AxisX)
+                          .value("AxisY", Acts::AxisDirection::AxisY)
+                          .value("AxisZ", Acts::AxisDirection::AxisZ)
+                          .value("AxisR", Acts::AxisDirection::AxisR)
+                          .value("AxisPhi", Acts::AxisDirection::AxisPhi)
+                          .value("AxisRPhi", Acts::AxisDirection::AxisRPhi)
+                          .value("AxisTheta", Acts::AxisDirection::AxisTheta)
+                          .value("AxisEta", Acts::AxisDirection::AxisEta)
+                          .value("AxisMag", Acts::AxisDirection::AxisMag);
 
   auto boundaryType = py::enum_<Acts::AxisBoundaryType>(m, "AxisBoundaryType")
                           .value("Bound", Acts::AxisBoundaryType::Bound)

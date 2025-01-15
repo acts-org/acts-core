@@ -44,26 +44,26 @@ ProtoLayer::ProtoLayer(const GeometryContext& gctx,
   measure(gctx, m_surfaces);
 }
 
-double ProtoLayer::min(BinningValue bval, bool addenv) const {
+double ProtoLayer::min(AxisDirection aDir, bool addenv) const {
   if (addenv) {
-    return extent.min(bval) - envelope[bval][0u];
+    return extent.min(aDir) - envelope[aDir][0u];
   }
-  return extent.min(bval);
+  return extent.min(aDir);
 }
 
-double ProtoLayer::max(BinningValue bval, bool addenv) const {
+double ProtoLayer::max(AxisDirection aDir, bool addenv) const {
   if (addenv) {
-    return extent.max(bval) + envelope[bval][1u];
+    return extent.max(aDir) + envelope[aDir][1u];
   }
-  return extent.max(bval);
+  return extent.max(aDir);
 }
 
-double ProtoLayer::medium(BinningValue bval, bool addenv) const {
-  return 0.5 * (min(bval, addenv) + max(bval, addenv));
+double ProtoLayer::medium(AxisDirection aDir, bool addenv) const {
+  return 0.5 * (min(aDir, addenv) + max(aDir, addenv));
 }
 
-double ProtoLayer::range(BinningValue bval, bool addenv) const {
-  return std::abs(max(bval, addenv) - min(bval, addenv));
+double ProtoLayer::range(AxisDirection aDir, bool addenv) const {
+  return std::abs(max(aDir, addenv) - min(aDir, addenv));
 }
 
 std::ostream& ProtoLayer::toStream(std::ostream& sl) const {

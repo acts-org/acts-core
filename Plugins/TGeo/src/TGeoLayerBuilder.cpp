@@ -150,12 +150,12 @@ void Acts::TGeoLayerBuilder::buildLayers(const GeometryContext& gctx,
       ProtoLayer pl(gctx, lSurfaces);
       ACTS_DEBUG("- creating CylinderLayer with "
                  << lSurfaces.size()
-                 << " surfaces at r = " << pl.medium(BinningValue::binR));
+                 << " surfaces at r = " << pl.medium(AxisDirection::AxisR));
 
-      pl.envelope[Acts::BinningValue::binR] = {lCfg.envelope.first,
-                                               lCfg.envelope.second};
-      pl.envelope[Acts::BinningValue::binZ] = {lCfg.envelope.second,
-                                               lCfg.envelope.second};
+      pl.envelope[Acts::AxisDirection::AxisR] = {lCfg.envelope.first,
+                                                 lCfg.envelope.second};
+      pl.envelope[Acts::AxisDirection::AxisZ] = {lCfg.envelope.second,
+                                                 lCfg.envelope.second};
       if (nb0 >= 0 && nb1 >= 0) {
         layers.push_back(
             m_cfg.layerCreator->cylinderLayer(gctx, lSurfaces, nb0, nb1, pl));
@@ -167,12 +167,12 @@ void Acts::TGeoLayerBuilder::buildLayers(const GeometryContext& gctx,
       ProtoLayer pl(gctx, lSurfaces);
       ACTS_DEBUG("- creating DiscLayer with "
                  << lSurfaces.size()
-                 << " surfaces at z = " << pl.medium(BinningValue::binZ));
+                 << " surfaces at z = " << pl.medium(AxisDirection::AxisZ));
 
-      pl.envelope[Acts::BinningValue::binR] = {lCfg.envelope.first,
-                                               lCfg.envelope.second};
-      pl.envelope[Acts::BinningValue::binZ] = {lCfg.envelope.second,
-                                               lCfg.envelope.second};
+      pl.envelope[Acts::AxisDirection::AxisR] = {lCfg.envelope.first,
+                                                 lCfg.envelope.second};
+      pl.envelope[Acts::AxisDirection::AxisZ] = {lCfg.envelope.second,
+                                                 lCfg.envelope.second};
       if (nb0 >= 0 && nb1 >= 0) {
         layers.push_back(
             m_cfg.layerCreator->discLayer(gctx, lSurfaces, nb0, nb1, pl));
@@ -192,7 +192,7 @@ void Acts::TGeoLayerBuilder::buildLayers(const GeometryContext& gctx,
     if (!layerCfg.parseRanges.empty()) {
       for (const auto& pRange : layerCfg.parseRanges) {
         ACTS_DEBUG("- layer parsing restricted in "
-                   << binningValueName(pRange.first) << " to ["
+                   << axisDirectionName(pRange.first) << " to ["
                    << pRange.second.first << "/" << pRange.second.second
                    << "].");
       }
@@ -200,7 +200,7 @@ void Acts::TGeoLayerBuilder::buildLayers(const GeometryContext& gctx,
     if (!layerCfg.splitConfigs.empty()) {
       for (const auto& sConfig : layerCfg.splitConfigs) {
         ACTS_DEBUG("- layer splitting attempt in "
-                   << binningValueName(sConfig.first) << " with tolerance "
+                   << axisDirectionName(sConfig.first) << " with tolerance "
                    << sConfig.second << ".");
       }
     }
@@ -240,7 +240,7 @@ void Acts::TGeoLayerBuilder::buildLayers(const GeometryContext& gctx,
       ACTS_DEBUG("- applying  " << layerCfg.parseRanges.size()
                                 << " search restrictions.");
       for (const auto& prange : layerCfg.parseRanges) {
-        ACTS_VERBOSE(" - range " << binningValueName(prange.first)
+        ACTS_VERBOSE(" - range " << axisDirectionName(prange.first)
                                  << " within [ " << prange.second.first << ", "
                                  << prange.second.second << "]");
       }

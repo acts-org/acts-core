@@ -40,7 +40,7 @@ namespace Acts {
 std::shared_ptr<const TrackingGeometry> trackingGeometry() {
   using namespace Acts::UnitLiterals;
 
-  BinUtility zbinned(8, -40, 40, open, BinningValue::binZ);
+  BinUtility zbinned(8, -40, 40, open, AxisDirection::AxisZ);
   auto matProxy = std::make_shared<const ProtoSurfaceMaterial>(zbinned);
 
   Logging::Level surfaceLLevel = Logging::INFO;

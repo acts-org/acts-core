@@ -261,7 +261,7 @@ bool Acts::Experimental::DetectorVolume::checkContainment(
   // We don't have a logging instance here
   // so can't throw a warning for shapes that are
   // using the bounding box
-  auto binningValues = volumeBounds().canonicalBinning();
+  auto binningValues = volumeBounds().canonicalAxes();
 
   // Create the volume extent
   auto volumeExtent = extent(gctx, nseg);

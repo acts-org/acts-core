@@ -51,8 +51,8 @@ class CompositePortalLink final : public PortalLinkBase {
   /// @param direction The binning direction
   /// @param flatten If true, the composite will flatten any nested composite
   CompositePortalLink(std::unique_ptr<PortalLinkBase> a,
-                      std::unique_ptr<PortalLinkBase> b, BinningValue direction,
-                      bool flatten = true);
+                      std::unique_ptr<PortalLinkBase> b,
+                      AxisDirection direction, bool flatten = true);
 
   /// Construct a composite portal from any number of arbitrary other portal
   /// links. The only requirement is that the portal link surfaces are
@@ -61,7 +61,7 @@ class CompositePortalLink final : public PortalLinkBase {
   /// @param direction The binning direction
   /// @param flatten If true, the composite will flatten any nested composite
   CompositePortalLink(std::vector<std::unique_ptr<PortalLinkBase>> links,
-                      BinningValue direction, bool flatten = true);
+                      AxisDirection direction, bool flatten = true);
 
   /// Print the composite portal link
   /// @param os The output stream
@@ -110,7 +110,7 @@ class CompositePortalLink final : public PortalLinkBase {
   boost::container::small_vector<std::unique_ptr<PortalLinkBase>, 4>
       m_children{};
 
-  BinningValue m_direction;
+  AxisDirection m_direction;
 };
 
 }  // namespace Acts

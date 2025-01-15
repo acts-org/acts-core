@@ -10,7 +10,7 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Tolerance.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/Result.hpp"
 
@@ -75,7 +75,7 @@ class PortalLinkBase {
   /// @return The merged portal link
   static std::unique_ptr<PortalLinkBase> merge(
       std::unique_ptr<PortalLinkBase> a, std::unique_ptr<PortalLinkBase> b,
-      BinningValue direction, const Logger& logger = getDummyLogger());
+      AxisDirection direction, const Logger& logger = getDummyLogger());
 
   /// Stream output function
   /// @param os The output stream
@@ -111,7 +111,7 @@ class PortalLinkBase {
   /// executed.
   static void checkMergePreconditions(const PortalLinkBase& a,
                                       const PortalLinkBase& b,
-                                      BinningValue direction);
+                                      AxisDirection direction);
 
   std::shared_ptr<RegularSurface> m_surface;
 };

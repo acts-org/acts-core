@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Acts/Surfaces/SurfaceBounds.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 
 #include <span>
 #include <tuple>
@@ -62,6 +62,6 @@ void addVolumeLink(nlohmann::json& jSurface, int vLink);
 /// @param casts are the grid axes cast types
 ///
 /// @return the acceleration link idnetifier
-std::size_t accelerationLink(std::span<const BinningValue> casts);
+std::size_t accelerationLink(std::span<const AxisDirection> casts);
 
 }  // namespace Acts::DetrayJsonHelper

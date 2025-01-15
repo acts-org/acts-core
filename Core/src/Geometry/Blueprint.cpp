@@ -58,7 +58,7 @@ void Blueprint::addToGraphviz(std::ostream &os) const {
 std::unique_ptr<TrackingGeometry> Blueprint::construct(
     const BlueprintOptions &options, const GeometryContext &gctx,
     const Logger &logger) {
-  using enum BinningValue;
+  using enum AxisDirection;
 
   ACTS_INFO(prefix() << "Building tracking geometry from blueprint tree");
 
@@ -94,7 +94,7 @@ std::unique_ptr<TrackingGeometry> Blueprint::construct(
     // Make a copy that we'll modify
     auto newBounds = std::make_shared<CylinderVolumeBounds>(*cyl);
 
-    const auto &zEnv = m_cfg.envelope[binZ];
+    const auto &zEnv = m_cfg.envelope[AxisZ];
     if (zEnv[0] != zEnv[1]) {
       ACTS_ERROR(
           prefix() << "Root node cylinder envelope for z must be symmetric");
@@ -103,7 +103,7 @@ std::unique_ptr<TrackingGeometry> Blueprint::construct(
           "symmetric");
     }
 
-    const auto &rEnv = m_cfg.envelope[binR];
+    const auto &rEnv = m_cfg.envelope[AxisR];
 
     newBounds->set({
         {eHalfLengthZ, newBounds->get(eHalfLengthZ) + zEnv[0]},

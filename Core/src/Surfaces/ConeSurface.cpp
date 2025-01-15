@@ -61,19 +61,19 @@ ConeSurface::ConeSurface(const Transform3& transform,
   throw_assert(m_bounds, "ConeBounds must not be nullptr");
 }
 
-Vector3 ConeSurface::binningPosition(const GeometryContext& gctx,
-                                     BinningValue bValue) const {
+Vector3 ConeSurface::referencePosition(const GeometryContext& gctx,
+                                       AxisDirection aDir) const {
   const Vector3& sfCenter = center(gctx);
 
   // special binning type for R-type methods
-  if (bValue == BinningValue::binR || bValue == BinningValue::binRPhi) {
+  if (aDir == AxisDirection::AxisR || aDir == AxisDirection::AxisRPhi) {
     return Vector3(sfCenter.x() + bounds().r(sfCenter.z()), sfCenter.y(),
                    sfCenter.z());
   }
   // give the center as default for all of these binning types
-  // BinningValue::binX, BinningValue::binY, BinningValue::binZ,
-  // BinningValue::binR, BinningValue::binPhi, BinningValue::binRPhi,
-  // BinningValue::binH, BinningValue::binEta
+  // AxisDirection::AxisX, AxisDirection::AxisY, AxisDirection::AxisZ,
+  // AxisDirection::AxisR, AxisDirection::AxisPhi, AxisDirection::AxisRPhi,
+  // AxisDirection::AxisTheta, AxisDirection::AxisEta
   return sfCenter;
 }
 

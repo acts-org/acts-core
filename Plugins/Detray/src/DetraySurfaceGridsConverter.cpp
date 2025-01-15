@@ -111,8 +111,8 @@ Acts::DetraySurfaceGridsConverter::convertImpl(const index_grid& indexGrid) {
 
   if constexpr (index_grid::grid_type::DIM == 2u) {
     // Check for axis swap
-    swapAxes = (indexGrid.casts[0u] == Acts::BinningValue::binZ &&
-                indexGrid.casts[1u] == Acts::BinningValue::binPhi);
+    swapAxes = (indexGrid.casts[0u] == Acts::AxisDirection::AxisZ &&
+                indexGrid.casts[1u] == Acts::AxisDirection::AxisPhi);
   }
 
   detray::io::grid_payload<std::size_t, detray::io::accel_id> grid_pd =

@@ -84,44 +84,44 @@ Acts::Grid3D Acts::createGrid(Acts::MaterialGridAxisData gridAxis1,
 }
 
 std::function<double(Acts::Vector3)> Acts::globalToLocalFromBin(
-    Acts::BinningValue& type) {
+    Acts::AxisDirection& type) {
   std::function<double(Acts::Vector3)> transfoGlobalToLocal;
 
   switch (type) {
-    case Acts::BinningValue::binX:
+    case Acts::AxisDirection::AxisX:
       transfoGlobalToLocal = [](const Acts::Vector3& pos) -> double {
         return (pos.x());
       };
       break;
 
-    case Acts::BinningValue::binY:
+    case Acts::AxisDirection::AxisY:
       transfoGlobalToLocal = [](const Acts::Vector3& pos) -> double {
         return (pos.y());
       };
       break;
 
-    case Acts::BinningValue::binR:
+    case Acts::AxisDirection::AxisR:
       transfoGlobalToLocal = [](const Acts::Vector3& pos) -> double {
         return (Acts::VectorHelpers::perp(pos));
       };
       break;
 
-    case Acts::BinningValue::binPhi:
+    case Acts::AxisDirection::AxisPhi:
       transfoGlobalToLocal = [](const Acts::Vector3& pos) -> double {
         return (Acts::VectorHelpers::phi(pos));
       };
       break;
 
-    case Acts::BinningValue::binZ:
+    case Acts::AxisDirection::AxisZ:
       transfoGlobalToLocal = [](const Acts::Vector3& pos) -> double {
         return (pos.z());
       };
       break;
 
-      // case Acts::BinningValue::binRPhi:
-      // case Acts::BinningValue::binEta:
-      // case Acts::BinningValue::binH:
-      // case Acts::BinningValue::binMag:
+      // case Acts::AxisDirection::AxisRPhi:
+      // case Acts::AxisDirection::AxisEta:
+      // case Acts::AxisDirection::AxisTheta:
+      // case Acts::AxisDirection::AxisMag:
     default:
       throw std::invalid_argument("Incorrect bin, should be x,y,z,r,phi");
   }
@@ -137,12 +137,12 @@ Acts::Grid2D Acts::createGrid2D(
   bool isCylindrical = false;
 
   for (std::size_t b = 0; b < bu.size(); b++) {
-    if (bu[b].binvalue == Acts::BinningValue::binX ||
-        bu[b].binvalue == Acts::BinningValue::binY) {
+    if (bu[b].binvalue == Acts::AxisDirection::AxisX ||
+        bu[b].binvalue == Acts::AxisDirection::AxisY) {
       isCartesian = true;
     }
-    if (bu[b].binvalue == Acts::BinningValue::binR ||
-        bu[b].binvalue == Acts::BinningValue::binPhi) {
+    if (bu[b].binvalue == Acts::AxisDirection::AxisR ||
+        bu[b].binvalue == Acts::AxisDirection::AxisPhi) {
       isCylindrical = true;
     }
   }
@@ -177,12 +177,12 @@ Acts::Grid3D Acts::createGrid3D(
   bool isCylindrical = false;
 
   for (std::size_t b = 0; b < bu.size(); b++) {
-    if (bu[b].binvalue == Acts::BinningValue::binX ||
-        bu[b].binvalue == Acts::BinningValue::binY) {
+    if (bu[b].binvalue == Acts::AxisDirection::AxisX ||
+        bu[b].binvalue == Acts::AxisDirection::AxisY) {
       isCartesian = true;
     }
-    if (bu[b].binvalue == Acts::BinningValue::binR ||
-        bu[b].binvalue == Acts::BinningValue::binPhi) {
+    if (bu[b].binvalue == Acts::AxisDirection::AxisR ||
+        bu[b].binvalue == Acts::AxisDirection::AxisPhi) {
       isCylindrical = true;
     }
   }

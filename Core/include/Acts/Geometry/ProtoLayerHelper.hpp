@@ -10,7 +10,7 @@
 
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/ProtoLayer.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <memory>
@@ -30,7 +30,7 @@ struct ProtoLayer;
 /// @todo write more documentation on how this is done
 class ProtoLayerHelper {
  public:
-  using SortingConfig = std::pair<BinningValue, double>;
+  using SortingConfig = std::pair<AxisDirection, double>;
 
   struct Config {};
 

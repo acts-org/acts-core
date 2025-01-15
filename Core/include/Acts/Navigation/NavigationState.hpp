@@ -10,9 +10,7 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
-#include "Acts/Utilities/Delegate.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 
 #include <any>
@@ -58,15 +56,6 @@ struct NavigationState {
 
   /// The current direction
   Vector3 direction = Vector3(0., 0., 0.);
-
-  /// The current absolute momentum
-  double absMomentum = 0.;
-
-  /// The current absolute charge
-  double absCharge = 0.;
-
-  /// The current magnetic field
-  Vector3 magneticField = Vector3(0., 0., 0.);
 
   /// The current detector in processing
   const Detector* currentDetector = nullptr;

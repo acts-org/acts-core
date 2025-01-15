@@ -72,7 +72,7 @@ class MultiWireInternalStructureBuilder
         Acts::Experimental::MultiLayerSurfacesNavigation>
         isg{internalSurfaces,
             {},
-            {m_cfg.binning[0u].binValue, m_cfg.binning[1u].binValue},
+            {m_cfg.binning[0u].axisDir, m_cfg.binning[1u].axisDir},
             {m_cfg.binning[0u].expansion, m_cfg.binning[1u].expansion},
             m_cfg.transform};
     Acts::Experimental::detail::CenterReferenceGenerator rGenerator;

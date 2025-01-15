@@ -1798,7 +1798,7 @@ def addExaTrkX(
             acts.examples.OnnxEdgeClassifier(**filterConfig),
             acts.examples.OnnxEdgeClassifier(**gnnConfig),
         ]
-        trackBuilder = acts.examples.CugraphTrackBuilding(customLogLevel())
+        trackBuilder = acts.examples.BoostTrackBuilding(customLogLevel())
 
     findingAlg = acts.examples.TrackFindingAlgorithmExaTrkX(
         level=customLogLevel(),

@@ -28,26 +28,26 @@ Acts::Experimental::detail::SupportSurfacesHelper::SupportSurfaceComponents
 Acts::Experimental::detail::SupportSurfacesHelper::CylindricalSupport::
 operator()(const Extent& lExtent) const {
   // Bail out if you have no measure of R, Z
-  if (!lExtent.constrains(BinningValue::binZ) ||
-      !lExtent.constrains(BinningValue::binR)) {
+  if (!lExtent.constrains(AxisDirection::AxisZ) ||
+      !lExtent.constrains(AxisDirection::AxisR)) {
     throw std::invalid_argument(
         "SupportSurfacesHelper::CylindricalSupport::operator() - z or "
         "r are not constrained.");
   }
 
   // Min / Max z  with clearances adapted
-  double minZ = lExtent.min(BinningValue::binZ) + std::abs(zClearance[0u]);
-  double maxZ = lExtent.max(BinningValue::binZ) - std::abs(zClearance[1u]);
+  double minZ = lExtent.min(AxisDirection::AxisZ) + std::abs(zClearance[0u]);
+  double maxZ = lExtent.max(AxisDirection::AxisZ) - std::abs(zClearance[1u]);
 
   // Phi sector
   double hPhiSector = std::numbers::pi;
   double avgPhi = 0.;
-  if (lExtent.constrains(BinningValue::binPhi)) {
+  if (lExtent.constrains(AxisDirection::AxisPhi)) {
     // Min / Max phi  with clearances adapted
     double minPhi =
-        lExtent.min(BinningValue::binPhi) + std::abs(phiClearance[0u]);
+        lExtent.min(AxisDirection::AxisPhi) + std::abs(phiClearance[0u]);
     double maxPhi =
-        lExtent.max(BinningValue::binPhi) - std::abs(phiClearance[1u]);
+        lExtent.max(AxisDirection::AxisPhi) - std::abs(phiClearance[1u]);
     hPhiSector = 0.5 * (maxPhi - minPhi);
     avgPhi = 0.5 * (minPhi + maxPhi);
   }
@@ -58,10 +58,10 @@ operator()(const Extent& lExtent) const {
   }
 
   // The Radius estimation
-  double r = rOffset < 0 ? lExtent.min(BinningValue::binR) + rOffset
-                         : lExtent.max(BinningValue::binR) + rOffset;
+  double r = rOffset < 0 ? lExtent.min(AxisDirection::AxisR) + rOffset
+                         : lExtent.max(AxisDirection::AxisR) + rOffset;
   if (rOffset == 0.) {
-    r = lExtent.medium(BinningValue::binR);
+    r = lExtent.medium(AxisDirection::AxisR);
   }
   // Components are resolved and returned as a tuple
   return {
@@ -72,35 +72,35 @@ Acts::Experimental::detail::SupportSurfacesHelper::SupportSurfaceComponents
 Acts::Experimental::detail::SupportSurfacesHelper::DiscSupport::operator()(
     const Extent& lExtent) const {
   // Bail out if you have no measure of R, Z
-  if (!lExtent.constrains(BinningValue::binZ) ||
-      !lExtent.constrains(BinningValue::binR)) {
+  if (!lExtent.constrains(AxisDirection::AxisZ) ||
+      !lExtent.constrains(AxisDirection::AxisR)) {
     throw std::invalid_argument(
         "SupportSurfacesHelper::DiscSupport::operator() - z or "
         "r are not constrained.");
   }
 
   // Min / Max r  with clearances adapted
-  double minR = lExtent.min(BinningValue::binR) + std::abs(rClearance[0u]);
-  double maxR = lExtent.max(BinningValue::binR) - std::abs(rClearance[1u]);
+  double minR = lExtent.min(AxisDirection::AxisR) + std::abs(rClearance[0u]);
+  double maxR = lExtent.max(AxisDirection::AxisR) - std::abs(rClearance[1u]);
 
   // Phi sector
   double hPhiSector = std::numbers::pi;
   double avgPhi = 0.;
-  if (lExtent.constrains(BinningValue::binPhi)) {
+  if (lExtent.constrains(AxisDirection::AxisPhi)) {
     // Min / Max phi  with clearances adapted
     double minPhi =
-        lExtent.min(BinningValue::binPhi) + std::abs(phiClearance[0u]);
+        lExtent.min(AxisDirection::AxisPhi) + std::abs(phiClearance[0u]);
     double maxPhi =
-        lExtent.max(BinningValue::binPhi) - std::abs(phiClearance[1u]);
+        lExtent.max(AxisDirection::AxisPhi) - std::abs(phiClearance[1u]);
     hPhiSector = 0.5 * (maxPhi - minPhi);
     avgPhi = 0.5 * (minPhi + maxPhi);
   }
 
   // The z position estimate
-  double z = zOffset < 0 ? lExtent.min(BinningValue::binZ) + zOffset
-                         : lExtent.max(BinningValue::binZ) + zOffset;
+  double z = zOffset < 0 ? lExtent.min(AxisDirection::AxisZ) + zOffset
+                         : lExtent.max(AxisDirection::AxisZ) + zOffset;
   if (zOffset == 0.) {
-    z = lExtent.medium(BinningValue::binZ);
+    z = lExtent.medium(AxisDirection::AxisZ);
   }
 
   Transform3 transform = Transform3::Identity();
@@ -114,20 +114,21 @@ Acts::Experimental::detail::SupportSurfacesHelper::SupportSurfaceComponents
 Acts::Experimental::detail::SupportSurfacesHelper::RectangularSupport::
 operator()(const Extent& lExtent) const {
   // Bail out if you have no measure of X, Y, Z
-  if (!(lExtent.constrains(BinningValue::binX) &&
-        lExtent.constrains(BinningValue::binY) &&
-        lExtent.constrains(BinningValue::binZ))) {
+  if (!(lExtent.constrains(AxisDirection::AxisX) &&
+        lExtent.constrains(AxisDirection::AxisY) &&
+        lExtent.constrains(AxisDirection::AxisZ))) {
     throw std::invalid_argument(
         "SupportSurfacesHelper::RectangularSupport::operator() - x, y or "
         "z are not constrained.");
   }
 
   // Set the local coordinates - cyclic permutation
-  std::array<BinningValue, 2> locals = {BinningValue::binX, BinningValue::binY};
-  if (pPlacement == BinningValue::binX) {
-    locals = {BinningValue::binY, BinningValue::binZ};
-  } else if (pPlacement == BinningValue::binY) {
-    locals = {BinningValue::binZ, BinningValue::binX};
+  std::array<AxisDirection, 2> locals = {AxisDirection::AxisX,
+                                         AxisDirection::AxisY};
+  if (pPlacement == AxisDirection::AxisX) {
+    locals = {AxisDirection::AxisY, AxisDirection::AxisZ};
+  } else if (pPlacement == AxisDirection::AxisY) {
+    locals = {AxisDirection::AxisZ, AxisDirection::AxisX};
   }
 
   // Make the rectangular shape

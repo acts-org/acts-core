@@ -39,11 +39,18 @@ std::vector<std::vector<int>> ExaTrkXPipeline::run(
     std::vector<float> &features, const std::vector<std::uint64_t> &moduleIds,
     std::vector<int> &spacepointIDs, const ExaTrkXHook &hook,
     ExaTrkXTiming *timing) const {
+  ExecutionContext ctx;
+  ctx.device = m_graphConstructor->device();
+#ifndef ACTS_EXATRKX_CPUONLY
+  if (ctx.device.type() == torch::kCUDA) {
+    ctx.stream = c10::cuda::getStreamFromPool(ctx.device.index());
+  }
+#endif
+
   try {
     auto t0 = std::chrono::high_resolution_clock::now();
     auto [nodeFeatures, edgeIndex, edgeFeatures] =
-        (*m_graphConstructor)(features, spacepointIDs.size(), moduleIds,
-                              m_graphConstructor->device());
+        (*m_graphConstructor)(features, spacepointIDs.size(), moduleIds, ctx);
     auto t1 = std::chrono::high_resolution_clock::now();
 
     if (timing != nullptr) {
@@ -59,7 +66,7 @@ std::vector<std::vector<int>> ExaTrkXPipeline::run(
       t0 = std::chrono::high_resolution_clock::now();
       auto [newNodeFeatures, newEdgeIndex, newEdgeFeatures, newEdgeScores] =
           (*edgeClassifier)(std::move(nodeFeatures), std::move(edgeIndex),
-                            std::move(edgeFeatures), edgeClassifier->device());
+                            std::move(edgeFeatures), ctx);
       t1 = std::chrono::high_resolution_clock::now();
 
       if (timing != nullptr) {
@@ -76,8 +83,7 @@ std::vector<std::vector<int>> ExaTrkXPipeline::run(
 
     t0 = std::chrono::high_resolution_clock::now();
     auto res = (*m_trackBuilder)(std::move(nodeFeatures), std::move(edgeIndex),
-                                 std::move(edgeScores), spacepointIDs,
-                                 m_trackBuilder->device());
+                                 std::move(edgeScores), spacepointIDs, ctx);
     t1 = std::chrono::high_resolution_clock::now();
 
     if (timing != nullptr) {

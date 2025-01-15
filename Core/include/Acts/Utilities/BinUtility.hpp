@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
@@ -69,10 +70,10 @@ class BinUtility {
   /// @param min in the minimal value
   /// @param max is the maximal value
   /// @param opt is the binning option : open, closed
-  /// @param value is the binninb value : binX, binY, binZ, etc.
+  /// @param value is the axis direction : AxisX, AxisY, AxisZ, etc.
   /// @param tForm is the (optional) transform
   BinUtility(std::size_t bins, float min, float max, BinningOption opt = open,
-             BinningValue value = BinningValue::binX,
+             AxisDirection value = AxisDirection::AxisX,
              const Transform3& tForm = Transform3::Identity())
       : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
     m_binningData.reserve(3);
@@ -83,10 +84,10 @@ class BinUtility {
   ///
   /// @param bValues is the boundary values of the binning
   /// @param opt is the binning option : open, closed
-  /// @param value is the binninb value : binX, binY, binZ, etc.
+  /// @param value is the axis direction : AxisX, AxisY, AxisZ, etc.
   /// @param tForm is the (optional) transform
   BinUtility(std::vector<float>& bValues, BinningOption opt = open,
-             BinningValue value = BinningValue::binPhi,
+             AxisDirection value = AxisDirection::AxisPhi,
              const Transform3& tForm = Transform3::Identity())
       : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
     m_binningData.reserve(3);
@@ -267,7 +268,7 @@ class BinUtility {
   /// @param ba is the binaccessor
   ///
   /// @return the binning value of the accessor entry
-  BinningValue binningValue(std::size_t ba = 0) const {
+  AxisDirection binningValue(std::size_t ba = 0) const {
     if (ba >= m_binningData.size()) {
       throw std::runtime_error{"Dimension out of bounds"};
     }

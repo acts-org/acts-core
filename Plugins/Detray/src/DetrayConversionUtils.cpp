@@ -8,20 +8,20 @@
 
 #include "Acts/Plugins/Detray/DetrayConversionUtils.hpp"
 
-detray::axis::label Acts::DetrayConversionUtils::convertBinningValue(
-    BinningValue bValue) {
+detray::axis::label Acts::DetrayConversionUtils::convertAxisDirection(
+    AxisDirection bValue) {
   switch (bValue) {
-    case BinningValue::binX:
+    case AxisDirection::AxisX:
       return detray::axis::label::e_x;
-    case BinningValue::binY:
+    case AxisDirection::AxisY:
       return detray::axis::label::e_y;
-    case BinningValue::binZ:
+    case AxisDirection::AxisZ:
       return detray::axis::label::e_z;
-    case BinningValue::binR:
+    case AxisDirection::AxisR:
       return detray::axis::label::e_r;
-    case BinningValue::binPhi:
+    case AxisDirection::AxisPhi:
       return detray::axis::label::e_phi;
-    case BinningValue::binRPhi:
+    case AxisDirection::AxisRPhi:
       return detray::axis::label::e_rphi;
     default:
       throw std::invalid_argument(
@@ -69,7 +69,7 @@ detray::io::axis_payload Acts::DetrayConversionUtils::convertBinningData(
   // Set the binning option
   axis.bounds = convertBinningOption(bData.option);
   // Set the binning value
-  axis.label = convertBinningValue(bData.binvalue);
+  axis.label = convertAxisDirection(bData.binvalue);
   // Set the binning range
   axis.edges = {};
   if (bData.type == BinningType::equidistant) {

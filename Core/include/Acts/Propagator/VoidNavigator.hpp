@@ -8,28 +8,39 @@
 
 #pragma once
 
+#include "Acts/Definitions/Algebra.hpp"
+#include "Acts/Definitions/Direction.hpp"
+#include "Acts/Propagator/NavigationTarget.hpp"
 #include "Acts/Propagator/NavigatorOptions.hpp"
 #include "Acts/Propagator/NavigatorStatistics.hpp"
+
 namespace Acts {
 
 class Surface;
 
-/// @brief The void navigator struct as a default navigator
+/// @brief A navigator that does nothing
 ///
-/// It does not provide any navigation action, the compiler
-/// should eventually optimise that the function call is not done
+/// It does not provide any navigation action
 ///
-struct VoidNavigator {
+class VoidNavigator {
+ public:
+  /// @brief Nested Config struct
   struct Config {};
 
+  /// @brief Nested Options struct
   struct Options : public NavigatorPlainOptions {
+    explicit Options(const GeometryContext& gctx)
+        : NavigatorPlainOptions(gctx) {}
+
     void setPlainOptions(const NavigatorPlainOptions& options) {
       static_cast<NavigatorPlainOptions&>(*this) = options;
     }
   };
 
-  /// @brief Nested State struct, minimal requirement
+  /// @brief Nested State struct
   struct State {
+    explicit State(const Options& options_) : options(options_) {}
+
     Options options;
 
     /// Navigation statistics
@@ -37,8 +48,7 @@ struct VoidNavigator {
   };
 
   State makeState(const Options& options) const {
-    State state;
-    state.options = options;
+    State state(options);
     return state;
   }
 
@@ -50,45 +60,29 @@ struct VoidNavigator {
 
   const Surface* targetSurface(const State& /*state*/) const { return nullptr; }
 
-  bool targetReached(const State& /*state*/) const { return false; }
+  bool navigationBreak(const State& /*state*/) const { return true; }
 
-  bool navigationBreak(const State& /*state*/) const { return false; }
+  void initialize(State& /*state*/, const Vector3& /*position*/,
+                  const Vector3& /*direction*/,
+                  Direction /*propagationDirection*/) const {
+    return;
+  }
 
-  void currentSurface(State& /*state*/, const Surface* /*surface*/) const {}
+  NavigationTarget nextTarget(State& /*state*/, const Vector3& /*position*/,
+                              const Vector3& /*direction*/) const {
+    return NavigationTarget::None();
+  }
 
-  void targetReached(State& /*state*/, bool /*targetReached*/) const {}
+  bool checkTargetValid(const State& /*state*/, const Vector3& /*position*/,
+                        const Vector3& /*direction*/) const {
+    return true;
+  }
 
-  void navigationBreak(State& /*state*/, bool /*navigationBreak*/) const {}
-
-  /// Navigation call - void
-  ///
-  /// @tparam propagator_state_t is the type of Propagatgor state
-  /// @tparam stepper_t Type of the Stepper
-  ///
-  /// Empty call, compiler should optimise that
-  template <typename propagator_state_t, typename stepper_t>
-  void initialize(propagator_state_t& /*state*/,
-                  const stepper_t& /*stepper*/) const {}
-
-  /// Navigation call - void
-  ///
-  /// @tparam propagator_state_t is the type of Propagatgor state
-  /// @tparam stepper_t Type of the Stepper
-  ///
-  /// Empty call, compiler should optimise that
-  template <typename propagator_state_t, typename stepper_t>
-  void preStep(propagator_state_t& /*state*/,
-               const stepper_t& /*stepper*/) const {}
-
-  /// Navigation call - void
-  ///
-  /// @tparam propagator_state_t is the type of Propagatgor state
-  /// @tparam stepper_t Type of the Stepper
-  ///
-  /// Empty call, compiler should optimise that
-  template <typename propagator_state_t, typename stepper_t>
-  void postStep(propagator_state_t& /*state*/,
-                const stepper_t& /*stepper*/) const {}
+  void handleSurfaceReached(State& /*state*/, const Vector3& /*position*/,
+                            const Vector3& /*direction*/,
+                            const Surface& /*surface*/) const {
+    return;
+  }
 };
 
 }  // namespace Acts

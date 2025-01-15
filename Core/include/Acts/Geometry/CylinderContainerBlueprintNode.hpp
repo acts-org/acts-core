@@ -11,7 +11,7 @@
 #include "Acts/Geometry/BlueprintNode.hpp"
 #include "Acts/Geometry/CylinderVolumeStack.hpp"
 #include "Acts/Geometry/PortalShell.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <map>
@@ -36,7 +36,7 @@ class CylinderContainerBlueprintNode final : public BlueprintNode {
   /// @note The parameters are passed through to @ref CylinderVolumeStack,
   ///       see documentation of that class for more information
   CylinderContainerBlueprintNode(
-      const std::string& name, BinningValue direction,
+      const std::string& name, AxisDirection direction,
       CylinderVolumeStack::AttachmentStrategy attachmentStrategy =
           CylinderVolumeStack::AttachmentStrategy::Midpoint,
       CylinderVolumeStack::ResizeStrategy resizeStrategy =
@@ -95,7 +95,7 @@ class CylinderContainerBlueprintNode final : public BlueprintNode {
   /// Setter for the stacking direction
   /// @param direction The stacking direction
   /// @return This node for chaining
-  CylinderContainerBlueprintNode& setDirection(BinningValue direction);
+  CylinderContainerBlueprintNode& setDirection(AxisDirection direction);
 
   /// Setter for the attachment strategy
   /// @param attachmentStrategy The attachment strategy
@@ -111,7 +111,7 @@ class CylinderContainerBlueprintNode final : public BlueprintNode {
 
   /// Accessor to the stacking direction
   /// @return The stacking direction
-  BinningValue direction() const;
+  AxisDirection direction() const;
 
   /// Accessor to the attachment strategy
   /// @return The attachment strategy
@@ -136,7 +136,7 @@ class CylinderContainerBlueprintNode final : public BlueprintNode {
 
   std::string m_name;
 
-  BinningValue m_direction = BinningValue::binZ;
+  AxisDirection m_direction = AxisDirection::AxisZ;
 
   CylinderVolumeStack::AttachmentStrategy m_attachmentStrategy{
       CylinderVolumeStack::AttachmentStrategy::Midpoint};

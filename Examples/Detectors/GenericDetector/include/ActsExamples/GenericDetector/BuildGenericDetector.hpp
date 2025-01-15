@@ -156,20 +156,21 @@ std::unique_ptr<const Acts::TrackingGeometry> buildDetector(
   // Prepare the proto material - in case it's designed to do so
   // - cylindrical
   Acts::BinUtility pCylinderUtility(10, -1, 1, Acts::closed,
-                                    Acts::BinningValue::binPhi);
+                                    Acts::AxisDirection::AxisPhi);
   pCylinderUtility +=
-      Acts::BinUtility(10, -1, 1, Acts::open, Acts::BinningValue::binZ);
+      Acts::BinUtility(10, -1, 1, Acts::open, Acts::AxisDirection::AxisZ);
   auto pCylinderMaterial =
       std::make_shared<const Acts::ProtoSurfaceMaterial>(pCylinderUtility);
   // - disc
-  Acts::BinUtility pDiscUtility(10, 0, 1, Acts::open, Acts::BinningValue::binR);
+  Acts::BinUtility pDiscUtility(10, 0, 1, Acts::open,
+                                Acts::AxisDirection::AxisR);
   pDiscUtility +=
-      Acts::BinUtility(10, -1, 1, Acts::closed, Acts::BinningValue::binPhi);
+      Acts::BinUtility(10, -1, 1, Acts::closed, Acts::AxisDirection::AxisPhi);
   auto pDiscMaterial =
       std::make_shared<const Acts::ProtoSurfaceMaterial>(pDiscUtility);
   // - plane
   Acts::BinUtility pPlaneUtility(1, -1, 1, Acts::open,
-                                 Acts::BinningValue::binX);
+                                 Acts::AxisDirection::AxisX);
   auto pPlaneMaterial =
       std::make_shared<const Acts::ProtoSurfaceMaterial>(pPlaneUtility);
 

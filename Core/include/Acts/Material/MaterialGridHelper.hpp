@@ -12,7 +12,7 @@
 #include "Acts/Material/AccumulatedVolumeMaterial.hpp"
 #include "Acts/Material/Material.hpp"
 #include "Acts/Utilities/Axis.hpp"
-#include "Acts/Utilities/AxisFwd.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinUtility.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Grid.hpp"
@@ -71,7 +71,7 @@ Grid3D createGrid(MaterialGridAxisData gridAxis1,
 ///
 /// @return a coordinate transform function
 std::function<double(Acts::Vector3)> globalToLocalFromBin(
-    Acts::BinningValue& type);
+    Acts::AxisDirection& type);
 
 /// @brief Create a 2DGrid using a BinUtility.
 /// Also determine the corresponding global to local transform and grid mapping

@@ -14,6 +14,7 @@
 #include "Acts/Navigation/NavigationStateFillers.hpp"
 #include "Acts/Navigation/NavigationStateUpdaters.hpp"
 #include "Acts/Utilities/Axis.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Grid.hpp"
 
 #include <stdexcept>
@@ -86,7 +87,7 @@ struct BoundVolumesGrid1Navigation : public IExternalNavigation {
   /// @param cVolumes the contained volumes
   /// @param bTransform is the optional transform
   BoundVolumesGrid1Navigation(
-      const std::vector<double>& gBoundaries, BinningValue bValue,
+      const std::vector<double>& gBoundaries, AxisDirection bValue,
       const std::vector<const DetectorVolume*>& cVolumes,
       const Transform3& bTransform = Transform3::Identity()) noexcept(false)
       : indexedUpdater(IndexedUpdater(VariableBoundIndexGrid1(std::make_tuple(

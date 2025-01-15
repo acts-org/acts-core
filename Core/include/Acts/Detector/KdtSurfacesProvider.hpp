@@ -12,7 +12,7 @@
 #include "Acts/Detector/detail/ReferenceGenerators.hpp"
 #include "Acts/Detector/interface/ISurfacesProvider.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "Acts/Utilities/BinningData.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/KDTree.hpp"
 
 #include <array>
@@ -50,7 +50,7 @@ class KdtSurfaces {
   /// @param rgen the reference point generator
   KdtSurfaces(const GeometryContext& gctx,
               const std::vector<std::shared_ptr<Surface>>& surfaces,
-              const std::array<BinningValue, kDIM>& casts,
+              const std::array<AxisDirection, kDIM>& casts,
               const reference_generator& rgen =
                   detail::PolyhedronReferenceGenerator<1u, false>{})
       : m_kdt(nullptr), m_casts(casts), m_rGenerator(rgen) {
@@ -113,7 +113,7 @@ class KdtSurfaces {
   std::unique_ptr<KDTS> m_kdt = nullptr;
 
   /// Cast values that turn a global position to lookup position
-  std::array<BinningValue, kDIM> m_casts = {};
+  std::array<AxisDirection, kDIM> m_casts = {};
 
   /// Helper to generate reference points for filling
   reference_generator m_rGenerator;

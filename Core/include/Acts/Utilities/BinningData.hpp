@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/ThrowAssert.hpp"
@@ -41,13 +42,13 @@ namespace Acts {
 ///
 class BinningData {
  public:
-  BinningType type{};       ///< binning type: equidistant, arbitrary
-  BinningOption option{};   ///< binning option: open, closed
-  BinningValue binvalue{};  ///< binning value: binX, binY, binZ, binR ...
-  float min{};              ///< minimum value
-  float max{};              ///< maximum value
-  float step{};             ///< binning step
-  bool zdim{};              ///< zero dimensional binning : direct access
+  BinningType type{};        ///< binning type: equidistant, arbitrary
+  BinningOption option{};    ///< binning option: open, closed
+  AxisDirection binvalue{};  ///< axis direction: AxisX, AxisY, AxisZ, ...
+  float min{};               ///< minimum value
+  float max{};               ///< maximum value
+  float step{};              ///< binning step
+  bool zdim{};               ///< zero dimensional binning : direct access
 
   /// sub structure: describe some sub binning
   std::unique_ptr<const BinningData> subBinningData;
@@ -56,10 +57,10 @@ class BinningData {
 
   /// Constructor for 0D binning
   ///
-  /// @param bValue is the binning value: binX, binY, etc.
+  /// @param bValue is the axis direction AxisX, AxisY, etc.
   /// @param bMin is the minimum value
   /// @param bMax is the maximum value
-  BinningData(BinningValue bValue, float bMin, float bMax)
+  BinningData(AxisDirection bValue, float bMin, float bMax)
       : type(equidistant),
         option(open),
         binvalue(bValue),
@@ -79,13 +80,13 @@ class BinningData {
   /// multiplicative or additive
   ///
   /// @param bOption is the binning option : open, closed
-  /// @param bValue is the binning value: binX, binY, etc.
+  /// @param bValue is the axis direction: Axis, AxisY, etc.
   /// @param bBins is number of equidistant bins
   /// @param bMin is the minimum value
   /// @param bMax is the maximum value
   /// @param sBinData is (optional) sub structure
   /// @param sBinAdditive is the prescription for the sub structure
-  BinningData(BinningOption bOption, BinningValue bValue, std::size_t bBins,
+  BinningData(BinningOption bOption, AxisDirection bValue, std::size_t bBins,
               float bMin, float bMax,
               std::unique_ptr<const BinningData> sBinData = nullptr,
               bool sBinAdditive = false)
@@ -116,10 +117,10 @@ class BinningData {
   /// Constructor for non-equidistant binning
   ///
   /// @param bOption is the binning option : open / closed
-  /// @param bValue is the binning value : binX, binY, etc.
+  /// @param bValue is the axis direction : AxisX, AxisY, etc.
   /// @param bBoundaries are the bin boundaries
   /// @param sBinData is (optional) sub structure
-  BinningData(BinningOption bOption, BinningValue bValue,
+  BinningData(BinningOption bOption, AxisDirection bValue,
               const std::vector<float>& bBoundaries,
               std::unique_ptr<const BinningData> sBinData = nullptr)
       : type(arbitrary),
@@ -241,8 +242,10 @@ class BinningData {
   /// @return float value according to the binning setup
   float value(const Vector2& lposition) const {
     // ordered after occurrence
-    if (binvalue == BinningValue::binR || binvalue == BinningValue::binRPhi ||
-        binvalue == BinningValue::binX || binvalue == BinningValue::binH) {
+    if (binvalue == AxisDirection::AxisR ||
+        binvalue == AxisDirection::AxisRPhi ||
+        binvalue == AxisDirection::AxisX ||
+        binvalue == AxisDirection::AxisTheta) {
       return lposition[0];
     }
 
@@ -259,13 +262,14 @@ class BinningData {
     using VectorHelpers::perp;
     using VectorHelpers::phi;
     // ordered after occurrence
-    if (binvalue == BinningValue::binR || binvalue == BinningValue::binH) {
+    if (binvalue == AxisDirection::AxisR ||
+        binvalue == AxisDirection::AxisTheta) {
       return (perp(position));
     }
-    if (binvalue == BinningValue::binRPhi) {
+    if (binvalue == AxisDirection::AxisRPhi) {
       return (perp(position) * phi(position));
     }
-    if (binvalue == BinningValue::binEta) {
+    if (binvalue == AxisDirection::AxisEta) {
       return (eta(position));
     }
     if (toUnderlying(binvalue) < 3) {

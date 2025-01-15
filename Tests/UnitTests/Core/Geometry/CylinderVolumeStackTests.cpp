@@ -108,12 +108,12 @@ BOOST_DATA_TEST_CASE(Baseline,
 
   if (shift < 1.0) {
     BOOST_CHECK_THROW(
-        CylinderVolumeStack(volumes, BinningValue::binZ, strategy,
+        CylinderVolumeStack(volumes, AxisDirection::AxisZ, strategy,
                             CylinderVolumeStack::ResizeStrategy::Gap, *logger),
         std::invalid_argument);
     return;
   }
-  CylinderVolumeStack cylStack(volumes, BinningValue::binZ, strategy,
+  CylinderVolumeStack cylStack(volumes, AxisDirection::AxisZ, strategy,
                                CylinderVolumeStack::ResizeStrategy::Gap,
                                *logger);
 
@@ -341,9 +341,10 @@ BOOST_AUTO_TEST_CASE(Asymmetric) {
 
   std::vector<Volume*> volumes = {vol2.get(), vol1.get(), vol3.get()};
 
-  CylinderVolumeStack cylStack(
-      volumes, BinningValue::binZ, CylinderVolumeStack::AttachmentStrategy::Gap,
-      CylinderVolumeStack::ResizeStrategy::Gap, *logger);
+  CylinderVolumeStack cylStack(volumes, AxisDirection::AxisZ,
+                               CylinderVolumeStack::AttachmentStrategy::Gap,
+                               CylinderVolumeStack::ResizeStrategy::Gap,
+                               *logger);
   BOOST_CHECK_EQUAL(volumes.size(), 5);
 
   auto stackBounds =
@@ -383,7 +384,7 @@ BOOST_DATA_TEST_CASE(RotationInZ, boost::unit_test::data::make(strategies),
 
   std::vector<Volume*> volumes = {vol1.get(), vol2.get()};
 
-  CylinderVolumeStack cylStack(volumes, BinningValue::binZ, strategy,
+  CylinderVolumeStack cylStack(volumes, AxisDirection::AxisZ, strategy,
                                CylinderVolumeStack::ResizeStrategy::Gap,
                                *logger);
 
@@ -479,7 +480,7 @@ BOOST_DATA_TEST_CASE(UpdateStack,
                                                 transform3};
 
   CylinderVolumeStack cylStack(
-      volumes, BinningValue::binZ,
+      volumes, AxisDirection::AxisZ,
       CylinderVolumeStack::AttachmentStrategy::Gap,  // should not make a
                                                      // difference
       strategy, *logger);
@@ -710,7 +711,7 @@ BOOST_DATA_TEST_CASE(
 
   std::vector<Volume*> volumes = {vol1.get(), vol2.get()};
 
-  CylinderVolumeStack cylStack{volumes, BinningValue::binZ,
+  CylinderVolumeStack cylStack{volumes, AxisDirection::AxisZ,
                                CylinderVolumeStack::AttachmentStrategy::Gap,
                                strategy, *logger};
   const auto* originalBounds =
@@ -822,7 +823,7 @@ BOOST_AUTO_TEST_CASE(ResizeReproduction1) {
   Volume vol1{trf1, bounds1};
 
   std::vector<Volume*> volumes = {&vol1};
-  CylinderVolumeStack stack(volumes, BinningValue::binZ,
+  CylinderVolumeStack stack(volumes, AxisDirection::AxisZ,
                             CylinderVolumeStack::AttachmentStrategy::Gap,
                             CylinderVolumeStack::ResizeStrategy::Gap, *logger);
 
@@ -848,7 +849,7 @@ BOOST_AUTO_TEST_CASE(ResizeReproduction2) {
   Volume vol1{trf1, bounds1};
 
   std::vector<Volume*> volumes = {&vol1};
-  CylinderVolumeStack stack(volumes, BinningValue::binZ,
+  CylinderVolumeStack stack(volumes, AxisDirection::AxisZ,
                             CylinderVolumeStack::AttachmentStrategy::Gap,
                             CylinderVolumeStack::ResizeStrategy::Gap, *logger);
 
@@ -901,7 +902,7 @@ BOOST_AUTO_TEST_CASE(ResizeGapMultiple) {
 
   BOOST_TEST_CONTEXT("Positive") {
     std::vector<Volume*> volumes = {&vol};
-    CylinderVolumeStack stack(volumes, BinningValue::binZ,
+    CylinderVolumeStack stack(volumes, AxisDirection::AxisZ,
                               CylinderVolumeStack::AttachmentStrategy::Gap,
                               CylinderVolumeStack::ResizeStrategy::Gap,
                               *logger);
@@ -938,7 +939,7 @@ BOOST_AUTO_TEST_CASE(ResizeGapMultiple) {
 
   BOOST_TEST_CONTEXT("Negative") {
     std::vector<Volume*> volumes = {&vol};
-    CylinderVolumeStack stack(volumes, BinningValue::binZ,
+    CylinderVolumeStack stack(volumes, AxisDirection::AxisZ,
                               CylinderVolumeStack::AttachmentStrategy::Gap,
                               CylinderVolumeStack::ResizeStrategy::Gap,
                               *logger);
@@ -1034,13 +1035,13 @@ BOOST_DATA_TEST_CASE(Baseline,
 
   if (f < 0.0) {
     BOOST_CHECK_THROW(
-        CylinderVolumeStack(volumes, BinningValue::binR, strategy,
+        CylinderVolumeStack(volumes, AxisDirection::AxisR, strategy,
                             CylinderVolumeStack::ResizeStrategy::Gap, *logger),
         std::invalid_argument);
     return;
   }
 
-  CylinderVolumeStack cylStack(volumes, BinningValue::binR, strategy,
+  CylinderVolumeStack cylStack(volumes, AxisDirection::AxisR, strategy,
                                CylinderVolumeStack::ResizeStrategy::Gap,
                                *logger);
 
@@ -1276,7 +1277,7 @@ BOOST_DATA_TEST_CASE(UpdateStack,
     }
 
     cylStack = std::make_unique<CylinderVolumeStack>(
-        volumes, BinningValue::binR,
+        volumes, AxisDirection::AxisR,
         CylinderVolumeStack::AttachmentStrategy::Gap,  // should not make a
                                                        // difference
         strategy, *logger);
@@ -1595,7 +1596,7 @@ BOOST_DATA_TEST_CASE(
 
   std::vector<Volume*> volumes = {vol1.get(), vol2.get()};
 
-  CylinderVolumeStack cylStack{volumes, BinningValue::binR,
+  CylinderVolumeStack cylStack{volumes, AxisDirection::AxisR,
                                CylinderVolumeStack::AttachmentStrategy::Gap,
                                strategy, *logger};
   const auto* originalBounds =
@@ -1671,7 +1672,7 @@ BOOST_AUTO_TEST_CASE(ResizeGapMultiple) {
 
   BOOST_TEST_CONTEXT("Outer") {
     std::vector<Volume*> volumes = {&vol};
-    CylinderVolumeStack stack(volumes, BinningValue::binR,
+    CylinderVolumeStack stack(volumes, AxisDirection::AxisR,
                               CylinderVolumeStack::AttachmentStrategy::Gap,
                               CylinderVolumeStack::ResizeStrategy::Gap,
                               *logger);
@@ -1706,7 +1707,7 @@ BOOST_AUTO_TEST_CASE(ResizeGapMultiple) {
 
   BOOST_TEST_CONTEXT("Inner") {
     std::vector<Volume*> volumes = {&vol};
-    CylinderVolumeStack stack(volumes, BinningValue::binR,
+    CylinderVolumeStack stack(volumes, AxisDirection::AxisR,
                               CylinderVolumeStack::AttachmentStrategy::Gap,
                               CylinderVolumeStack::ResizeStrategy::Gap,
                               *logger);
@@ -1753,22 +1754,24 @@ BOOST_DATA_TEST_CASE(JoinCylinderVolumesInvalidDirection,
   volumes.push_back(vol1.get());
 
   // Single volume invalid direction still gives an error
-  BOOST_CHECK_THROW(CylinderVolumeStack(volumes, BinningValue::binY, strategy),
-                    std::invalid_argument);
+  BOOST_CHECK_THROW(
+      CylinderVolumeStack(volumes, AxisDirection::AxisY, strategy),
+      std::invalid_argument);
 
   auto vol2 = std::make_shared<Volume>(
       Transform3::Identity(),
       std::make_shared<CylinderVolumeBounds>(100_mm, 400_mm, 400_mm));
   volumes.push_back(vol2.get());
 
-  BOOST_CHECK_THROW(CylinderVolumeStack(volumes, BinningValue::binY, strategy),
-                    std::invalid_argument);
+  BOOST_CHECK_THROW(
+      CylinderVolumeStack(volumes, AxisDirection::AxisY, strategy),
+      std::invalid_argument);
 }
 
 BOOST_DATA_TEST_CASE(JoinCylinderVolumesInvalidInput,
                      (boost::unit_test::data::make(strategies) *
-                      boost::unit_test::data::make(Acts::BinningValue::binZ,
-                                                   Acts::BinningValue::binR)),
+                      boost::unit_test::data::make(Acts::AxisDirection::AxisZ,
+                                                   Acts::AxisDirection::AxisR)),
                      strategy, direction) {
   BOOST_TEST_CONTEXT("Empty Volume") {
     std::vector<Volume*> volumes;
@@ -1857,7 +1860,7 @@ BOOST_DATA_TEST_CASE(JoinCylinderVolumesInvalidInput,
 
         {
           std::shared_ptr<Volume> vol;
-          if (direction == BinningValue::binZ) {
+          if (direction == AxisDirection::AxisZ) {
             vol = std::make_shared<Volume>(
                 Transform3{Translation3{Vector3{0_mm, 0_mm, 500_mm}}}, invalid);
           } else {
@@ -1881,8 +1884,8 @@ BOOST_DATA_TEST_CASE(JoinCylinderVolumesInvalidInput,
 }
 
 BOOST_DATA_TEST_CASE(JoinCylinderVolumeSingle,
-                     (boost::unit_test::data::make(Acts::BinningValue::binZ,
-                                                   Acts::BinningValue::binR) *
+                     (boost::unit_test::data::make(Acts::AxisDirection::AxisZ,
+                                                   Acts::AxisDirection::AxisR) *
                       boost::unit_test::data::make(strategies)),
                      direction, strategy) {
   auto vol = std::make_shared<Volume>(

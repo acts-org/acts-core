@@ -17,13 +17,13 @@ namespace Acts {
 
 std::unique_ptr<GridPortalLink> GridPortalLink::make(
     const std::shared_ptr<RegularSurface>& surface, TrackingVolume& volume,
-    BinningValue direction) {
+    AxisDirection direction) {
   std::unique_ptr<GridPortalLink> grid;
 
   if (const auto* cylinder =
           dynamic_cast<const CylinderSurface*>(surface.get());
       cylinder != nullptr) {
-    if (direction == BinningValue::binRPhi) {
+    if (direction == AxisDirection::AxisRPhi) {
       double r = cylinder->bounds().get(CylinderBounds::eR);
       if (cylinder->bounds().coversFullAzimuth()) {
         grid = GridPortalLink::make(
@@ -35,7 +35,7 @@ std::unique_ptr<GridPortalLink> GridPortalLink::make(
         grid = GridPortalLink::make(surface, direction,
                                     Axis{AxisBound, -hlPhi * r, hlPhi * r, 1});
       }
-    } else if (direction == BinningValue::binZ) {
+    } else if (direction == AxisDirection::AxisZ) {
       double hlZ = cylinder->bounds().get(CylinderBounds::eHalfLengthZ);
       grid = GridPortalLink::make(surface, direction,
                                   Axis{AxisBound, -hlZ, hlZ, 1});
@@ -45,12 +45,12 @@ std::unique_ptr<GridPortalLink> GridPortalLink::make(
   } else if (const auto* disc = dynamic_cast<const DiscSurface*>(surface.get());
              disc != nullptr) {
     const auto& bounds = dynamic_cast<const RadialBounds&>(disc->bounds());
-    if (direction == BinningValue::binR) {
+    if (direction == AxisDirection::AxisR) {
       double minR = bounds.get(RadialBounds::eMinR);
       double maxR = bounds.get(RadialBounds::eMaxR);
       grid = GridPortalLink::make(surface, direction,
                                   Axis{AxisBound, minR, maxR, 1});
-    } else if (direction == BinningValue::binPhi) {
+    } else if (direction == AxisDirection::AxisPhi) {
       if (bounds.coversFullAzimuth()) {
         grid = GridPortalLink::make(
             surface, direction,
@@ -126,7 +126,7 @@ void GridPortalLink::checkConsistency(const CylinderSurface& cyl) const {
 
   if (dim() == 1) {
     const IAxis& axisLoc0 = *grid().axes().front();
-    if (direction() == BinningValue::binRPhi) {
+    if (direction() == AxisDirection::AxisRPhi) {
       checkRPhi(axisLoc0);
     } else {
       checkZ(axisLoc0);
@@ -188,7 +188,7 @@ void GridPortalLink::checkConsistency(const DiscSurface& disc) const {
 
   if (dim() == 1) {
     const IAxis& axisLoc0 = *grid().axes().front();
-    if (direction() == BinningValue::binR) {
+    if (direction() == AxisDirection::AxisR) {
       checkR(axisLoc0);
     } else {
       checkPhi(axisLoc0);
@@ -222,15 +222,15 @@ void GridPortalLink::printContents(std::ostream& os) const {
   if (surface().type() == Surface::Cylinder) {
     loc0 = "rPhi";
     loc1 = "z";
-    flipped = direction() != BinningValue::binRPhi;
+    flipped = direction() != AxisDirection::AxisRPhi;
   } else if (surface().type() == Surface::Disc) {
     loc0 = "r";
     loc1 = "phi";
-    flipped = direction() != BinningValue::binR;
+    flipped = direction() != AxisDirection::AxisR;
   } else if (surface().type() == Surface::Plane) {
     loc0 = "x";
     loc1 = "y";
-    flipped = direction() != BinningValue::binX;
+    flipped = direction() != AxisDirection::AxisX;
   } else {
     throw std::invalid_argument{"Unsupported surface type"};
   }
@@ -318,9 +318,9 @@ void GridPortalLink::fillGrid1dTo2d(FillDirection dir,
 std::unique_ptr<GridPortalLink> GridPortalLink::extendTo2dImpl(
     const std::shared_ptr<CylinderSurface>& surface, const IAxis* other) const {
   assert(dim() == 1);
-  if (direction() == BinningValue::binRPhi) {
+  if (direction() == AxisDirection::AxisRPhi) {
     const auto& axisRPhi = *grid().axes().front();
-    // 1D direction is binRPhi, so add a Z axis
+    // 1D direction is AxisRPhi, so add a Z axis
     double hlZ = surface->bounds().get(CylinderBounds::eHalfLengthZ);
 
     auto grid = axisRPhi.visit([&](const auto& axis0) {
@@ -338,7 +338,7 @@ std::unique_ptr<GridPortalLink> GridPortalLink::extendTo2dImpl(
 
   } else {
     const auto& axisZ = *grid().axes().front();
-    // 1D direction is binZ, so add an rPhi axis
+    // 1D direction is AxisZ, so add an rPhi axis
     double r = surface->bounds().get(CylinderBounds::eR);
     double hlPhi = surface->bounds().get(CylinderBounds::eHalfPhiSector);
     double hlRPhi = r * hlPhi;
@@ -375,9 +375,9 @@ std::unique_ptr<GridPortalLink> GridPortalLink::extendTo2dImpl(
         "GridPortalLink: DiscBounds: invalid bounds type.");
   }
 
-  if (direction() == BinningValue::binR) {
+  if (direction() == AxisDirection::AxisR) {
     const auto& axisR = *grid().axes().front();
-    // 1D direction is binR, so add a phi axis
+    // 1D direction is AxisR, so add a phi axis
     double hlPhi = bounds->get(RadialBounds::eHalfPhiSector);
 
     auto makeGrid = [&](auto bdt) {
@@ -401,7 +401,7 @@ std::unique_ptr<GridPortalLink> GridPortalLink::extendTo2dImpl(
     }
   } else {
     const auto& axisPhi = *grid().axes().front();
-    // 1D direction is binPhi, so add an R axis
+    // 1D direction is AxisPhi, so add an R axis
     double rMin = bounds->get(RadialBounds::eMinR);
     double rMax = bounds->get(RadialBounds::eMaxR);
 

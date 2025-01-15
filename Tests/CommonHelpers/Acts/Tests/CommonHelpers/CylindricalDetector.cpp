@@ -73,7 +73,7 @@ std::shared_ptr<const Detector> Acts::Test::buildCylindricalDetector(
   // Create the barrel container builder
   CylindricalContainerBuilder::Config barrelRCfg;
   barrelRCfg.builders = {barrel0, barrel1, barrel2};
-  barrelRCfg.binning = {BinningValue::binR};
+  barrelRCfg.binning = {AxisDirection::AxisR};
 
   auto barrel = std::make_shared<CylindricalContainerBuilder>(
       barrelRCfg, getDefaultLogger("BarrelBuilderR", Logging::INFO));
@@ -88,7 +88,7 @@ std::shared_ptr<const Detector> Acts::Test::buildCylindricalDetector(
   // Create the barrel container builder
   CylindricalContainerBuilder::Config barrelEndcapCfg;
   barrelEndcapCfg.builders = {endcapN, barrel, endcapP};
-  barrelEndcapCfg.binning = {BinningValue::binZ};
+  barrelEndcapCfg.binning = {AxisDirection::AxisZ};
 
   auto barrelEndcap = std::make_shared<CylindricalContainerBuilder>(
       barrelEndcapCfg, getDefaultLogger("BarrelEndcapBuilder", Logging::INFO));
@@ -96,7 +96,7 @@ std::shared_ptr<const Detector> Acts::Test::buildCylindricalDetector(
   // Create the barrel container builder
   CylindricalContainerBuilder::Config detectorCfg;
   detectorCfg.builders = {beampipe, barrelEndcap};
-  detectorCfg.binning = {BinningValue::binR};
+  detectorCfg.binning = {AxisDirection::AxisR};
 
   auto containerBuilder = std::make_shared<CylindricalContainerBuilder>(
       detectorCfg, getDefaultLogger("DetectorBuilder", Logging::INFO));

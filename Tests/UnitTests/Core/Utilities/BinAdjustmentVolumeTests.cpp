@@ -27,9 +27,9 @@ namespace Acts::Test {
 BOOST_AUTO_TEST_CASE(BinAdjustmentVolume_Cylinder) {
   CylinderVolumeBounds bound(10, 50, 150, std::numbers::pi / 2., 0);
   BinUtility bu;
-  bu += BinUtility(1, 0, 1, Acts::open, Acts::BinningValue::binR);
-  bu += BinUtility(1, 0, 1, Acts::open, Acts::BinningValue::binPhi);
-  bu += BinUtility(1, 0, 1, Acts::open, Acts::BinningValue::binZ);
+  bu += BinUtility(1, 0, 1, Acts::open, Acts::AxisDirection::AxisR);
+  bu += BinUtility(1, 0, 1, Acts::open, Acts::AxisDirection::AxisPhi);
+  bu += BinUtility(1, 0, 1, Acts::open, Acts::AxisDirection::AxisZ);
 
   BinUtility buAdjust = adjustBinUtility(bu, bound, Transform3::Identity());
 
@@ -47,9 +47,9 @@ BOOST_AUTO_TEST_CASE(BinAdjustmentVolume_Cylinder) {
 BOOST_AUTO_TEST_CASE(BinAdjustmentVolume_CutoutCylinder) {
   CutoutCylinderVolumeBounds bound(10, 20, 50, 100, 15);
   BinUtility bu;
-  bu += BinUtility(1, 0, 1, Acts::open, Acts::BinningValue::binR);
-  bu += BinUtility(1, 0, 1, Acts::closed, Acts::BinningValue::binPhi);
-  bu += BinUtility(1, 0, 1, Acts::open, Acts::BinningValue::binZ);
+  bu += BinUtility(1, 0, 1, Acts::open, Acts::AxisDirection::AxisR);
+  bu += BinUtility(1, 0, 1, Acts::closed, Acts::AxisDirection::AxisPhi);
+  bu += BinUtility(1, 0, 1, Acts::open, Acts::AxisDirection::AxisZ);
 
   BinUtility buAdjust = adjustBinUtility(bu, bound, Transform3::Identity());
 
@@ -65,9 +65,9 @@ BOOST_AUTO_TEST_CASE(BinAdjustmentVolume_CutoutCylinder) {
 BOOST_AUTO_TEST_CASE(BinAdjustmentVolume_Cuboid) {
   CuboidVolumeBounds bound(13, 23, 42);
   BinUtility bu;
-  bu += BinUtility(1, 0, 1, Acts::open, Acts::BinningValue::binX);
-  bu += BinUtility(1, 0, 1, Acts::open, Acts::BinningValue::binY);
-  bu += BinUtility(1, 0, 1, Acts::open, Acts::BinningValue::binZ);
+  bu += BinUtility(1, 0, 1, Acts::open, Acts::AxisDirection::AxisX);
+  bu += BinUtility(1, 0, 1, Acts::open, Acts::AxisDirection::AxisY);
+  bu += BinUtility(1, 0, 1, Acts::open, Acts::AxisDirection::AxisZ);
 
   BinUtility buAdjust = adjustBinUtility(bu, bound, Transform3::Identity());
 

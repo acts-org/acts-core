@@ -11,7 +11,7 @@
 /// @note This file is foreseen for the `Geometry` module to replace `Extent`
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
 #include "Acts/Utilities/Helpers.hpp"
 #include "Acts/Utilities/RangeXD.hpp"
@@ -29,20 +29,20 @@ using Envelope = std::array<double, 2>;
 
 constexpr Envelope zeroEnvelope = {0, 0};
 
-/// This struct models a multi-dimensional enveloper along the binning values
+/// This struct models a multi-dimensional enveloper along the axis directions
 struct ExtentEnvelope {
   /// Access a single envelope configuration
-  /// @param bValue the binning value
+  /// @param aDir the axis definition
   /// @return the envelope
-  Envelope& operator[](BinningValue bValue) {
-    return m_values.at(toUnderlying(bValue));
+  Envelope& operator[](AxisDirection aDir) {
+    return m_values.at(toUnderlying(aDir));
   }
 
   /// Access a single envelope configuration
-  /// @param bValue the binning value
+  /// @param aDir the axis direction
   /// @return the envelope
-  const Envelope& operator[](BinningValue bValue) const {
-    return m_values.at(toUnderlying(bValue));
+  const Envelope& operator[](AxisDirection aDir) const {
+    return m_values.at(toUnderlying(aDir));
   }
 
   /// Constructor from a single envelope that is assigned to all values
@@ -77,7 +77,7 @@ struct ExtentEnvelope {
     Envelope r = zeroEnvelope;
     Envelope phi = zeroEnvelope;
     Envelope rPhi = zeroEnvelope;
-    Envelope h = zeroEnvelope;
+    Envelope theta = zeroEnvelope;
     Envelope eta = zeroEnvelope;
     Envelope mag = zeroEnvelope;
   };
@@ -85,15 +85,15 @@ struct ExtentEnvelope {
   /// Constructor using a helper struct for designated initializaion
   /// @param args the arguments
   constexpr explicit ExtentEnvelope(Arguments&& args) {
-    using enum BinningValue;
-    m_values[toUnderlying(binX)] = args.x;
-    m_values[toUnderlying(binY)] = args.y;
-    m_values[toUnderlying(binZ)] = args.z;
-    m_values[toUnderlying(binR)] = args.r;
-    m_values[toUnderlying(binPhi)] = args.phi;
-    m_values[toUnderlying(binH)] = args.h;
-    m_values[toUnderlying(binEta)] = args.eta;
-    m_values[toUnderlying(binMag)] = args.mag;
+    using enum AxisDirection;
+    m_values[toUnderlying(AxisX)] = args.x;
+    m_values[toUnderlying(AxisY)] = args.y;
+    m_values[toUnderlying(AxisZ)] = args.z;
+    m_values[toUnderlying(AxisR)] = args.r;
+    m_values[toUnderlying(AxisPhi)] = args.phi;
+    m_values[toUnderlying(AxisTheta)] = args.theta;
+    m_values[toUnderlying(AxisEta)] = args.eta;
+    m_values[toUnderlying(AxisMag)] = args.mag;
   }
 
   /// Comparison operator between envelope sets
@@ -105,11 +105,11 @@ struct ExtentEnvelope {
   }
 
  private:
-  std::array<Envelope, numBinningValues()> m_values{};
+  std::array<Envelope, numAxisDirections()> m_values{};
 };
 
 /// A class representing the geometric extent of an object in its possible
-/// dimensions, these can be all dimensions that are described as BinningValues
+/// dimensions, these can be all dimensions that are described as AxisDirections
 ///
 /// The extent object can have an optional envelope in all of those values
 /// @note that the consistency of the different envelopes is not checked
@@ -125,28 +125,28 @@ class Extent {
   /// Extend with a position vertex
   ///
   /// @param vtx the vertex to be used for extending
-  /// @param bValues the binning values
+  /// @param aDirs the axis directions
   /// @param applyEnv boolean to steer if envelope should be applied
   /// @param fillHistograms is a boolean flag to steer whether the values
   ///        to fill this extent should be stored
   void extend(const Vector3& vtx,
-              const std::vector<BinningValue>& bValues = allBinningValues(),
+              const std::vector<AxisDirection>& aDirs = allAxisDirections(),
               bool applyEnv = true, bool fillHistograms = false);
 
   /// Extend with a set of vectors by iterators
   ///
   /// @param start the start iterator of the loop
   /// @param end the end iterator of the loop
-  /// @param bValues the binning values
+  /// @param aDirs the axis directions
   /// @param applyEnv boolean to steer if envelope should be applied
   /// @param fillHistograms is a boolean flag to steer whether the values
   ///        to fill this extent should be stored
   template <typename vector_iterator_t>
   void extend(const vector_iterator_t& start, const vector_iterator_t& end,
-              const std::vector<BinningValue>& bValues = allBinningValues(),
+              const std::vector<AxisDirection>& aDirs = allAxisDirections(),
               bool applyEnv = true, bool fillHistograms = false) {
     for (vector_iterator_t vIt = start; vIt < end; ++vIt) {
-      extend(*vIt, bValues, applyEnv, fillHistograms);
+      extend(*vIt, aDirs, applyEnv, fillHistograms);
     }
   }
 
@@ -158,14 +158,14 @@ class Extent {
   /// which then is applied to the current one
   ///
   /// @param rhs is the other source Extent
-  /// @param bValues the binning values
+  /// @param aDirs the axis directions
   /// @param applyEnv boolean to steer if envelope should be applied
   ///        on the constraint values, if only an envelope is given
   ///        but the value not constraint, then it is always applied
   ///
   /// @note that the histogram values can not be filled in this call
   void extend(const Extent& rhs,
-              const std::vector<BinningValue>& bValues = allBinningValues(),
+              const std::vector<AxisDirection>& aDirs = allAxisDirections(),
               bool applyEnv = true);
 
   /// Constrain an extent by another one, this is
@@ -180,22 +180,22 @@ class Extent {
 
   /// Set a range for a dedicated binning value
   ///
-  /// @param bValue the binning identification
+  /// @param aDir the axis direction
   /// @param min the minimum parameter
   /// @param max the maximum parameter
-  void set(BinningValue bValue, double min, double max);
+  void set(AxisDirection aDir, double min, double max);
 
   /// Set a min value for a dedicated binning value
   ///
-  /// @param bValue the binning identification
+  /// @param aDir the axis direction
   /// @param min the minimum parameter
-  void setMin(BinningValue bValue, double min);
+  void setMin(AxisDirection aDir, double min);
 
   /// Set a max value for a dedicated binning value
   ///
-  /// @param bValue the binning identification
+  /// @param aDir the axis direction
   /// @param max the maximum parameter
-  void setMax(BinningValue bValue, double max);
+  void setMax(AxisDirection aDir, double max);
 
   /// (re-)Set the envelope
   ///
@@ -204,31 +204,31 @@ class Extent {
 
   /// Return the individual 1-dimensional range
   ///
-  /// @param bValue is the binning value to be returned
+  /// @param aDir is the axis direction to be returned
   ///
   /// @return a one dimensional arrange
-  auto range(BinningValue bValue) { return m_range[toUnderlying(bValue)]; }
+  auto range(AxisDirection aDir) { return m_range[toUnderlying(aDir)]; }
 
   /// Return the individual 1-dimensional range
   ///
-  /// @param bValue is the binning value to be returned
+  /// @param aDir is the axis direction to be returned
   ///
   /// @return a one dimensional arrange
-  Range1D<double> range(BinningValue bValue) const;
+  Range1D<double> range(AxisDirection aDir) const;
 
   /// Return the N-dimension range
-  const RangeXD<numBinningValues(), double>& range() const;
+  const RangeXD<numAxisDirections(), double>& range() const;
 
   /// Return an D-dimensional sub range according to the
   /// the given binvalues
   /// @tparam kSUBDIM the number of sub dimensions
-  /// @param binValues the binning values
+  /// @param axisDirections the axis directions
   /// @return the sub range
   template <unsigned int kSUBDIM>
   RangeXD<kSUBDIM, double> range(
-      const std::array<BinningValue, kSUBDIM>& binValues) const {
+      const std::array<AxisDirection, kSUBDIM>& axisDirections) const {
     RangeXD<kSUBDIM, double> rRange;
-    for (auto [i, v] : enumerate(binValues)) {
+    for (auto [i, v] : enumerate(axisDirections)) {
       rRange[i] = range(v);
     }
     return rRange;
@@ -243,47 +243,47 @@ class Extent {
   /// Return the histogram store
   ///
   /// The histogram store can be used for automated binning detection
-  const std::array<std::vector<double>, numBinningValues()>& valueHistograms()
+  const std::array<std::vector<double>, numAxisDirections()>& valueHistograms()
       const;
 
   /// Access the minimum parameter
   ///
-  /// @param bValue the binning identification
-  double min(BinningValue bValue) const {
-    return m_range[toUnderlying(bValue)].min();
+  /// @param aDir the axis direction
+  double min(AxisDirection aDir) const {
+    return m_range[toUnderlying(aDir)].min();
   }
 
   /// Access the maximum parameter
   ///
-  /// @param bValue the binning identification
-  double max(BinningValue bValue) const {
-    return m_range[toUnderlying(bValue)].max();
+  /// @param aDir the axis direction
+  double max(AxisDirection aDir) const {
+    return m_range[toUnderlying(aDir)].max();
   }
 
   /// Access the midpoint
   ///
-  /// @param bValue the binning identification
-  double medium(BinningValue bValue) const {
-    return 0.5 * (m_range[toUnderlying(bValue)].min() +
-                  m_range[toUnderlying(bValue)].max());
+  /// @param aDir the axis direction
+  double medium(AxisDirection aDir) const {
+    return 0.5 * (m_range[toUnderlying(aDir)].min() +
+                  m_range[toUnderlying(aDir)].max());
   }
 
   /// Access the parameter interval (i.e. the range span)
   ///
-  /// @param bValue the binning identification
-  double interval(BinningValue bValue) const {
-    return m_range[toUnderlying(bValue)].size();
+  /// @param aDir the axis direction
+  double interval(AxisDirection aDir) const {
+    return m_range[toUnderlying(aDir)].size();
   }
 
   /// Contains check
   ///
   /// @param rhs the extent that is check if it is contained
-  /// @param bValue is the binning value, if set to nullopt
+  /// @param aDir is the axis direction, if set to nullopt
   ///               the check on all is done
   ///
   /// @return true if the rhs is contained
   bool contains(const Extent& rhs,
-                std::optional<BinningValue> bValue = std::nullopt) const;
+                std::optional<AxisDirection> aDir = std::nullopt) const;
 
   /// Contains check for a single point
   ///
@@ -295,17 +295,17 @@ class Extent {
   /// Intersection checks
   ///
   /// @param rhs the extent that is check for intersection
-  /// @param bValue is the binning value, if set to nulloptr
+  /// @param aDir is the axis direction, if set to nulloptr
   ///               the check on all is done
   ///
   /// @return true if the rhs intersects
   bool intersects(const Extent& rhs,
-                  std::optional<BinningValue> bValue = std::nullopt) const;
+                  std::optional<AxisDirection> aDir = std::nullopt) const;
 
   /// Check if this object constrains a given direction
   ///
-  /// @param bValue is the binning value
-  bool constrains(BinningValue bValue) const;
+  /// @param aDir is the axis direction
+  bool constrains(AxisDirection aDir) const;
 
   /// Check if this object constrains any direction
   bool constrains() const;
@@ -317,20 +317,20 @@ class Extent {
 
  private:
   /// A bitset that remembers the constraint values
-  std::bitset<numBinningValues()> m_constrains{0};
+  std::bitset<numAxisDirections()> m_constrains{0};
   /// The actual range store
-  RangeXD<numBinningValues(), double> m_range;
+  RangeXD<numAxisDirections(), double> m_range;
   /// A potential envelope
   ExtentEnvelope m_envelope = ExtentEnvelope::Zero();
   /// (Optional) Value histograms for bin detection
-  std::array<std::vector<double>, numBinningValues()> m_valueHistograms;
+  std::array<std::vector<double>, numAxisDirections()> m_valueHistograms;
 };
 
-inline Range1D<double> Acts::Extent::range(BinningValue bValue) const {
-  return m_range[toUnderlying(bValue)];
+inline Range1D<double> Acts::Extent::range(AxisDirection aDir) const {
+  return m_range[toUnderlying(aDir)];
 }
 
-inline const RangeXD<numBinningValues(), double>& Extent::range() const {
+inline const RangeXD<numAxisDirections(), double>& Extent::range() const {
   return m_range;
 }
 
@@ -342,7 +342,7 @@ inline const ExtentEnvelope& Extent::envelope() const {
   return m_envelope;
 }
 
-inline const std::array<std::vector<double>, numBinningValues()>&
+inline const std::array<std::vector<double>, numAxisDirections()>&
 Extent::valueHistograms() const {
   return m_valueHistograms;
 }

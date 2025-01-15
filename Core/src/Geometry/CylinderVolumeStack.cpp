@@ -85,7 +85,7 @@ struct CylinderVolumeStack::VolumeTuple {
 };
 
 CylinderVolumeStack::CylinderVolumeStack(std::vector<Volume*>& volumes,
-                                         BinningValue direction,
+                                         AxisDirection direction,
                                          AttachmentStrategy strategy,
                                          ResizeStrategy resizeStrategy,
                                          const Logger& logger)
@@ -105,20 +105,20 @@ Volume& CylinderVolumeStack::initialVolume(
   return *volumes.front();
 }
 
-void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
+void CylinderVolumeStack::initializeOuterVolume(AxisDirection direction,
                                                 AttachmentStrategy strategy,
                                                 const Logger& logger) {
   ACTS_DEBUG("Creating CylinderVolumeStack from "
              << m_volumes.size() << " volumes in direction "
-             << binningValueName(direction));
+             << axisDirectionName(direction));
   if (m_volumes.empty()) {
     throw std::invalid_argument(
         "CylinderVolumeStack requires at least one volume");
   }
 
-  if (direction != Acts::BinningValue::binZ &&
-      direction != Acts::BinningValue::binR) {
-    throw std::invalid_argument(binningValueName(direction) +
+  if (direction != Acts::AxisDirection::AxisZ &&
+      direction != Acts::AxisDirection::AxisR) {
+    throw std::invalid_argument(axisDirectionName(direction) +
                                 " is not supported ");
   }
 
@@ -161,7 +161,7 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
   ACTS_VERBOSE("Checking volume alignment");
   checkVolumeAlignment(volumeTuples, logger);
 
-  if (direction == Acts::BinningValue::binZ) {
+  if (direction == Acts::AxisDirection::AxisZ) {
     ACTS_VERBOSE("Sorting by volume z position");
     std::ranges::sort(volumeTuples, {}, [](const auto& v) {
       return v.localTransform.translation()[eZ];
@@ -222,7 +222,7 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
     // @TODO: We probably can reuse m_transform
     m_groupTransform = m_transform;
 
-  } else if (direction == Acts::BinningValue::binR) {
+  } else if (direction == Acts::AxisDirection::AxisR) {
     ACTS_VERBOSE("Sorting by volume r middle point");
     std::ranges::sort(volumeTuples, {}, [](const auto& v) { return v.midR(); });
 
@@ -280,15 +280,15 @@ void CylinderVolumeStack::initializeOuterVolume(BinningValue direction,
     m_groupTransform = m_transform;
 
   } else {
-    ACTS_ERROR("Binning in " << binningValueName(direction)
+    ACTS_ERROR("Binning in " << axisDirectionName(direction)
                              << " is not supported");
-    throw std::invalid_argument(binningValueName(direction) +
+    throw std::invalid_argument(axisDirectionName(direction) +
                                 " is not supported ");
   }
 }
 
 void CylinderVolumeStack::overlapPrint(
-    BinningValue direction, const CylinderVolumeStack::VolumeTuple& a,
+    AxisDirection direction, const CylinderVolumeStack::VolumeTuple& a,
     const CylinderVolumeStack::VolumeTuple& b, const Logger& logger) {
   if (logger().doPrint(Acts::Logging::DEBUG)) {
     std::stringstream ss;
@@ -299,7 +299,7 @@ void CylinderVolumeStack::overlapPrint(
     int w = 9;
 
     ACTS_VERBOSE("Checking overlap between");
-    if (direction == BinningValue::binZ) {
+    if (direction == AxisDirection::AxisZ) {
       ss << " - "
          << " z: [ " << std::setw(w) << a.minZ() << " <- " << std::setw(w)
          << a.midZ() << " -> " << std::setw(w) << a.maxZ() << " ]";
@@ -336,7 +336,7 @@ CylinderVolumeStack::checkOverlapAndAttachInZ(
     auto& a = volumes.at(i);
     auto& b = volumes.at(j);
 
-    overlapPrint(BinningValue::binZ, a, b, logger);
+    overlapPrint(AxisDirection::AxisZ, a, b, logger);
 
     if (a.maxZ() > b.minZ()) {
       ACTS_ERROR(" -> Overlap in z");
@@ -470,7 +470,7 @@ CylinderVolumeStack::checkOverlapAndAttachInR(
     auto& a = volumes.at(i);
     auto& b = volumes.at(j);
 
-    overlapPrint(BinningValue::binR, a, b, logger);
+    overlapPrint(AxisDirection::AxisR, a, b, logger);
 
     if (a.maxR() > b.minR()) {
       ACTS_ERROR(" -> Overlap in r");
@@ -758,7 +758,7 @@ void CylinderVolumeStack::update(std::shared_ptr<VolumeBounds> volbounds,
         m_gaps, [&](const auto& gap) { return vol == gap.get(); });
   };
 
-  if (m_direction == BinningValue::binZ) {
+  if (m_direction == AxisDirection::AxisZ) {
     ACTS_VERBOSE("Stack direction is z");
 
     std::vector<VolumeTuple> volumeTuples;
@@ -920,7 +920,7 @@ void CylinderVolumeStack::update(std::shared_ptr<VolumeBounds> volbounds,
       m_volumes.push_back(vt.volume);
     }
 
-  } else if (m_direction == BinningValue::binR) {
+  } else if (m_direction == AxisDirection::AxisR) {
     ACTS_VERBOSE("Stack direction is r");
 
     std::vector<VolumeTuple> volumeTuples;

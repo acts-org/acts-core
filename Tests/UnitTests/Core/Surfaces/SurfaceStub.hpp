@@ -76,8 +76,8 @@ class SurfaceStub : public RegularSurface {
   }
 
   /// Inherited from GeometryObject base
-  Vector3 binningPosition(const GeometryContext& /*txt*/,
-                          BinningValue /*bValue*/) const final {
+  Vector3 referencePosition(const GeometryContext& /*txt*/,
+                            AxisDirection /*bValue*/) const final {
     const Vector3 v{0., 0., 0.};
     return v;
   }
