@@ -122,9 +122,10 @@ struct SimulationActor {
       const auto stepSize = properTimeDiff *
                             result.particle.absoluteMomentum() /
                             result.particle.mass();
-      stepper.releaseStepSize(state.stepping, Acts::ConstrainedStep::user);
+      stepper.releaseStepSize(state.stepping,
+                              Acts::ConstrainedStep::Type::User);
       stepper.updateStepSize(state.stepping, stepSize,
-                             Acts::ConstrainedStep::user);
+                             Acts::ConstrainedStep::Type::User);
     }
 
     // arm the point-like interaction limits in the first step

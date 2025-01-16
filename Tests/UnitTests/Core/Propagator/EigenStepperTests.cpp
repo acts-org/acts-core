@@ -260,11 +260,11 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_test) {
   // Step size modifies
   const std::string originalStepSize = esState.stepSize.toString();
 
-  es.updateStepSize(esState, -1337., ConstrainedStep::navigator);
+  es.updateStepSize(esState, -1337., ConstrainedStep::Type::Navigator);
   BOOST_CHECK_EQUAL(esState.previousStepSize, stepSize);
   BOOST_CHECK_EQUAL(esState.stepSize.value(), -1337.);
 
-  es.releaseStepSize(esState, ConstrainedStep::navigator);
+  es.releaseStepSize(esState, ConstrainedStep::Type::Navigator);
   BOOST_CHECK_EQUAL(esState.stepSize.value(), stepSize);
   BOOST_CHECK_EQUAL(es.outputStepSize(esState), originalStepSize);
 
@@ -450,8 +450,8 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_test) {
       CurvilinearSurface(pos + navDir * 2. * dir, dir).planeSurface();
   es.updateSurfaceStatus(esState, *targetSurface, 0, navDir,
                          BoundaryTolerance::Infinite(), s_onSurfaceTolerance,
-                         ConstrainedStep::navigator);
-  CHECK_CLOSE_ABS(esState.stepSize.value(ConstrainedStep::navigator),
+                         ConstrainedStep::Type::Navigator);
+  CHECK_CLOSE_ABS(esState.stepSize.value(ConstrainedStep::Type::Navigator),
                   navDir * 2., eps);
 
   // Test the step size modification in the context of a surface
@@ -461,17 +461,17 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_test) {
                                     navDir * es.direction(esState),
                                     BoundaryTolerance::Infinite())
                         .closest(),
-                    navDir, ConstrainedStep::navigator);
+                    navDir, ConstrainedStep::Type::Navigator);
   CHECK_CLOSE_ABS(esState.stepSize.value(), 2., eps);
   esState.stepSize.setUser(navDir * stepSize);
-  es.releaseStepSize(esState, ConstrainedStep::navigator);
+  es.releaseStepSize(esState, ConstrainedStep::Type::Navigator);
   es.updateStepSize(esState,
                     targetSurface
                         ->intersect(tgContext, es.position(esState),
                                     navDir * es.direction(esState),
                                     BoundaryTolerance::Infinite())
                         .closest(),
-                    navDir, ConstrainedStep::navigator);
+                    navDir, ConstrainedStep::Type::Navigator);
   CHECK_CLOSE_ABS(esState.stepSize.value(), 2., eps);
 
   // Test the bound state construction

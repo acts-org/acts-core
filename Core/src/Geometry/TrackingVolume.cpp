@@ -746,6 +746,10 @@ void TrackingVolume::visualize(IVisualization3D& helper,
     surface.visualize(helper, gctx, sensitiveViewConfig);
   }
 
+  for (const auto& portal : portals()) {
+    portal.surface().visualize(helper, gctx, portalViewConfig);
+  }
+
   for (const auto& child : volumes()) {
     child.visualize(helper, gctx, viewConfig, portalViewConfig,
                     sensitiveViewConfig);

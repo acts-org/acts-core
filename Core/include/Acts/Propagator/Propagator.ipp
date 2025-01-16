@@ -59,7 +59,7 @@ auto Acts::Propagator<S, N>::propagate(propagator_state_t& state) const
           state.stepping, *nextTarget.surface,
           nextTarget.surfaceIntersectionIndex, state.options.direction,
           nextTarget.boundaryTolerance, state.options.surfaceTolerance,
-          ConstrainedStep::navigator, logger());
+          ConstrainedStep::Type::Navigator, logger());
       if (preStepSurfaceStatus == IntersectionStatus::reachable ||
           preStepSurfaceStatus == IntersectionStatus::onSurface) {
         return nextTarget;
@@ -109,8 +109,8 @@ auto Acts::Propagator<S, N>::propagate(propagator_state_t& state) const
                                    << state.direction.transpose());
 
     // release actor and aborter constrains after step was performed
-    m_stepper.releaseStepSize(state.stepping, ConstrainedStep::navigator);
-    m_stepper.releaseStepSize(state.stepping, ConstrainedStep::actor);
+    m_stepper.releaseStepSize(state.stepping, ConstrainedStep::Type::Navigator);
+    m_stepper.releaseStepSize(state.stepping, ConstrainedStep::Type::Actor);
 
     // Post-stepping: check target status, call actors, check abort conditions
     state.stage = PropagatorStage::postStep;
@@ -120,7 +120,7 @@ auto Acts::Propagator<S, N>::propagate(propagator_state_t& state) const
           state.stepping, *nextTarget.surface,
           nextTarget.surfaceIntersectionIndex, state.options.direction,
           nextTarget.boundaryTolerance, state.options.surfaceTolerance,
-          ConstrainedStep::navigator, logger());
+          ConstrainedStep::Type::Navigator, logger());
       if (postStepSurfaceStatus == IntersectionStatus::onSurface) {
         m_navigator.handleSurfaceReached(state.navigation, state.position,
                                          state.direction, *nextTarget.surface);
@@ -155,7 +155,8 @@ auto Acts::Propagator<S, N>::propagate(propagator_state_t& state) const
 
     if (nextTarget.isNone()) {
       // navigator step constraint is not valid anymore
-      m_stepper.releaseStepSize(state.stepping, ConstrainedStep::navigator);
+      m_stepper.releaseStepSize(state.stepping,
+                                ConstrainedStep::Type::Navigator);
 
       nextTargetResult = getNextTarget();
       if (!nextTargetResult.ok()) {

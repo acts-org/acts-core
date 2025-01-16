@@ -41,7 +41,7 @@ variables:
 
 clang_tidy:
   stage: build
-  image: ghcr.io/acts-project/ubuntu2404:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
   tags:
     - large
   artifacts:
@@ -264,11 +264,11 @@ build_linux_ubuntu:
     - cmake --build build -- -j6
     - ccache -s
 
-    - ctest --test-dir build #-j$(nproc)
+    - ctest --test-dir build -j$(nproc)
     - cmake --build build --target integrationtests
 
     # Install main project
-    - cmake --install build > install.log
+    - cmake --install build
 
     # Downstream configure
     - >
@@ -281,9 +281,11 @@ build_linux_ubuntu:
     # Downstream build
     - cmake --build build-downstream
 
+    # Downstream run
+    - ./build-downstream/bin/ShowActsVersion
+
   after_script:
    - !reference [.spack_cleanup, after_script]
-
 
 linux_test_examples:
   stage: test
@@ -315,7 +317,6 @@ linux_test_examples:
 
 linux_physmon:
   stage: test
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
   needs: [build_linux_ubuntu]
 
   artifacts:
@@ -434,7 +435,7 @@ linux_ubuntu_2204_clang:
 ######################
 
 .lcg_base_job:
-  image: ghcr.io/acts-project/${OS}-base:63
+  image: registry.cern.ch/ghcr.io/acts-project/${OS}-base:63
   stage: build
   tags:
     - cvmfs
