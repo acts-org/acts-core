@@ -41,7 +41,7 @@ variables:
 
 clang_tidy:
   stage: build
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:71
   tags:
     - large
   artifacts:
@@ -98,7 +98,7 @@ clang_tidy:
 
 build_exatrkx_cpu:
   stage: build
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:71
   tags:
     - large
 
@@ -132,7 +132,7 @@ build_exatrkx_cpu:
 
 build_exatrkx:
   stage: build
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:71
   tags:
     - large
 
@@ -175,7 +175,7 @@ test_exatrkx_unittests:
   stage: test
   needs:
     - build_exatrkx
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:71
   tags:
     - docker-gpu-nvidia
 
@@ -198,7 +198,7 @@ test_exatrkx_python:
   stage: test
   needs:
     - build_exatrkx
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204_exatrkx:71
   tags:
     - docker-gpu-nvidia
 
@@ -226,7 +226,7 @@ test_exatrkx_python:
 
 build_linux_ubuntu:
   stage: build
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:71
 
   cache:
    - !reference [.ccache_base, cache]
@@ -289,7 +289,7 @@ build_linux_ubuntu:
 
 linux_test_examples:
   stage: test
-  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:63
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:71
   needs: [build_linux_ubuntu]
 
   cache:
@@ -318,6 +318,7 @@ linux_test_examples:
 linux_physmon:
   stage: test
   needs: [build_linux_ubuntu]
+  image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:71
 
   artifacts:
     when: always
@@ -435,7 +436,7 @@ linux_ubuntu_2204_clang:
 ######################
 
 .lcg_base_job:
-  image: registry.cern.ch/ghcr.io/acts-project/${OS}-base:63
+  image: registry.cern.ch/ghcr.io/acts-project/${OS}-base:71
   stage: build
   tags:
     - cvmfs
