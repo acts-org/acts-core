@@ -14,6 +14,7 @@
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/Surfaces/DiscSurface.hpp"
 #include "Acts/Surfaces/RadialBounds.hpp"
+#include "Acts/Surfaces/RectangleBounds.hpp"
 #include "Acts/Surfaces/RegularSurface.hpp"
 #include "Acts/Utilities/ThrowAssert.hpp"
 
@@ -56,6 +57,18 @@ void PortalLinkBase::checkMergePreconditions(const PortalLinkBase& a,
                      dynamic_cast<const RadialBounds*>(&discB->bounds()),
                  "DiscSurface bounds must be RadialBounds");
 
+  } else if (const auto* planeA = dynamic_cast<const PlaneSurface*>(&surfaceA);
+             planeA != nullptr) {
+    const auto* planeB = dynamic_cast<const PlaneSurface*>(&surfaceB);
+    throw_assert(planeB != nullptr,
+                 "Cannot merge PlaneSurface with non-PlaneSurface");
+    throw_assert(
+        direction == AxisDirection::AxisX || direction == AxisDirection::AxisY,
+        "Invalid binning direction: " + axisDirectionName(direction));
+
+    throw_assert(dynamic_cast<const RectangleBounds*>(&planeA->bounds()) &&
+                     dynamic_cast<const RectangleBounds*>(&planeB->bounds()),
+                 "PlaneSurface bounds must be RectangleBounds");
   } else {
     throw std::logic_error{"Surface type is not supported"};
   }

@@ -29,7 +29,7 @@ class Direction;
 
 struct OrientedSurface {
   std::shared_ptr<RegularSurface> surface;
-  Direction direction;
+  Direction direction = Direction::AlongNormal();
 };
 
 // Planar definitions to help construct the boundary surfaces

@@ -9,11 +9,15 @@
 #include "Acts/Geometry/CuboidVolumeBounds.hpp"
 
 #include "Acts/Definitions/Direction.hpp"
+#include "Acts/Surfaces/LineSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Surfaces/RectangleBounds.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/BoundingBox.hpp"
 
+#include <algorithm>
+#include <array>
+#include <stdexcept>
 #include <utility>
 
 namespace Acts {
@@ -30,6 +34,21 @@ CuboidVolumeBounds::CuboidVolumeBounds(const std::array<double, eSize>& values)
   buildSurfaceBounds();
 }
 
+CuboidVolumeBounds::CuboidVolumeBounds(
+    std::initializer_list<std::pair<BoundValues, double>> keyValues)
+    : m_values({-1, -1, -1}) {
+  for (const auto& [key, value] : keyValues) {
+    m_values[key] = value;
+  }
+  // Throw error here instead of consistency check for clarity
+  if (std::any_of(m_values.begin(), m_values.end(),
+                  [](const auto& val) { return val == -1; })) {
+    throw std::logic_error("Missing bound values");
+  }
+  checkConsistency();
+  buildSurfaceBounds();
+}
+
 std::vector<double> CuboidVolumeBounds::values() const {
   return {m_values.begin(), m_values.end()};
 }
@@ -42,36 +61,36 @@ std::vector<Acts::OrientedSurface> Acts::CuboidVolumeBounds::orientedSurfaces(
   //   (1) - at negative local z
   auto sf = Surface::makeShared<PlaneSurface>(
       transform * Translation3(0., 0., -get(eHalfLengthZ)), m_xyBounds);
-  oSurfaces.push_back(OrientedSurface{std::move(sf), Direction::AlongNormal});
+  oSurfaces.push_back(OrientedSurface{std::move(sf), Direction::AlongNormal()});
   //   (2) - at positive local z
   sf = Surface::makeShared<PlaneSurface>(
       transform * Translation3(0., 0., get(eHalfLengthZ)), m_xyBounds);
   oSurfaces.push_back(
-      OrientedSurface{std::move(sf), Direction::OppositeNormal});
+      OrientedSurface{std::move(sf), Direction::OppositeNormal()});
   // Face surfaces yz -------------------------------------
   //   (3) - at negative local x
   sf = Surface::makeShared<PlaneSurface>(
       transform * Translation3(-get(eHalfLengthX), 0., 0.) * s_planeYZ,
       m_yzBounds);
-  oSurfaces.push_back(OrientedSurface{std::move(sf), Direction::AlongNormal});
+  oSurfaces.push_back(OrientedSurface{std::move(sf), Direction::AlongNormal()});
   //   (4) - at positive local x
   sf = Surface::makeShared<PlaneSurface>(
       transform * Translation3(get(eHalfLengthX), 0., 0.) * s_planeYZ,
       m_yzBounds);
   oSurfaces.push_back(
-      OrientedSurface{std::move(sf), Direction::OppositeNormal});
+      OrientedSurface{std::move(sf), Direction::OppositeNormal()});
   // Face surfaces zx -------------------------------------
   //   (5) - at negative local y
   sf = Surface::makeShared<PlaneSurface>(
       transform * Translation3(0., -get(eHalfLengthY), 0.) * s_planeZX,
       m_zxBounds);
-  oSurfaces.push_back(OrientedSurface{std::move(sf), Direction::AlongNormal});
+  oSurfaces.push_back(OrientedSurface{std::move(sf), Direction::AlongNormal()});
   //   (6) - at positive local y
   sf = Surface::makeShared<PlaneSurface>(
       transform * Translation3(0., get(eHalfLengthY), 0.) * s_planeZX,
       m_zxBounds);
   oSurfaces.push_back(
-      OrientedSurface{std::move(sf), Direction::OppositeNormal});
+      OrientedSurface{std::move(sf), Direction::OppositeNormal()});
 
   return oSurfaces;
 }
@@ -147,6 +166,21 @@ void CuboidVolumeBounds::set(
   } catch (std::invalid_argument& e) {
     m_values = previous;
     throw e;
+  }
+}
+
+CuboidVolumeBounds::BoundValues CuboidVolumeBounds::fromAxisDirection(
+    AxisDirection direction) {
+  using enum AxisDirection;
+  switch (direction) {
+    case AxisX:
+      return BoundValues::eHalfLengthX;
+    case AxisY:
+      return BoundValues::eHalfLengthY;
+    case AxisZ:
+      return BoundValues::eHalfLengthZ;
+    default:
+      throw std::invalid_argument("Invalid axis direction");
   }
 }
 

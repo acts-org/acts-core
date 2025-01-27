@@ -33,7 +33,7 @@ namespace detail {
 /// later stage, the surface is referenced counted here.
 struct Step {
   ConstrainedStep stepSize;
-  Direction navDir;
+  Direction navDir = Direction::Forward();
   Vector3 position = Vector3(0., 0., 0.);
   Vector3 momentum = Vector3(0., 0., 0.);
   std::shared_ptr<const Surface> surface = nullptr;

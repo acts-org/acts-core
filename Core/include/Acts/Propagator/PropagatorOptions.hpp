@@ -25,7 +25,7 @@ namespace detail {
 /// @brief Holds the generic pure propagator options
 struct PurePropagatorPlainOptions {
   /// Propagation direction
-  Direction direction = Direction::Forward;
+  Direction direction = Direction::Forward();
 
   /// Maximum number of steps for one propagate call
   ///

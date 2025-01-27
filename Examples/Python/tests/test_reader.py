@@ -53,13 +53,13 @@ def test_root_particle_reader(tmp_path, conf_const, ptcl_gun):
         conf_const(
             RootParticleReader,
             acts.logging.WARNING,
-            outputParticles="particles_input",
+            outputParticles="particles_generated",
             filePath=str(file),
         )
     )
 
     alg = AssertCollectionExistsAlg(
-        "particles_input", "check_alg", acts.logging.WARNING
+        "particles_generated", "check_alg", acts.logging.WARNING
     )
     s2.addAlgorithm(alg)
 
@@ -317,7 +317,7 @@ def test_edm4hep_simhit_particle_reader(tmp_path):
                     "LongStripBarrelReadout",
                     "LongStripEndcapReadout",
                 ],
-                outputParticlesGenerator="particles_input",
+                outputParticlesGenerator="particles_generated",
                 outputParticlesSimulation="particles_simulated",
                 outputSimHits="simhits",
                 dd4hepDetector=detector,
@@ -329,7 +329,7 @@ def test_edm4hep_simhit_particle_reader(tmp_path):
         s.addAlgorithm(alg)
 
         alg = AssertCollectionExistsAlg(
-            "particles_input", "check_alg", acts.logging.WARNING
+            "particles_generated", "check_alg", acts.logging.WARNING
         )
         s.addAlgorithm(alg)
 
@@ -435,3 +435,52 @@ def test_edm4hep_tracks_reader(tmp_path):
     )
 
     s.run()
+
+
+@pytest.mark.root
+def test_buffered_reader(tmp_path, conf_const, ptcl_gun):
+    # Test the buffered reader with the ROOT particle reader
+    # need to write out some particles first
+    eventsInBuffer = 5
+    eventsToProcess = 10
+
+    s = Sequencer(numThreads=1, events=eventsInBuffer, logLevel=acts.logging.WARNING)
+    evGen = ptcl_gun(s)
+
+    file = tmp_path / "particles.root"
+    s.addWriter(
+        conf_const(
+            RootParticleWriter,
+            acts.logging.WARNING,
+            inputParticles=evGen.config.outputParticles,
+            filePath=str(file),
+        )
+    )
+
+    s.run()
+
+    # reset sequencer for reading
+    s2 = Sequencer(events=eventsToProcess, numThreads=1, logLevel=acts.logging.WARNING)
+
+    reader = acts.examples.RootParticleReader(
+        level=acts.logging.WARNING,
+        outputParticles="particles_input",
+        filePath=str(file),
+    )
+
+    s2.addReader(
+        acts.examples.BufferedReader(
+            level=acts.logging.WARNING,
+            upstreamReader=reader,
+            bufferSize=eventsInBuffer,
+        )
+    )
+
+    alg = AssertCollectionExistsAlg(
+        "particles_input", "check_alg", acts.logging.WARNING
+    )
+    s2.addAlgorithm(alg)
+
+    s2.run()
+
+    assert alg.events_seen == eventsToProcess

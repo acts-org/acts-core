@@ -10,7 +10,6 @@
 // TODO: update to C++17 style
 
 #include "Acts/Geometry/Extent.hpp"
-#include "Acts/Seeding/SeedFilter.hpp"
 #include "Acts/Seeding/SeedFinder.hpp"
 #include "Acts/Seeding/SeedFinderGbtsConfig.hpp"
 #include "Acts/Seeding/SeedFinderUtils.hpp"
@@ -47,10 +46,6 @@ void SeedFinderGbts<external_spacepoint_t>::loadSpacePoints(
     const std::vector<GbtsSP<external_spacepoint_t>>& gbtsSPvect) {
   ACTS_VERBOSE("Loading space points");
   for (const auto& gbtssp : gbtsSPvect) {
-    bool is_Pixel = gbtssp.isPixel();
-    if (!is_Pixel) {
-      continue;
-    }
     m_storage->addSpacePoint(gbtssp, (m_config.m_useClusterWidth > 0));
   }
 
@@ -166,11 +161,11 @@ void SeedFinderGbts<external_spacepoint_t>::runGbts_TrackFinder(
                 continue;
               }
 
-              float r1 = n1->m_spGbts.SP->r();
+              float r1 = n1->m_spGbts.r();
               float x1 = n1->m_spGbts.SP->x();
               float y1 = n1->m_spGbts.SP->y();
               float z1 = n1->m_spGbts.SP->z();
-              float phi1 = std::atan(x1 / y1);
+              float phi1 = n1->m_spGbts.phi();
 
               float minPhi = phi1 - deltaPhi;
               float maxPhi = phi1 + deltaPhi;
@@ -199,7 +194,7 @@ void SeedFinderGbts<external_spacepoint_t>::runGbts_TrackFinder(
                   continue;
                 }
 
-                float r2 = n2->m_spGbts.SP->r();
+                float r2 = n2->m_spGbts.r();
 
                 float dr = r2 - r1;
 
@@ -545,7 +540,7 @@ void SeedFinderGbts<external_spacepoint_t>::runGbts_TrackFinder(
 
     for (unsigned int idx_m = 1; idx_m < vSP.size() - 1; idx_m++) {
       const GbtsSP<external_spacepoint_t>& spM = *vSP.at(idx_m);
-      const double pS_r = spM.SP->r();
+      const double pS_r = spM.r();
       const double pS_x = spM.SP->x();
       const double pS_y = spM.SP->y();
       const double cosA = pS_x / pS_r;
@@ -656,31 +651,32 @@ void SeedFinderGbts<external_spacepoint_t>::createSeeds(
     return;
   }
 
-  m_triplets.clear();  // member of class , saying not declared, maybe public?
+  m_triplets.clear();
 
   for (auto& track : vTracks) {
     for (auto& seed : track.m_seeds) {  // access member of GbtsTrigTracklet
-
-      float newQ = seed.Q();  // function of TrigInDetTriplet
-      if (m_config.m_LRTmode) {
-        // In LRT mode penalize pixels in Triplets
-        if (seed.s1().isPixel()) {
-          newQ += 1000;  // functions of TrigSiSpacePointBase
-        }
-        if (seed.s2().isPixel()) {
-          newQ += 1000;
-        }
-        if (seed.s3().isPixel()) {
-          newQ += 1000;
-        }
-      } else {
-        // In normal (non LRT) mode penalise SSS by 1000, PSS (if enabled) and
-        // PPS by 10000
-        if (seed.s3().isSCT()) {
-          newQ += seed.s1().isSCT() ? 1000.0 : 10000.0;
-        }
-      }
-      seed.Q(newQ);
+      // Currently not used, but leaving in to use concept in future development
+      //  float newQ = seed.Q();  // function of TrigInDetTriplet
+      //  if (m_config.m_LRTmode) {
+      //    // In LRT mode penalize pixels in Triplets
+      //    if (seed.s1().isPixel()) {
+      //      newQ += 1000;  // functions of TrigSiSpacePointBase
+      //    }
+      //    if (seed.s2().isPixel()) {
+      //      newQ += 1000;
+      //    }
+      //    if (seed.s3().isPixel()) {
+      //      newQ += 1000;
+      //    }
+      //  } else {
+      //    // In normal (non LRT) mode penalise SSS by 1000, PSS (if enabled)
+      //    and
+      //    // PPS by 10000
+      //    if (seed.s3().isSCT()) {
+      //      newQ += seed.s1().isSCT() ? 1000.0 : 10000.0;
+      //    }
+      //  }
+      //  seed.Q(newQ);
       m_triplets.emplace_back(seed);
     }
   }

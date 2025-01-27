@@ -78,7 +78,7 @@ class DirectNavigator {
 
     Options options;
 
-    Direction direction = Direction::Forward;
+    Direction direction = Direction::Forward();
 
     /// Index of the next surface to try
     /// @note -1 means before the first surface in the sequence and size()
@@ -99,7 +99,7 @@ class DirectNavigator {
     }
 
     void nextSurface() {
-      if (direction == Direction::Forward) {
+      if (direction == Direction::Forward()) {
         ++surfaceIndex;
       } else {
         --surfaceIndex;
@@ -107,21 +107,21 @@ class DirectNavigator {
     }
 
     bool endOfSurfaces() const {
-      if (direction == Direction::Forward) {
+      if (direction == Direction::Forward()) {
         return surfaceIndex >= static_cast<int>(options.surfaces.size());
       }
       return surfaceIndex < 0;
     }
 
     int remainingSurfaces() const {
-      if (direction == Direction::Forward) {
+      if (direction == Direction::Forward()) {
         return options.surfaces.size() - surfaceIndex;
       }
       return surfaceIndex + 1;
     }
 
     void resetSurfaceIndex() {
-      surfaceIndex = direction == Direction::Forward
+      surfaceIndex = direction == Direction::Forward()
                          ? -1
                          : static_cast<int>(options.surfaces.size());
     }

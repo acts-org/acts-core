@@ -96,7 +96,7 @@ struct CorrectedFreeToBoundTransformer {
   std::optional<std::tuple<BoundVector, BoundSquareMatrix>> operator()(
       const FreeVector& freeParams, const FreeSquareMatrix& freeCovariance,
       const Surface& surface, const GeometryContext& geoContext,
-      Direction navDir = Direction::Forward,
+      Direction navDir = Direction::Forward(),
       const Logger& logger = getDummyLogger()) const;
 
  private:

@@ -15,49 +15,32 @@
 
 namespace Acts {
 
-BoundaryTolerance::BoundaryTolerance(const Infinite& infinite)
-    : m_variant{infinite} {}
-
-BoundaryTolerance::BoundaryTolerance(const None& none) : m_variant{none} {}
-
-BoundaryTolerance::BoundaryTolerance(const AbsoluteBound& absoluteBound)
-    : m_variant{absoluteBound} {}
-
-BoundaryTolerance::BoundaryTolerance(const AbsoluteCartesian& absoluteCartesian)
-    : m_variant{absoluteCartesian} {}
-
-BoundaryTolerance::BoundaryTolerance(const AbsoluteEuclidean& absoluteEuclidean)
-    : m_variant{absoluteEuclidean} {}
-
-BoundaryTolerance::BoundaryTolerance(const Chi2Bound& chi2Bound)
-    : m_variant{chi2Bound} {}
-
 BoundaryTolerance::BoundaryTolerance(Variant variant)
     : m_variant{std::move(variant)} {}
 
 bool BoundaryTolerance::isInfinite() const {
-  return holdsVariant<Infinite>();
+  return holdsVariant<InfiniteParams>();
 }
 
 bool BoundaryTolerance::isNone() const {
-  return holdsVariant<None>();
+  return holdsVariant<NoneParams>();
 }
 
 bool BoundaryTolerance::hasAbsoluteBound(bool isCartesian) const {
-  return holdsVariant<None>() || holdsVariant<AbsoluteBound>() ||
-         (isCartesian && holdsVariant<AbsoluteCartesian>());
+  return holdsVariant<NoneParams>() || holdsVariant<AbsoluteBoundParams>() ||
+         (isCartesian && holdsVariant<AbsoluteCartesianParams>());
 }
 
 bool BoundaryTolerance::hasAbsoluteCartesian() const {
-  return holdsVariant<AbsoluteCartesian>();
+  return holdsVariant<AbsoluteCartesianParams>();
 }
 
 bool BoundaryTolerance::hasAbsoluteEuclidean() const {
-  return holdsVariant<AbsoluteEuclidean>();
+  return holdsVariant<AbsoluteEuclideanParams>();
 }
 
 bool BoundaryTolerance::hasChi2Bound() const {
-  return holdsVariant<Chi2Bound>();
+  return holdsVariant<Chi2BoundParams>();
 }
 
 BoundaryTolerance::ToleranceMode BoundaryTolerance::toleranceMode() const {
@@ -70,7 +53,7 @@ BoundaryTolerance::ToleranceMode BoundaryTolerance::toleranceMode() const {
     return None;
   }
 
-  if (const auto* absoluteBound = getVariantPtr<AbsoluteBound>();
+  if (const auto* absoluteBound = getVariantPtr<AbsoluteBoundParams>();
       absoluteBound != nullptr) {
     if (absoluteBound->tolerance0 == 0. && absoluteBound->tolerance1 == 0.) {
       return None;
@@ -79,7 +62,7 @@ BoundaryTolerance::ToleranceMode BoundaryTolerance::toleranceMode() const {
     return Extend;
   }
 
-  if (const auto* absoluteCartesian = getVariantPtr<AbsoluteCartesian>();
+  if (const auto* absoluteCartesian = getVariantPtr<AbsoluteCartesianParams>();
       absoluteCartesian != nullptr) {
     if (absoluteCartesian->tolerance0 == 0. &&
         absoluteCartesian->tolerance1 == 0.) {
@@ -89,7 +72,7 @@ BoundaryTolerance::ToleranceMode BoundaryTolerance::toleranceMode() const {
     return Extend;
   }
 
-  if (const auto* absoluteEuclidean = getVariantPtr<AbsoluteEuclidean>();
+  if (const auto* absoluteEuclidean = getVariantPtr<AbsoluteEuclideanParams>();
       absoluteEuclidean != nullptr) {
     if (absoluteEuclidean->tolerance == 0.) {
       return None;
@@ -100,7 +83,7 @@ BoundaryTolerance::ToleranceMode BoundaryTolerance::toleranceMode() const {
     }
   }
 
-  if (const auto* chi2Bound = getVariantPtr<Chi2Bound>();
+  if (const auto* chi2Bound = getVariantPtr<Chi2BoundParams>();
       chi2Bound != nullptr) {
     if (chi2Bound->maxChi2 == 0.) {
       return None;
@@ -115,35 +98,36 @@ BoundaryTolerance::ToleranceMode BoundaryTolerance::toleranceMode() const {
   return None;
 }
 
-BoundaryTolerance::AbsoluteBound BoundaryTolerance::asAbsoluteBound(
+BoundaryTolerance::AbsoluteBoundParams BoundaryTolerance::asAbsoluteBound(
     bool isCartesian) const {
   if (isNone()) {
-    return AbsoluteBound{0., 0.};
+    return AbsoluteBoundParams{0., 0.};
   }
 
   if (isCartesian && hasAbsoluteCartesian()) {
-    const auto& cartesian = getVariant<AbsoluteCartesian>();
-    return AbsoluteBound{cartesian.tolerance0, cartesian.tolerance1};
+    const auto& cartesian = getVariant<AbsoluteCartesianParams>();
+    return AbsoluteBoundParams{cartesian.tolerance0, cartesian.tolerance1};
   }
 
-  return getVariant<AbsoluteBound>();
+  return getVariant<AbsoluteBoundParams>();
 }
 
-const BoundaryTolerance::AbsoluteCartesian&
+const BoundaryTolerance::AbsoluteCartesianParams&
 BoundaryTolerance::asAbsoluteCartesian() const {
-  return getVariant<AbsoluteCartesian>();
+  return getVariant<AbsoluteCartesianParams>();
 }
 
-const BoundaryTolerance::AbsoluteEuclidean&
+const BoundaryTolerance::AbsoluteEuclideanParams&
 BoundaryTolerance::asAbsoluteEuclidean() const {
-  return getVariant<AbsoluteEuclidean>();
+  return getVariant<AbsoluteEuclideanParams>();
 }
 
-const BoundaryTolerance::Chi2Bound& BoundaryTolerance::asChi2Bound() const {
-  return getVariant<Chi2Bound>();
+const BoundaryTolerance::Chi2BoundParams& BoundaryTolerance::asChi2Bound()
+    const {
+  return getVariant<Chi2BoundParams>();
 }
 
-std::optional<BoundaryTolerance::AbsoluteBound>
+std::optional<BoundaryTolerance::AbsoluteBoundParams>
 BoundaryTolerance::asAbsoluteBoundOpt(bool isCartesian) const {
   return hasAbsoluteBound(isCartesian)
              ? std::optional(asAbsoluteBound(isCartesian))
@@ -161,13 +145,13 @@ bool BoundaryTolerance::isTolerated(
     return distance == Vector2::Zero();
   }
 
-  if (const auto* absoluteBound = getVariantPtr<AbsoluteBound>();
+  if (const auto* absoluteBound = getVariantPtr<AbsoluteBoundParams>();
       absoluteBound != nullptr) {
     return std::abs(distance[0]) <= absoluteBound->tolerance0 &&
            std::abs(distance[1]) <= absoluteBound->tolerance1;
   }
 
-  if (const auto* chi2Bound = getVariantPtr<Chi2Bound>();
+  if (const auto* chi2Bound = getVariantPtr<Chi2BoundParams>();
       chi2Bound != nullptr) {
     // Mahalanobis distances mean is 2 in 2-dim. cut is 1-d sigma.
     double chi2 = distance.transpose() * chi2Bound->weight * distance;
@@ -187,13 +171,13 @@ bool BoundaryTolerance::isTolerated(
     cartesianDistance = jacobian * distance;
   }
 
-  if (const auto* absoluteCartesian = getVariantPtr<AbsoluteCartesian>();
+  if (const auto* absoluteCartesian = getVariantPtr<AbsoluteCartesianParams>();
       absoluteCartesian != nullptr) {
     return std::abs(cartesianDistance[0]) <= absoluteCartesian->tolerance0 &&
            std::abs(cartesianDistance[1]) <= absoluteCartesian->tolerance1;
   }
 
-  if (const auto* absoluteEuclidean = getVariantPtr<AbsoluteEuclidean>();
+  if (const auto* absoluteEuclidean = getVariantPtr<AbsoluteEuclideanParams>();
       absoluteEuclidean != nullptr) {
     if (absoluteEuclidean->tolerance < 0) {
       return cartesianDistance.norm() > std::abs(absoluteEuclidean->tolerance);
@@ -214,7 +198,8 @@ SquareMatrix2 BoundaryTolerance::getMetric(
   bool isCartesian = !jacobianOpt.has_value();
   SquareMatrix2 metric = SquareMatrix2::Identity();
 
-  if (const auto* chi2Bound = getVariantPtr<BoundaryTolerance::Chi2Bound>();
+  if (const auto* chi2Bound =
+          getVariantPtr<BoundaryTolerance::Chi2BoundParams>();
       chi2Bound != nullptr) {
     metric = chi2Bound->weight;
   } else if (!isCartesian) {

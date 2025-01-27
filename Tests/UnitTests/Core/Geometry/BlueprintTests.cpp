@@ -22,6 +22,7 @@
 #include "Acts/Geometry/MaterialDesignatorBlueprintNode.hpp"
 #include "Acts/Geometry/StaticBlueprintNode.hpp"
 #include "Acts/Geometry/TrackingVolume.hpp"
+#include "Acts/Geometry/VolumeAttachmentStrategy.hpp"
 #include "Acts/Material/BinnedSurfaceMaterial.hpp"
 #include "Acts/Material/ProtoSurfaceMaterial.hpp"
 #include "Acts/Surfaces/RectangleBounds.hpp"
@@ -214,7 +215,7 @@ BOOST_AUTO_TEST_CASE(CylinderContainer) {
   auto root = std::make_unique<Blueprint>(cfg);
 
   auto& cyl = root->addCylinderContainer("Container", AxisDirection::AxisZ);
-  cyl.setAttachmentStrategy(CylinderVolumeStack::AttachmentStrategy::Gap);
+  cyl.setAttachmentStrategy(VolumeAttachmentStrategy::Gap);
 
   double z0 = -200_mm;
   double hlZ = 30_mm;

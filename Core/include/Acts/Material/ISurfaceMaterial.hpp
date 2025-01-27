@@ -137,9 +137,9 @@ inline double ISurfaceMaterial::factor(Direction pDir,
   if (mStage == Acts::MaterialUpdateStage::FullUpdate) {
     return 1.;
   } else if (mStage == Acts::MaterialUpdateStage::PreUpdate) {
-    return pDir == Direction::Negative ? m_splitFactor : 1 - m_splitFactor;
+    return pDir == Direction::Negative() ? m_splitFactor : 1 - m_splitFactor;
   } else /*if (mStage == Acts::MaterialUpdateStage::PostUpdate)*/ {
-    return pDir == Direction::Positive ? m_splitFactor : 1 - m_splitFactor;
+    return pDir == Direction::Positive() ? m_splitFactor : 1 - m_splitFactor;
   }
 }
 

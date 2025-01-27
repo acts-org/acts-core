@@ -2,6 +2,7 @@ add_library(ActsPluginExaTrkX SHARED src/buildEdges.cpp src/ExaTrkXPipeline.cpp)
 
 if(ACTS_EXATRKX_ENABLE_CUDA)
     target_compile_definitions(ActsPluginExaTrkX PUBLIC ACTS_EXATRKX_WITH_CUDA)
+    target_sources(ActsPluginExaTrkX PRIVATE src/CudaTrackBuilding.cu)
 endif()
 
 if(ACTS_EXATRKX_ENABLE_ONNX)
@@ -41,12 +42,10 @@ target_link_libraries(
 
 if(ACTS_EXATRKX_ENABLE_CUDA)
     target_link_libraries(ActsPluginExaTrkX PRIVATE frnn)
+    target_compile_features(ActsPluginExaTrkX PUBLIC cuda_std_20)
     set_target_properties(
         ActsPluginExaTrkX
-        PROPERTIES
-            CUDA_STANDARD 20
-            CUDA_STANDARD_REQUIRED ON
-            CUDA_SEPARABLE_COMPILATION ON
+        PROPERTIES CUDA_STANDARD_REQUIRED ON CUDA_SEPARABLE_COMPILATION ON
     )
     target_compile_options(
         ActsPluginExaTrkX

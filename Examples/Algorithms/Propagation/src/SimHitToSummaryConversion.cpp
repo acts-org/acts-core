@@ -99,7 +99,7 @@ ActsExamples::ProcessCode ActsExamples::SimHitToSummaryConversion::execute(
       step.position = Acts::Vector3(hx, hy, hz);
       step.momentum = simHit.direction();
       step.geoID = moduleGeoId;
-      step.navDir = Acts::Direction::Forward;
+      step.navDir = Acts::Direction::Forward();
       moduleSteps[paritcleId].push_back(step);
     }
     // Loop over and fill into the trackSteps

@@ -67,7 +67,7 @@ using MultiStepperLoop = MultiEigenStepperLoop<EigenStepperDefaultExtension>;
 using SingleStepper = EigenStepper<EigenStepperDefaultExtension>;
 
 const double defaultStepSize = 123.;
-const auto defaultNDir = Direction::Backward;
+const auto defaultNDir = Direction::Backward();
 
 const auto defaultBField =
     std::make_shared<ConstantBField>(Vector3(1., 2.5, 33.33));
@@ -507,7 +507,7 @@ void test_multi_stepper_surface_status_update() {
   // Update surface status and check
   {
     auto status = multi_stepper.updateSurfaceStatus(
-        multi_state, *right_surface, 0, Direction::Forward,
+        multi_state, *right_surface, 0, Direction::Forward(),
         BoundaryTolerance::Infinite(), s_onSurfaceTolerance,
         ConstrainedStep::Type::Navigator);
 
@@ -526,18 +526,18 @@ void test_multi_stepper_surface_status_update() {
 
   // Step forward now
   {
-    auto multi_prop_state = DummyPropState(Direction::Forward, multi_state);
+    auto multi_prop_state = DummyPropState(Direction::Forward(), multi_state);
     multi_stepper.step(multi_prop_state, mockNavigator);
 
     // Single stepper
-    auto single_prop_state = DummyPropState(Direction::Forward, single_state);
+    auto single_prop_state = DummyPropState(Direction::Forward(), single_state);
     single_stepper.step(single_prop_state, mockNavigator);
   }
 
   // Update surface status and check again
   {
     auto status = multi_stepper.updateSurfaceStatus(
-        multi_state, *right_surface, 0, Direction::Forward,
+        multi_state, *right_surface, 0, Direction::Forward(),
         BoundaryTolerance::Infinite(), s_onSurfaceTolerance,
         ConstrainedStep::Type::Navigator);
 
@@ -554,7 +554,7 @@ void test_multi_stepper_surface_status_update() {
   // Start surface should be reachable
   {
     auto status = multi_stepper.updateSurfaceStatus(
-        multi_state, *start_surface, 0, Direction::Forward,
+        multi_state, *start_surface, 0, Direction::Forward(),
         BoundaryTolerance::Infinite(), s_onSurfaceTolerance,
         ConstrainedStep::Type::Navigator);
 
@@ -624,18 +624,18 @@ void test_component_bound_state() {
   // Step forward now
   {
     multi_stepper.updateSurfaceStatus(
-        multi_state, *right_surface, 0, Direction::Forward,
+        multi_state, *right_surface, 0, Direction::Forward(),
         BoundaryTolerance::Infinite(), s_onSurfaceTolerance,
         ConstrainedStep::Type::Navigator);
-    auto multi_prop_state = DummyPropState(Direction::Forward, multi_state);
+    auto multi_prop_state = DummyPropState(Direction::Forward(), multi_state);
     multi_stepper.step(multi_prop_state, mockNavigator);
 
     // Single stepper
     single_stepper.updateSurfaceStatus(
-        single_state, *right_surface, 0, Direction::Forward,
+        single_state, *right_surface, 0, Direction::Forward(),
         BoundaryTolerance::Infinite(), s_onSurfaceTolerance,
         ConstrainedStep::Type::Navigator);
-    auto single_prop_state = DummyPropState(Direction::Forward, single_state);
+    auto single_prop_state = DummyPropState(Direction::Forward(), single_state);
     single_stepper.step(single_prop_state, mockNavigator);
   }
 

@@ -257,7 +257,8 @@ std::unique_ptr<PortalLinkBase> mergeGridPortals(
         dynamic_cast<const DiscSurface&>(*surfaceB), direction, true, logger);
   } else if (const auto* planeA = dynamic_cast<const PlaneSurface*>(surfaceA);
              planeA != nullptr) {
-    throw std::logic_error{"Plane surfaces not implemented yet"};
+    std::tie(mergedSurface, reversed) = planeA->mergedWith(
+        dynamic_cast<const PlaneSurface&>(*surfaceB), direction, logger);
   } else {
     throw std::invalid_argument{"Unsupported surface type"};
   }
@@ -442,6 +443,7 @@ std::unique_ptr<PortalLinkBase> mergeGridPortals(const GridPortalLink* a,
 
   const auto* cylinder = dynamic_cast<const CylinderSurface*>(&a->surface());
   const auto* disc = dynamic_cast<const DiscSurface*>(&a->surface());
+  const auto* plane = dynamic_cast<const PlaneSurface*>(&a->surface());
 
   if (a->dim() == b->dim()) {
     ACTS_VERBOSE("Grid both have same dimension: " << a->dim());
@@ -454,8 +456,11 @@ std::unique_ptr<PortalLinkBase> mergeGridPortals(const GridPortalLink* a,
       return mergeGridPortals(a, b, disc,
                               &dynamic_cast<const DiscSurface&>(b->surface()),
                               AxisR, AxisPhi, direction, logger);
+    } else if (plane != nullptr) {
+      return mergeGridPortals(a, b, plane,
+                              &dynamic_cast<const PlaneSurface&>(b->surface()),
+                              AxisX, AxisY, direction, logger);
     } else {
-      // @TODO: Support PlaneSurface
       ACTS_VERBOSE("Surface type is not supported here, falling back");
       return nullptr;
     }

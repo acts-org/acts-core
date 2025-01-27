@@ -189,7 +189,7 @@ test_exatrkx_unittests:
     - git checkout $HEAD_SHA
     - source CI/dependencies/setup.sh -c g++
     - cd ..
-    - ctest --test-dir build -R ExaTrkX
+    - ctest --test-dir build -R "(ExaTrkX|ConnectedComponentsCuda)"
 
   after_script:
    - !reference [.spack_cleanup, after_script]
@@ -363,6 +363,7 @@ linux_physmon:
 .linux_ubuntu_extra:
   variables:
     INSTALL_DIR: ${CI_PROJECT_DIR}/install
+    CXX: g++
 
   stage: build
 
@@ -386,6 +387,7 @@ linux_physmon:
       --preset=gitlab-ci
       -DCMAKE_CXX_COMPILER=${COMPILER}
       -DCMAKE_CXX_STANDARD=${CXXSTD}
+      -DCMAKE_CXX_COMPILER=${CXX}
 
     - ccache -z
     - cmake --build build -- -j6
@@ -426,6 +428,7 @@ linux_ubuntu_2204:
 linux_ubuntu_2204_clang:
   extends: .linux_ubuntu_extra
   variables:
+    CXX: clang++
     CXXSTD: 20
     COMPILER: clang++
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:71

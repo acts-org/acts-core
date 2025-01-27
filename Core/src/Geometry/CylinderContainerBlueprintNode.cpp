@@ -24,8 +24,8 @@ namespace Acts {
 
 CylinderContainerBlueprintNode::CylinderContainerBlueprintNode(
     const std::string& name, AxisDirection direction,
-    CylinderVolumeStack::AttachmentStrategy attachmentStrategy,
-    CylinderVolumeStack::ResizeStrategy resizeStrategy)
+    VolumeAttachmentStrategy attachmentStrategy,
+    VolumeResizeStrategy resizeStrategy)
     : m_name(name),
       m_direction(direction),
       m_attachmentStrategy(attachmentStrategy),
@@ -207,7 +207,7 @@ CylinderContainerBlueprintNode& CylinderContainerBlueprintNode::setDirection(
 
 CylinderContainerBlueprintNode&
 CylinderContainerBlueprintNode::setAttachmentStrategy(
-    CylinderVolumeStack::AttachmentStrategy attachmentStrategy) {
+    VolumeAttachmentStrategy attachmentStrategy) {
   if (m_stack != nullptr) {
     throw std::runtime_error("Cannot change direction after build");
   }
@@ -217,7 +217,7 @@ CylinderContainerBlueprintNode::setAttachmentStrategy(
 
 CylinderContainerBlueprintNode&
 CylinderContainerBlueprintNode::setResizeStrategy(
-    CylinderVolumeStack::ResizeStrategy resizeStrategy) {
+    VolumeResizeStrategy resizeStrategy) {
   if (m_stack != nullptr) {
     throw std::runtime_error("Cannot change direction after build");
   }
@@ -244,13 +244,12 @@ AxisDirection CylinderContainerBlueprintNode::direction() const {
   return m_direction;
 }
 
-CylinderVolumeStack::AttachmentStrategy
-CylinderContainerBlueprintNode::attachmentStrategy() const {
+VolumeAttachmentStrategy CylinderContainerBlueprintNode::attachmentStrategy()
+    const {
   return m_attachmentStrategy;
 }
 
-CylinderVolumeStack::ResizeStrategy
-CylinderContainerBlueprintNode::resizeStrategy() const {
+VolumeResizeStrategy CylinderContainerBlueprintNode::resizeStrategy() const {
   return m_resizeStrategy;
 }
 

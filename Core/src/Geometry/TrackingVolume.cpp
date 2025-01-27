@@ -114,7 +114,7 @@ const TrackingVolumeBoundaries& TrackingVolume::boundarySurfaces() const {
 void TrackingVolume::connectDenseBoundarySurfaces(
     MutableTrackingVolumeVector& confinedDenseVolumes) {
   if (!confinedDenseVolumes.empty()) {
-    Direction dir = Direction::Positive;
+    Direction dir = Direction::Positive();
     // Walk over each dense volume
     for (auto& confDenseVol : confinedDenseVolumes) {
       // Walk over each boundary surface of the volume
@@ -133,12 +133,12 @@ void TrackingVolume::connectDenseBoundarySurfaces(
                 boundSur.at(i));
         if (mutableBs->m_oppositeVolume != nullptr &&
             mutableBs->m_alongVolume == nullptr) {
-          dir = Direction::Positive;
+          dir = Direction::Positive();
           mutableBs->attachVolume(this, dir);
         } else {
           if (mutableBs->m_oppositeVolume == nullptr &&
               mutableBs->m_alongVolume != nullptr) {
-            dir = Direction::Negative;
+            dir = Direction::Negative();
             mutableBs->attachVolume(this, dir);
           }
         }
@@ -163,7 +163,7 @@ void TrackingVolume::createBoundarySurfaces() {
   for (auto& osf : orientedSurfaces) {
     TrackingVolume* opposite = nullptr;
     TrackingVolume* along = nullptr;
-    if (osf.direction == Direction::OppositeNormal) {
+    if (osf.direction == Direction::OppositeNormal()) {
       opposite = this;
     } else {
       along = this;

@@ -247,10 +247,10 @@ jobs:
         include:
           - image: ubuntu2204
             std: 20
-            compiler: g++
+            cxx: g++
           - image: ubuntu2204
             std: 20
-            compiler: clang++
+            cxx: clang++
     container: ghcr.io/acts-project/${{ matrix.image }}:71
     env:
       INSTALL_DIR: ${{ github.workspace }}/install
@@ -265,7 +265,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/dependencies
         with:
-          compiler: ${{ matrix.compiler }}
+          compiler: ${{ matrix.cxx }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore ccache
@@ -283,8 +283,8 @@ jobs:
           ccache -z &&
           cmake -B build -S .
           --preset=github-ci
+          -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           -DCMAKE_CXX_STANDARD=${{ matrix.std }}
-          -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
           -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
 
       - name: Build

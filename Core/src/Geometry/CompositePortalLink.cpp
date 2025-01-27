@@ -15,10 +15,13 @@
 #include "Acts/Surfaces/DiscSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Surfaces/RadialBounds.hpp"
+#include "Acts/Surfaces/RectangleBounds.hpp"
 #include "Acts/Surfaces/RegularSurface.hpp"
 #include "Acts/Utilities/Axis.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
@@ -48,7 +51,9 @@ std::shared_ptr<RegularSurface> mergedSurface(const Surface& a,
     return merged;
   } else if (const auto* planeA = dynamic_cast<const PlaneSurface*>(&a);
              planeA != nullptr) {
-    throw std::logic_error{"Plane surfaces not implemented yet"};
+    const auto& planeB = dynamic_cast<const PlaneSurface&>(b);
+    auto [merged, reversed] = planeA->mergedWith(planeB, direction);
+    return merged;
   } else {
     throw std::invalid_argument{"Unsupported surface type"};
   }
@@ -289,7 +294,55 @@ std::unique_ptr<GridPortalLink> CompositePortalLink::makeGrid(
 
     return grid;
   } else if (surface().type() == Surface::SurfaceType::Plane) {
-    throw std::runtime_error{"Plane surfaces not implemented yet"};
+    ACTS_VERBOSE("Combining composite into plane grid");
+
+    if (m_direction != AxisDirection::AxisX &&
+        m_direction != AxisDirection::AxisY) {
+      ACTS_ERROR("Plane grid only supports binning in x/y direction");
+      throw std::runtime_error{"Unsupported binning direction"};
+    }
+
+    bool dirX = m_direction == AxisDirection::AxisX;
+
+    std::vector<double> edges;
+    edges.reserve(m_children.size() + 1);
+
+    const Transform3& groupTransform = m_surface->transform(gctx);
+    Transform3 itransform = groupTransform.inverse();
+
+    std::size_t sortingDir = dirX ? eX : eY;
+    std::ranges::sort(trivialLinks, [&itransform, &gctx, sortingDir](
+                                        const auto& a, const auto& b) {
+      return (itransform * a->surface().transform(gctx))
+                 .translation()[sortingDir] <
+             (itransform * b->surface().transform(gctx))
+                 .translation()[sortingDir];
+    });
+
+    for (const auto& [i, child] : enumerate(trivialLinks)) {
+      const auto& bounds =
+          dynamic_cast<const RectangleBounds&>(child->surface().bounds());
+      Transform3 ltransform = itransform * child->surface().transform(gctx);
+      double half = dirX ? bounds.halfLengthX() : bounds.halfLengthY();
+      double min = ltransform.translation()[sortingDir] - half;
+      double max = ltransform.translation()[sortingDir] + half;
+      if (i == 0) {
+        edges.push_back(min);
+      }
+      edges.push_back(max);
+    }
+
+    ACTS_VERBOSE("~> Determined bin edges to be " << printEdges(edges));
+
+    Axis axis{AxisBound, edges};
+
+    auto grid = GridPortalLink::make(m_surface, m_direction, std::move(axis));
+    for (const auto& [i, child] : enumerate(trivialLinks)) {
+      grid->atLocalBins({i + 1}) = &child->volume();
+    }
+
+    return grid;
+
   } else {
     throw std::invalid_argument{"Unsupported surface type"};
   }

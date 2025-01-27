@@ -45,25 +45,25 @@ BOOST_AUTO_TEST_CASE(ISurfaceMaterial_factor_test) {
   SurfaceMaterialStub stub{splitFactor};
 
   BOOST_CHECK_EQUAL(
-      stub.factor(Direction::Forward, MaterialUpdateStage::FullUpdate), 1.0);
+      stub.factor(Direction::Forward(), MaterialUpdateStage::FullUpdate), 1.0);
 
   BOOST_CHECK_EQUAL(
-      stub.factor(Direction::Backward, MaterialUpdateStage::FullUpdate), 1.0);
+      stub.factor(Direction::Backward(), MaterialUpdateStage::FullUpdate), 1.0);
 
   BOOST_CHECK_EQUAL(
-      stub.factor(Direction::Forward, MaterialUpdateStage::PostUpdate),
+      stub.factor(Direction::Forward(), MaterialUpdateStage::PostUpdate),
       splitFactor);
 
   BOOST_CHECK_EQUAL(
-      stub.factor(Direction::Backward, MaterialUpdateStage::PreUpdate),
+      stub.factor(Direction::Backward(), MaterialUpdateStage::PreUpdate),
       splitFactor);
 
   BOOST_CHECK_EQUAL(
-      stub.factor(Direction::Forward, MaterialUpdateStage::PreUpdate),
+      stub.factor(Direction::Forward(), MaterialUpdateStage::PreUpdate),
       1 - splitFactor);
 
   BOOST_CHECK_EQUAL(
-      stub.factor(Direction::Backward, MaterialUpdateStage::PostUpdate),
+      stub.factor(Direction::Backward(), MaterialUpdateStage::PostUpdate),
       1 - splitFactor);
 }
 

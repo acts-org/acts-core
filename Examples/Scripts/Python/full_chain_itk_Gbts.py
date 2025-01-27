@@ -5,11 +5,12 @@ from acts.examples.simulation import (
     MomentumConfig,
     EtaConfig,
     ParticleConfig,
-    ParticleSelectorConfig,
     addPythia8,
-    addFatras,
     ParticleSelectorConfig,
+    addGenParticleSelection,
+    addFatras,
     addDigitization,
+    addDigiParticleSelection,
 )
 from acts.examples.reconstruction import (
     addSeeding,
@@ -51,27 +52,21 @@ else:
         outputDirRoot=outputDir,
     )
 
-addFatras(
-    s,
-    trackingGeometry,
-    field,
-    rnd=rnd,
-    preSelectParticles=(
+    addGenParticleSelection(
+        s,
         ParticleSelectorConfig(
             rho=(0.0 * u.mm, 28.0 * u.mm),
             absZ=(0.0 * u.mm, 1.0 * u.m),
             eta=(-4.0, 4.0),
             pt=(150 * u.MeV, None),
-        )
-        if ttbar_pu200
-        else ParticleSelectorConfig()
-    ),
-    postSelectParticles=ParticleSelectorConfig(
-        pt=(1.0 * u.GeV, None),
-        eta=(-4.0, 4.0),
-        hits=(9, None),
-        removeNeutral=True,
-    ),
+        ),
+    )
+
+addFatras(
+    s,
+    trackingGeometry,
+    field,
+    rnd=rnd,
     outputDirRoot=outputDir,
 )
 
@@ -85,6 +80,16 @@ addDigitization(
     rnd=rnd,
 )
 
+addDigiParticleSelection(
+    s,
+    ParticleSelectorConfig(
+        pt=(1.0 * u.GeV, None),
+        eta=(-4.0, 4.0),
+        measurements=(9, None),
+        removeNeutral=True,
+    ),
+)
+
 addSeeding(
     s,
     trackingGeometry,
@@ -95,7 +100,7 @@ addSeeding(
     ),
     geoSelectionConfigFile=geo_dir / "itk-hgtd/geoSelection-ITk.json",
     layerMappingConfigFile=geo_dir / "itk-hgtd/ACTS_FTF_mapinput.csv",
-    connector_inputConfigFile=geo_dir / "itk-hgtd/binTables_ITK_RUN4.txt",
+    ConnectorInputConfigFile=geo_dir / "itk-hgtd/binTables_ITK_RUN4.txt",
     outputDirRoot=outputDir,
 )
 

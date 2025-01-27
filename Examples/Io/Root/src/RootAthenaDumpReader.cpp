@@ -398,8 +398,8 @@ RootAthenaDumpReader::readMeasurements(
 
       bool inside =
           surface->isOnSurface(gctx, cluster.globalPosition, {},
-                               Acts::BoundaryTolerance::AbsoluteEuclidean{
-                                   m_cfg.absBoundaryTolerance},
+                               Acts::BoundaryTolerance::AbsoluteEuclidean(
+                                   m_cfg.absBoundaryTolerance),
                                std::numeric_limits<double>::max());
 
       if (!inside) {

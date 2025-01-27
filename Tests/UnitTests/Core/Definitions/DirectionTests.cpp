@@ -18,11 +18,11 @@ using namespace Acts;
 BOOST_AUTO_TEST_SUITE(DefinitionsDirection)
 
 BOOST_AUTO_TEST_CASE(DirectionTests) {
-  constexpr Direction bwd = Direction::Backward;
-  constexpr Direction fwd = Direction::Forward;
+  constexpr Direction bwd = Direction::Backward();
+  constexpr Direction fwd = Direction::Forward();
 
-  BOOST_CHECK_EQUAL(bwd, Direction::Negative);
-  BOOST_CHECK_EQUAL(fwd, Direction::Positive);
+  BOOST_CHECK_EQUAL(bwd, Direction::Negative());
+  BOOST_CHECK_EQUAL(fwd, Direction::Positive());
 
   BOOST_CHECK_EQUAL(Direction::fromScalar(-1.), bwd);
   BOOST_CHECK_EQUAL(Direction::fromScalar(1.), fwd);

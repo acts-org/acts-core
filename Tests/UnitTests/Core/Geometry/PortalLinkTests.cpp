@@ -15,12 +15,14 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/Geometry/CompositePortalLink.hpp"
+#include "Acts/Geometry/CuboidVolumeBounds.hpp"
 #include "Acts/Geometry/CylinderVolumeBounds.hpp"
 #include "Acts/Geometry/GridPortalLink.hpp"
 #include "Acts/Geometry/TrackingVolume.hpp"
 #include "Acts/Geometry/TrivialPortalLink.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/Surfaces/RadialBounds.hpp"
+#include "Acts/Surfaces/RectangleBounds.hpp"
 #include "Acts/Surfaces/SurfaceMergingException.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 #include "Acts/Utilities/AxisDefinitions.hpp"
@@ -465,7 +467,124 @@ BOOST_AUTO_TEST_CASE(Disc) {
 }
 
 BOOST_AUTO_TEST_CASE(Plane) {
-  // @TODO: Add plane tests
+  using enum AxisType;
+  using enum AxisBoundaryType;
+  BOOST_TEST_CONTEXT("1D") {
+    // Initialize surfaces
+    auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 100_mm);
+    auto planeX =
+        Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+    auto planeY =
+        Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+    // Volume for bin testing
+    auto vol = std::make_shared<TrackingVolume>(
+        Transform3::Identity(),
+        std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+    // Initialize grids
+    auto gridX = GridPortalLink::make(planeX, AxisDirection::AxisX,
+                                      Axis{AxisBound, -30_mm, 30_mm, 3});
+    auto gridY = GridPortalLink::make(planeY, AxisDirection::AxisY,
+                                      Axis{AxisBound, -100_mm, 100_mm, 3});
+
+    // Check grid X
+    BOOST_REQUIRE_NE(gridX, nullptr);
+    BOOST_CHECK_EQUAL(gridX->grid().axes().size(), 1);
+    const auto& axisX = *gridX->grid().axes().front();
+    Axis axisXExpected{AxisBound, -30_mm, 30_mm, 3};
+    BOOST_CHECK_EQUAL(axisX, axisXExpected);
+
+    // Check grid Y
+    BOOST_REQUIRE_NE(gridY, nullptr);
+    BOOST_CHECK_EQUAL(gridY->grid().axes().size(), 1);
+    const auto& axisY = *gridY->grid().axes().front();
+    Axis axisYExpected{AxisBound, -100_mm, 100_mm, 3};
+    BOOST_CHECK_EQUAL(axisY, axisYExpected);
+
+    // Check gridX/gridX bin content
+    auto checkAllBins = [&](const auto& grid) {
+      visitBins(grid, [&](const TrackingVolume* content) {
+        BOOST_CHECK_EQUAL(content, vol.get());
+      });
+    };
+
+    gridX->setVolume(vol.get());
+    checkAllBins(*gridX);
+
+    gridY->setVolume(vol.get());
+    checkAllBins(*gridY);
+
+    // Test making 2D grids from the 1D ones
+
+    // Test grid X
+    auto gridX2d = gridX->extendTo2d(nullptr);
+    BOOST_REQUIRE(gridX2d);
+    BOOST_CHECK_EQUAL(gridX2d->grid().axes().size(), 2);
+    const auto* axisX1 = gridX2d->grid().axes().front();
+    BOOST_CHECK_EQUAL(*axisX1, axisXExpected);
+    const auto* axisX2 = gridX2d->grid().axes().back();
+    BOOST_CHECK_EQUAL(axisX2->getMin(), -100_mm);
+    BOOST_CHECK_EQUAL(axisX2->getMax(), 100_mm);
+    BOOST_CHECK_EQUAL(axisX2->getNBins(), 1);
+    BOOST_CHECK_EQUAL(axisX2->getType(), AxisType::Equidistant);
+    BOOST_CHECK_EQUAL(axisX2->getBoundaryType(), AxisBoundaryType::Bound);
+
+    // Test grid X explicit
+    Axis axisYExplicit{AxisClosed, -100_mm, 100_mm, 3};
+    auto gridX2dExplicit = gridX->extendTo2d(&axisYExplicit);
+    BOOST_REQUIRE(gridX2dExplicit);
+    BOOST_CHECK_EQUAL(gridX2dExplicit->grid().axes().size(), 2);
+    axisX1 = gridX2dExplicit->grid().axes().front();
+    axisX2 = gridX2dExplicit->grid().axes().back();
+    BOOST_CHECK_EQUAL(*axisX1, axisXExpected);
+    BOOST_CHECK_EQUAL(*axisX2, axisYExplicit);
+
+    checkAllBins(
+        dynamic_cast<
+            GridPortalLinkT<decltype(axisXExpected), decltype(axisYExplicit)>&>(
+            *gridX2dExplicit));
+
+    // Test grid Y
+    auto gridY2d = gridY->extendTo2d(nullptr);
+    BOOST_REQUIRE(gridY2d);
+    BOOST_CHECK_EQUAL(gridY2d->grid().axes().size(), 2);
+    const auto* axisY1 = gridY2d->grid().axes().front();
+    BOOST_CHECK_EQUAL(axisY1->getMin(), -30_mm);
+    BOOST_CHECK_EQUAL(axisY1->getMax(), 30_mm);
+    BOOST_CHECK_EQUAL(axisY1->getNBins(), 1);
+    BOOST_CHECK_EQUAL(axisY1->getType(), AxisType::Equidistant);
+    BOOST_CHECK_EQUAL(axisY1->getBoundaryType(), AxisBoundaryType::Bound);
+    const auto* axisY2 = gridY2d->grid().axes().back();
+    BOOST_CHECK_EQUAL(*axisY2, axisYExpected);
+
+    // Test grid Y explicit
+    Axis axisXExplicit{AxisClosed, -30_mm, 30_mm, 3};
+    auto gridY2dExplicit = gridY->extendTo2d(&axisXExplicit);
+    BOOST_REQUIRE(gridY2dExplicit);
+    BOOST_CHECK_EQUAL(gridY2dExplicit->grid().axes().size(), 2);
+    axisY1 = gridY2dExplicit->grid().axes().front();
+    axisY2 = gridY2dExplicit->grid().axes().back();
+    BOOST_CHECK_EQUAL(*axisY1, axisXExplicit);
+    BOOST_CHECK_EQUAL(*axisY2, axisYExpected);
+
+    checkAllBins(
+        dynamic_cast<
+            GridPortalLinkT<decltype(axisXExplicit), decltype(axisYExpected)>&>(
+            *gridY2dExplicit));
+  }
+  BOOST_TEST_CONTEXT("2D") {
+    auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 100_mm);
+
+    auto plane =
+        Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+    Axis xAxis{AxisBound, -30_mm, 30_mm, 5};
+    Axis yAxis{AxisBound, -100_mm, 100_mm, 5};
+
+    auto grid = GridPortalLink::make(plane, xAxis, yAxis);
+    BOOST_REQUIRE_NE(grid, nullptr);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(FromTrivial) {
@@ -566,6 +685,45 @@ BOOST_AUTO_TEST_CASE(FromTrivial) {
     BOOST_CHECK_EQUAL(
         gridPhi->resolveVolume(gctx, Vector2{90_mm, 10_degree}).value(),
         vol.get());
+  }
+  BOOST_TEST_CONTEXT("Plane") {
+    auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 100_mm);
+
+    auto plane =
+        Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+    auto vol = std::make_shared<TrackingVolume>(
+        Transform3::Identity(),
+        std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+    auto trivial = std::make_unique<TrivialPortalLink>(plane, *vol);
+    BOOST_REQUIRE(trivial);
+
+    // Doesn't matter which position
+    BOOST_CHECK_EQUAL(
+        trivial->resolveVolume(gctx, Vector2{10_mm, 20_mm}).value(), vol.get());
+
+    auto gridX = trivial->makeGrid(AxisDirection::AxisX);
+    BOOST_REQUIRE(gridX);
+
+    BOOST_CHECK_EQUAL(gridX->grid().axes().size(), 1);
+    BOOST_CHECK_EQUAL(gridX->surface().bounds(), plane->bounds());
+    Axis axisXExpected{AxisBound, -30_mm, 30_mm, 1};
+    BOOST_CHECK_EQUAL(*gridX->grid().axes().front(), axisXExpected);
+
+    BOOST_CHECK_EQUAL(gridX->resolveVolume(gctx, Vector2{20_mm, 10_mm}).value(),
+                      vol.get());
+
+    auto gridY = trivial->makeGrid(AxisDirection::AxisY);
+    BOOST_REQUIRE(gridY);
+
+    BOOST_CHECK_EQUAL(gridY->grid().axes().size(), 1);
+    BOOST_CHECK_EQUAL(gridY->surface().bounds(), plane->bounds());
+    Axis axisYExpected{AxisBound, -100_mm, 100_mm, 1};
+    BOOST_CHECK_EQUAL(*gridY->grid().axes().front(), axisYExpected);
+
+    BOOST_CHECK_EQUAL(gridY->resolveVolume(gctx, Vector2{15_mm, 20_mm}).value(),
+                      vol.get());
   }
 }
 
@@ -2048,6 +2206,391 @@ BOOST_AUTO_TEST_CASE(PhiDirection) {
 
 BOOST_AUTO_TEST_SUITE_END()  // MergeCrossDisc
 
+BOOST_AUTO_TEST_SUITE(Merging1dPlane)
+
+BOOST_AUTO_TEST_CASE(ColinearMerge) {
+  auto rBounds1 = std::make_shared<const RectangleBounds>(30_mm, 100_mm);
+
+  auto plane1 =
+      Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds1);
+
+  auto gridX1 = GridPortalLink::make(plane1, AxisDirection::AxisX,
+                                     Axis{AxisBound, -30_mm, 30_mm, 6});
+  auto gridY1 = GridPortalLink::make(plane1, AxisDirection::AxisY,
+                                     Axis{AxisBound, -100_mm, 100_mm, 10});
+
+  auto rBounds2 = std::make_shared<const RectangleBounds>(80_mm, 100_mm);
+  Translation3 offsetX{110_mm, 0., 0.};
+  auto planeX2 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetX, rBounds2);
+
+  auto rBounds3 = std::make_shared<const RectangleBounds>(30_mm, 20_mm);
+  Translation3 offsetY{0, 120_mm, 0.};
+  auto planeY2 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetY, rBounds3);
+
+  auto gridX2 = GridPortalLink::make(planeX2, AxisDirection::AxisX,
+                                     Axis{AxisBound, -80_mm, 80_mm, 16});
+  auto gridY2 = GridPortalLink::make(planeY2, AxisDirection::AxisY,
+                                     Axis{AxisBound, -20_mm, 20_mm, 2});
+
+  auto mergedPtrX =
+      GridPortalLink::merge(*gridX1, *gridX2, AxisDirection::AxisX, *logger);
+  BOOST_REQUIRE(mergedPtrX);
+  const auto* mergedX = dynamic_cast<const GridPortalLink*>(mergedPtrX.get());
+  BOOST_REQUIRE_NE(mergedX, nullptr);
+
+  BOOST_CHECK_EQUAL(mergedX->grid().axes().size(), 1);
+  Axis axisXExpected{AxisBound, -110_mm, 110_mm, 22};
+  BOOST_CHECK_EQUAL(*mergedX->grid().axes().front(), axisXExpected);
+
+  auto mergedPtrY =
+      GridPortalLink::merge(*gridY1, *gridY2, AxisDirection::AxisY, *logger);
+  BOOST_REQUIRE(mergedPtrY);
+  const auto* mergedY = dynamic_cast<const GridPortalLink*>(mergedPtrY.get());
+  BOOST_REQUIRE_NE(mergedY, nullptr);
+
+  BOOST_CHECK_EQUAL(mergedY->grid().axes().size(), 1);
+  Axis axisYExpected{AxisBound, -120_mm, 120_mm, 12};
+  BOOST_CHECK_EQUAL(*mergedY->grid().axes().front(), axisYExpected);
+}
+
+BOOST_AUTO_TEST_CASE(ParallelMerge) {
+  auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 100_mm);
+  auto plane1 =
+      Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+  auto grid1X = GridPortalLink::make(plane1, AxisDirection::AxisX,
+                                     Axis{AxisBound, -30_mm, 30_mm, 6});
+
+  auto grid1Y = GridPortalLink::make(plane1, AxisDirection::AxisY,
+                                     Axis{AxisBound, -100_mm, 100_mm, 5});
+
+  Translation3 offsetX{60_mm, 0, 0.};
+  auto plane2 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetX, rBounds);
+  auto grid2 = GridPortalLink::make(plane2, AxisDirection::AxisY,
+                                    Axis{AxisBound, -100_mm, 100_mm, 5});
+
+  Translation3 offsetY{0, 200_mm, 0.};
+  auto plane3 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetY, rBounds);
+  auto grid3 = GridPortalLink::make(plane3, AxisDirection::AxisX,
+                                    Axis{AxisBound, -30_mm, 30_mm, 6});
+
+  auto mergedPtrX =
+      GridPortalLink::merge(*grid1Y, *grid2, AxisDirection::AxisX, *logger);
+  BOOST_REQUIRE(mergedPtrX);
+  const auto* mergedX = dynamic_cast<const GridPortalLink*>(mergedPtrX.get());
+  BOOST_REQUIRE_NE(mergedX, nullptr);
+
+  BOOST_CHECK_EQUAL(mergedX->grid().axes().size(), 2);
+  const auto& axisX1 = *mergedX->grid().axes().front();
+  const auto& axisX2 = *mergedX->grid().axes().back();
+  Axis axisX1Expected{AxisBound, -60_mm, 60_mm, 2};
+  BOOST_CHECK_EQUAL(axisX1, axisX1Expected);
+  Axis axisX2Expected{AxisBound, -100_mm, 100_mm, 5};
+  BOOST_CHECK_EQUAL(axisX2, axisX2Expected);
+
+  auto mergedPtrY =
+      GridPortalLink::merge(*grid1X, *grid3, AxisDirection::AxisY, *logger);
+  BOOST_REQUIRE(mergedPtrY);
+  const auto* mergedY = dynamic_cast<const GridPortalLink*>(mergedPtrY.get());
+  BOOST_REQUIRE_NE(mergedY, nullptr);
+
+  BOOST_CHECK_EQUAL(mergedY->grid().axes().size(), 2);
+  const auto& axisY1 = *mergedY->grid().axes().front();
+  const auto& axisY2 = *mergedY->grid().axes().back();
+  Axis axisY1Expected{AxisBound, -30_mm, 30_mm, 6};
+  BOOST_CHECK_EQUAL(axisY1, axisY1Expected);
+  Axis axisY2Expected{AxisBound, -200_mm, 200_mm, 2};
+  BOOST_CHECK_EQUAL(axisY2, axisY2Expected);
+}
+
+BOOST_AUTO_TEST_CASE(BinFilling) {
+  // Volumes for bin content checking
+  auto vol1 = std::make_shared<TrackingVolume>(
+      Transform3::Identity(),
+      std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+  auto vol2 = std::make_shared<TrackingVolume>(
+      Transform3::Identity(),
+      std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+  auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 100_mm);
+  auto plane1 =
+      Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+  auto grid1X = GridPortalLink::make(plane1, AxisDirection::AxisX,
+                                     Axis{AxisBound, -30_mm, 30_mm, 2});
+  grid1X->setVolume(vol1.get());
+
+  auto grid1Y = GridPortalLink::make(plane1, AxisDirection::AxisY,
+                                     Axis{AxisBound, -100_mm, 100_mm, 2});
+  grid1Y->setVolume(vol1.get());
+
+  Translation3 offsetX{60_mm, 0., 0.};
+  auto plane2 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetX, rBounds);
+  auto grid2 = GridPortalLink::make(plane2, AxisDirection::AxisX,
+                                    Axis{AxisBound, -30_mm, 30_mm, 2});
+  grid2->setVolume(vol2.get());
+
+  Translation3 offsetY{0., 200_mm, 0.};
+  auto plane3 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetY, rBounds);
+  auto grid3 = GridPortalLink::make(plane3, AxisDirection::AxisY,
+                                    Axis{AxisBound, -100_mm, 100_mm, 2});
+  grid3->setVolume(vol2.get());
+
+  auto mergedPtrX =
+      GridPortalLink::merge(*grid1X, *grid2, AxisDirection::AxisX, *logger);
+
+  auto mergedPtrY =
+      GridPortalLink::merge(*grid1Y, *grid3, AxisDirection::AxisY, *logger);
+
+  using merged_type =
+      GridPortalLinkT<Axis<AxisType::Equidistant, AxisBoundaryType::Bound>>;
+
+  const auto* mergedX = dynamic_cast<const merged_type*>(mergedPtrX.get());
+  BOOST_REQUIRE(mergedX);
+
+  grid1X->printContents(std::cout);
+  grid2->printContents(std::cout);
+  mergedX->printContents(std::cout);
+
+  BOOST_CHECK_EQUAL(mergedX->grid().atLocalBins({1}), vol1.get());
+  BOOST_CHECK_EQUAL(mergedX->grid().atLocalBins({2}), vol1.get());
+  BOOST_CHECK_EQUAL(mergedX->grid().atLocalBins({3}), vol2.get());
+  BOOST_CHECK_EQUAL(mergedX->grid().atLocalBins({4}), vol2.get());
+
+  const auto* mergedY = dynamic_cast<const merged_type*>(mergedPtrX.get());
+  BOOST_REQUIRE(mergedY);
+
+  BOOST_CHECK_EQUAL(mergedY->grid().atLocalBins({1}), vol1.get());
+  BOOST_CHECK_EQUAL(mergedY->grid().atLocalBins({2}), vol1.get());
+  BOOST_CHECK_EQUAL(mergedY->grid().atLocalBins({3}), vol2.get());
+  BOOST_CHECK_EQUAL(mergedY->grid().atLocalBins({4}), vol2.get());
+
+  grid1X->printContents(std::cout);
+  grid2->printContents(std::cout);
+  grid3->printContents(std::cout);
+  mergedX->printContents(std::cout);
+  mergedY->printContents(std::cout);
+}
+
+BOOST_AUTO_TEST_SUITE_END()  // Merging1dPlane
+
+BOOST_AUTO_TEST_SUITE(Merging2dPlane)
+
+BOOST_AUTO_TEST_CASE(XYDirection) {
+  // Basic, because the parallel 1D case already tests this to some degree
+  auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 100_mm);
+  auto plane1 =
+      Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+  auto grid1 = GridPortalLink::make(plane1, Axis{AxisBound, -30_mm, 30_mm, 10},
+                                    Axis{AxisBound, -100_mm, 100_mm, 3});
+
+  Translation3 offsetX{60_mm, 0., 0.};
+  auto plane2 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetX, rBounds);
+  auto grid2 = GridPortalLink::make(plane2, Axis{AxisBound, -30_mm, 30_mm, 10},
+                                    Axis{AxisBound, -100_mm, 100_mm, 3});
+
+  Translation3 offsetY{0., 200_mm, 0.};
+  auto plane3 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetY, rBounds);
+  auto grid3 = GridPortalLink::make(plane3, Axis{AxisBound, -30_mm, 30_mm, 10},
+                                    Axis{AxisBound, -100_mm, 100_mm, 3});
+
+  auto mergedPtrX =
+      GridPortalLink::merge(*grid1, *grid2, AxisDirection::AxisX, *logger);
+
+  auto mergedPtrY =
+      GridPortalLink::merge(*grid1, *grid3, AxisDirection::AxisY, *logger);
+
+  BOOST_REQUIRE(mergedPtrX);
+  const auto* mergedX = dynamic_cast<const GridPortalLink*>(mergedPtrX.get());
+  BOOST_REQUIRE_NE(mergedX, nullptr);
+  BOOST_CHECK_EQUAL(mergedX->grid().axes().size(), 2);
+  const auto& axisX1 = *mergedX->grid().axes().front();
+  const auto& axisX2 = *mergedX->grid().axes().back();
+
+  BOOST_CHECK_EQUAL(axisX1.getMin(), -60_mm);
+  BOOST_CHECK_EQUAL(axisX1.getMax(), 60_mm);
+  BOOST_CHECK_EQUAL(axisX1.getNBins(), 20);
+  BOOST_CHECK_EQUAL(axisX1.getType(), AxisType::Equidistant);
+  BOOST_CHECK_EQUAL(axisX1.getBoundaryType(), AxisBoundaryType::Bound);
+  BOOST_CHECK_EQUAL(axisX2.getMin(), -100_mm);
+  BOOST_CHECK_EQUAL(axisX2.getMax(), 100_mm);
+  BOOST_CHECK_EQUAL(axisX2.getNBins(), 3);
+  BOOST_CHECK_EQUAL(axisX2.getType(), AxisType::Equidistant);
+
+  BOOST_REQUIRE(mergedPtrY);
+  const auto* mergedY = dynamic_cast<const GridPortalLink*>(mergedPtrY.get());
+  BOOST_REQUIRE_NE(mergedY, nullptr);
+  BOOST_CHECK_EQUAL(mergedY->grid().axes().size(), 2);
+  const auto& axisY1 = *mergedY->grid().axes().front();
+  const auto& axisY2 = *mergedY->grid().axes().back();
+
+  BOOST_CHECK_EQUAL(axisY1.getMin(), -30_mm);
+  BOOST_CHECK_EQUAL(axisY1.getMax(), 30_mm);
+  BOOST_CHECK_EQUAL(axisY1.getNBins(), 10);
+  BOOST_CHECK_EQUAL(axisY1.getType(), AxisType::Equidistant);
+  BOOST_CHECK_EQUAL(axisY1.getBoundaryType(), AxisBoundaryType::Bound);
+  BOOST_CHECK_EQUAL(axisY2.getMin(), -200_mm);
+  BOOST_CHECK_EQUAL(axisY2.getMax(), 200_mm);
+  BOOST_CHECK_EQUAL(axisY2.getNBins(), 6);
+  BOOST_CHECK_EQUAL(axisY2.getType(), AxisType::Equidistant);
+}
+
+BOOST_AUTO_TEST_CASE(BinFilling) {
+  // Volumes for bin content checking
+  // Volume shape/transform is irrelevant, only used for pointer identity
+  auto vol1 = std::make_shared<TrackingVolume>(
+      Transform3::Identity(),
+      std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+  auto vol2 = std::make_shared<TrackingVolume>(
+      Transform3::Identity(),
+      std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+  auto fillCheckerBoard = [&](auto& grid) {
+    auto loc = grid.numLocalBins();
+    for (std::size_t i = 1; i <= loc[0]; ++i) {
+      for (std::size_t j = 1; j <= loc[1]; ++j) {
+        grid.atLocalBins({i, j}) = (i + j) % 2 == 0 ? vol1.get() : vol2.get();
+      }
+    }
+  };
+
+  auto checkCheckerBoard = [&](const auto& grid) {
+    auto loc = grid.numLocalBins();
+    for (std::size_t i = 1; i <= loc[0]; ++i) {
+      for (std::size_t j = 1; j <= loc[1]; ++j) {
+        const auto* vol = grid.atLocalBins({i, j});
+        if (vol != ((i + j) % 2 == 0 ? vol1.get() : vol2.get())) {
+          BOOST_ERROR("Is not a checkerboard pattern");
+          return;
+        }
+      }
+    }
+  };
+
+  // Basic, because the parallel 1D case already tests this to some degree
+  auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 100_mm);
+  auto plane1 =
+      Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+  auto grid1 = GridPortalLink::make(plane1, Axis{AxisBound, -30_mm, 30_mm, 2},
+                                    Axis{AxisBound, -100_mm, 100_mm, 2});
+
+  Translation3 offsetX{60_mm, 0., 0.};
+  auto plane2 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetX, rBounds);
+  auto grid2 = GridPortalLink::make(plane2, Axis{AxisBound, -30_mm, 30_mm, 2},
+                                    Axis{AxisBound, -100_mm, 100_mm, 2});
+
+  Translation3 offsetY{0., 200_mm, 0.};
+  auto plane3 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * offsetY, rBounds);
+  auto grid3 = GridPortalLink::make(plane3, Axis{AxisBound, -30_mm, 30_mm, 2},
+                                    Axis{AxisBound, -100_mm, 100_mm, 2});
+
+  fillCheckerBoard(grid1->grid());
+  checkCheckerBoard(grid1->grid());
+
+  fillCheckerBoard(grid2->grid());
+  checkCheckerBoard(grid2->grid());
+
+  fillCheckerBoard(grid3->grid());
+  checkCheckerBoard(grid3->grid());
+
+  auto mergedPtrX =
+      GridPortalLink::merge(*grid1, *grid2, AxisDirection::AxisX, *logger);
+  auto mergedPtrY =
+      GridPortalLink::merge(*grid1, *grid3, AxisDirection::AxisY, *logger);
+
+  using merged_type =
+      GridPortalLinkT<Axis<AxisType::Equidistant, AxisBoundaryType::Bound>,
+                      Axis<AxisType::Equidistant, AxisBoundaryType::Bound>>;
+
+  const auto* mergedX = dynamic_cast<const merged_type*>(mergedPtrX.get());
+  BOOST_REQUIRE(mergedX);
+  checkCheckerBoard(mergedX->grid());
+
+  const auto* mergedY = dynamic_cast<const merged_type*>(mergedPtrY.get());
+  BOOST_REQUIRE(mergedY);
+  checkCheckerBoard(mergedY->grid());
+
+  // Fill a / b
+  grid1->setVolume(vol1.get());
+  grid2->setVolume(vol2.get());
+  grid3->setVolume(vol2.get());
+
+  mergedPtrX =
+      GridPortalLink::merge(*grid1, *grid2, AxisDirection::AxisX, *logger);
+  mergedPtrY =
+      GridPortalLink::merge(*grid1, *grid3, AxisDirection::AxisY, *logger);
+
+  mergedX = dynamic_cast<const merged_type*>(mergedPtrX.get());
+  BOOST_REQUIRE(mergedX);
+
+  mergedY = dynamic_cast<const merged_type*>(mergedPtrY.get());
+  BOOST_REQUIRE(mergedY);
+
+  const auto* v1 = vol1.get();
+  const auto* v2 = vol2.get();
+
+  std::vector<std::pair<Vector2, const TrackingVolume*>> locationsX = {
+      {{-45_mm, 0_mm}, v1},
+      {{-15_mm, 0_mm}, v1},
+      {{15_mm, 0_mm}, v2},
+      {{45_mm, 0_mm}, v2},
+  };
+  std::vector<std::pair<Vector2, const TrackingVolume*>> locationsY = {
+      {{0_mm, -150_mm}, v1},
+      {{0_mm, -50_mm}, v1},
+      {{0_mm, 50_mm}, v2},
+      {{0_mm, 150_mm}, v2},
+  };
+
+  for (const auto& [loc, vol] : locationsX) {
+    BOOST_TEST_CONTEXT(loc.transpose())
+    BOOST_CHECK_EQUAL(mergedX->resolveVolume(gctx, loc).value(), vol);
+  }
+  for (const auto& [loc, vol] : locationsY) {
+    BOOST_TEST_CONTEXT(loc.transpose())
+    BOOST_CHECK_EQUAL(mergedY->resolveVolume(gctx, loc).value(), vol);
+  }
+
+  std::vector<std::vector<const TrackingVolume*>> contentsX = {
+      {v1, v1},
+      {v1, v1},
+      {v2, v2},
+      {v2, v2},
+  };
+  std::vector<std::vector<const TrackingVolume*>> contentsY = {
+      {v1, v1, v2, v2},
+      {v1, v1, v2, v2},
+  };
+
+  for (std::size_t i = 0; i < 4; ++i) {
+    for (std::size_t j = 0; j < 2; ++j) {
+      BOOST_CHECK_EQUAL(mergedX->grid().atLocalBins({i + 1, j + 1}),
+                        contentsX.at(i).at(j));
+    }
+  }
+  for (std::size_t i = 0; i < 2; ++i) {
+    for (std::size_t j = 0; j < 4; ++j) {
+      BOOST_CHECK_EQUAL(mergedY->grid().atLocalBins({i + 1, j + 1}),
+                        contentsY.at(i).at(j));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_SUITE_END()  // Merging2dPlane
+
 BOOST_AUTO_TEST_SUITE_END()  // GridMerging
 
 BOOST_AUTO_TEST_CASE(CompositeConstruction) {
@@ -2298,6 +2841,152 @@ BOOST_DATA_TEST_CASE(TrivialTrivial,
         grid123->resolveVolume(gctx, Vector2{40_mm, 190_mm}).value(),
         vol3.get());
   }
+  BOOST_TEST_CONTEXT("PlaneXDirection") {
+    auto vol1 = std::make_shared<TrackingVolume>(
+        Transform3::Identity(),
+        std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+    auto vol2 = std::make_shared<TrackingVolume>(
+        Transform3::Identity() * Translation3{Vector3::UnitX() * 60},
+        std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+    auto vol3 = std::make_shared<TrackingVolume>(
+        Transform3::Identity() * Translation3{Vector3::UnitX() * 120},
+        std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+    auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 40_mm);
+    auto plane1 =
+        Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+    auto plane2 = Surface::makeShared<PlaneSurface>(
+        Transform3::Identity() * Translation3{Vector3::UnitX() * 60}, rBounds);
+
+    auto plane3 = Surface::makeShared<PlaneSurface>(
+        Transform3::Identity() * Translation3{Vector3::UnitX() * 120}, rBounds);
+
+    auto trivial1 = std::make_unique<TrivialPortalLink>(plane1, *vol1);
+    BOOST_REQUIRE(trivial1);
+    auto trivial2 = std::make_unique<TrivialPortalLink>(plane2, *vol2);
+    BOOST_REQUIRE(trivial2);
+    auto trivial3 = std::make_unique<TrivialPortalLink>(plane3, *vol3);
+    BOOST_REQUIRE(trivial3);
+
+    auto grid1 = trivial1->makeGrid(AxisDirection::AxisX);
+    auto compGridTrivial = PortalLinkBase::merge(
+        std::move(grid1), std::make_unique<TrivialPortalLink>(*trivial2),
+        AxisDirection::AxisX, *logger);
+    BOOST_REQUIRE(compGridTrivial);
+    BOOST_CHECK_EQUAL(dynamic_cast<CompositePortalLink&>(*compGridTrivial)
+                          .makeGrid(gctx, *logger),
+                      nullptr);
+
+    auto composite =
+        PortalLinkBase::merge(std::move(trivial1), std::move(trivial2),
+                              AxisDirection::AxisX, *logger);
+    BOOST_REQUIRE(composite);
+
+    auto grid12 =
+        dynamic_cast<CompositePortalLink&>(*composite).makeGrid(gctx, *logger);
+    BOOST_REQUIRE(grid12);
+
+    BOOST_CHECK_EQUAL(grid12->resolveVolume(gctx, Vector2{-30_mm, 0}).value(),
+                      vol1.get());
+
+    BOOST_CHECK_EQUAL(grid12->resolveVolume(gctx, Vector2{30_mm, 0}).value(),
+                      vol2.get());
+
+    composite = PortalLinkBase::merge(std::move(composite), std::move(trivial3),
+                                      AxisDirection::AxisX, *logger);
+    BOOST_REQUIRE(composite);
+
+    auto grid123 =
+        dynamic_cast<CompositePortalLink&>(*composite).makeGrid(gctx, *logger);
+    BOOST_REQUIRE(grid123);
+
+    BOOST_CHECK_EQUAL(
+        grid123->resolveVolume(gctx, Vector2{-80_mm, 0_mm}).value(),
+        vol1.get());
+
+    BOOST_CHECK_EQUAL(grid123->resolveVolume(gctx, Vector2{0_mm, 0_mm}).value(),
+                      vol2.get());
+
+    BOOST_CHECK_EQUAL(
+        grid123->resolveVolume(gctx, Vector2{80_mm, 0_mm}).value(), vol3.get());
+  }
+  BOOST_TEST_CONTEXT("PlaneYDirection") {
+    auto vol1 = std::make_shared<TrackingVolume>(
+        Transform3::Identity(),
+        std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+    auto vol2 = std::make_shared<TrackingVolume>(
+        Transform3::Identity() * Translation3{Vector3::UnitY() * 80},
+        std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+    auto vol3 = std::make_shared<TrackingVolume>(
+        Transform3::Identity() * Translation3{Vector3::UnitY() * 160},
+        std::make_shared<CuboidVolumeBounds>(30_mm, 40_mm, 100_mm));
+
+    auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 40_mm);
+    auto plane1 =
+        Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+    auto plane2 = Surface::makeShared<PlaneSurface>(
+        Transform3::Identity() * Translation3{Vector3::UnitY() * 80}, rBounds);
+
+    auto plane3 = Surface::makeShared<PlaneSurface>(
+        Transform3::Identity() * Translation3{Vector3::UnitY() * 160}, rBounds);
+
+    auto trivial1 = std::make_unique<TrivialPortalLink>(plane1, *vol1);
+    BOOST_REQUIRE(trivial1);
+    auto trivial2 = std::make_unique<TrivialPortalLink>(plane2, *vol2);
+    BOOST_REQUIRE(trivial2);
+    auto trivial3 = std::make_unique<TrivialPortalLink>(plane3, *vol3);
+    BOOST_REQUIRE(trivial3);
+
+    auto grid1 = trivial1->makeGrid(AxisDirection::AxisY);
+    auto compGridTrivial = PortalLinkBase::merge(
+        std::move(grid1), std::make_unique<TrivialPortalLink>(*trivial2),
+        AxisDirection::AxisY, *logger);
+    BOOST_REQUIRE(compGridTrivial);
+    BOOST_CHECK_EQUAL(dynamic_cast<CompositePortalLink&>(*compGridTrivial)
+                          .makeGrid(gctx, *logger),
+                      nullptr);
+
+    auto composite =
+        PortalLinkBase::merge(std::move(trivial1), std::move(trivial2),
+                              AxisDirection::AxisY, *logger);
+    BOOST_REQUIRE(composite);
+
+    auto grid12 =
+        dynamic_cast<CompositePortalLink&>(*composite).makeGrid(gctx, *logger);
+    BOOST_REQUIRE(grid12);
+
+    BOOST_CHECK_EQUAL(
+        grid12->resolveVolume(gctx, Vector2{0_mm, -40_mm}).value(), vol1.get());
+
+    BOOST_CHECK_EQUAL(grid12->resolveVolume(gctx, Vector2{0_mm, 40_mm}).value(),
+                      vol2.get());
+
+    composite = PortalLinkBase::merge(std::move(composite), std::move(trivial3),
+                                      AxisDirection::AxisY, *logger);
+    BOOST_REQUIRE(composite);
+
+    auto grid123 =
+        dynamic_cast<CompositePortalLink&>(*composite).makeGrid(gctx, *logger);
+    BOOST_REQUIRE(grid123);
+
+    BOOST_CHECK_EQUAL(
+        grid123->resolveVolume(gctx, Vector2{0_mm, -110_mm}).value(),
+        vol1.get());
+
+    BOOST_CHECK_EQUAL(
+        grid123->resolveVolume(gctx, Vector2{0_mm, -10_mm}).value(),
+        vol2.get());
+
+    BOOST_CHECK_EQUAL(
+        grid123->resolveVolume(gctx, Vector2{0_mm, 110_mm}).value(),
+        vol3.get());
+  }
 }
 
 BOOST_AUTO_TEST_CASE(TrivialGridR) {
@@ -2379,6 +3068,48 @@ BOOST_AUTO_TEST_CASE(TrivialGridPhi) {
   BOOST_TEST_CONTEXT("Orthogonal") {
     auto merged = PortalLinkBase::merge(copy(gridR), copy(trivial),
                                         AxisDirection::AxisPhi, *logger);
+    BOOST_REQUIRE(merged);
+    BOOST_CHECK_NE(dynamic_cast<CompositePortalLink*>(merged.get()), nullptr);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(TrivialGridXY) {
+  auto vol1 = std::make_shared<TrackingVolume>(
+      Transform3::Identity(),
+      std::make_shared<CuboidVolumeBounds>(30_mm, 30_mm, 30_mm));
+
+  auto vol2 = std::make_shared<TrackingVolume>(
+      Transform3::Identity() * Translation3{Vector3::UnitX() * 60},
+      std::make_shared<CuboidVolumeBounds>(30_mm, 30_mm, 30_mm));
+
+  auto rBounds = std::make_shared<const RectangleBounds>(30_mm, 30_mm);
+  auto plane1 =
+      Surface::makeShared<PlaneSurface>(Transform3::Identity(), rBounds);
+
+  auto plane2 = Surface::makeShared<PlaneSurface>(
+      Transform3::Identity() * Translation3{Vector3::UnitX() * 60}, rBounds);
+
+  auto gridX = GridPortalLink::make(plane1, AxisDirection::AxisX,
+                                    Axis{AxisBound, -30_mm, 30_mm, 2});
+  gridX->setVolume(vol1.get());
+
+  auto gridY = GridPortalLink::make(plane1, AxisDirection::AxisY,
+                                    Axis{AxisBound, -30_mm, 30_mm, 2});
+  gridY->setVolume(vol1.get());
+
+  auto trivial = std::make_unique<TrivialPortalLink>(plane2, *vol2);
+  BOOST_REQUIRE(trivial);
+
+  BOOST_TEST_CONTEXT("Colinear") {
+    auto merged = PortalLinkBase::merge(copy(trivial), copy(gridX),
+                                        AxisDirection::AxisX, *logger);
+    BOOST_REQUIRE(merged);
+    BOOST_CHECK_NE(dynamic_cast<CompositePortalLink*>(merged.get()), nullptr);
+  }
+
+  BOOST_TEST_CONTEXT("Orthogonal") {
+    auto merged = PortalLinkBase::merge(copy(gridY), copy(trivial),
+                                        AxisDirection::AxisX, *logger);
     BOOST_REQUIRE(merged);
     BOOST_CHECK_NE(dynamic_cast<CompositePortalLink*>(merged.get()), nullptr);
   }

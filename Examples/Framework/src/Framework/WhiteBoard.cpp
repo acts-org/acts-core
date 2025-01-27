@@ -37,9 +37,9 @@ inline int levenshteinDistance(const std::string_view &a,
   }
 
   // Fill matrix
-  for (std::size_t j = 1; j < b.size() + 1; ++j) {
-    for (std::size_t i = 1; i < a.size() + 1; ++i) {
-      const auto substitutionCost = a[i] == b[j] ? 0 : 1;
+  for (std::size_t j = 1; j < b.size(); ++j) {
+    for (std::size_t i = 1; i < a.size(); ++i) {
+      const auto substitutionCost = a.at(i) == b.at(j) ? 0 : 1;
 
       std::array<int, 3> possibilities = {{
           d(i - 1, j) + 1,                    // deletion
@@ -67,6 +67,11 @@ std::vector<std::string_view> ActsExamples::WhiteBoard::similarNames(
       names.push_back({d, n});
     }
   }
+  for (const auto &[from, to] : m_objectAliases) {
+    if (const auto d = levenshteinDistance(from, name); d < distThreshold) {
+      names.push_back({d, from});
+    }
+  }
 
   std::ranges::sort(names, {}, [](const auto &n) { return n.first; });
 
@@ -83,4 +88,39 @@ std::string ActsExamples::WhiteBoard::typeMismatchMessage(
   return std::string{"Type mismatch for '" + name + "'. Requested " +
                      boost::core::demangle(req) + " but actually " +
                      boost::core::demangle(act)};
+}
+
+void ActsExamples::WhiteBoard::copyFrom(const WhiteBoard &other) {
+  for (auto &[key, val] : other.m_store) {
+    addHolder(key, val);
+    ACTS_VERBOSE("Copied key '" << key << "' to whiteboard");
+  }
+}
+
+void ActsExamples::WhiteBoard::addHolder(
+    const std::string &name, const std::shared_ptr<IHolder> &holder) {
+  if (name.empty()) {
+    throw std::invalid_argument("Object can not have an empty name");
+  }
+
+  if (holder == nullptr) {
+    throw std::invalid_argument("Object '" + name + "' is nullptr");
+  }
+
+  auto [storeIt, success] = m_store.insert({name, holder});
+
+  if (!success) {
+    throw std::invalid_argument("Object '" + name + "' already exists");
+  }
+  ACTS_VERBOSE("Added object '" << name << "' of type "
+                                << storeIt->second->type().name());
+
+  if (success) {
+    // deal with aliases
+    auto range = m_objectAliases.equal_range(name);
+    for (auto it = range.first; it != range.second; ++it) {
+      m_store[it->second] = holder;
+      ACTS_VERBOSE("Added alias object '" << it->second << "'");
+    }
+  }
 }

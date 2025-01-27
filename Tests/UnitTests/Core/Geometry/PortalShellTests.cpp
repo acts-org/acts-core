@@ -314,13 +314,13 @@ BOOST_AUTO_TEST_CASE(PortalAssignment) {
   // Setting new outer cylinder
   BOOST_REQUIRE_NE(oCyl, nullptr);
   auto* oCylLink = dynamic_cast<const TrivialPortalLink*>(
-      oCyl->getLink(Direction::OppositeNormal));
+      oCyl->getLink(Direction::OppositeNormal()));
   BOOST_REQUIRE_NE(oCylLink, nullptr);
 
   auto grid = oCylLink->makeGrid(AxisDirection::AxisZ);
 
   auto portal2 =
-      std::make_shared<Portal>(Direction::OppositeNormal, std::move(grid));
+      std::make_shared<Portal>(Direction::OppositeNormal(), std::move(grid));
   shell.setPortal(portal2, OuterCylinder);
   BOOST_CHECK_EQUAL(shell.portal(OuterCylinder), portal2.get());
 
@@ -332,13 +332,13 @@ BOOST_AUTO_TEST_CASE(PortalAssignment) {
   // Setting new negative disc
   BOOST_REQUIRE_NE(nDisc, nullptr);
   auto* nDiscLink = dynamic_cast<const TrivialPortalLink*>(
-      nDisc->getLink(Direction::AlongNormal));
+      nDisc->getLink(Direction::AlongNormal()));
   BOOST_REQUIRE_NE(nDiscLink, nullptr);
 
   grid = nDiscLink->makeGrid(AxisDirection::AxisR);
 
   auto portal3 =
-      std::make_shared<Portal>(Direction::AlongNormal, std::move(grid));
+      std::make_shared<Portal>(Direction::AlongNormal(), std::move(grid));
   shell.setPortal(portal3, NegativeDisc);
   BOOST_CHECK_EQUAL(shell.portal(NegativeDisc), portal3.get());
 
@@ -728,24 +728,28 @@ BOOST_AUTO_TEST_CASE(Fill) {
 
   using enum CylinderVolumeBounds::Face;
   BOOST_CHECK_EQUAL(
-      shell.portal(OuterCylinder)->getLink(Direction::AlongNormal), nullptr);
+      shell.portal(OuterCylinder)->getLink(Direction::AlongNormal()), nullptr);
   BOOST_CHECK_EQUAL(
-      shell.portal(InnerCylinder)->getLink(Direction::OppositeNormal), nullptr);
-  BOOST_CHECK_EQUAL(shell.portal(PositiveDisc)->getLink(Direction::AlongNormal),
-                    nullptr);
+      shell.portal(InnerCylinder)->getLink(Direction::OppositeNormal()),
+      nullptr);
   BOOST_CHECK_EQUAL(
-      shell.portal(NegativeDisc)->getLink(Direction::OppositeNormal), nullptr);
+      shell.portal(PositiveDisc)->getLink(Direction::AlongNormal()), nullptr);
+  BOOST_CHECK_EQUAL(
+      shell.portal(NegativeDisc)->getLink(Direction::OppositeNormal()),
+      nullptr);
 
   shell.fill(cyl2);
 
-  BOOST_CHECK_NE(shell.portal(OuterCylinder)->getLink(Direction::AlongNormal),
+  BOOST_CHECK_NE(shell.portal(OuterCylinder)->getLink(Direction::AlongNormal()),
                  nullptr);
   BOOST_CHECK_NE(
-      shell.portal(InnerCylinder)->getLink(Direction::OppositeNormal), nullptr);
-  BOOST_CHECK_NE(shell.portal(PositiveDisc)->getLink(Direction::AlongNormal),
+      shell.portal(InnerCylinder)->getLink(Direction::OppositeNormal()),
+      nullptr);
+  BOOST_CHECK_NE(shell.portal(PositiveDisc)->getLink(Direction::AlongNormal()),
                  nullptr);
-  BOOST_CHECK_NE(shell.portal(NegativeDisc)->getLink(Direction::OppositeNormal),
-                 nullptr);
+  BOOST_CHECK_NE(
+      shell.portal(NegativeDisc)->getLink(Direction::OppositeNormal()),
+      nullptr);
 }
 
 BOOST_AUTO_TEST_CASE(RegisterInto) {

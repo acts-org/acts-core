@@ -509,7 +509,7 @@ Result<std::pair<double, double>> ImpactPointEstimator::getLifetimeSignOfTrack(
 
   // Create propagator options
   PropagatorPlainOptions pOptions(gctx, mctx);
-  pOptions.direction = Direction::Backward;
+  pOptions.direction = Direction::Backward();
 
   // Do the propagation to the perigeee
   auto result =
@@ -548,7 +548,7 @@ Result<double> ImpactPointEstimator::get3DLifetimeSignOfTrack(
 
   // Create propagator options
   PropagatorPlainOptions pOptions(gctx, mctx);
-  pOptions.direction = Direction::Backward;
+  pOptions.direction = Direction::Backward();
 
   // Do the propagation to the perigeee
   auto result =

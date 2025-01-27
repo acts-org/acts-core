@@ -16,6 +16,7 @@
 
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <iomanip>
 #include <iosfwd>
 #include <memory>
@@ -70,6 +71,9 @@ class CuboidVolumeBounds : public VolumeBounds {
   ///
   /// @param values iw the bound values
   CuboidVolumeBounds(const std::array<double, eSize>& values);
+
+  CuboidVolumeBounds(
+      std::initializer_list<std::pair<BoundValues, double>> keyValues);
 
   /// Copy Constructor
   ///
@@ -148,6 +152,11 @@ class CuboidVolumeBounds : public VolumeBounds {
   /// Set a range of bound values
   /// @param keyValues the initializer list of key value pairs
   void set(std::initializer_list<std::pair<BoundValues, double>> keyValues);
+
+  /// Convert axis direction to a corresponding bound value
+  /// in local coordinate convention
+  /// @param direction the axis direction to convert
+  static BoundValues fromAxisDirection(AxisDirection direction);
 
   /// Output Method for std::ostream
   ///

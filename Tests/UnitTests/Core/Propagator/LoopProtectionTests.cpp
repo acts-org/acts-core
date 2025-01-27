@@ -95,7 +95,7 @@ struct Options {
   double pathLimit = std::numeric_limits<double>::max();
   bool loopProtection = true;
   double loopFraction = 0.5;
-  Direction direction = Direction::Forward;
+  Direction direction = Direction::Forward();
 
   bool debug = false;
   std::string debugString;

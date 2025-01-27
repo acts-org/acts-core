@@ -319,8 +319,8 @@ std::shared_ptr<Acts::Experimental::Portal> Acts::PortalJsonConverter::fromJson(
   }
   auto portal = std::make_shared<Experimental::Portal>(regSurface);
 
-  std::array<Acts::Direction, 2> normalDirs = {Direction::Backward,
-                                               Direction::Forward};
+  std::array<Acts::Direction, 2> normalDirs = {Direction::Backward(),
+                                               Direction::Forward()};
   // re-create the volume links
   auto jLinks = jPortal["volume_links"];
   for (auto [ivl, vl] : enumerate(jLinks)) {

@@ -135,7 +135,7 @@ void runTest(const propagator_t& prop,
   Options bwdOptions(tgContext, mfContext);
   bwdOptions.stepping.maxStepSize = 25_cm;
   bwdOptions.pathLimit = -25_cm;
-  bwdOptions.direction = Direction::Backward;
+  bwdOptions.direction = Direction::Backward();
 
   // get the material collector and configure it
   auto& bwdMaterialInteractor =
@@ -266,7 +266,7 @@ void runTest(const propagator_t& prop,
   Options bwdStepOptions(tgContext, mfContext);
   bwdStepOptions.stepping.maxStepSize = 25_cm;
   bwdStepOptions.pathLimit = -25_cm;
-  bwdStepOptions.direction = Direction::Backward;
+  bwdStepOptions.direction = Direction::Backward();
 
   // get the material collector and configure it
   auto& bwdStepMaterialInteractor =

@@ -15,6 +15,7 @@ add_library(
     src/Framework/RandomNumbers.cpp
     src/Framework/Sequencer.cpp
     src/Framework/DataHandle.cpp
+    src/Framework/BufferedReader.cpp
     src/Utilities/EventDataTransforms.cpp
     src/Utilities/Paths.cpp
     src/Utilities/Options.cpp

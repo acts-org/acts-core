@@ -269,7 +269,7 @@ inline std::pair<Acts::BoundTrackParameters, double> transportToSurface(
 
   // setup propagation options
   options_t options(geoCtx, magCtx);
-  options.direction = Acts::Direction::Forward;
+  options.direction = Acts::Direction::Forward();
   options.pathLimit = pathLimit;
   options.surfaceTolerance = 1_nm;
   options.stepping.stepTolerance = 1_nm;
@@ -293,7 +293,7 @@ inline void runForwardBackwardTest(
     const Acts::MagneticFieldContext& magCtx,
     const Acts::CurvilinearTrackParameters& initialParams, double pathLength,
     double epsPos, double epsDir, double epsMom) {
-  // propagate parameters Acts::Direction::Forward
+  // propagate parameters Acts::Direction::Forward()
   auto [fwdParams, fwdPathLength] = transportFreely<propagator_t, options_t>(
       propagator, geoCtx, magCtx, initialParams, pathLength);
   CHECK_CLOSE_ABS(fwdPathLength, pathLength, epsPos);

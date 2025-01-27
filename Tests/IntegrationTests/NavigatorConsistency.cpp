@@ -103,7 +103,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
   // backward surface test
   Options bwdOptions(tgContext, mfContext);
   bwdOptions.pathLimit = 25_cm;
-  bwdOptions.direction = Direction::Backward;
+  bwdOptions.direction = Direction::Backward();
 
   // get the surface collector and configure it
   auto& bwdMSurfaceCollector =
@@ -189,7 +189,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
   // stepping from one surface to the next : backwards
   // now go from surface to surface and check
   Options bwdStepOptions(tgContext, mfContext);
-  bwdStepOptions.direction = Direction::Backward;
+  bwdStepOptions.direction = Direction::Backward();
 
   // get the surface collector and configure it
   auto& bwdStepSurfaceCollector =

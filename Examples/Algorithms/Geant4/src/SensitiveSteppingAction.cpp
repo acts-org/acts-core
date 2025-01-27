@@ -98,7 +98,7 @@ Acts::detail::Step stepFromG4Step(const G4Step* step) {
   auto [preStepPosition, preStepMomentum, postStepPosition, postStepMomentum] =
       kinematicsOfStep(step);
 
-  pStep.navDir = Acts::Direction::Forward;
+  pStep.navDir = Acts::Direction::Forward();
   pStep.position = 0.5 * (preStepPosition + postStepPosition).block<3, 1>(0, 0);
   pStep.momentum = 0.5 * (preStepMomentum + postStepMomentum).block<3, 1>(0, 0);
   pStep.nTotalTrials = 1;

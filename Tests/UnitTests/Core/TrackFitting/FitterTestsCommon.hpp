@@ -236,7 +236,7 @@ struct FitterTester {
     // backward filtering requires a reference surface
     options.referenceSurface = &start.referenceSurface();
     // this is the default option. set anyway for consistency
-    options.propagatorPlainOptions.direction = Acts::Direction::Forward;
+    options.propagatorPlainOptions.direction = Acts::Direction::Forward();
 
     Acts::TrackContainer tracks{Acts::VectorTrackContainer{},
                                 Acts::VectorMultiTrajectory{}};
@@ -295,7 +295,7 @@ struct FitterTester {
         Acts::ParticleHypothesis::pion());
 
     options.referenceSurface = &startOuter.referenceSurface();
-    options.propagatorPlainOptions.direction = Acts::Direction::Backward;
+    options.propagatorPlainOptions.direction = Acts::Direction::Backward();
 
     Acts::TrackContainer tracks{Acts::VectorTrackContainer{},
                                 Acts::VectorMultiTrajectory{}};

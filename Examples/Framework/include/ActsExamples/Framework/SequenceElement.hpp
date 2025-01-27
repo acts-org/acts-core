@@ -51,6 +51,8 @@ class SequenceElement {
   template <typename T>
   friend class ReadDataHandle;
 
+  friend class BufferedReader;
+
   std::vector<const DataHandleBase*> m_writeHandles;
   std::vector<const DataHandleBase*> m_readHandles;
 };

@@ -129,8 +129,9 @@ class DetrayPropagator : public PropagatorInterface {
         Acts::detail::Step step;
         step.position = Acts::Vector3(dposition[0], dposition[1], dposition[2]);
         step.geoID = geoID;
-        step.navDir = object.intersection.direction ? Acts::Direction::Forward
-                                                    : Acts::Direction::Backward;
+        step.navDir = object.intersection.direction
+                          ? Acts::Direction::Forward()
+                          : Acts::Direction::Backward();
         summary.steps.emplace_back(step);
       }
     } else {

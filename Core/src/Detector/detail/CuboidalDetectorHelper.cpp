@@ -208,7 +208,7 @@ Acts::Experimental::detail::CuboidalDetectorHelper::connect(
       // Assign the portal direction
       // in a consistent way
       Acts::Direction dir =
-          (index % 2 == 0) ? Direction::Forward : Direction::Backward;
+          (index % 2 == 0) ? Direction::Forward() : Direction::Backward();
 
       // Make the stitch boundaries
       pReplacements.push_back(PortalReplacement(
@@ -283,13 +283,11 @@ Acts::Experimental::detail::CuboidalDetectorHelper::connect(
 
     std::shared_ptr<Portal> sPortal = formerContainer.find(startIndex)->second;
     auto sAttachedVolumes =
-        sPortal
-            ->attachedDetectorVolumes()[Direction(Direction::Backward).index()];
+        sPortal->attachedDetectorVolumes()[Direction::Backward().index()];
 
     std::shared_ptr<Portal> ePortal = currentContainer.find(endIndex)->second;
     auto eAttachedVolumes =
-        ePortal
-            ->attachedDetectorVolumes()[Direction(Direction::Forward).index()];
+        ePortal->attachedDetectorVolumes()[Direction::Forward().index()];
 
     auto fusedPortal = Portal::fuse(sPortal, ePortal);
 

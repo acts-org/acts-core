@@ -11,13 +11,13 @@
 #include "Acts/Definitions/Tolerance.hpp"
 #include "Acts/Geometry/PortalLinkBase.hpp"
 #include "Acts/Geometry/TrackingVolume.hpp"
-#include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/Surfaces/DiscSurface.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/Grid.hpp"
 #include "Acts/Utilities/Logger.hpp"
+#include "Acts/Utilities/ThrowAssert.hpp"
 
 #include <iosfwd>
 
@@ -67,6 +67,9 @@ class GridPortalLink : public PortalLinkBase {
     } else if (dynamic_cast<const DiscSurface*>(surface.get()) != nullptr &&
                direction != AxisR && direction != AxisPhi) {
       throw std::invalid_argument{"Invalid binning direction"};
+    } else if (dynamic_cast<const PlaneSurface*>(surface.get()) != nullptr &&
+               direction != AxisX && direction != AxisY) {
+      throw std::invalid_argument{"Invalid binning direction"};
     }
 
     return std::make_unique<GridPortalLinkT<axis_t>>(
@@ -90,6 +93,8 @@ class GridPortalLink : public PortalLinkBase {
       direction = AxisDirection::AxisRPhi;
     } else if (dynamic_cast<const DiscSurface*>(surface.get()) != nullptr) {
       direction = AxisDirection::AxisR;
+    } else if (dynamic_cast<const PlaneSurface*>(surface.get()) != nullptr) {
+      direction = AxisDirection::AxisX;
     }
 
     return std::make_unique<GridPortalLinkT<axis_1_t, axis_2_t>>(
@@ -353,6 +358,10 @@ class GridPortalLink : public PortalLinkBase {
   /// @param disc The disc surface
   void checkConsistency(const DiscSurface& disc) const;
 
+  /// Helper function to check consistency for grid on a plane surface
+  /// @param plane The plane surface
+  void checkConsistency(const PlaneSurface& plane) const;
+
   /// Expand a 1D grid to a 2D one for a cylinder surface
   /// @param surface The cylinder surface
   /// @param other The axis to use for the missing direction,
@@ -369,6 +378,14 @@ class GridPortalLink : public PortalLinkBase {
   /// @return A unique pointer to the 2D grid portal link
   std::unique_ptr<GridPortalLink> extendTo2dImpl(
       const std::shared_ptr<DiscSurface>& surface, const IAxis* other) const;
+
+  /// Expand a 1D grid to a 2D one for a plane surface
+  /// @param surface The plane surface
+  /// @param other The axis to use for the missing direction,
+  ///              can be null for auto determination
+  /// @return A unique pointer to the 2D grid portal link
+  std::unique_ptr<GridPortalLink> extendTo2dImpl(
+      const std::shared_ptr<PlaneSurface>& surface, const IAxis* other) const;
 
   /// Helper enum to declare which local direction to fill
   enum class FillDirection {
@@ -451,6 +468,17 @@ class GridPortalLinkT : public GridPortalLink {
       } else {
         throw std::invalid_argument{"Invalid binning direction"};
       }
+    } else if (const auto* plane =
+                   dynamic_cast<const PlaneSurface*>(m_surface.get())) {
+      checkConsistency(*plane);
+
+      if (direction == AxisX) {
+        m_projection = &projection<PlaneSurface, AxisX>;
+      } else if (direction == AxisDirection::AxisY) {
+        m_projection = &projection<PlaneSurface, AxisY>;
+      } else {
+        throw std::invalid_argument{"Invalid binning direction"};
+      }
 
     } else {
       throw std::logic_error{"Surface type is not supported"};
@@ -490,6 +518,9 @@ class GridPortalLinkT : public GridPortalLink {
       } else if (auto disc =
                      std::dynamic_pointer_cast<DiscSurface>(m_surface)) {
         return extendTo2dImpl(disc, other);
+      } else if (auto plane =
+                     std::dynamic_pointer_cast<PlaneSurface>(m_surface)) {
+        return extendTo2dImpl(plane, other);
       } else {
         throw std::logic_error{
             "Surface type is not supported (this should not happen)"};
@@ -539,7 +570,8 @@ class GridPortalLinkT : public GridPortalLink {
   Result<const TrackingVolume*> resolveVolume(
       const GeometryContext& /*gctx*/, const Vector2& position,
       double /*tolerance*/ = s_onSurfaceTolerance) const override {
-    assert(surface().insideBounds(position, BoundaryTolerance::None()));
+    throw_assert(surface().insideBounds(position, BoundaryTolerance::None()),
+                 "Checking volume outside of bounds");
     return m_grid.atPosition(m_projection(position));
   }
 

@@ -86,7 +86,7 @@ struct PropState {
   stepper_state_t stepping;
   /// Propagator options which only carry the relevant components
   struct {
-    Direction direction = Direction::Forward;
+    Direction direction = Direction::Forward();
     struct {
       double stepTolerance = 1e-4;
       double stepSizeCutOff = 0.;
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_state_test) {
 /// The numerical correctness of the stepper is tested in the integration tests
 BOOST_AUTO_TEST_CASE(eigen_stepper_test) {
   // Set up some variables for the state
-  Direction navDir = Direction::Backward;
+  Direction navDir = Direction::Backward();
   double stepSize = 123.;
   auto bField = std::make_shared<ConstantBField>(Vector3(1., 2.5, 33.33));
   auto bCache = bField->makeCache(mfContext);
@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_test) {
                                  ParticleHypothesis::pion());
   FreeVector freeParams = transformBoundToFreeParameters(
       cp2.referenceSurface(), tgContext, cp2.parameters());
-  navDir = Direction::Forward;
+  navDir = Direction::Forward();
   double stepSize2 = -2. * stepSize;
 
   auto copyState = [&](auto& field, const auto& state) {

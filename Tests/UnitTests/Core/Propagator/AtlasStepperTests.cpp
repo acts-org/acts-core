@@ -64,7 +64,7 @@ struct MockPropagatorState {
   Stepper::State stepping;
   /// Propagator options with only the relevant components.
   struct {
-    Direction direction = Direction::Backward;
+    Direction direction = Direction::Backward();
     struct {
       double stepTolerance = 10_um;
     } stepping;
@@ -80,7 +80,7 @@ static constexpr auto eps = 1024 * std::numeric_limits<double>::epsilon();
 
 // propagation settings
 static constexpr auto stepSize = 10_mm;
-static constexpr Direction navDir = Direction::Backward;
+static constexpr Direction navDir = Direction::Backward();
 static auto magneticField =
     std::make_shared<ConstantBField>(Vector3(0.1_T, -0.2_T, 2_T));
 
@@ -404,7 +404,7 @@ BOOST_AUTO_TEST_CASE(Reset) {
                                   particleHypothesis);
   FreeVector freeParams = transformBoundToFreeParameters(
       cp.referenceSurface(), geoCtx, cp.parameters());
-  Direction navDir = Direction::Forward;
+  Direction navDir = Direction::Forward();
   double stepSize = -256.;
 
   auto copyState = [&](auto& field, const auto& other) {
