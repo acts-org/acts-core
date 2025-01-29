@@ -363,7 +363,6 @@ linux_physmon:
 .linux_ubuntu_extra:
   variables:
     INSTALL_DIR: ${CI_PROJECT_DIR}/install
-    CXX: g++
 
   stage: build
 
@@ -378,14 +377,13 @@ linux_physmon:
     - git checkout $HEAD_SHA
     - git submodule init
     - git submodule update
-    - source CI/dependencies/setup.sh -c ${COMPILER}
+    - source CI/dependencies/setup.sh -c ${CXX}
 
     - cd ..
     - mkdir build
     - >
       cmake -B build -S src
       --preset=gitlab-ci
-      -DCMAKE_CXX_COMPILER=${COMPILER}
       -DCMAKE_CXX_STANDARD=${CXXSTD}
       -DCMAKE_CXX_COMPILER=${CXX}
 
@@ -405,8 +403,8 @@ linux_physmon:
       -GNinja
       -DCMAKE_BUILD_TYPE=Release
       -DCMAKE_CXX_FLAGS=-Werror
-      -DCMAKE_CXX_COMPILER=${COMPILER}
       -DCMAKE_CXX_STANDARD=${CXXSTD}
+      -DCMAKE_CXX_COMPILER=${CXX}
       -DCMAKE_PREFIX_PATH="${INSTALL_DIR}"
 
     # Downstream build
@@ -421,8 +419,8 @@ linux_physmon:
 linux_ubuntu_2204:
   extends: .linux_ubuntu_extra
   variables:
+    CXX: g++
     CXXSTD: 20
-    COMPILER: g++
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:71
 
 linux_ubuntu_2204_clang:
@@ -430,7 +428,6 @@ linux_ubuntu_2204_clang:
   variables:
     CXX: clang++
     CXXSTD: 20
-    COMPILER: clang++
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2204:71
 
 
