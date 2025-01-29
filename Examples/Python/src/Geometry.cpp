@@ -290,6 +290,11 @@ void addGeometry(Context& ctx) {
               Acts::AxisDirection bval) -> std::array<double, 2> {
              return {self.min(bval), self.max(bval)};
            })
+      .def("setRange",
+           [](Extent& self, Acts::AxisDirection bval,
+              const std::array<double, 2>& range) {
+             self.set(bval, range[0], range[1]);
+           })
       .def("__str__", &Extent::toString);
 
   {

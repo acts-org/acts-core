@@ -12,11 +12,11 @@
 #include <cmath>
 #include <sstream>
 
-namespace Acts {
+namespace Acts::Experimental {
 
-Acts::RoiDescriptor::RoiDescriptor(double eta, double etaMinus, double etaPlus,
-                                   double phi, double phiMinus, double phiPlus,
-                                   double zed, double zedMinus, double zedPlus)
+RoiDescriptor::RoiDescriptor(double eta, double etaMinus, double etaPlus,
+                             double phi, double phiMinus, double phiPlus,
+                             double zed, double zedMinus, double zedPlus)
     : m_phi(phi),
       m_eta(eta),
       m_zed(zed),
@@ -38,6 +38,6 @@ Acts::RoiDescriptor::RoiDescriptor(double eta, double etaMinus, double etaPlus,
   m_dzdrPlus = 1 / m_drdzPlus;    // 45
 }
 
-Acts::RoiDescriptor::~RoiDescriptor() = default;
+RoiDescriptor::~RoiDescriptor() = default;
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

@@ -18,7 +18,7 @@
 #include <numbers>
 #include <vector>
 
-namespace Acts {
+namespace Acts::Experimental {
 
 constexpr std::size_t MAX_SEG_PER_NODE = 1000;  // was 30
 constexpr std::size_t N_SEG_CONNS = 6;          // was 6
@@ -286,4 +286,4 @@ class GbtsEdge {
   unsigned int m_vNei[N_SEG_CONNS]{};  // global indices of the connected edges
 };
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

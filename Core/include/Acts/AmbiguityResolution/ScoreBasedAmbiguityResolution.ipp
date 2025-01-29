@@ -336,7 +336,7 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::ambiguityScore(
       // detector.
       std::size_t nHits = trackFeatures.nHits;
       if (nHits > detector.maxHits) {
-        score = score * (detector.maxHits - nHits + 1);  // hits are good !
+        score = score * (nHits - detector.maxHits + 1);  // hits are good !
         nHits = detector.maxHits;
       }
       score = score * detector.factorHits[nHits];

@@ -107,6 +107,7 @@ void addTruthTracking(Context& ctx) {
     pythonRangeProperty(c, "pt", &Config::ptMin, &Config::ptMax);
     pythonRangeProperty(c, "measurements", &Config::measurementsMin,
                         &Config::measurementsMax);
+    pythonRangeProperty(c, "hits", &Config::hitsMin, &Config::hitsMax);
     pythonRangeProperty(c, "primaryVertexId", &Config::minPrimaryVertexId,
                         &Config::maxPrimaryVertexId);
   }

@@ -18,7 +18,7 @@
 #include <memory>
 
 // core algorithm so in acts namespace
-namespace Acts {
+namespace Acts::Experimental {
 
 template <typename SpacePoint>
 struct SeedFinderGbtsConfig {
@@ -94,4 +94,4 @@ struct SeedFinderGbtsConfig {
 
 };  // end of config struct
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

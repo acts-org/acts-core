@@ -15,7 +15,7 @@
 #include <set>
 #include <unordered_map>
 
-namespace Acts {
+namespace Acts::Experimental {
 
 GbtsConnection::GbtsConnection(unsigned int s, unsigned int d)
     : m_src(s), m_dst(d) {}
@@ -171,4 +171,4 @@ GbtsConnector::GbtsConnector(std::ifstream &inFile) {
   newConnMap.clear();
 }
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

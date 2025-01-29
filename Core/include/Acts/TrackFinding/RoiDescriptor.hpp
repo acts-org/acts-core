@@ -17,7 +17,7 @@
 
 #include <stdint.h>
 
-namespace Acts {
+namespace Acts::Experimental {
 
 class RoiDescriptor {
  public:
@@ -209,4 +209,4 @@ class RoiDescriptor {
   //   RoiDescriptor& d ); //<! printing helper (wraps above)
 };
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

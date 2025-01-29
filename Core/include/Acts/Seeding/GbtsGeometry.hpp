@@ -18,7 +18,7 @@
 #include <memory>
 #include <vector>
 
-namespace Acts {
+namespace Acts::Experimental {
 class TrigInDetSiLayer {
  public:
   int m_subdet;  // combined ID
@@ -264,7 +264,7 @@ template <typename space_point_t>
 class GbtsGeometry {
  public:
   GbtsGeometry(const std::vector<TrigInDetSiLayer> &layers,
-               std::unique_ptr<Acts::GbtsConnector> &conn)
+               std::unique_ptr<GbtsConnector> &conn)
 
       : m_connector(std::move(conn)) {
     const float min_z0 = -168.0;
@@ -334,7 +334,7 @@ class GbtsGeometry {
 
   int num_bins() const { return m_nEtaBins; }
 
-  Acts::GbtsConnector *connector() const { return m_connector.get(); }
+  GbtsConnector *connector() const { return m_connector.get(); }
 
  protected:
   const GbtsLayer<space_point_t> *addNewLayer(const TrigInDetSiLayer &l,
@@ -358,7 +358,7 @@ class GbtsGeometry {
 
   int m_nEtaBins{0};
 
-  std::unique_ptr<Acts::GbtsConnector> m_connector;
+  std::unique_ptr<GbtsConnector> m_connector;
 };
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

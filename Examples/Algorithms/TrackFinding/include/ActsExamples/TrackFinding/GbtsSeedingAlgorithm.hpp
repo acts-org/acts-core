@@ -35,7 +35,7 @@ class GbtsSeedingAlgorithm final : public IAlgorithm {
 
     std::string outputSeeds;
 
-    Acts::SeedFinderGbtsConfig<SimSpacePoint> seedFinderConfig;
+    Acts::Experimental::SeedFinderGbtsConfig<SimSpacePoint> seedFinderConfig;
     Acts::SeedFinderOptions seedFinderOptions;
 
     std::string layerMappingFile;
@@ -68,16 +68,16 @@ class GbtsSeedingAlgorithm final : public IAlgorithm {
   // make the map
   std::map<std::pair<int, int>, std::pair<int, int>> makeActsGbtsMap() const;
   // make the vector of space points with FTF Info
-  std::vector<Acts::GbtsSP<SimSpacePoint>> MakeGbtsSpacePoints(
+  std::vector<Acts::Experimental::GbtsSP<SimSpacePoint>> MakeGbtsSpacePoints(
       const AlgorithmContext &ctx,
       std::map<std::pair<int, int>, std::pair<int, int>> map) const;
   // layer numbering
-  std::vector<Acts::TrigInDetSiLayer> LayerNumbering() const;
+  std::vector<Acts::Experimental::TrigInDetSiLayer> LayerNumbering() const;
 
  private:
   Config m_cfg;
 
-  std::unique_ptr<Acts::GbtsGeometry<SimSpacePoint>> m_gbtsGeo;
+  std::unique_ptr<Acts::Experimental::GbtsGeometry<SimSpacePoint>> m_gbtsGeo;
 
   std::vector<std::unique_ptr<ReadDataHandle<SimSpacePointContainer>>>
       m_inputSpacePoints{};

@@ -196,7 +196,7 @@ void addTrackFinding(Context& ctx) {
   }
 
   {
-    using Config = Acts::SeedFinderGbtsConfig<SimSpacePoint>;
+    using Config = Acts::Experimental::SeedFinderGbtsConfig<SimSpacePoint>;
     auto c = py::class_<Config>(m, "SeedFinderGbtsConfig").def(py::init<>());
     ACTS_PYTHON_STRUCT_BEGIN(c, Config);
     ACTS_PYTHON_MEMBER(minPt);
