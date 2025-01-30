@@ -101,6 +101,12 @@ Sequencer::Sequencer(const Sequencer::Config& cfg)
       m_taskArena((m_cfg.numThreads < 0) ? tbb::task_arena::automatic
                                          : m_cfg.numThreads),
       m_logger(Acts::getDefaultLogger("Sequencer", m_cfg.logLevel)) {
+  if (m_cfg.numThreads < -1 || m_cfg.numThreads == 0) {
+    ACTS_ERROR("Number of threads must be -1 (automatic) or positive");
+    throw std::invalid_argument(
+        "Number of threads must be -1 (automatic) or positive");
+  }
+
   if (m_cfg.numThreads == 1) {
     ACTS_INFO("Create Sequencer (single-threaded)");
   } else {
@@ -387,6 +393,9 @@ inline std::string asString(D duration) {
 // Convert duration scaled to one event to a printable string.
 template <typename D>
 inline std::string perEvent(D duration, std::size_t numEvents) {
+  if (numEvents == 0) {
+    return "undef/event";
+  }
   return asString(duration / numEvents) + "/event";
 }
 

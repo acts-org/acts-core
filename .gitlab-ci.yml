@@ -224,6 +224,38 @@ test_exatrkx_python:
   after_script:
    - !reference [.spack_cleanup, after_script]
 
+build_gnn_tensorrt:
+  stage: build
+  image: ghcr.io/acts-project/ubuntu2404_tensorrt:74
+
+  cache:
+    - !reference [.spack_cache, cache]
+    - !reference [.ccache_base, cache]
+
+  tags:
+    - docker-gpu-nvidia
+
+  script:
+    - git clone $CLONE_URL src
+    - cd src
+    - git checkout $HEAD_SHA
+    - source CI/dependencies/setup.sh -c g++
+    - cd ..
+    - mkdir build
+    - >
+      cmake -B build -S src
+      -DACTS_BUILD_PLUGIN_EXATRKX=ON
+      -DACTS_EXATRKX_ENABLE_TORCH=OFF
+      -DACTS_EXATRKX_ENABLE_CUDA=ON
+      -DACTS_EXATRKX_ENABLE_TENSORRT=ON
+      -DCMAKE_CUDA_ARCHITECTURES="75;86"
+    - ccache -z
+    - cmake --build build -- -j6
+    - ccache -s
+
+  after_script:
+   - !reference [.spack_cleanup, after_script]
+
 build_linux_ubuntu:
   stage: build
   image: registry.cern.ch/ghcr.io/acts-project/ubuntu2404:71

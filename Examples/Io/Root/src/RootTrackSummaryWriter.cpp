@@ -407,9 +407,9 @@ ProcessCode RootTrackSummaryWriter::writeT(const AlgorithmContext& ctx,
         param[i] = parameter[i];
       }
 
-      const auto& covariance = track.covariance();
       for (unsigned int i = 0; i < Acts::eBoundSize; ++i) {
-        error[i] = std::sqrt(covariance(i, i));
+        double variance = getCov(i, i);
+        error[i] = variance >= 0 ? std::sqrt(variance) : NaNfloat;
       }
     }
 

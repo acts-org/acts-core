@@ -59,7 +59,9 @@ class TrackSummaryPlotTool {
   /// @brief book the track info plots
   ///
   /// @param trackSummaryPlotCache the cache for track info plots
-  void book(TrackSummaryPlotCache& trackSummaryPlotCache) const;
+  /// @param prefix a prefix prepended to the name, concatenation with '_'
+  void book(TrackSummaryPlotCache& trackSummaryPlotCache,
+            const std::string& prefix = "") const;
 
   /// @brief fill reco track info w.r.t. fitted track parameters
   ///

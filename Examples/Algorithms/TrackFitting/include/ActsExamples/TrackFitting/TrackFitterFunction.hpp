@@ -68,6 +68,7 @@ std::shared_ptr<TrackFitterFunction> makeKalmanFitterFunction(
     double reverseFilteringMomThreshold = 0.0,
     Acts::FreeToBoundCorrection freeToBoundCorrection =
         Acts::FreeToBoundCorrection(),
+    double chi2Cut = std::numeric_limits<double>::infinity(),
     const Acts::Logger& logger = *Acts::getDefaultLogger("Kalman",
                                                          Acts::Logging::INFO));
 

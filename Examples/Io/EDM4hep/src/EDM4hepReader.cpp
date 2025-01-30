@@ -198,6 +198,8 @@ ProcessCode EDM4hepReader::read(const AlgorithmContext& ctx) {
   // container
   std::unordered_map<int, std::size_t> edm4hepParticleMap;
 
+  std::size_t nGeneratorParticles = 0;
+
   std::size_t nPrimaryVertices = 0;
   // Walk the particle tree
   for (const auto& [vtxPos, particles] : primaryVertices) {
@@ -215,6 +217,11 @@ ProcessCode EDM4hepReader::read(const AlgorithmContext& ctx) {
               .withParticleId(SimBarcode{}
                                   .setParticle(nParticles)
                                   .setVertexPrimary(nPrimaryVertices));
+
+      if (!inParticle.isCreatedInSimulation()) {
+        nGeneratorParticles += 1;
+      }
+
       ACTS_VERBOSE("+ add particle " << particle);
       ACTS_VERBOSE("  - at " << particle.position().transpose());
       ACTS_VERBOSE("  - createdInSim: " << inParticle.isCreatedInSimulation());
@@ -243,9 +250,10 @@ ProcessCode EDM4hepReader::read(const AlgorithmContext& ctx) {
   ACTS_DEBUG("Found " << unorderedParticlesInitial.size() << " particles");
 
   std::vector<SimParticle> particlesGeneratorUnordered;
-  particlesGeneratorUnordered.reserve(mcParticleCollection.size());
+  particlesGeneratorUnordered.reserve(nGeneratorParticles);
   std::vector<SimParticle> particlesSimulatedUnordered;
-  particlesSimulatedUnordered.reserve(mcParticleCollection.size());
+  particlesSimulatedUnordered.reserve(mcParticleCollection.size() -
+                                      nGeneratorParticles);
 
   for (const auto& inParticle : mcParticleCollection) {
     auto particleIt = edm4hepParticleMap.find(inParticle.getObjectID().index);
@@ -369,6 +377,17 @@ ProcessCode EDM4hepReader::read(const AlgorithmContext& ctx) {
             ACTS_VERBOSE("   -> surface: " << surface->geometryId());
             return surface->geometryId();
           });
+
+      // Increase hit count in generated and simulated particles
+      if (auto itSim = particlesSimulated.find(simHit.particleId());
+          itSim != particlesSimulated.end()) {
+        itSim->final().setNumberOfHits(itSim->final().numberOfHits() + 1);
+      } else if (auto itGen = particlesGenerator.find(simHit.particleId());
+                 itGen != particlesGenerator.end()) {
+        itGen->final().setNumberOfHits(itGen->final().numberOfHits() + 1);
+      } else {
+        ACTS_ERROR("SimHit has source particle that we did not see before");
+      }
 
       simHitsUnordered.push_back(std::move(simHit));
     }

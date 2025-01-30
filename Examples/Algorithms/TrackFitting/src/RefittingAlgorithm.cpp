@@ -35,7 +35,7 @@
 
 ActsExamples::RefittingAlgorithm::RefittingAlgorithm(Config config,
                                                      Acts::Logging::Level level)
-    : ActsExamples::IAlgorithm("TrackFittingAlgorithm", level),
+    : ActsExamples::IAlgorithm("RefittingAlgorithm", level),
       m_cfg(std::move(config)) {
   if (m_cfg.inputTracks.empty()) {
     throw std::invalid_argument("Missing input tracks collection");
@@ -127,6 +127,7 @@ ActsExamples::ProcessCode ActsExamples::RefittingAlgorithm::execute(
                    << itrack << " with error: " << result.error() << ", "
                    << result.error().message());
     }
+    ++itrack;
   }
 
   std::stringstream ss;

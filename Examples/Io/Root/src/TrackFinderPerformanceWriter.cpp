@@ -74,6 +74,9 @@ TrackFinderPerformanceWriter::TrackFinderPerformanceWriter(
   m_fakeRatePlotTool.book(m_fakeRatePlotCache);
   m_duplicationPlotTool.book(m_duplicationPlotCache);
   m_trackSummaryPlotTool.book(m_trackSummaryPlotCache);
+  for (const auto& [key, _] : m_cfg.subDetectorTrackSummaryVolumes) {
+    m_trackSummaryPlotTool.book(m_subDetectorSummaryCaches[key], key);
+  }
 }
 
 TrackFinderPerformanceWriter::~TrackFinderPerformanceWriter() {
@@ -81,6 +84,9 @@ TrackFinderPerformanceWriter::~TrackFinderPerformanceWriter() {
   m_fakeRatePlotTool.clear(m_fakeRatePlotCache);
   m_duplicationPlotTool.clear(m_duplicationPlotCache);
   m_trackSummaryPlotTool.clear(m_trackSummaryPlotCache);
+  for (const auto& [key, _] : m_cfg.subDetectorTrackSummaryVolumes) {
+    m_trackSummaryPlotTool.clear(m_subDetectorSummaryCaches.at(key));
+  }
   if (m_outputFile != nullptr) {
     m_outputFile->Close();
   }
@@ -131,6 +137,10 @@ ProcessCode TrackFinderPerformanceWriter::finalize() {
     m_fakeRatePlotTool.write(m_fakeRatePlotCache);
     m_duplicationPlotTool.write(m_duplicationPlotCache);
     m_trackSummaryPlotTool.write(m_trackSummaryPlotCache);
+    for (const auto& [key, _] : m_cfg.subDetectorTrackSummaryVolumes) {
+      m_trackSummaryPlotTool.write(m_subDetectorSummaryCaches.at(key));
+    }
+
     writeFloat(eff_tracks, "eff_tracks");
     writeFloat(fakeRate_tracks, "fakerate_tracks");
     writeFloat(duplicationRate_tracks, "duplicaterate_tracks");
@@ -163,14 +173,17 @@ ProcessCode TrackFinderPerformanceWriter::writeT(
   // Vector of input features for neural network classification
   std::vector<float> inputFeatures(3);
 
+  ACTS_DEBUG("Collect information from " << tracks.size() << " tracks");
+  std::size_t unmatched = 0, missingRefSurface = 0;
   for (const auto& track : tracks) {
     // Counting number of total trajectories
     m_nTotalTracks++;
 
     // Check if the reco track has fitted track parameters
     if (!track.hasReferenceSurface()) {
-      ACTS_WARNING("No fitted track parameters for track, index = "
+      ACTS_VERBOSE("No fitted track parameters for track, index = "
                    << track.index() << " tip index = " << track.tipIndex());
+      missingRefSurface++;
       continue;
     }
 
@@ -183,11 +196,38 @@ ProcessCode TrackFinderPerformanceWriter::writeT(
                                 track.nOutliers(), track.nHoles(),
                                 track.nSharedHits());
 
+    // Potentially fill other track summary caches for the given volumes
+    for (const auto& [key, volumes] : m_cfg.subDetectorTrackSummaryVolumes) {
+      ACTS_VERBOSE("Fill track summary stats for subset " << key);
+      std::size_t nTrackStates{}, nMeasurements{}, nOutliers{}, nHoles{},
+          nSharedHits{};
+      for (auto state : track.trackStatesReversed()) {
+        if (!state.hasReferenceSurface() ||
+            !volumes.contains(state.referenceSurface().geometryId().volume())) {
+          continue;
+        }
+
+        nTrackStates++;
+        nMeasurements += static_cast<std::size_t>(
+            state.typeFlags().test(Acts::MeasurementFlag));
+        nOutliers +=
+            static_cast<std::size_t>(state.typeFlags().test(Acts::OutlierFlag));
+        nHoles +=
+            static_cast<std::size_t>(state.typeFlags().test(Acts::HoleFlag));
+        nSharedHits += static_cast<std::size_t>(
+            state.typeFlags().test(Acts::SharedHitFlag));
+      }
+      m_trackSummaryPlotTool.fill(m_subDetectorSummaryCaches.at(key),
+                                  fittedParameters, nTrackStates, nMeasurements,
+                                  nOutliers, nHoles, nSharedHits);
+    }
+
     // Get the truth matching information
     auto imatched = trackParticleMatching.find(track.index());
     if (imatched == trackParticleMatching.end()) {
       ACTS_DEBUG("No truth matching information for this track, index = "
                  << track.index() << " tip index = " << track.tipIndex());
+      unmatched++;
       continue;
     }
 
@@ -210,6 +250,14 @@ ProcessCode TrackFinderPerformanceWriter::writeT(
     m_duplicationPlotTool.fill(
         m_duplicationPlotCache, fittedParameters,
         particleMatch.classification == TrackMatchClassification::Duplicate);
+  }
+
+  if (unmatched > 0) {
+    ACTS_DEBUG("No matching information found for " << unmatched << " tracks");
+  }
+  if (missingRefSurface > 0) {
+    ACTS_DEBUG("Reference surface was missing for " << missingRefSurface
+                                                    << " tracks");
   }
 
   // Loop over all truth particles for efficiency plots and reco details.

@@ -20,41 +20,55 @@ ActsExamples::TrackSummaryPlotTool::TrackSummaryPlotTool(
       m_logger(Acts::getDefaultLogger("TrackSummaryPlotTool", lvl)) {}
 
 void ActsExamples::TrackSummaryPlotTool::book(
-    TrackSummaryPlotTool::TrackSummaryPlotCache& trackSummaryPlotCache) const {
+    TrackSummaryPlotTool::TrackSummaryPlotCache& trackSummaryPlotCache,
+    const std::string& prefix) const {
   PlotHelpers::Binning bEta = m_cfg.varBinning.at("Eta");
   PlotHelpers::Binning bPt = m_cfg.varBinning.at("Pt");
   PlotHelpers::Binning bNum = m_cfg.varBinning.at("Num");
-  ACTS_DEBUG("Initialize the histograms for track info plots");
+  ACTS_DEBUG("Initialize the histograms for track info plots, use prefix '"
+             << prefix << "'");
+  auto addPrefix = [&](const std::string& name) {
+    return prefix.empty() ? name : prefix + "_" + name;
+  };
   // number of track states versus eta
-  trackSummaryPlotCache.nStates_vs_eta = PlotHelpers::bookProf(
-      "nStates_vs_eta", "Number of total states vs. #eta", bEta, bNum);
+  trackSummaryPlotCache.nStates_vs_eta =
+      PlotHelpers::bookProf(addPrefix("nStates_vs_eta").c_str(),
+                            "Number of total states vs. #eta", bEta, bNum);
   // number of measurements versus eta
-  trackSummaryPlotCache.nMeasurements_vs_eta = PlotHelpers::bookProf(
-      "nMeasurements_vs_eta", "Number of measurements vs. #eta", bEta, bNum);
+  trackSummaryPlotCache.nMeasurements_vs_eta =
+      PlotHelpers::bookProf(addPrefix("nMeasurements_vs_eta").c_str(),
+                            "Number of measurements vs. #eta", bEta, bNum);
   // number of holes versus eta
-  trackSummaryPlotCache.nHoles_vs_eta = PlotHelpers::bookProf(
-      "nHoles_vs_eta", "Number of holes vs. #eta", bEta, bNum);
+  trackSummaryPlotCache.nHoles_vs_eta =
+      PlotHelpers::bookProf(addPrefix("nHoles_vs_eta").c_str(),
+                            "Number of holes vs. #eta", bEta, bNum);
   // number of outliers versus eta
-  trackSummaryPlotCache.nOutliers_vs_eta = PlotHelpers::bookProf(
-      "nOutliers_vs_eta", "Number of outliers vs. #eta", bEta, bNum);
+  trackSummaryPlotCache.nOutliers_vs_eta =
+      PlotHelpers::bookProf(addPrefix("nOutliers_vs_eta").c_str(),
+                            "Number of outliers vs. #eta", bEta, bNum);
   // number of Shared Hits versus eta
-  trackSummaryPlotCache.nSharedHits_vs_eta = PlotHelpers::bookProf(
-      "nSharedHits_vs_eta", "Number of Shared Hits vs. #eta", bEta, bNum);
+  trackSummaryPlotCache.nSharedHits_vs_eta =
+      PlotHelpers::bookProf(addPrefix("nSharedHits_vs_eta").c_str(),
+                            "Number of Shared Hits vs. #eta", bEta, bNum);
   // number of track states versus pt
-  trackSummaryPlotCache.nStates_vs_pt = PlotHelpers::bookProf(
-      "nStates_vs_pT", "Number of total states vs. pT", bPt, bNum);
+  trackSummaryPlotCache.nStates_vs_pt =
+      PlotHelpers::bookProf(addPrefix("nStates_vs_pT").c_str(),
+                            "Number of total states vs. pT", bPt, bNum);
   // number of measurements versus pt
-  trackSummaryPlotCache.nMeasurements_vs_pt = PlotHelpers::bookProf(
-      "nMeasurements_vs_pT", "Number of measurements vs. pT", bPt, bNum);
+  trackSummaryPlotCache.nMeasurements_vs_pt =
+      PlotHelpers::bookProf(addPrefix("nMeasurements_vs_pT").c_str(),
+                            "Number of measurements vs. pT", bPt, bNum);
   // number of holes versus pt
   trackSummaryPlotCache.nHoles_vs_pt = PlotHelpers::bookProf(
-      "nHoles_vs_pT", "Number of holes vs. pT", bPt, bNum);
+      addPrefix("nHoles_vs_pT").c_str(), "Number of holes vs. pT", bPt, bNum);
   // number of outliers versus pt
-  trackSummaryPlotCache.nOutliers_vs_pt = PlotHelpers::bookProf(
-      "nOutliers_vs_pT", "Number of outliers vs. pT", bPt, bNum);
+  trackSummaryPlotCache.nOutliers_vs_pt =
+      PlotHelpers::bookProf(addPrefix("nOutliers_vs_pT").c_str(),
+                            "Number of outliers vs. pT", bPt, bNum);
   // number of Shared Hits versus pt
-  trackSummaryPlotCache.nSharedHits_vs_pt = PlotHelpers::bookProf(
-      "nSharedHits_vs_pT", "Number of Shared Hits vs. pT", bPt, bNum);
+  trackSummaryPlotCache.nSharedHits_vs_pt =
+      PlotHelpers::bookProf(addPrefix("nSharedHits_vs_pT").c_str(),
+                            "Number of Shared Hits vs. pT", bPt, bNum);
 }
 
 void ActsExamples::TrackSummaryPlotTool::clear(

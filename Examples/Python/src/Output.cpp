@@ -398,13 +398,13 @@ void addOutput(Context& ctx) {
       trackingGeometry, outputDir, outputPrecision, writeSensitive,
       writeBoundary, writeSurfaceGrid, writeLayerVolume, writePerEvent);
 
-  ACTS_PYTHON_DECLARE_WRITER(ActsExamples::TrackFinderPerformanceWriter, mex,
-                             "TrackFinderPerformanceWriter", inputTracks,
-                             inputParticles, inputTrackParticleMatching,
-                             inputParticleTrackMatching, filePath, fileMode,
-                             effPlotToolConfig, fakeRatePlotToolConfig,
-                             duplicationPlotToolConfig,
-                             trackSummaryPlotToolConfig, writeMatchingDetails);
+  ACTS_PYTHON_DECLARE_WRITER(
+      ActsExamples::TrackFinderPerformanceWriter, mex,
+      "TrackFinderPerformanceWriter", inputTracks, inputParticles,
+      inputTrackParticleMatching, inputParticleTrackMatching, filePath,
+      fileMode, effPlotToolConfig, fakeRatePlotToolConfig,
+      duplicationPlotToolConfig, trackSummaryPlotToolConfig,
+      subDetectorTrackSummaryVolumes, writeMatchingDetails);
 
   ACTS_PYTHON_DECLARE_WRITER(
       ActsExamples::RootNuclearInteractionParametersWriter, mex,

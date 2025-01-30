@@ -53,17 +53,17 @@ void addTrackFitting(Context& ctx) {
            std::shared_ptr<const Acts::MagneticFieldProvider> magneticField,
            bool multipleScattering, bool energyLoss,
            double reverseFilteringMomThreshold,
-           Acts::FreeToBoundCorrection freeToBoundCorrection,
+           Acts::FreeToBoundCorrection freeToBoundCorrection, double chi2Cut,
            Logging::Level level) {
           return ActsExamples::makeKalmanFitterFunction(
               trackingGeometry, magneticField, multipleScattering, energyLoss,
-              reverseFilteringMomThreshold, freeToBoundCorrection,
+              reverseFilteringMomThreshold, freeToBoundCorrection, chi2Cut,
               *Acts::getDefaultLogger("Kalman", level));
         },
         py::arg("trackingGeometry"), py::arg("magneticField"),
         py::arg("multipleScattering"), py::arg("energyLoss"),
         py::arg("reverseFilteringMomThreshold"),
-        py::arg("freeToBoundCorrection"), py::arg("level"));
+        py::arg("freeToBoundCorrection"), py::arg("chi2Cut"), py::arg("level"));
 
     py::class_<MeasurementCalibrator, std::shared_ptr<MeasurementCalibrator>>(
         mex, "MeasurementCalibrator");

@@ -63,6 +63,10 @@ class TrackFinderPerformanceWriter final : public WriterT<ConstTrackContainer> {
     DuplicationPlotTool::Config duplicationPlotToolConfig;
     TrackSummaryPlotTool::Config trackSummaryPlotToolConfig;
 
+    /// Additional tracksummary plot tool configs for detector regions
+    /// Allows e.g. to do pixel/strip only plots based on a list of volumes
+    std::map<std::string, std::set<int>> subDetectorTrackSummaryVolumes;
+
     /// Write additional matching details to a TTree
     bool writeMatchingDetails = false;
   };
@@ -97,6 +101,8 @@ class TrackFinderPerformanceWriter final : public WriterT<ConstTrackContainer> {
   /// Plot tool for track hit info
   TrackSummaryPlotTool m_trackSummaryPlotTool;
   TrackSummaryPlotTool::TrackSummaryPlotCache m_trackSummaryPlotCache{};
+  std::map<std::string, TrackSummaryPlotTool::TrackSummaryPlotCache>
+      m_subDetectorSummaryCaches;
 
   /// For optional output of the matching details
   TTree* m_matchingTree{nullptr};
