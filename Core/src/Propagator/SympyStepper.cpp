@@ -84,7 +84,7 @@ SympyStepper::boundState(
       state.pathAccumulated, freeToBoundCorrection);
 }
 
-std::tuple<CurvilinearTrackParameters, BoundMatrix, double>
+std::tuple<BoundTrackParameters, BoundMatrix, double>
 SympyStepper::curvilinearState(State& state, bool transportCov) const {
   return detail::sympy::curvilinearState(
       state.cov, state.jacobian, state.jacTransport, state.derivative,

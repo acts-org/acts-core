@@ -49,8 +49,8 @@ using ConstantFieldStepper = EigenStepper<>;
 using ConstantFieldPropagator = Propagator<ConstantFieldStepper, Navigator>;
 
 /// Construct initial track parameters.
-CurvilinearTrackParameters makeParameters(double phi, double theta, double p,
-                                          double q) {
+BoundTrackParameters makeParameters(double phi, double theta, double p,
+                                    double q) {
   // create covariance matrix from reasonable standard deviations
   BoundVector stddev;
   stddev[eBoundLoc0] = 100_um;
@@ -62,8 +62,8 @@ CurvilinearTrackParameters makeParameters(double phi, double theta, double p,
   BoundSquareMatrix cov = stddev.cwiseProduct(stddev).asDiagonal();
   // Let the particle start from the origin
   Vector4 mPos4(-3_m, 0., 0., 0.);
-  return CurvilinearTrackParameters(mPos4, phi, theta, q / p, cov,
-                                    ParticleHypothesis::pionLike(q));
+  return BoundTrackParameters::makeCurvilinear(mPos4, phi, theta, q / p, cov,
+                                               ParticleHypothesis::pionLike(q));
 }
 
 std::pair<Vector3, Vector3> stripEnds(

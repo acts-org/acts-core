@@ -24,7 +24,7 @@ StraightLineStepper::boundState(
       state.pathAccumulated, freeToBoundCorrection);
 }
 
-std::tuple<CurvilinearTrackParameters, BoundMatrix, double>
+std::tuple<BoundTrackParameters, BoundMatrix, double>
 StraightLineStepper::curvilinearState(State& state, bool transportCov) const {
   return detail::curvilinearState(
       state.cov, state.jacobian, state.jacTransport, state.derivative,

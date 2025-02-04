@@ -44,9 +44,8 @@ using CellBound = std::pair<std::shared_ptr<Acts::BoundTrackParameters>,
 using GridBound = Acts::Grid<CellBound, Axis, Axis>;
 using AccBound = Acts::TrackParamsLookupAccumulator<GridBound>;
 
-using CellCurvilinear =
-    std::pair<std::shared_ptr<Acts::CurvilinearTrackParameters>,
-              std::shared_ptr<Acts::CurvilinearTrackParameters>>;
+using CellCurvilinear = std::pair<std::shared_ptr<Acts::BoundTrackParameters>,
+                                  std::shared_ptr<Acts::BoundTrackParameters>>;
 
 using GridCurvilinear = Acts::Grid<CellCurvilinear, Axis, Axis>;
 using AccCurvilinear = Acts::TrackParamsLookupAccumulator<GridCurvilinear>;
@@ -175,7 +174,7 @@ BOOST_AUTO_TEST_CASE(Accumulation) {
                            std::nullopt, hypothesis)
                            .value();
 
-      auto parsCurvilinear = Acts::CurvilinearTrackParameters(
+      auto parsCurvilinear = Acts::BoundTrackParameters::makeCurvilinear(
           fourPositions.at(j), direction, 1. / P, std::nullopt, hypothesis);
 
       auto parsFree = Acts::FreeTrackParameters(
@@ -208,7 +207,7 @@ BOOST_AUTO_TEST_CASE(Accumulation) {
     CHECK_CLOSE_ABS(ipBound->direction(), avgDir, 1e-3);
     CHECK_CLOSE_ABS(ipBound->absoluteMomentum(), avgP, 1e-3);
 
-    CHECK_CLOSE_ABS(ipCurvilinear->fourPosition(), avgPos, 1e-3);
+    CHECK_CLOSE_ABS(ipCurvilinear->fourPosition(gctx), avgPos, 1e-3);
     CHECK_CLOSE_ABS(ipCurvilinear->direction(), avgDir, 1e-3);
     CHECK_CLOSE_ABS(ipCurvilinear->absoluteMomentum(), avgP, 1e-3);
 

@@ -169,10 +169,6 @@ class MultiEigenStepperLoop : public EigenStepper<extension_t> {
   using BoundState =
       std::tuple<MultiComponentBoundTrackParameters, Jacobian, double>;
 
-  /// @brief Define an own curvilinear state
-  using CurvilinearState =
-      std::tuple<MultiComponentCurvilinearTrackParameters, Jacobian, double>;
-
   /// @brief The reducer type
   using Reducer = component_reducer_t;
 
@@ -699,8 +695,7 @@ class MultiEigenStepperLoop : public EigenStepper<extension_t> {
   ///   - the curvilinear parameters at given position
   ///   - the stepweise jacobian towards it (from last bound)
   ///   - and the path length (from start - for ordering)
-  CurvilinearState curvilinearState(State& state,
-                                    bool transportCov = true) const;
+  BoundState curvilinearState(State& state, bool transportCov = true) const;
 
   /// Method for on-demand transport of the covariance
   /// to a new curvilinear frame at current  position,

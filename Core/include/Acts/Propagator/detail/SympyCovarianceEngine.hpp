@@ -16,7 +16,7 @@
 
 #include <tuple>
 
-namespace {
+namespace Acts {
 class Surface;
 }
 
@@ -83,7 +83,7 @@ Result<std::tuple<BoundTrackParameters, BoundMatrix, double>> boundState(
 ///   - the curvilinear parameters at given position
 ///   - the stepweise jacobian towards it (from last bound)
 ///   - and the path length (from start - for ordering)
-std::tuple<CurvilinearTrackParameters, BoundMatrix, double> curvilinearState(
+std::tuple<BoundTrackParameters, BoundMatrix, double> curvilinearState(
     BoundSquareMatrix& boundCovariance, BoundMatrix& fullTransportJacobian,
     FreeMatrix& transportJacobian, FreeVector& freeToPathDerivatives,
     BoundToFreeMatrix& boundToFreeJacobian, const FreeVector& freeParameters,

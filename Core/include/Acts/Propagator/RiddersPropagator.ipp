@@ -14,16 +14,14 @@ template <typename propagator_t>
 template <typename parameters_t, typename propagator_options_t>
 auto Acts::RiddersPropagator<propagator_t>::propagate(
     const parameters_t& start, const propagator_options_t& options) const
-    -> Result<
-        actor_list_t_result_t<CurvilinearTrackParameters,
-                              typename propagator_options_t::actor_list_type>> {
-  using ThisResult = Result<
-      actor_list_t_result_t<CurvilinearTrackParameters,
-                            typename propagator_options_t::actor_list_type>>;
+    -> Result<actor_list_t_result_t<
+        BoundTrackParameters, typename propagator_options_t::actor_list_type>> {
+  using ThisResult = Result<actor_list_t_result_t<
+      BoundTrackParameters, typename propagator_options_t::actor_list_type>>;
 
   // Remove the covariance from our start parameters in order to skip jacobian
   // transport for the nominal propagation
-  CurvilinearTrackParameters startWithoutCov = start;
+  BoundTrackParameters startWithoutCov = start;
   startWithoutCov.covariance() = std::nullopt;
 
   // Propagate the nominal parameters
@@ -43,7 +41,7 @@ auto Acts::RiddersPropagator<propagator_t>::propagate(
     // use nominal parameters and Ridders covariance
     auto cov = jacobian * (*start.covariance()) * jacobian.transpose();
     // replace the covariance of the nominal result w/ the ridders covariance
-    nominalResult.endParameters = CurvilinearTrackParameters(
+    nominalResult.endParameters = BoundTrackParameters::makeCurvilinear(
         nominalFinalParameters.fourPosition(options.geoContext),
         nominalFinalParameters.direction(), nominalFinalParameters.qOverP(),
         std::move(cov), nominalFinalParameters.particleHypothesis());

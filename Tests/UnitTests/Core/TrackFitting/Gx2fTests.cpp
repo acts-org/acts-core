@@ -16,7 +16,6 @@
 #include "Acts/Geometry/CuboidVolumeBuilder.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Geometry/TrackingGeometryBuilder.hpp"
-#include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/Material/HomogeneousSurfaceMaterial.hpp"
 #include "Acts/Material/MaterialSlab.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
@@ -78,7 +77,7 @@ static void drawMeasurements(
 }
 
 //// Construct initial track parameters.
-Acts::CurvilinearTrackParameters makeParameters(
+Acts::BoundTrackParameters makeParameters(
     const double x = 0.0_m, const double y = 0.0_m, const double z = 0.0_m,
     const double w = 42_ns, const double phi = 0_degree,
     const double theta = 90_degree, const double p = 2_GeV,
@@ -94,8 +93,8 @@ Acts::CurvilinearTrackParameters makeParameters(
   const Acts::BoundSquareMatrix cov = stddev.cwiseProduct(stddev).asDiagonal();
   // define a track in the transverse plane along x
   const Acts::Vector4 mPos4(x, y, z, w);
-  return Acts::CurvilinearTrackParameters(mPos4, phi, theta, q / p, cov,
-                                          Acts::ParticleHypothesis::pion());
+  return Acts::BoundTrackParameters::makeCurvilinear(
+      mPos4, phi, theta, q / p, cov, Acts::ParticleHypothesis::pion());
 }
 
 static std::vector<Acts::SourceLink> prepareSourceLinks(

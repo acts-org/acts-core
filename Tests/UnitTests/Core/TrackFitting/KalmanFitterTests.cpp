@@ -9,29 +9,21 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
-#include "Acts/EventData/MultiTrajectory.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
-#include "Acts/EventData/TrackStatePropMask.hpp"
 #include "Acts/EventData/VectorMultiTrajectory.hpp"
 #include "Acts/EventData/detail/TestSourceLink.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
-#include "Acts/Tests/CommonHelpers/LineSurfaceStub.hpp"
 #include "Acts/TrackFitting/GainMatrixSmoother.hpp"
 #include "Acts/TrackFitting/GainMatrixUpdater.hpp"
 #include "Acts/TrackFitting/KalmanFitter.hpp"
-#include "Acts/Utilities/Delegate.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
-#include <algorithm>
 #include <functional>
-#include <map>
 #include <memory>
 #include <optional>
 #include <random>
@@ -63,7 +55,7 @@ KalmanUpdater kfUpdater;
 KalmanSmoother kfSmoother;
 
 // Construct initial track parameters.
-Acts::CurvilinearTrackParameters makeParameters() {
+Acts::BoundTrackParameters makeParameters() {
   // create covariance matrix from reasonable standard deviations
   Acts::BoundVector stddev;
   stddev[Acts::eBoundLoc0] = 100_um;
@@ -75,8 +67,8 @@ Acts::CurvilinearTrackParameters makeParameters() {
   Acts::BoundSquareMatrix cov = stddev.cwiseProduct(stddev).asDiagonal();
   // define a track in the transverse plane along x
   Acts::Vector4 mPos4(-3_m, 0., 0., 42_ns);
-  return Acts::CurvilinearTrackParameters(mPos4, 0_degree, 90_degree,
-                                          1_e / 1_GeV, cov, pion);
+  return Acts::BoundTrackParameters::makeCurvilinear(mPos4, 0_degree, 90_degree,
+                                                     1_e / 1_GeV, cov, pion);
 }
 
 // Instantiate the tester

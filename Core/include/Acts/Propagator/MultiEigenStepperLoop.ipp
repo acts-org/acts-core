@@ -65,7 +65,7 @@ auto MultiEigenStepperLoop<E, R>::boundState(
 
 template <typename E, typename R>
 auto MultiEigenStepperLoop<E, R>::curvilinearState(
-    State& state, bool transportCov) const -> CurvilinearState {
+    State& state, bool transportCov) const -> BoundState {
   assert(!state.components.empty());
 
   std::vector<std::tuple<double, Vector4, Vector3, double, BoundSquareMatrix>>
@@ -84,9 +84,9 @@ auto MultiEigenStepperLoop<E, R>::curvilinearState(
     accumulatedPathLength += state.components[i].weight * pl;
   }
 
-  return CurvilinearState{
-      MultiComponentCurvilinearTrackParameters(cmps, state.particleHypothesis),
-      Jacobian::Zero(), accumulatedPathLength};
+  return BoundState{MultiComponentBoundTrackParameters::makeCurvilinear(
+                        cmps, state.particleHypothesis),
+                    Jacobian::Zero(), accumulatedPathLength};
 }
 
 template <typename E, typename R>

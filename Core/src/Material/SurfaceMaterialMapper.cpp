@@ -9,12 +9,10 @@
 #include "Acts/Material/SurfaceMaterialMapper.hpp"
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/Tolerance.hpp"
 #include "Acts/EventData/ParticleHypothesis.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Geometry/ApproachDescriptor.hpp"
-#include "Acts/Geometry/BoundarySurfaceT.hpp"
 #include "Acts/Geometry/Layer.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Material/BinnedSurfaceMaterial.hpp"
@@ -22,20 +20,16 @@
 #include "Acts/Material/MaterialInteraction.hpp"
 #include "Acts/Material/ProtoSurfaceMaterial.hpp"
 #include "Acts/Propagator/ActorList.hpp"
-#include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/SurfaceCollector.hpp"
 #include "Acts/Propagator/VolumeCollector.hpp"
 #include "Acts/Surfaces/SurfaceArray.hpp"
 #include "Acts/Utilities/BinAdjustment.hpp"
 #include "Acts/Utilities/BinUtility.hpp"
-#include "Acts/Utilities/BinnedArray.hpp"
 #include "Acts/Utilities/Result.hpp"
 
 #include <cstddef>
 #include <ostream>
-#include <string>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -230,10 +224,11 @@ void Acts::SurfaceMaterialMapper::mapInteraction(
   std::map<GeometryIdentifier, unsigned int> assignedMaterial;
   using VectorHelpers::makeVector4;
   // Neutral curvilinear parameters
-  NeutralCurvilinearTrackParameters start(
-      makeVector4(mTrack.first.first, 0), mTrack.first.second,
-      1 / mTrack.first.second.norm(), std::nullopt,
-      NeutralParticleHypothesis::geantino());
+  NeutralBoundTrackParameters start =
+      NeutralBoundTrackParameters::makeCurvilinear(
+          makeVector4(mTrack.first.first, 0), mTrack.first.second,
+          1 / mTrack.first.second.norm(), std::nullopt,
+          NeutralParticleHypothesis::geantino());
 
   // Prepare Action list and abort list
   using MaterialSurfaceCollector = SurfaceCollector<MaterialSurface>;

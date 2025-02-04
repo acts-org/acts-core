@@ -70,7 +70,7 @@ std::vector<GeometryIdentifier> collectRelevantGeoIds(
 /// @param logger A logger instance
 template <typename propagator_t>
 void runSelfConsistencyTest(const propagator_t& prop,
-                            const CurvilinearTrackParameters& start,
+                            const BoundTrackParameters& start,
                             const Acts::Logger& logger) {
   // Actor list
   using ActorList = ActorList<SurfaceCollector>;
@@ -254,7 +254,7 @@ void runSelfConsistencyTest(const propagator_t& prop,
 template <typename propagator_probe_t, typename propagator_ref_t>
 void runConsistencyTest(const propagator_probe_t& propProbe,
                         const propagator_ref_t& propRef,
-                        const CurvilinearTrackParameters& start,
+                        const BoundTrackParameters& start,
                         const Acts::Logger& logger) {
   // Action list and abort list
   using ActorList = ActorList<SurfaceCollector>;
@@ -367,12 +367,13 @@ auto eventGen =
         (bdata::engine = std::mt19937(), bdata::seed = 23,
          bdata::distribution = std::uniform_int_distribution<int>(0, 1)));
 
-CurvilinearTrackParameters createStartParameters(double pT, double phi,
-                                                 double theta, int charge) {
+BoundTrackParameters createStartParameters(double pT, double phi, double theta,
+                                           int charge) {
   double p = pT / std::sin(theta);
   double q = -1 + 2 * charge;
-  return CurvilinearTrackParameters(Vector4(0, 0, 0, 0), phi, theta, q / p,
-                                    std::nullopt, ParticleHypothesis::pion());
+  return BoundTrackParameters::makeCurvilinear(Vector4(0, 0, 0, 0), phi, theta,
+                                               q / p, std::nullopt,
+                                               ParticleHypothesis::pion());
 }
 
 BOOST_DATA_TEST_CASE(NavigatorStraightLineSelfConsistency,
@@ -380,8 +381,7 @@ BOOST_DATA_TEST_CASE(NavigatorStraightLineSelfConsistency,
                      theta, charge, index) {
   ACTS_LOCAL_LOGGER(Acts::getDefaultLogger("NavigatorTest", logLevel));
 
-  CurvilinearTrackParameters start =
-      createStartParameters(pT, phi, theta, charge);
+  BoundTrackParameters start = createStartParameters(pT, phi, theta, charge);
 
   ACTS_DEBUG(">>> Run navigation tests with:\n    pT = "
              << pT << "\n    phi = " << phi << "\n    theta = " << theta
@@ -396,8 +396,7 @@ BOOST_DATA_TEST_CASE(NavigatorEigenSelfConsistency,
                      theta, charge, index) {
   ACTS_LOCAL_LOGGER(Acts::getDefaultLogger("NavigatorTest", logLevel));
 
-  CurvilinearTrackParameters start =
-      createStartParameters(pT, phi, theta, charge);
+  BoundTrackParameters start = createStartParameters(pT, phi, theta, charge);
 
   ACTS_DEBUG(">>> Run navigation tests with:\n    pT = "
              << pT << "\n    phi = " << phi << "\n    theta = " << theta
@@ -412,8 +411,7 @@ BOOST_DATA_TEST_CASE(NavigatorRef1StraightLineConsistency,
                      theta, charge, index) {
   ACTS_LOCAL_LOGGER(Acts::getDefaultLogger("NavigatorTest", logLevel));
 
-  CurvilinearTrackParameters start =
-      createStartParameters(pT, phi, theta, charge);
+  BoundTrackParameters start = createStartParameters(pT, phi, theta, charge);
 
   ACTS_DEBUG(">>> Run navigation tests with:\n    pT = "
              << pT << "\n    phi = " << phi << "\n    theta = " << theta
@@ -428,8 +426,7 @@ BOOST_DATA_TEST_CASE(NavigatorRef1EigenConsistency,
                      theta, charge, index) {
   ACTS_LOCAL_LOGGER(Acts::getDefaultLogger("NavigatorTest", logLevel));
 
-  CurvilinearTrackParameters start =
-      createStartParameters(pT, phi, theta, charge);
+  BoundTrackParameters start = createStartParameters(pT, phi, theta, charge);
 
   ACTS_DEBUG(">>> Run navigation tests with:\n    pT = "
              << pT << "\n    phi = " << phi << "\n    theta = " << theta
@@ -444,8 +441,7 @@ BOOST_DATA_TEST_CASE(NavigatorRef2StraightLineConsistency,
                      theta, charge, index) {
   ACTS_LOCAL_LOGGER(Acts::getDefaultLogger("NavigatorTest", logLevel));
 
-  CurvilinearTrackParameters start =
-      createStartParameters(pT, phi, theta, charge);
+  BoundTrackParameters start = createStartParameters(pT, phi, theta, charge);
 
   ACTS_DEBUG(">>> Run navigation tests with:\n    pT = "
              << pT << "\n    phi = " << phi << "\n    theta = " << theta
@@ -460,8 +456,7 @@ BOOST_DATA_TEST_CASE(NavigatorRef2EigenConsistency,
                      theta, charge, index) {
   ACTS_LOCAL_LOGGER(Acts::getDefaultLogger("NavigatorTest", logLevel));
 
-  CurvilinearTrackParameters start =
-      createStartParameters(pT, phi, theta, charge);
+  BoundTrackParameters start = createStartParameters(pT, phi, theta, charge);
 
   ACTS_DEBUG(">>> Run navigation tests with:\n    pT = "
              << pT << "\n    phi = " << phi << "\n    theta = " << theta

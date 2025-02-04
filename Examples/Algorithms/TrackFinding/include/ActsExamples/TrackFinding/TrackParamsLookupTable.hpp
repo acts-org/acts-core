@@ -18,8 +18,8 @@
 namespace ActsExamples {
 
 using TrackParamsLookupPair =
-    std::pair<std::shared_ptr<Acts::CurvilinearTrackParameters>,
-              std::shared_ptr<Acts::CurvilinearTrackParameters>>;
+    std::pair<std::shared_ptr<Acts::BoundTrackParameters>,
+              std::shared_ptr<Acts::BoundTrackParameters>>;
 
 /// @brief Track parameters lookup table axis used
 /// in the track estimation algorithm

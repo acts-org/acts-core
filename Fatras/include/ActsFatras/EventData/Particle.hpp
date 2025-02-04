@@ -274,8 +274,8 @@ class Particle {
                                       params, std::nullopt, hypothesis());
   }
 
-  Acts::CurvilinearTrackParameters curvilinearParameters() const {
-    return Acts::CurvilinearTrackParameters(
+  Acts::BoundTrackParameters curvilinearParameters() const {
+    return Acts::BoundTrackParameters::makeCurvilinear(
         fourPosition(), direction(), qOverP(), std::nullopt, hypothesis());
   }
 

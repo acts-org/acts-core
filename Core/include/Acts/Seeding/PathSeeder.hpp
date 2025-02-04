@@ -11,7 +11,6 @@
 #include "Acts/EventData/SourceLink.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Seeding/detail/UtilityFunctions.hpp"
-#include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/Delegate.hpp"
 #include "Acts/Utilities/GridIterator.hpp"
 
@@ -44,8 +43,7 @@ namespace Acts {
 /// in the user-defined delegate functions.
 class PathSeeder {
  public:
-  using PathSeed =
-      std::pair<CurvilinearTrackParameters, std::vector<SourceLink>>;
+  using PathSeed = std::pair<BoundTrackParameters, std::vector<SourceLink>>;
 
   /// @brief Delegate to estimate the IP parameters
   /// and the momentum direction at the reference tracking layer
@@ -55,8 +53,8 @@ class PathSeeder {
   ///
   /// @return Pair of the track parameters at the IP and
   /// the reference tracking layer
-  using TrackEstimator = Delegate<
-      std::pair<CurvilinearTrackParameters, CurvilinearTrackParameters>(
+  using TrackEstimator =
+      Delegate<std::pair<BoundTrackParameters, BoundTrackParameters>(
           const GeometryContext&, const SourceLink&)>;
 
   /// @brief Delegate to find the intersections for the given pivot
@@ -69,7 +67,7 @@ class PathSeeder {
   /// and the local intersection point
   using IntersectionLookup =
       Delegate<std::vector<std::pair<GeometryIdentifier, Vector2>>(
-          const GeometryContext&, const CurvilinearTrackParameters&)>;
+          const GeometryContext&, const BoundTrackParameters&)>;
 
   /// @brief Delegate to provide the path width around
   /// the intersection point to pull the source links
@@ -97,10 +95,7 @@ class PathSeeder {
   };
 
   /// @brief Constructor
-  PathSeeder(const Config& config) : m_cfg(config) {};
-
-  /// @brief Destructor
-  ~PathSeeder() = default;
+  PathSeeder(const Config& config) : m_cfg(config) {}
 
   /// @brief Extract the IP parameters and
   /// sort the source links into the seeds

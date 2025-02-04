@@ -8,8 +8,8 @@
 
 #include "Acts/Vertexing/NumericalTrackLinearizer.hpp"
 
+#include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Propagator/PropagatorOptions.hpp"
-#include "Acts/Surfaces/PerigeeSurface.hpp"
 #include "Acts/Utilities/UnitVectors.hpp"
 #include "Acts/Vertexing/LinearizerTrackParameters.hpp"
 
@@ -116,9 +116,10 @@ Acts::NumericalTrackLinearizer::linearizeTrack(
     Vector3 wiggledDir = makeDirectionFromPhiTheta(paramVecCopy(eLinPhi),
                                                    paramVecCopy(eLinTheta));
     // Since we work in 4D we have eLinPosSize = 4
-    CurvilinearTrackParameters wiggledCurvilinearParams(
-        paramVecCopy.template head<eLinPosSize>(), wiggledDir,
-        paramVecCopy(eLinQOverP), std::nullopt, ParticleHypothesis::pion());
+    BoundTrackParameters wiggledCurvilinearParams =
+        BoundTrackParameters::makeCurvilinear(
+            paramVecCopy.template head<eLinPosSize>(), wiggledDir,
+            paramVecCopy(eLinQOverP), std::nullopt, ParticleHypothesis::pion());
 
     // Obtain propagation direction
     intersection = perigeeSurface

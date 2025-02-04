@@ -65,8 +65,8 @@ const MeasurementResolutionMap resolutions = {
      MeasurementResolution{MeasurementType::eLoc01, {0, 0}}}};
 
 // Construct initial track parameters.
-CurvilinearTrackParameters makeParameters(double phi, double theta, double p,
-                                          double q) {
+BoundTrackParameters makeParameters(double phi, double theta, double p,
+                                    double q) {
   // create covariance matrix from reasonable standard deviations
   Acts::BoundVector stddev;
   stddev[Acts::eBoundLoc0] = 100_um;
@@ -78,8 +78,8 @@ CurvilinearTrackParameters makeParameters(double phi, double theta, double p,
   BoundSquareMatrix cov = stddev.cwiseProduct(stddev).asDiagonal();
   // Let the particle starts from the origin
   Vector4 mPos4(0., 0., 0., 0.);
-  return CurvilinearTrackParameters(mPos4, phi, theta, q / p, cov,
-                                    ParticleHypothesis::pionLike(std::abs(q)));
+  return BoundTrackParameters::makeCurvilinear(
+      mPos4, phi, theta, q / p, cov, ParticleHypothesis::pionLike(std::abs(q)));
 }
 
 std::default_random_engine rng(42);

@@ -9,10 +9,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
@@ -26,11 +24,8 @@
 #include "Acts/Utilities/Result.hpp"
 
 #include <algorithm>
-#include <array>
-#include <map>
 #include <memory>
 #include <optional>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -128,9 +123,9 @@ BOOST_AUTO_TEST_CASE(kalman_extrapolator) {
       0, 0, 0, 0.162, 0, 0.1, 0, 0, 0.5, 0, 0, 0, 1. / (10_GeV), 0, 0, 0, 0, 0,
       0, 0;
   // The start parameters
-  CurvilinearTrackParameters start(Vector4(-3_m, 0, 0, 42_ns), 0_degree,
-                                   90_degree, 1_e / 1_GeV, cov,
-                                   ParticleHypothesis::pion());
+  BoundTrackParameters start = BoundTrackParameters::makeCurvilinear(
+      Vector4(-3_m, 0, 0, 42_ns), 0_degree, 90_degree, 1_e / 1_GeV, cov,
+      ParticleHypothesis::pion());
 
   // Create the ActionList and AbortList
   using StepWiseResult = StepWiseActor::result_type;

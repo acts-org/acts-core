@@ -218,7 +218,7 @@ void SensitiveSteppingAction::UserSteppingAction(const G4Step* step) {
       double zDirVtx = track->GetVertexMomentumDirection().z();
       double absMomentum = track->GetMomentum().mag() * convertEnergy;
 
-      PropagationSummary iSummary(Acts::CurvilinearTrackParameters(
+      PropagationSummary iSummary(Acts::BoundTrackParameters::makeCurvilinear(
           Acts::Vector4(xVtx, yVtx, zVtx, 0.),
           Acts::Vector3(xDirVtx, yDirVtx, zDirVtx), absCharge / absMomentum,
           std::nullopt, Acts::ParticleHypothesis::pion()));

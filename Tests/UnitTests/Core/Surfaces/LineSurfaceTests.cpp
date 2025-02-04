@@ -26,7 +26,6 @@
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 #include "Acts/Tests/CommonHelpers/LineSurfaceStub.hpp"
 #include "Acts/Tests/CommonHelpers/PredefinedMaterials.hpp"
-#include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Intersection.hpp"
 #include "Acts/Utilities/Result.hpp"
 #include "Acts/Utilities/ThrowAssert.hpp"
@@ -316,9 +315,10 @@ BOOST_AUTO_TEST_CASE(LineSurfaceIntersection) {
 
   Propagator propagator({});
 
-  CurvilinearTrackParameters displacedParameters{
-      Vector4::Zero(), Vector3::Zero(), 1, std::nullopt,
-      ParticleHypothesis::pion()};
+  BoundTrackParameters displacedParameters =
+      BoundTrackParameters::makeCurvilinear(Vector4::Zero(), Vector3::Zero(), 1,
+                                            std::nullopt,
+                                            ParticleHypothesis::pion());
   {
     PropagatorOptions options(tgContext, {});
     options.direction = Acts::Direction::Backward();

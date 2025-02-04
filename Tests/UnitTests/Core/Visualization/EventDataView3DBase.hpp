@@ -9,7 +9,6 @@
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/EventData/MeasurementHelpers.hpp"
 #include "Acts/EventData/SourceLink.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/EventData/VectorMultiTrajectory.hpp"
@@ -22,7 +21,6 @@
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Material/HomogeneousSurfaceMaterial.hpp"
-#include "Acts/Material/ISurfaceMaterial.hpp"
 #include "Acts/Propagator/EigenStepper.hpp"
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
@@ -38,7 +36,6 @@
 #include "Acts/Visualization/IVisualization3D.hpp"
 
 #include <cmath>
-#include <fstream>
 #include <optional>
 #include <random>
 #include <sstream>
@@ -327,8 +324,9 @@ static inline std::string testMultiTrajectory(IVisualization3D& helper) {
       0., 0., 0., 0.01, 0., 0., 0., 0., 0., 0., 1.;
   Vector3 rPos(-350._mm, 100_um * gauss(generator), 100_um * gauss(generator));
   Vector3 rDir(1, 0.025 * gauss(generator), 0.025 * gauss(generator));
-  CurvilinearTrackParameters rStart(makeVector4(rPos, 42_ns), rDir, 1_e / 1_GeV,
-                                    cov, ParticleHypothesis::pion());
+  BoundTrackParameters rStart = BoundTrackParameters::makeCurvilinear(
+      makeVector4(rPos, 42_ns), rDir, 1_e / 1_GeV, cov,
+      ParticleHypothesis::pion());
 
   const Surface* rSurface = &rStart.referenceSurface();
 

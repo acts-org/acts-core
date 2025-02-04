@@ -9,7 +9,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Geometry/CuboidVolumeBuilder.hpp"
@@ -43,7 +42,6 @@
 #include <memory>
 #include <random>
 #include <string>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -260,8 +258,8 @@ BOOST_AUTO_TEST_CASE(VolumeMaterialMapper_comparison_tests) {
   // Set some start parameters
   Vector4 pos4(0., 0., 0., 42_ns);
   Vector3 dir(1., 0., 0.);
-  CurvilinearTrackParameters sctp(pos4, dir, 1 / 1_GeV, std::nullopt,
-                                  ParticleHypothesis::pion0());
+  BoundTrackParameters sctp = BoundTrackParameters::makeCurvilinear(
+      pos4, dir, 1 / 1_GeV, std::nullopt, ParticleHypothesis::pion0());
 
   MagneticFieldContext mc;
   // Launch propagation and gather result

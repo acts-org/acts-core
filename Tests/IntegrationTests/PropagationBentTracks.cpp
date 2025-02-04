@@ -15,7 +15,6 @@
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/detail/SteppingLogger.hpp"
-#include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Tests/CommonHelpers/CubicTrackingGeometry.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
@@ -52,9 +51,10 @@ std::vector<double> xPositionsOfPassedSurfaces(Acts::Navigator::Config navCfg,
 
   // Start a bit in the volume 2, so we do not have any boundary checking for
   // the volume transition in the log
-  Acts::CurvilinearTrackParameters start(
-      Acts::Vector4(0.01, 0, 0, 0), dir.normalized(), 1 / 1_GeV, std::nullopt,
-      Acts::ParticleHypothesis::pion());
+  Acts::BoundTrackParameters start =
+      Acts::BoundTrackParameters::makeCurvilinear(
+          Acts::Vector4(0.01, 0, 0, 0), dir.normalized(), 1 / 1_GeV,
+          std::nullopt, Acts::ParticleHypothesis::pion());
 
   Propagator::Options<
       Acts::ActorList<Acts::detail::SteppingLogger, Acts::EndOfWorldReached>>

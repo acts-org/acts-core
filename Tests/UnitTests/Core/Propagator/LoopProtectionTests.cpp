@@ -12,8 +12,6 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
-#include "Acts/EventData/ParticleHypothesis.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/MagneticField/ConstantBField.hpp"
@@ -27,16 +25,12 @@
 #include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/Result.hpp"
 
-#include <algorithm>
-#include <array>
 #include <cmath>
 #include <limits>
 #include <memory>
 #include <numbers>
-#include <optional>
 #include <random>
 #include <string>
-#include <tuple>
 #include <utility>
 
 namespace bdata = boost::unit_test::data;
@@ -195,8 +189,9 @@ BOOST_DATA_TEST_CASE(
   EigenPropagator epropagator(std::move(estepper));
 
   // define start parameters
-  CurvilinearTrackParameters start(Vector4(0, 0, 0, 42), phi, theta, q / p,
-                                   std::nullopt, ParticleHypothesis::pion());
+  BoundTrackParameters start = BoundTrackParameters::makeCurvilinear(
+      Vector4(0, 0, 0, 42), phi, theta, q / p, std::nullopt,
+      ParticleHypothesis::pion());
 
   using PropagatorOptions = EigenPropagator::Options<ActorList<>>;
   PropagatorOptions options(tgContext, mfContext);

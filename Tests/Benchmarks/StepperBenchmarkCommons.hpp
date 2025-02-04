@@ -108,8 +108,8 @@ struct BenchmarkStepper {
     if (withCov) {
       covOpt = cov;
     }
-    CurvilinearTrackParameters pars(pos4, dir, +1 / ptInGeV, covOpt,
-                                    ParticleHypothesis::pion());
+    BoundTrackParameters pars = BoundTrackParameters::makeCurvilinear(
+        pos4, dir, +1 / ptInGeV, covOpt, ParticleHypothesis::pion());
 
     double totalPathLength = 0;
     std::size_t numSteps = 0;

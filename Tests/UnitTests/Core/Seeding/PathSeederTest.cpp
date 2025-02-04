@@ -16,18 +16,12 @@
 #include "Acts/EventData/detail/TestSourceLink.hpp"
 #include "Acts/Geometry/CuboidVolumeBounds.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
-#include "Acts/MagneticField/ConstantBField.hpp"
-#include "Acts/Navigation/DetectorNavigator.hpp"
 #include "Acts/Navigation/DetectorVolumeFinders.hpp"
 #include "Acts/Navigation/InternalNavigation.hpp"
-#include "Acts/Propagator/EigenStepper.hpp"
-#include "Acts/Propagator/Propagator.hpp"
-#include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/Seeding/PathSeeder.hpp"
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
 #include "Acts/Surfaces/PlaneSurface.hpp"
 #include "Acts/Surfaces/RectangleBounds.hpp"
-#include "Acts/Tests/CommonHelpers/MeasurementsCreator.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <numbers>
@@ -39,8 +33,6 @@ using namespace Acts::UnitLiterals;
 
 using Axis = Acts::Axis<AxisType::Equidistant, AxisBoundaryType::Open>;
 using Grid = Acts::Grid<std::vector<SourceLink>, Axis, Axis>;
-
-using TrackParameters = CurvilinearTrackParameters;
 
 GeometryContext gctx;
 
@@ -68,8 +60,8 @@ class NoFieldIntersectionFinder {
   // length
   std::vector<std::pair<GeometryIdentifier, Vector2>> operator()(
       const GeometryContext& geoCtx,
-      const TrackParameters& trackParameters) const {
-    Vector3 position = trackParameters.position();
+      const BoundTrackParameters& trackParameters) const {
+    Vector3 position = trackParameters.position(geoCtx);
     Vector3 direction = trackParameters.direction();
 
     std::vector<std::pair<GeometryIdentifier, Vector2>> sIntersections;
@@ -121,7 +113,7 @@ class TrackEstimator {
   Vector3 m_ip;
   SourceLinkSurfaceAccessor m_surfaceAccessor;
 
-  std::pair<TrackParameters, TrackParameters> operator()(
+  std::pair<BoundTrackParameters, BoundTrackParameters> operator()(
       const GeometryContext& geoCtx, const SourceLink& pivot) const {
     auto testSourceLink = pivot.get<detail::Test::TestSourceLink>();
     Vector3 pivot3 = m_surfaceAccessor(pivot)->localToGlobal(
@@ -135,9 +127,11 @@ class TrackEstimator {
     double theta = Acts::VectorHelpers::theta(direction);
     ParticleHypothesis particle = ParticleHypothesis::electron();
 
-    TrackParameters ipParams(ip, phi, theta, qOverP, std::nullopt, particle);
-    TrackParameters firstLayerParams(ip, phi, theta, qOverP, std::nullopt,
-                                     particle);
+    BoundTrackParameters ipParams = BoundTrackParameters::makeCurvilinear(
+        ip, phi, theta, qOverP, std::nullopt, particle);
+    BoundTrackParameters firstLayerParams =
+        BoundTrackParameters::makeCurvilinear(ip, phi, theta, qOverP,
+                                              std::nullopt, particle);
 
     return {ipParams, firstLayerParams};
   }
@@ -312,9 +306,10 @@ std::vector<SourceLink> createSourceLinks(
 
   std::vector<SourceLink> sourceLinks;
   for (double phi : truePhis) {
-    TrackParameters trackParameters(trueVertex, phi, trueTheta, trueQOverP,
-                                    std::nullopt,
-                                    ParticleHypothesis::electron());
+    BoundTrackParameters trackParameters =
+        BoundTrackParameters::makeCurvilinear(trueVertex, phi, trueTheta,
+                                              trueQOverP, std::nullopt,
+                                              ParticleHypothesis::electron());
 
     auto intersections = intersectionFinder(geoCtx, trackParameters);
 

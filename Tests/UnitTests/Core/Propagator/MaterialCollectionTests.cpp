@@ -13,7 +13,6 @@
 #include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
@@ -24,21 +23,17 @@
 #include "Acts/Propagator/MaterialInteractor.hpp"
 #include "Acts/Propagator/Navigator.hpp"
 #include "Acts/Propagator/Propagator.hpp"
-#include "Acts/Propagator/StandardAborters.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Tests/CommonHelpers/CylindricalTrackingGeometry.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 
-#include <algorithm>
-#include <array>
 #include <cmath>
 #include <iostream>
 #include <memory>
 #include <numbers>
 #include <optional>
 #include <random>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -83,8 +78,7 @@ bool debugMode = false;
 /// @param prop is the propagator instance
 /// @param start the start parameters
 template <typename propagator_t>
-void runTest(const propagator_t& prop,
-             const CurvilinearTrackParameters& start) {
+void runTest(const propagator_t& prop, const BoundTrackParameters& start) {
   // Action list and abort list
   using ActorList = ActorList<MaterialInteractor>;
 
@@ -388,8 +382,8 @@ BOOST_DATA_TEST_CASE(
      0.5, 0, 0, 0, 1_e / 10_GeV, 0,
      0, 0, 0, 0, 0, 1_us;
   // clang-format on
-  CurvilinearTrackParameters start(Vector4(0, 0, 0, 0), phi, theta, q / p, cov,
-                                   ParticleHypothesis::pion());
+  BoundTrackParameters start = BoundTrackParameters::makeCurvilinear(
+      Vector4(0, 0, 0, 0), phi, theta, q / p, cov, ParticleHypothesis::pion());
 
   runTest(epropagator, start);
   runTest(slpropagator, start);

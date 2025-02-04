@@ -22,6 +22,7 @@
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Propagator/Navigator.hpp"
+#include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Tests/CommonHelpers/CubicTrackingGeometry.hpp"
@@ -290,9 +291,10 @@ struct FitterTester {
     // create a track near the tracker exit for outward->inward filtering
     Acts::Vector4 posOuter = start.fourPosition(geoCtx);
     posOuter[Acts::ePos0] = 3_m;
-    Acts::CurvilinearTrackParameters startOuter(
-        posOuter, start.direction(), start.qOverP(), start.covariance(),
-        Acts::ParticleHypothesis::pion());
+    Acts::BoundTrackParameters startOuter =
+        Acts::BoundTrackParameters::makeCurvilinear(
+            posOuter, start.direction(), start.qOverP(), start.covariance(),
+            Acts::ParticleHypothesis::pion());
 
     options.referenceSurface = &startOuter.referenceSurface();
     options.propagatorPlainOptions.direction = Acts::Direction::Backward();

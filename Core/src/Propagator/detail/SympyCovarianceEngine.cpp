@@ -18,8 +18,6 @@ namespace Acts::detail {
 /// Some type defs
 using Jacobian = BoundMatrix;
 using BoundState = std::tuple<BoundTrackParameters, Jacobian, double>;
-using CurvilinearState =
-    std::tuple<CurvilinearTrackParameters, Jacobian, double>;
 
 Result<BoundState> sympy::boundState(
     const GeometryContext& geoContext, const Surface& surface,
@@ -56,12 +54,14 @@ Result<BoundState> sympy::boundState(
       fullTransportJacobian, accumulatedPath);
 }
 
-CurvilinearState sympy::curvilinearState(
-    BoundSquareMatrix& boundCovariance, BoundMatrix& fullTransportJacobian,
-    FreeMatrix& freeTransportJacobian, FreeVector& freeToPathDerivatives,
-    BoundToFreeMatrix& boundToFreeJacobian, const FreeVector& freeParameters,
-    const ParticleHypothesis& particleHypothesis, bool covTransport,
-    double accumulatedPath) {
+BoundState sympy::curvilinearState(BoundSquareMatrix& boundCovariance,
+                                   BoundMatrix& fullTransportJacobian,
+                                   FreeMatrix& freeTransportJacobian,
+                                   FreeVector& freeToPathDerivatives,
+                                   BoundToFreeMatrix& boundToFreeJacobian,
+                                   const FreeVector& freeParameters,
+                                   const ParticleHypothesis& particleHypothesis,
+                                   bool covTransport, double accumulatedPath) {
   const Vector3& direction = freeParameters.segment<3>(eFreeDir0);
 
   // Covariance transport
@@ -82,9 +82,10 @@ CurvilinearState sympy::curvilinearState(
   pos4[ePos1] = freeParameters[eFreePos1];
   pos4[ePos2] = freeParameters[eFreePos2];
   pos4[eTime] = freeParameters[eFreeTime];
-  CurvilinearTrackParameters curvilinearParams(
-      pos4, direction, freeParameters[eFreeQOverP], std::move(cov),
-      particleHypothesis);
+  BoundTrackParameters curvilinearParams =
+      BoundTrackParameters::makeCurvilinear(pos4, direction,
+                                            freeParameters[eFreeQOverP],
+                                            std::move(cov), particleHypothesis);
   // Create the curvilinear state
   return {std::move(curvilinearParams), fullTransportJacobian, accumulatedPath};
 }

@@ -14,7 +14,6 @@
 #include "Acts/Definitions/TrackParametrization.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/EventData/GenericBoundTrackParameters.hpp"
-#include "Acts/EventData/GenericCurvilinearTrackParameters.hpp"
 #include "Acts/EventData/ParticleHypothesis.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/EventData/TransformationHelpers.hpp"
@@ -191,8 +190,9 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_state_test) {
   EigenStepper<>::Options esOptions(tgContext, mfContext);
 
   // Test charged parameters without covariance matrix
-  CurvilinearTrackParameters cp(makeVector4(pos, time), dir, charge / absMom,
-                                std::nullopt, ParticleHypothesis::pion());
+  BoundTrackParameters cp = BoundTrackParameters::makeCurvilinear(
+      makeVector4(pos, time), dir, charge / absMom, std::nullopt,
+      ParticleHypothesis::pion());
   EigenStepper<> es(bField);
   EigenStepper<>::State esState = es.makeState(esOptions, cp);
 
@@ -206,16 +206,18 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_state_test) {
   BOOST_CHECK_EQUAL(esState.previousStepSize, 0.);
 
   // Test without charge and covariance matrix
-  CurvilinearTrackParameters ncp(makeVector4(pos, time), dir, 1 / absMom,
-                                 std::nullopt, ParticleHypothesis::pion0());
+  BoundTrackParameters ncp = BoundTrackParameters::makeCurvilinear(
+      makeVector4(pos, time), dir, 1 / absMom, std::nullopt,
+      ParticleHypothesis::pion0());
   esOptions = EigenStepper<>::Options(tgContext, mfContext);
   esState = es.makeState(esOptions, ncp);
   BOOST_CHECK_EQUAL(es.charge(esState), 0.);
 
   // Test with covariance matrix
   Covariance cov = 8. * Covariance::Identity();
-  ncp = CurvilinearTrackParameters(makeVector4(pos, time), dir, 1 / absMom, cov,
-                                   ParticleHypothesis::pion0());
+  ncp = BoundTrackParameters::makeCurvilinear(makeVector4(pos, time), dir,
+                                              1 / absMom, cov,
+                                              ParticleHypothesis::pion0());
   esState = es.makeState(esOptions, ncp);
   BOOST_CHECK_NE(esState.jacToGlobal, BoundToFreeMatrix::Zero());
   BOOST_CHECK(esState.covTransport);
@@ -238,8 +240,9 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_test) {
   double absMom = 8.;
   double charge = -1.;
   Covariance cov = 8. * Covariance::Identity();
-  CurvilinearTrackParameters cp(makeVector4(pos, time), dir, charge / absMom,
-                                cov, ParticleHypothesis::pion());
+  BoundTrackParameters cp = BoundTrackParameters::makeCurvilinear(
+      makeVector4(pos, time), dir, charge / absMom, cov,
+      ParticleHypothesis::pion());
 
   EigenStepper<>::Options esOptions(tgContext, mfContext);
   esOptions.maxStepSize = stepSize;
@@ -333,9 +336,9 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_test) {
   double absMom2 = 8.5;
   double charge2 = 1.;
   BoundSquareMatrix cov2 = 8.5 * Covariance::Identity();
-  CurvilinearTrackParameters cp2(makeVector4(pos2, time2), dir2,
-                                 charge2 / absMom2, cov2,
-                                 ParticleHypothesis::pion());
+  BoundTrackParameters cp2 = BoundTrackParameters::makeCurvilinear(
+      makeVector4(pos2, time2), dir2, charge2 / absMom2, cov2,
+      ParticleHypothesis::pion());
   FreeVector freeParams = transformBoundToFreeParameters(
       cp2.referenceSurface(), tgContext, cp2.parameters());
   navDir = Direction::Forward();
@@ -572,8 +575,8 @@ BOOST_AUTO_TEST_CASE(step_extension_vacuum_test) {
   Covariance cov = Covariance::Identity();
   const Vector3 startDir = makeDirectionFromPhiTheta(0_degree, 90_degree);
   const Vector3 startMom = 1_GeV * startDir;
-  const CurvilinearTrackParameters sbtp(Vector4::Zero(), startDir, 1_e / 1_GeV,
-                                        cov, ParticleHypothesis::pion());
+  const BoundTrackParameters sbtp = BoundTrackParameters::makeCurvilinear(
+      Vector4::Zero(), startDir, 1_e / 1_GeV, cov, ParticleHypothesis::pion());
 
   using Stepper = EigenStepper<EigenStepperDenseExtension>;
   using Propagator = Propagator<Stepper, Navigator>;
@@ -667,8 +670,8 @@ BOOST_AUTO_TEST_CASE(step_extension_material_test) {
   Covariance cov = Covariance::Identity();
   const Vector3 startDir = makeDirectionFromPhiTheta(0_degree, 90_degree);
   const Vector3 startMom = 5_GeV * startDir;
-  const CurvilinearTrackParameters sbtp(Vector4::Zero(), startDir, 1_e / 5_GeV,
-                                        cov, ParticleHypothesis::pion());
+  const BoundTrackParameters sbtp = BoundTrackParameters::makeCurvilinear(
+      Vector4::Zero(), startDir, 1_e / 5_GeV, cov, ParticleHypothesis::pion());
 
   using Stepper = EigenStepper<EigenStepperDenseExtension>;
   using Propagator = Propagator<Stepper, Navigator>;
@@ -811,9 +814,9 @@ BOOST_AUTO_TEST_CASE(step_extension_vacmatvac_test) {
   Navigator naviDet({det, true, true, true});
 
   // Set initial parameters for the particle track
-  CurvilinearTrackParameters sbtp(Vector4::Zero(), 0_degree, 90_degree,
-                                  1_e / 5_GeV, Covariance::Identity(),
-                                  ParticleHypothesis::pion());
+  BoundTrackParameters sbtp = BoundTrackParameters::makeCurvilinear(
+      Vector4::Zero(), 0_degree, 90_degree, 1_e / 5_GeV, Covariance::Identity(),
+      ParticleHypothesis::pion());
 
   using Stepper = EigenStepper<EigenStepperDenseExtension>;
   using Propagator = Acts::Propagator<Stepper, Navigator>;
@@ -1044,9 +1047,9 @@ BOOST_AUTO_TEST_CASE(step_extension_trackercalomdt_test) {
   Navigator naviVac({detector, true, true, true});
 
   // Set initial parameters for the particle track
-  CurvilinearTrackParameters sbtp(Vector4::Zero(), 0_degree, 90_degree,
-                                  1_e / 1_GeV, Covariance::Identity(),
-                                  ParticleHypothesis::pion());
+  BoundTrackParameters sbtp = BoundTrackParameters::makeCurvilinear(
+      Vector4::Zero(), 0_degree, 90_degree, 1_e / 1_GeV, Covariance::Identity(),
+      ParticleHypothesis::pion());
 
   using Stepper = EigenStepper<EigenStepperDenseExtension>;
   using Propagator = Acts::Propagator<Stepper, Navigator>;
