@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_unittest(AlignmentContext AlignmentContextTests.cpp)
 add_unittest(ConeVolumeBounds ConeVolumeBoundsTests.cpp)
 add_unittest(ConeLayer ConeLayerTests.cpp)

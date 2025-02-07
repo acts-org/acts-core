@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Integration tests
 
 These are tests of large or multiple components of the library.

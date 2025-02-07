@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Generate a configuration file for the smearing digitizer
 
 As a convenience, a simple helper script is provided to help producing JSON configuration files for smearing digitization.

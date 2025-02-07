@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Acts Common Tracking Software
 
 or *A Common Tracking Software* if you do not like recursive acronyms

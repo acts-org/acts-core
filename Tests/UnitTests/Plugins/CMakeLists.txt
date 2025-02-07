@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_subdirectory_if(ActSVG ACTS_BUILD_PLUGIN_ACTSVG)
 add_subdirectory_if(Cuda ACTS_BUILD_PLUGIN_CUDA)
 add_subdirectory_if(Detray ACTS_BUILD_PLUGIN_TRACCC)

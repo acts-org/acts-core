@@ -1,0 +1,8 @@
+version = 1
+
+[[annotations]]
+path = ["codespell_ignore.txt", "ctest2junit.xsl", "fpe_masks/requirements.in", "clang_tidy/requirements.in"]
+precedence = "aggregate"
+SPDX-PackageName = "ACTS"
+SPDX-FileCopyrightText = "2016 CERN"
+SPDX-License-Identifier = "MPL-2.0"

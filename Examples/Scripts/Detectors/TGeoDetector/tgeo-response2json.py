@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # tgeo-response2json.py - convert TGeo response file options to ACTS v13.0.0 JSON format
 
 import sys

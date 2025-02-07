@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 import sys
 import os
 import subprocess

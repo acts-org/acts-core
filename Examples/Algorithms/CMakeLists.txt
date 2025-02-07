@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_subdirectory(Digitization)
 add_subdirectory_if(HepMC ACTS_BUILD_EXAMPLES_HEPMC3)
 add_subdirectory(Fatras)

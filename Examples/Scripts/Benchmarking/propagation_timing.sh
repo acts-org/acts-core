@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 #
 # This script runs the propagation test with different steppers and different pT bins
 #

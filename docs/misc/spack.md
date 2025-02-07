@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Building with Spack
 
 [Spack](https://spack.io/) is a package manager designed to handle software

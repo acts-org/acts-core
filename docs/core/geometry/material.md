@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Detector material description
 
 Two types of material description exist, one for a surface based material, one

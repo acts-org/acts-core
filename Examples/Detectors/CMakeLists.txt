@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_subdirectory(Common)
 add_subdirectory(ContextualDetector)
 add_subdirectory_if(DD4hepDetector ACTS_BUILD_EXAMPLES_DD4HEP)

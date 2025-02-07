@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 repos:
   - repo: https://github.com/pre-commit/mirrors-clang-format
     rev: 'v18.1.8'
@@ -40,14 +44,6 @@ repos:
         "-w"
       ]
       exclude: ^CI/.*$
-
-  - repo: local
-    hooks:
-    - id: license
-      name: license
-      language: system
-      entry: CI/check_license.py --fix
-      files: \.(cpp|hpp|ipp|cu|cuh)$
 
   - repo: local
     hooks:
@@ -103,3 +99,8 @@ repos:
       language: system
       entry: CI/check_math_macros.py
       files: \.(cpp|hpp|ipp|cu|cuh)$
+
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v5.0.2
+    hooks:
+    - id: reuse

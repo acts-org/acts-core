@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_unittest(Visualization3D Visualization3DTests.cpp)
 add_unittest(EventDataView3D EventDataView3DTests.cpp)
 add_unittest(Interpolation3D Interpolation3DTests.cpp)

@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # Acts compiler flags
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE

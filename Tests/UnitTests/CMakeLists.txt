@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # add a unittest executable w/ default dependencies and register it.
 
 # the common libraries which are linked to every unittest can be

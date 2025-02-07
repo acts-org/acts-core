@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 cmake_minimum_required(VERSION 3.14)
 
 # LCG sets CPATH, which gets treated like -I by the compiler. We want to ignore

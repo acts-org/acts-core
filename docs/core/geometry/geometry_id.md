@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Geometry identifier
 
 The {class}`Acts::GeometryIdentifier` is mainly used for fast identification of the type of

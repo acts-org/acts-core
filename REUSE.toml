@@ -1,0 +1,8 @@
+version = 1
+
+[[annotations]]
+path = ["version_number", "pytest.ini", "CITATION.cff", "**/*.patch", "sonar-project.properties", "CMakePresets.json", "CI/ssh_config", "AUTHORS", ".zenodo.json", "**/*.ipynb", "**/poetry.lock"]
+precedence = "aggregate"
+SPDX-PackageName = "ACTS"
+SPDX-FileCopyrightText = "2016 CERN"
+SPDX-License-Identifier = "MPL-2.0"

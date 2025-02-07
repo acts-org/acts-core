@@ -1,2 +1,6 @@
+// SPDX-PackageName: "ACTS"
+// SPDX-FileCopyrightText: 2016 CERN
+// SPDX-License-Identifier: MPL-2.0
+
 #define eigen_assert(x) assert(x)
 #include_next "Eigen/Dense"

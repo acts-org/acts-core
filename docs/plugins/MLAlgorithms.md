@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Machine learning algorithms
 
 ACTS allows you to replace some components of the tracking chain with machine-learning solutions.

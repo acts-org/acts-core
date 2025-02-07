@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 set(library_sources
     src/TGeoCylinderDiscSplitter.cpp
     src/TGeoDetectorElement.cpp

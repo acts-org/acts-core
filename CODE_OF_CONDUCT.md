@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Code Of Conduct
 
 The Acts project observes [CERN's Code of Conduct](https://cern.ch/codeofconduct).

@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # to be compatible with readthedocs.org, the documentation build is always
 # in-source; as opposed to the configurable out-of-source build directory for
 # the code. when running running on readthedocs.org, the build is fully driven

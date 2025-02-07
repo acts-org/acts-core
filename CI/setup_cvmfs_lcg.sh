@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # setup latest, supported LCG release via cvmfs
 
 if test -n "$BASH_SOURCE"; then

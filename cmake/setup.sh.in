@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # set up environment variables
 # the ${VAR:+:} part adds a double colon only if VAR is not empty
 export PATH="@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@${PATH:+:}${PATH}"

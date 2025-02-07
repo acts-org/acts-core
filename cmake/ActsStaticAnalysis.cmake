@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 if(ACTS_RUN_CLANG_TIDY)
     find_program(CLANG_TIDY_COMMAND NAMES clang-tidy)
     if(NOT CLANG_TIDY_COMMAND)

@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Particle hypothesis
 
 The *particle hypothesis* consists of the information about a particle necessary for accurate track reconstruction. This is the

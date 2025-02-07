@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Code guidelines
 
 The following guidelines must be followed by all new code. Existing code that does not yet follow should be adapted when possible.

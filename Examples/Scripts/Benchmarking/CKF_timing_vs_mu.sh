@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 #
 # This script runs the CombinatorialKalmanFitter(CKF) timing test at different pileup (mu) bins using ttbar events
 # To run the test:./CKF_timing_vs_mu.sh -d <detector> -b <bFieldMap> -n <numEvents>

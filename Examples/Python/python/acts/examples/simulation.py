@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 from typing import Optional, Union, Any, List
 from pathlib import Path
 from collections import namedtuple

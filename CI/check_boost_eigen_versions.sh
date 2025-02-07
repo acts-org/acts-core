@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 ## This script to be used only when building our own boost & eigen
 ## Also, this relies on Tests/DownstreamProject/ShowActsVersion.cpp
 

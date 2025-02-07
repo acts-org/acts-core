@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_unittest(GainMatrixSmoother GainMatrixSmootherTests.cpp)
 add_unittest(GainMatrixUpdater GainMatrixUpdaterTests.cpp)
 add_unittest(KalmanFitter KalmanFitterTests.cpp)

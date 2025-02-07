@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_unittest(FullBilloirVertexFitter FullBilloirVertexFitterTests.cpp)
 add_unittest(ImpactPointEstimator ImpactPointEstimatorTests.cpp)
 add_unittest(IterativeVertexFinder IterativeVertexFinderTests.cpp)

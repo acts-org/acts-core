@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 #
 # use scikit-hep/particle to generate c++ code for the particle data table.
 #
@@ -25,17 +30,9 @@ def main(output_file):
 
 
 CODE_HEADER = """\
-// This file is part of the ACTS project.
-//
-// Copyright (C) 2016 CERN for the benefit of the ACTS project
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
-// The entries within this file have been automatically created using the
-// particle data files from the 2019 edition of the Review of Particle Physics
-// by the Berkeley Particle Data Group.
+// SPDX-PackageName: "ACTS"
+//SPDX-FileCopyrightText: 2016 CERN
+// SPDX-License-Identifier: MPL-2.0
 
 #pragma once
 

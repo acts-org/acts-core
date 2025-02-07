@@ -1,3 +1,9 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2009 - 2010 Iowa State University
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: BSL-1.0
+# SPDX-License-Identifier: MPL-2.0
+
 # - Returns a version string from Git
 #
 # These functions force a re-configure on each git commit so that you can
@@ -30,11 +36,6 @@
 # 2009-2010 Ryan Pavlik <rpavlik@iastate.edu> <abiryan@ryand.net>
 # http://academic.cleardefinition.com
 # Iowa State University HCI Graduate Program/VRAC
-#
-# Copyright Iowa State University 2009-2010.
-# Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt)
 
 if(__get_git_revision_description)
     return()

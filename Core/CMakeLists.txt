@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 configure_file(
     ActsVersion.hpp.in
     ${CMAKE_CURRENT_BINARY_DIR}/Acts/ActsVersion.hpp

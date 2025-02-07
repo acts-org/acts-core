@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Profiling
 
 Software profiling allows you to inspect the performance of a piece of software, seeing where the bottlenecks are and how they can be improved.

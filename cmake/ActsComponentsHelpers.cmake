@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # Provide helper functions to simplify the handling of (optional) components
 #
 # Components must always be placed in a separate directory which can than

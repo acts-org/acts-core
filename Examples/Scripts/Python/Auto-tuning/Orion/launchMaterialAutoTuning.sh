@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # We first run a single batch of jobs using the geant4 material track as an input.
 # This will allow us to obtain a new material track file with the material associated with their respective surfaces.
 # This file is then move to the input directory using it will allow us to speed up the following mapping by 50%

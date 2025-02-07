@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 """
 (taken from https://github.com/zephyrproject-rtos/zephyr/blob/main/doc/_extensions/zephyr/warnings_filter.py)
 

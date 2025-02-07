@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # benchmarks tests are not registered with a common target
 # add an benchmark executable w/ default dependencies
 macro(add_benchmark _name)

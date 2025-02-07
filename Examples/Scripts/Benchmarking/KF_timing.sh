@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 #
 # This script runs the test of KalmanFitter timing vs. p at different eta
 # using particle gun particles

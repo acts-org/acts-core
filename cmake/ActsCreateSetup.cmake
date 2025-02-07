@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # Create a setup.sh file at the install prefix to setup the shell environment
 configure_file(
     ${CMAKE_CURRENT_LIST_DIR}/setup.sh.in

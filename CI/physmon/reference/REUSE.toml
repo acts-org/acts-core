@@ -1,0 +1,8 @@
+version = 1
+
+[[annotations]]
+path = ["**/*.root"]
+precedence = "aggregate"
+SPDX-PackageName = "ACTS"
+SPDX-FileCopyrightText = "2016 CERN"
+SPDX-License-Identifier = "MPL-2.0"

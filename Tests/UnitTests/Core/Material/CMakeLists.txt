@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_unittest(AccumulatedMaterialSlab AccumulatedMaterialSlabTests.cpp)
 add_unittest(AccumulatedSurfaceMaterial AccumulatedSurfaceMaterialTests.cpp)
 add_unittest(AccumulatedVolumeMaterial AccumulatedVolumeMaterialTests.cpp)

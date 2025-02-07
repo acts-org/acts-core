@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_unittest(AlgebraHelpersTests AlgebraHelpersTests.cpp)
 add_unittest(AnnealingUtility AnnealingUtilityTests.cpp)
 add_unittest(Axes AxesTests.cpp)

@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # Find the ONNX Runtime include directory and library.
 #
 # This module defines the `onnxruntime` imported target that encodes all

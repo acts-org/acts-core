@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_unittest(BoundTrackParameters BoundTrackParametersTests.cpp)
 add_unittest(Charge ChargeTests.cpp)
 add_unittest(CurvilinearTrackParameters CurvilinearTrackParametersTests.cpp)

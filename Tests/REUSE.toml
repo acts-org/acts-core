@@ -1,0 +1,8 @@
+version = 1
+
+[[annotations]]
+path = ["Data/**/*.root", "Data/**/*.json", "Data/**/*.csv", "UnitTests/Core/Seeding/sp.txt"]
+precedence = "aggregate"
+SPDX-PackageName = "ACTS"
+SPDX-FileCopyrightText = "2016 CERN"
+SPDX-License-Identifier = "MPL-2.0"

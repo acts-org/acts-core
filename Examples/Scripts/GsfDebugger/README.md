@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # GSF Debugger
 
 This is a (not so) tiny tool that should ease inspecting the very complicated GSF logs.

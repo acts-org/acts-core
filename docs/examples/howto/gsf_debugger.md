@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # GSF Debugger
 
 Python utility to visualize the `VERBOSE` log of a GSF track in ACTS. In general, the infrastructure could be used to also display tracks of other fitters with little adjustments.

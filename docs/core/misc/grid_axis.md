@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Grid and axis
 
 The `Grid` template class provides a generic binned `Grid` implementation in $N$ dimensions. `Grid` accepts a variadic list of `Axis` types, where the number of axes equals the number of desired dimensions of the `Grid`.

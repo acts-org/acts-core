@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 from pathlib import Path
 import os
 import sys
@@ -32,6 +36,7 @@ def main():
         "CI",
         "git",
         "cmake",
+        "LICENSES",
         ".git",
         ".github",
         ".idea",
@@ -41,6 +46,7 @@ def main():
         ".gitignore",
         "README.md",
         "CMakeLists.txt",
+        "REUSE.toml",
         # Filename not completed in source
         "vertexing_event_mu20_beamspot.csv",
         "vertexing_event_mu20_tracks.csv",

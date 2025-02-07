@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_library(ActsPluginLegacy INTERFACE)
 target_compile_features(ActsPluginLegacy INTERFACE cxx_std_17)
 target_include_directories(

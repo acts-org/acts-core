@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # Retrieve version identification.
 #
 # Must be included from the main CMakeLists file. Sets the following variables:

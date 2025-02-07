@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Geant4 plugin
 
 The Geant4 plugin allows to build {class}`Acts::TrackingGeometry` and {class}`Acts::Experimental::Detector` directly from Geant4 geometry input.

@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Layer classes
 
 The {class}`Acts::Layer` class is an extension of the {class}`Acts::Surface` class that allows the

@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 import pathlib, acts, acts.examples, acts.examples.itk
 from acts.examples.simulation import (
     addParticleGun,

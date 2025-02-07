@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Fatras
 
 Fatras is an ACTS implementation for fast track simulation which was primarily built to easily obtain hits from a tracking geometry.

@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_unittest(AtlasStepper AtlasStepperTests.cpp)
 add_unittest(ConstrainedStep ConstrainedStepTests.cpp)
 add_unittest(CovarianceEngine CovarianceEngineTests.cpp)

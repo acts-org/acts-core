@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 add_library(ActsExamplesDetectorDD4hep SHARED src/DD4hepDetector.cpp)
 
 target_include_directories(

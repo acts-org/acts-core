@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 set(FRNN_CXX_FLAGS "${TORCH_CXX_FLAGS}")
 
 if(CMAKE_COMPILER_IS_GNUCXX)

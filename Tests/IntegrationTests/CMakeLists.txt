@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # integration tests are different and should not be registered with the
 # preconfigured `tests` target. manually add a separate one.
 add_custom_target(integrationtests)

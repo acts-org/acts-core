@@ -1,3 +1,10 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2010 - 2012 Kitware, Inc.
+# SPDX-FileCopyrightText: 2012 Rolf Eike Beer
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: CC0-1.0
+# SPDX-License-Identifier: MPL-2.0
+
 # - Find ThreadingBuildingBlocks include dirs and libraries
 # Use this module by invoking find_package with the form:
 #  find_package(TBB
@@ -20,7 +27,7 @@
 #
 #  TBB_MALLOC_FOUND - system has TBB malloc library
 #  TBB_MALLOC_INCLUDE_DIRS - the TBB malloc include directories
-#  TBB_MALLOC_LIBRARIES - The TBB malloc libraries to be lined
+#  TBB_MALLOC_LIBRARIES - 2010-2012 Kitware, Inc.The TBB malloc libraries to be lined
 #  TBB::malloc - imported target for the TBB malloc library
 #
 #  TBB_MALLOC_PROXY_FOUND - system has TBB malloc proxy library

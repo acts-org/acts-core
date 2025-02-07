@@ -1,2 +1,6 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 numpy==1.26.3
 sympy==1.12

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 RET=0
 ERRORS=0
 

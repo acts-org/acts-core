@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 #
 # This script tests whether the output of a certain ACTS framework example is
 # reproducible between single-threaded and multi-threaded runs. For example,

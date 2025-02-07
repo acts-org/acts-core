@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # Provide helper macros to handle option interdependencies.
 #
 # Ensure an option is set if a condition is met. Can be used to encode

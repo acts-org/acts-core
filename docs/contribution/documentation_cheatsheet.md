@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Documentation Markdown Cheatsheet
 
 Below there are some snippets for creating documentation with the Myst Markdown parser.  Some examples might not work correctly locally if you did not build the full API documentation with `make docs-with-api`. Some links for further reading:

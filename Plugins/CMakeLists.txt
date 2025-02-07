@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # plugins are manually ordered such that dependent plugins appear after their
 # dependencies in the component list.
 # independent plugins

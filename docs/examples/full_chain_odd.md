@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # Walkthrough of the OpenDataDetector full chain example
 
 The OpenDataDetector (ODD) is fictitious silicon detector which resides in its own repository on [GitLab](https://gitlab.cern.ch/acts/OpenDataDetector). It is used for testing and as a performance baseline in ACTS.

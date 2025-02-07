@@ -1,3 +1,7 @@
+# SPDX-PackageName: "ACTS"
+# SPDX-FileCopyrightText: 2016 CERN
+# SPDX-License-Identifier: MPL-2.0
+
 # Find the Pythia8 includes and libraries.
 #
 # This module defines the `Pythia8` imported target that encodes all

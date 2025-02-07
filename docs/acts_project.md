@@ -1,3 +1,9 @@
+<!--
+SPDX-PackageName: "ACTS"
+SPDX-FileCopyrightText: 2016 CERN
+SPDX-License-Identifier: MPL-2.0
+-->
+
 # The ACTS project
 
 The *A Common Tracking Software (ACTS)* project is an attempt to preserve and evolve the track reconstruction software of the LHC era towards HL-LHC and beyond. It has been initiated in 2016 starting from the [ATLAS Common Tracking Software](https://gitlab.cern.ch/atlas/athena/-/tree/main/Tracking). Given the changing computing landscape, dedicated care of parallel code execution is taken, and is written in `C++20`.
