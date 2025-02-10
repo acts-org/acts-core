@@ -86,6 +86,7 @@ struct KalmanFitterFunctionImpl final : public TrackFitterFunction {
   Acts::GainMatrixUpdater kfUpdater;
   Acts::GainMatrixSmoother kfSmoother;
   SimpleReverseFilteringLogic reverseFilteringLogic;
+  double reverseFilteringCovarianceScaling = 1.0;
   SimpleOutlierFinder outlierFinder;
 
   bool multipleScattering = false;
@@ -127,6 +128,8 @@ struct KalmanFitterFunctionImpl final : public TrackFitterFunction {
     kfOptions.freeToBoundCorrection = freeToBoundCorrection;
     kfOptions.extensions.calibrator.connect<&calibrator_t::calibrate>(
         &calibrator);
+    kfOptions.reversedFilteringCovarianceScaling =
+        reverseFilteringCovarianceScaling;
 
     if (options.doRefit) {
       kfOptions.extensions.surfaceAccessor
@@ -172,6 +175,7 @@ ActsExamples::makeKalmanFitterFunction(
     std::shared_ptr<const Acts::MagneticFieldProvider> magneticField,
     bool multipleScattering, bool energyLoss,
     double reverseFilteringMomThreshold,
+    double reverseFilteringCovarianceScaling,
     Acts::FreeToBoundCorrection freeToBoundCorrection, double chi2Cut,
     const Acts::Logger& logger) {
   // Stepper should be copied into the fitters
@@ -204,6 +208,8 @@ ActsExamples::makeKalmanFitterFunction(
   fitterFunction->reverseFilteringLogic.momentumThreshold =
       reverseFilteringMomThreshold;
   fitterFunction->freeToBoundCorrection = freeToBoundCorrection;
+  fitterFunction->reverseFilteringCovarianceScaling =
+      reverseFilteringCovarianceScaling;
   fitterFunction->outlierFinder.chi2Cut = chi2Cut;
 
   return fitterFunction;

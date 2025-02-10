@@ -66,6 +66,7 @@ std::shared_ptr<TrackFitterFunction> makeKalmanFitterFunction(
     std::shared_ptr<const Acts::MagneticFieldProvider> magneticField,
     bool multipleScattering = true, bool energyLoss = true,
     double reverseFilteringMomThreshold = 0.0,
+    double reverseFilteringCovarianceScaling = 1.0,
     Acts::FreeToBoundCorrection freeToBoundCorrection =
         Acts::FreeToBoundCorrection(),
     double chi2Cut = std::numeric_limits<double>::infinity(),
@@ -90,6 +91,8 @@ enum class MixtureReductionAlgorithm { weightCut, KLDistance };
 /// parameters and covariance
 /// @param mixtureReductionAlgorithm How to reduce the number of components
 /// in a mixture
+/// @param reverseFilteringCovarianceScaling How the covariance matrices are
+/// inflated before the reverse filtering pass
 /// @param logger a logger instance
 std::shared_ptr<TrackFitterFunction> makeGsfFitterFunction(
     std::shared_ptr<const Acts::TrackingGeometry> trackingGeometry,
@@ -97,7 +100,7 @@ std::shared_ptr<TrackFitterFunction> makeGsfFitterFunction(
     BetheHeitlerApprox betheHeitlerApprox, std::size_t maxComponents,
     double weightCutoff, Acts::ComponentMergeMethod componentMergeMethod,
     MixtureReductionAlgorithm mixtureReductionAlgorithm,
-    const Acts::Logger& logger);
+    double reverseFilteringCovarianceScaling, const Acts::Logger& logger);
 
 /// Makes a fitter function object for the Global Chi Square Fitter (GX2F)
 ///
