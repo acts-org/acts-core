@@ -8,15 +8,23 @@
 
 #pragma once
 
+#include <system_error>
 #include <type_traits>
 
 namespace Acts {
 
-template <typename stepper_t>
-struct SupportsBoundParameters : public std::false_type {};
+enum class NavigatorError {
+  // ensure all values are non-zero
+  NotInsideExpectedVolume = 1,
+  NotOnExpectedSurface = 2,
+};
 
-template <typename stepper_t>
-constexpr bool SupportsBoundParameters_v =
-    SupportsBoundParameters<stepper_t>::value;
+std::error_code make_error_code(Acts::NavigatorError e);
 
 }  // namespace Acts
+
+// register with STL
+namespace std {
+template <>
+struct is_error_code_enum<Acts::NavigatorError> : std::true_type {};
+}  // namespace std

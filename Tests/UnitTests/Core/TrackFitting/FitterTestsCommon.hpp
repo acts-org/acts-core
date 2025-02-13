@@ -22,6 +22,7 @@
 #include "Acts/MagneticField/ConstantBField.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Propagator/Navigator.hpp"
+#include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/Surfaces/CurvilinearSurface.hpp"
 #include "Acts/Tests/CommonHelpers/CubicTrackingGeometry.hpp"

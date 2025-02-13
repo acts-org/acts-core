@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(TGeoParser_Pixel) {
     ObjVisualization3D objVis;
     for (auto& snode : tgpState.selectedNodes) {
       const auto& shape = *(snode.node->GetVolume()->GetShape());
-      const auto& transform = *(snode.transform.get());
+      const auto& transform = *snode.transform;
       auto [surface, thickness] =
           TGeoSurfaceConverter::toSurface(shape, transform, axes, scale);
       GeometryView3D::drawSurface(objVis, *surface, tgContext);
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(TGeoParser_Pixel_SelectInnermost) {
     ObjVisualization3D objVis;
     for (auto& snode : tgpState.selectedNodes) {
       const auto& shape = *(snode.node->GetVolume()->GetShape());
-      const auto& transform = *(snode.transform.get());
+      const auto& transform = *snode.transform;
       auto [surface, thickness] = TGeoSurfaceConverter::toSurface(
           shape, transform, axes, tgpOptions.unit);
       GeometryView3D::drawSurface(objVis, *surface, tgContext);

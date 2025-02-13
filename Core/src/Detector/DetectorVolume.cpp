@@ -100,7 +100,7 @@ Acts::Vector3 Acts::Experimental::DetectorVolume::center(
 
 const Acts::VolumeBounds& Acts::Experimental::DetectorVolume::volumeBounds()
     const {
-  return (*m_bounds.get());
+  return *m_bounds;
 }
 
 std::vector<std::shared_ptr<Acts::Experimental::Portal>>&
@@ -195,7 +195,7 @@ void Acts::Experimental::DetectorVolume::construct(
     const GeometryContext& gctx, const PortalGenerator& portalGenerator) {
   // Create portals with the given generator
   auto portalSurfaces =
-      portalGenerator(transform(gctx), *(m_bounds.get()), getSharedPtr());
+      portalGenerator(transform(gctx), *m_bounds, getSharedPtr());
   m_portals = ObjectStore<std::shared_ptr<Portal>>(portalSurfaces);
   createBoundingBox(gctx);
 }

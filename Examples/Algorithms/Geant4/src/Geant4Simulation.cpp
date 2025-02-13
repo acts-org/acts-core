@@ -93,7 +93,7 @@ void Geant4SimulationBase::commonInitialization() {
 }
 
 G4RunManager& Geant4SimulationBase::runManager() const {
-  return *m_geant4Instance->runManager.get();
+  return *m_geant4Instance->runManager;
 }
 
 Geant4::EventStore& Geant4SimulationBase::eventStore() const {

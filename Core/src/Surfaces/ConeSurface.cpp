@@ -177,7 +177,7 @@ Vector3 ConeSurface::normal(const GeometryContext& gctx,
 
 const ConeBounds& ConeSurface::bounds() const {
   // is safe because no constructor w/o bounds exists
-  return (*m_bounds.get());
+  return *m_bounds;
 }
 
 Polyhedron ConeSurface::polyhedronRepresentation(

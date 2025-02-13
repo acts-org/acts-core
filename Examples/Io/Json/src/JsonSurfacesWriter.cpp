@@ -109,7 +109,7 @@ void collectSurfaces(std::vector<SurfaceContainer::InputElement>& cSurfaces,
   // Step down into hierarchy to process all child volumnes
   if (volume.confinedVolumes()) {
     for (const auto& confined : volume.confinedVolumes()->arrayObjects()) {
-      collectSurfaces(cSurfaces, *confined.get(), writeLayer, writeApproach,
+      collectSurfaces(cSurfaces, *confined, writeLayer, writeApproach,
                       writeSensitive, writeBoundary);
     }
   }

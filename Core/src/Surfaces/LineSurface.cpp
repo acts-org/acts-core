@@ -132,7 +132,7 @@ Vector3 LineSurface::normal(const GeometryContext& gctx, const Vector3& pos,
 
 const SurfaceBounds& LineSurface::bounds() const {
   if (m_bounds) {
-    return (*m_bounds.get());
+    return *m_bounds;
   }
   return s_noBounds;
 }

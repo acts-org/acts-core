@@ -134,11 +134,13 @@ void testJacobianToGlobal(const Parameters& pars) {
   // a) ATLAS stepper
   AtlasStepperType astep(bField);
   AtlasStepperType::State astepState =
-      astep.makeState(AtlasStepperType::Options(tgContext, mfContext), pars);
+      astep.makeState(AtlasStepperType::Options(tgContext, mfContext));
+  astep.initialize(astepState, pars);
   // b) Eigen stepper
   EigenStepperType estep(bField);
   EigenStepperType::State estepState =
-      estep.makeState(EigenStepperType::Options(tgContext, mfContext), pars);
+      estep.makeState(EigenStepperType::Options(tgContext, mfContext));
+  estep.initialize(estepState, pars);
 
   // create the matrices
   auto asMatrix = convertToMatrix(astepState.pVector);

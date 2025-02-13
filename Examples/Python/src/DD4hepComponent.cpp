@@ -37,7 +37,8 @@ PYBIND11_MODULE(ActsPythonBindingsDD4hep, m) {
     auto f =
         py::class_<DD4hepDetector, Detector, std::shared_ptr<DD4hepDetector>>(
             m, "DD4hepDetector")
-            .def(py::init<const DD4hepDetector::Config&>());
+            .def(py::init<const DD4hepDetector::Config&>())
+            .def_property_readonly("field", &DD4hepDetector::field);
 
     auto c = py::class_<DD4hepDetector::Config>(f, "Config").def(py::init<>());
     ACTS_PYTHON_STRUCT_BEGIN(c, DD4hepDetector::Config);

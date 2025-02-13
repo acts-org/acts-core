@@ -269,7 +269,7 @@ ProtoLayerCreatorT<detector_element_t>::centralProtoLayers(
             m_cfg.centralModuleFrontsideStereo.at(icl) != 0.) {
           // twist by the stereo angle
           double stereo = m_cfg.centralModuleFrontsideStereo.at(icl);
-          (*mutableModuleTransform.get()) *=
+          (*mutableModuleTransform) *=
               Acts::AngleAxis3(-stereo, Acts::Vector3::UnitZ());
         }
         // count the modules
@@ -304,7 +304,7 @@ ProtoLayerCreatorT<detector_element_t>::centralProtoLayers(
           if (!m_cfg.centralModuleBacksideStereo.empty()) {
             // twist by the stereo angle
             double stereoBackSide = m_cfg.centralModuleBacksideStereo.at(icl);
-            (*mutableModuleTransform.get()) *=
+            (*mutableModuleTransform) *=
                 Acts::AngleAxis3(-stereoBackSide, Acts::Vector3::UnitZ());
           }
           // Finalize the transform
@@ -478,7 +478,7 @@ ProtoLayerCreatorT<detector_element_t>::createProtoLayers(
               // twist by the stereo angle
               double stereoBackSide =
                   m_cfg.posnegModuleBacksideStereo.at(ipnl).at(ipnR);
-              (*mutableModuleTransform.get()) *=
+              (*mutableModuleTransform) *=
                   Acts::AngleAxis3(-stereoBackSide, Acts::Vector3::UnitZ());
             }
             // Finalize the transform

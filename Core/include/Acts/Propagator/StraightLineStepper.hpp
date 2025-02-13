@@ -30,11 +30,12 @@
 #include "Acts/Utilities/Result.hpp"
 
 #include <cmath>
-#include <limits>
 #include <string>
 #include <tuple>
 
 namespace Acts {
+
+class IVolumeMaterial;
 
 /// @brief straight line stepper based on Surface intersection
 ///
@@ -114,48 +115,14 @@ class StraightLineStepper {
     StepperStatistics statistics;
   };
 
-  StraightLineStepper() = default;
+  State makeState(const Options& options) const;
 
-  State makeState(const Options& options,
-                  const BoundTrackParameters& par) const {
-    State state{options};
+  void initialize(State& state, const BoundTrackParameters& par) const;
 
-    state.particleHypothesis = par.particleHypothesis();
-
-    Vector3 position = par.position(options.geoContext);
-    Vector3 direction = par.direction();
-    state.pars.template segment<3>(eFreePos0) = position;
-    state.pars.template segment<3>(eFreeDir0) = direction;
-    state.pars[eFreeTime] = par.time();
-    state.pars[eFreeQOverP] = par.parameters()[eBoundQOverP];
-
-    // Init the jacobian matrix if needed
-    if (par.covariance()) {
-      // Get the reference surface for navigation
-      const auto& surface = par.referenceSurface();
-      // set the covariance transport flag to true and copy
-      state.covTransport = true;
-      state.cov = BoundSquareMatrix(*par.covariance());
-      state.jacToGlobal =
-          surface.boundToFreeJacobian(options.geoContext, position, direction);
-    }
-
-    state.stepSize = ConstrainedStep(options.maxStepSize);
-
-    return state;
-  }
-
-  /// @brief Resets the state
-  ///
-  /// @param [in, out] state State of the stepper
-  /// @param [in] boundParams Parameters in bound parametrisation
-  /// @param [in] cov Covariance matrix
-  /// @param [in] surface The reset @c State will be on this surface
-  /// @param [in] stepSize Step size
-  void resetState(
-      State& state, const BoundVector& boundParams,
-      const BoundSquareMatrix& cov, const Surface& surface,
-      const double stepSize = std::numeric_limits<double>::max()) const;
+  void initialize(State& state, const BoundVector& boundParams,
+                  const std::optional<BoundMatrix>& cov,
+                  ParticleHypothesis particleHypothesis,
+                  const Surface& surface) const;
 
   /// Get the field for the stepping, this gives back a zero field
   Result<Vector3> getField(State& /*state*/, const Vector3& /*pos*/) const {
@@ -315,28 +282,24 @@ class StraightLineStepper {
   /// Compute path length derivatives in case they have not been computed
   /// yet, which is the case if no step has been executed yet.
   ///
-  /// @param [in, out] prop_state State that will be presented as @c BoundState
-  /// @param [in] navigator the navigator of the propagation
+  /// @param [in, out] state The stepping state (thread-local cache)
   /// @return true if nothing is missing after this call, false otherwise.
-  template <typename propagator_state_t, typename navigator_t>
-  bool prepareCurvilinearState(
-      [[maybe_unused]] propagator_state_t& prop_state,
-      [[maybe_unused]] const navigator_t& navigator) const {
+  bool prepareCurvilinearState(State& state) const {
     // test whether the accumulated path has still its initial value.
-    if (prop_state.stepping.pathAccumulated == 0.) {
-      // dr/ds :
-      prop_state.stepping.derivative.template head<3>() =
-          direction(prop_state.stepping);
-      // dt / ds
-      prop_state.stepping.derivative(eFreeTime) =
-          fastHypot(1., prop_state.stepping.particleHypothesis.mass() /
-                            absoluteMomentum(prop_state.stepping));
-      // d (dr/ds) / ds : == 0
-      prop_state.stepping.derivative.template segment<3>(4) =
-          Acts::Vector3::Zero().transpose();
-      // d qop / ds  == 0
-      prop_state.stepping.derivative(eFreeQOverP) = 0.;
+    if (state.pathAccumulated != 0) {
+      return true;
     }
+
+    // dr/ds :
+    state.derivative.template head<3>() = direction(state);
+    // dt / ds
+    state.derivative(eFreeTime) = fastHypot(
+        1., state.particleHypothesis.mass() / absoluteMomentum(state));
+    // d (dr/ds) / ds : == 0
+    state.derivative.template segment<3>(4) = Acts::Vector3::Zero().transpose();
+    // d qop / ds  == 0
+    state.derivative(eFreeQOverP) = 0.;
+
     return true;
   }
 
@@ -401,62 +364,62 @@ class StraightLineStepper {
 
   /// Perform a straight line propagation step
   ///
-  /// @param [in,out] state is the propagation state associated with the track
-  /// parameters that are being propagated.
-  ///                The state contains the desired step size,
-  ///                it can be negative during backwards track propagation,
-  ///                and since we're using an adaptive algorithm, it can
-  ///                be modified by the stepper class during propagation.
+  /// @param [in,out] state State of the stepper
+  /// @param propDir is the direction of propagation
+  /// @param material is the optional volume material we are stepping through.
+  //         This is simply ignored if `nullptr`.
+  /// @return the result of the step
   ///
-  /// @return the step size taken
-  template <typename propagator_state_t, typename navigator_t>
-  Result<double> step(propagator_state_t& state,
-                      const navigator_t& /*navigator*/) const {
+  /// @note The state contains the desired step size. It can be negative during
+  ///       backwards track propagation.
+  Result<double> step(State& state, Direction propDir,
+                      const IVolumeMaterial* material) const {
+    (void)material;
+
     // use the adjusted step size
-    const auto h = state.stepping.stepSize.value() * state.options.direction;
-    const auto m = state.stepping.particleHypothesis.mass();
-    const auto p = absoluteMomentum(state.stepping);
+    const auto h = state.stepSize.value() * propDir;
+    const auto m = state.particleHypothesis.mass();
+    const auto p = absoluteMomentum(state);
     // time propagates along distance as 1/b = sqrt(1 + m²/p²)
     const auto dtds = fastHypot(1., m / p);
     // Update the track parameters according to the equations of motion
-    Vector3 dir = direction(state.stepping);
-    state.stepping.pars.template segment<3>(eFreePos0) += h * dir;
-    state.stepping.pars[eFreeTime] += h * dtds;
+    Vector3 dir = direction(state);
+    state.pars.template segment<3>(eFreePos0) += h * dir;
+    state.pars[eFreeTime] += h * dtds;
 
     // Propagate the jacobian
-    if (state.stepping.covTransport) {
+    if (state.covTransport) {
       // The step transport matrix in global coordinates
       FreeMatrix D = FreeMatrix::Identity();
       D.block<3, 3>(0, 4) = ActsSquareMatrix<3>::Identity() * h;
       // Extend the calculation by the time propagation
       // Evaluate dt/dlambda
-      D(3, 7) = h * m * m * state.stepping.pars[eFreeQOverP] / dtds;
+      D(3, 7) = h * m * m * state.pars[eFreeQOverP] / dtds;
       // Set the derivative factor the time
-      state.stepping.derivative(3) = dtds;
+      state.derivative(3) = dtds;
       // Update jacobian and derivative
-      state.stepping.jacTransport = D * state.stepping.jacTransport;
-      state.stepping.derivative.template head<3>() = dir;
+      state.jacTransport = D * state.jacTransport;
+      state.derivative.template head<3>() = dir;
     }
 
     // state the path length
-    state.stepping.pathAccumulated += h;
-    ++state.stepping.nSteps;
-    ++state.stepping.nStepTrials;
+    state.pathAccumulated += h;
+    ++state.nSteps;
+    ++state.nStepTrials;
 
-    ++state.stepping.statistics.nAttemptedSteps;
-    ++state.stepping.statistics.nSuccessfulSteps;
-    if (state.options.direction != Direction::fromScalarZeroAsPositive(h)) {
-      ++state.stepping.statistics.nReverseSteps;
+    ++state.statistics.nAttemptedSteps;
+    ++state.statistics.nSuccessfulSteps;
+    if (propDir != Direction::fromScalarZeroAsPositive(h)) {
+      ++state.statistics.nReverseSteps;
     }
-    state.stepping.statistics.pathLength += h;
-    state.stepping.statistics.absolutePathLength += std::abs(h);
+    state.statistics.pathLength += h;
+    state.statistics.absolutePathLength += std::abs(h);
 
     return h;
   }
 };
 
-template <typename navigator_t>
-struct SupportsBoundParameters<StraightLineStepper, navigator_t>
-    : public std::true_type {};
+template <>
+struct SupportsBoundParameters<StraightLineStepper> : public std::true_type {};
 
 }  // namespace Acts

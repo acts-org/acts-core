@@ -74,6 +74,9 @@ void addGeoModel(Context& ctx) {
     ACTS_PYTHON_MEMBER(path);
     ACTS_PYTHON_MEMBER(logLevel);
     ACTS_PYTHON_STRUCT_END();
+
+    // patch the constructor
+    patchKwargsConstructor(c);
   }
 
   // Shape converters

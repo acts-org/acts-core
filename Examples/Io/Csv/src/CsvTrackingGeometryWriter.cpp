@@ -351,9 +351,8 @@ void writeVolume(SurfaceWriter& sfWriter, SurfaceGridWriter& sfGridWriter,
   // step down into hierarchy to process all child volumnes
   if (volume.confinedVolumes()) {
     for (const auto& confined : volume.confinedVolumes()->arrayObjects()) {
-      writeVolume(sfWriter, sfGridWriter, lvWriter, *confined.get(),
-                  writeSensitive, writeBoundary, writeSurfaceGrid,
-                  writeLayerVolume, geoCtx);
+      writeVolume(sfWriter, sfGridWriter, lvWriter, *confined, writeSensitive,
+                  writeBoundary, writeSurfaceGrid, writeLayerVolume, geoCtx);
     }
   }
 }

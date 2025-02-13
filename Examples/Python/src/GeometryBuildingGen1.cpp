@@ -58,6 +58,8 @@ void addGeometryBuildingGen1(Context &ctx) {
     ACTS_PYTHON_MEMBER(surfaceArrayCreator);
     ACTS_PYTHON_MEMBER(cylinderZtolerance);
     ACTS_PYTHON_MEMBER(cylinderPhiTolerance);
+    ACTS_PYTHON_MEMBER(defaultEnvelopeR);
+    ACTS_PYTHON_MEMBER(defaultEnvelopeZ);
     ACTS_PYTHON_STRUCT_END();
   }
 

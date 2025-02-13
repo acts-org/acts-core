@@ -13,6 +13,7 @@
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Geometry/TrackingVolume.hpp"
 #include "Acts/Propagator/NavigationTarget.hpp"
+#include "Acts/Propagator/NavigatorError.hpp"
 #include "Acts/Propagator/NavigatorOptions.hpp"
 #include "Acts/Propagator/NavigatorStatistics.hpp"
 #include "Acts/Surfaces/BoundaryTolerance.hpp"
@@ -226,8 +227,6 @@ class Navigator {
 
   State makeState(const Options& options) const {
     State state(options);
-    state.startSurface = options.startSurface;
-    state.targetSurface = options.targetSurface;
     return state;
   }
 
@@ -262,22 +261,27 @@ class Navigator {
     return state.navigationBreak;
   }
 
-  /// @brief Initialize the navigator
+  /// @brief Initialize the navigator state
   ///
-  /// This function initializes the navigator for a new propagation.
+  /// This function initializes the navigator state for a new propagation.
   ///
   /// @param state The navigation state
   /// @param position The start position
   /// @param direction The start direction
   /// @param propagationDirection The propagation direction
-  void initialize(State& state, const Vector3& position,
-                  const Vector3& direction,
-                  Direction propagationDirection) const {
+  ///
+  /// @return Indication if the initialization was successful
+  [[nodiscard]] Result<void> initialize(State& state, const Vector3& position,
+                                        const Vector3& direction,
+                                        Direction propagationDirection) const {
     (void)propagationDirection;
 
     ACTS_VERBOSE(volInfo(state) << "Initialization.");
 
     state.reset();
+
+    state.startSurface = state.options.startSurface;
+    state.targetSurface = state.options.targetSurface;
 
     // Fast Navigation initialization for start condition:
     // - short-cut through object association, saves navigation in the
@@ -325,9 +329,16 @@ class Navigator {
     if (state.currentVolume != nullptr) {
       ACTS_VERBOSE(volInfo(state) << "Start volume resolved "
                                   << state.currentVolume->geometryId());
-      assert(state.currentVolume->inside(position,
-                                         state.options.surfaceTolerance) &&
-             "We did not end up inside the volume.");
+
+      if (!state.currentVolume->inside(position,
+                                       state.options.surfaceTolerance)) {
+        ACTS_DEBUG(
+            volInfo(state)
+            << "We did not end up inside the expected volume. position = "
+            << position.transpose());
+
+        return Result<void>::failure(NavigatorError::NotInsideExpectedVolume);
+      }
     }
     if (state.currentLayer != nullptr) {
       ACTS_VERBOSE(volInfo(state) << "Start layer resolved "
@@ -336,12 +347,21 @@ class Navigator {
     if (state.currentSurface != nullptr) {
       ACTS_VERBOSE(volInfo(state) << "Start surface resolved "
                                   << state.currentSurface->geometryId());
-      assert(state.currentSurface->isOnSurface(
-                 state.options.geoContext, position, direction,
-                 BoundaryTolerance::Infinite(),
-                 state.options.surfaceTolerance) &&
-             "Stepper not on surface");
+
+      if (!state.currentSurface->isOnSurface(
+              state.options.geoContext, position, direction,
+              BoundaryTolerance::Infinite(), state.options.surfaceTolerance)) {
+        ACTS_DEBUG(volInfo(state)
+                   << "We did not end up on the expected surface. surface = "
+                   << state.currentSurface->geometryId()
+                   << " position = " << position.transpose()
+                   << " direction = " << direction.transpose());
+
+        return Result<void>::failure(NavigatorError::NotOnExpectedSurface);
+      }
     }
+
+    return Result<void>::success();
   }
 
   /// @brief Get the next target surface

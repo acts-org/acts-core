@@ -70,7 +70,7 @@ repos:
     - id: type_t
       name: type_t
       language: system
-      entry: CI/check_type_t.py
+      entry: CI/check_type_t.py --fix
       files: \.(cpp|hpp|ipp|cu|cuh)$
 
   - repo: local

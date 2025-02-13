@@ -57,6 +57,10 @@ Acts::MutableLayerPtr Acts::LayerCreator::cylinderLayer(
     const Transform3& transform, std::unique_ptr<ApproachDescriptor> ad) const {
   ProtoLayer protoLayer =
       _protoLayer ? *_protoLayer : ProtoLayer(gctx, surfaces);
+  if (!_protoLayer) {
+    protoLayer.envelope[AxisDirection::AxisR] = m_cfg.defaultEnvelopeR;
+    protoLayer.envelope[AxisDirection::AxisZ] = m_cfg.defaultEnvelopeZ;
+  }
 
   // Remaining layer parameters - they include the envelopes
   double layerR = protoLayer.medium(AxisDirection::AxisR);
@@ -130,6 +134,10 @@ Acts::MutableLayerPtr Acts::LayerCreator::cylinderLayer(
     const Transform3& transform, std::unique_ptr<ApproachDescriptor> ad) const {
   ProtoLayer protoLayer =
       _protoLayer ? *_protoLayer : ProtoLayer(gctx, surfaces);
+  if (!_protoLayer) {
+    protoLayer.envelope[AxisDirection::AxisR] = m_cfg.defaultEnvelopeR;
+    protoLayer.envelope[AxisDirection::AxisZ] = m_cfg.defaultEnvelopeZ;
+  }
 
   // remaining layer parameters
   double layerR = protoLayer.medium(AxisDirection::AxisR);
@@ -204,6 +212,10 @@ Acts::MutableLayerPtr Acts::LayerCreator::discLayer(
     const Transform3& transform, std::unique_ptr<ApproachDescriptor> ad) const {
   ProtoLayer protoLayer =
       _protoLayer ? *_protoLayer : ProtoLayer(gctx, surfaces);
+  if (!_protoLayer) {
+    protoLayer.envelope[AxisDirection::AxisR] = m_cfg.defaultEnvelopeR;
+    protoLayer.envelope[AxisDirection::AxisZ] = m_cfg.defaultEnvelopeZ;
+  }
 
   double layerZ = protoLayer.medium(AxisDirection::AxisZ);
   double layerThickness = protoLayer.range(AxisDirection::AxisZ);
@@ -270,6 +282,10 @@ Acts::MutableLayerPtr Acts::LayerCreator::discLayer(
     const Transform3& transform, std::unique_ptr<ApproachDescriptor> ad) const {
   ProtoLayer protoLayer =
       _protoLayer ? *_protoLayer : ProtoLayer(gctx, surfaces);
+  if (!_protoLayer) {
+    protoLayer.envelope[AxisDirection::AxisR] = m_cfg.defaultEnvelopeR;
+    protoLayer.envelope[AxisDirection::AxisZ] = m_cfg.defaultEnvelopeZ;
+  }
 
   double layerZ = protoLayer.medium(AxisDirection::AxisZ);
   double layerThickness = protoLayer.range(AxisDirection::AxisZ);
@@ -334,6 +350,10 @@ Acts::MutableLayerPtr Acts::LayerCreator::planeLayer(
     std::unique_ptr<ApproachDescriptor> ad) const {
   ProtoLayer protoLayer =
       _protoLayer ? *_protoLayer : ProtoLayer(gctx, surfaces);
+  if (!_protoLayer) {
+    protoLayer.envelope[AxisDirection::AxisR] = m_cfg.defaultEnvelopeR;
+    protoLayer.envelope[AxisDirection::AxisZ] = m_cfg.defaultEnvelopeZ;
+  }
 
   // remaining layer parameters
   double layerHalf1 = 0, layerHalf2 = 0, layerThickness = 0;

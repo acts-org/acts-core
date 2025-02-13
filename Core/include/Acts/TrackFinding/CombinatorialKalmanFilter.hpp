@@ -21,13 +21,12 @@
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Propagator/ActorList.hpp"
 #include "Acts/Propagator/ConstrainedStep.hpp"
+#include "Acts/Propagator/PropagatorState.hpp"
 #include "Acts/Propagator/StandardAborters.hpp"
 #include "Acts/Propagator/detail/LoopProtection.hpp"
 #include "Acts/Propagator/detail/PointwiseMaterialInteraction.hpp"
 #include "Acts/TrackFinding/CombinatorialKalmanFilterError.hpp"
 #include "Acts/TrackFinding/CombinatorialKalmanFilterExtensions.hpp"
-#include "Acts/TrackFinding/TrackStateCreator.hpp"
-#include "Acts/TrackFitting/detail/VoidFitterComponents.hpp"
 #include "Acts/Utilities/CalibrationContext.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "Acts/Utilities/Result.hpp"
@@ -35,7 +34,6 @@
 #include <functional>
 #include <limits>
 #include <memory>
-#include <optional>
 #include <type_traits>
 
 namespace Acts {
@@ -372,20 +370,22 @@ class CombinatorialKalmanFilter {
                    << currentBranch.tipIndex());
 
       // Reset the stepping state
-      stepper.resetState(state.stepping, currentState.filtered(),
+      stepper.initialize(state.stepping, currentState.filtered(),
                          currentState.filteredCovariance(),
-                         currentState.referenceSurface(),
-                         state.options.stepping.maxStepSize);
+                         stepper.particleHypothesis(state.stepping),
+                         currentState.referenceSurface());
 
       // Reset the navigation state
       // Set targetSurface to nullptr for forward filtering
-      auto navigationOptions = state.navigation.options;
-      navigationOptions.startSurface = &currentState.referenceSurface();
-      navigationOptions.targetSurface = nullptr;
-      state.navigation = navigator.makeState(navigationOptions);
-      navigator.initialize(state.navigation, stepper.position(state.stepping),
-                           stepper.direction(state.stepping),
-                           state.options.direction);
+      state.navigation.options.startSurface = &currentState.referenceSurface();
+      state.navigation.options.targetSurface = nullptr;
+      auto navInitRes = navigator.initialize(
+          state.navigation, stepper.position(state.stepping),
+          stepper.direction(state.stepping), state.options.direction);
+      if (!navInitRes.ok()) {
+        ACTS_ERROR("Navigation initialization failed: " << navInitRes.error());
+        result.lastError = navInitRes.error();
+      }
 
       // No Kalman filtering for the starting surface, but still need
       // to consider the material effects here
@@ -873,9 +873,17 @@ class CombinatorialKalmanFilter {
     combKalmanActor.m_extensions = tfOptions.extensions;
 
     auto propState =
-        m_propagator.template makeState<start_parameters_t, PropagatorOptions,
-                                        StubPathLimitReached>(initialParameters,
-                                                              propOptions);
+        m_propagator
+            .template makeState<PropagatorOptions, StubPathLimitReached>(
+                propOptions);
+
+    auto initResult = m_propagator.template initialize<
+        decltype(propState), start_parameters_t, StubPathLimitReached>(
+        propState, initialParameters);
+    if (!initResult.ok()) {
+      ACTS_ERROR("Propagation initialization failed: " << initResult.error());
+      return initResult.error();
+    }
 
     auto& r =
         propState

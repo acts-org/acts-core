@@ -413,8 +413,24 @@ class Result<void, E> {
   /// @return Reference to the error
   E error() && noexcept { return std::move(m_opt.value()); }
 
+  void value() const { checkValueAccess(); }
+
  private:
   std::optional<E> m_opt;
+
+  void checkValueAccess() const {
+    if (m_opt.has_value()) {
+      if constexpr (std::is_same_v<E, std::error_code>) {
+        std::stringstream ss;
+        const auto& e = m_opt.value();
+        ss << "Value called on error value: " << e.category().name() << ": "
+           << e.message() << " [" << e.value() << "]";
+        throw std::runtime_error(ss.str());
+      } else {
+        throw std::runtime_error("Value called on error value");
+      }
+    }
+  }
 };
 
 }  // namespace Acts

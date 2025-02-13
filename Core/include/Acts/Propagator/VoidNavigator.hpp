@@ -13,9 +13,12 @@
 #include "Acts/Propagator/NavigationTarget.hpp"
 #include "Acts/Propagator/NavigatorOptions.hpp"
 #include "Acts/Propagator/NavigatorStatistics.hpp"
+#include "Acts/Utilities/Result.hpp"
 
 namespace Acts {
 
+class TrackingVolume;
+class IVolumeMaterial;
 class Surface;
 
 /// @brief A navigator that does nothing
@@ -56,16 +59,24 @@ class VoidNavigator {
     return nullptr;
   }
 
+  const TrackingVolume* currentVolume(const State& /*state*/) const {
+    return nullptr;
+  }
+
+  const IVolumeMaterial* currentVolumeMaterial(const State& /*state*/) const {
+    return nullptr;
+  }
+
   const Surface* startSurface(const State& /*state*/) const { return nullptr; }
 
   const Surface* targetSurface(const State& /*state*/) const { return nullptr; }
 
   bool navigationBreak(const State& /*state*/) const { return true; }
 
-  void initialize(State& /*state*/, const Vector3& /*position*/,
-                  const Vector3& /*direction*/,
-                  Direction /*propagationDirection*/) const {
-    return;
+  [[nodiscard]] Result<void> initialize(
+      State& /*state*/, const Vector3& /*position*/,
+      const Vector3& /*direction*/, Direction /*propagationDirection*/) const {
+    return Result<void>::success();
   }
 
   NavigationTarget nextTarget(State& /*state*/, const Vector3& /*position*/,

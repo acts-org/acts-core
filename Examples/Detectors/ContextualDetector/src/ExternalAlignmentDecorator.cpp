@@ -26,7 +26,7 @@ ExternalAlignmentDecorator::ExternalAlignmentDecorator(
     : m_cfg(cfg), m_logger(std::move(logger)) {
   if (m_cfg.trackingGeometry != nullptr) {
     // parse and populate
-    parseGeometry(*m_cfg.trackingGeometry.get());
+    parseGeometry(*m_cfg.trackingGeometry);
   }
 }
 

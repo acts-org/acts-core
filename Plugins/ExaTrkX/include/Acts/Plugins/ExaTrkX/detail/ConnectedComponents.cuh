@@ -38,6 +38,7 @@ __global__ void labelConnectedComponents(std::size_t numEdges,
     labelsNext[i] = i;
   }
 
+  __syncthreads();
   bool changed = false;
 
   do {

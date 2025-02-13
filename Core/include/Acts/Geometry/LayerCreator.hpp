@@ -51,8 +51,10 @@ class LayerCreator {
     double cylinderZtolerance{10.};
     /// cylinder module phi tolerance: it counts as same phi, if ...
     double cylinderPhiTolerance{0.1};
-    /// standard constructor
-    Config() = default;
+    /// Default z envelope. Can be overridden by proto layer
+    Envelope defaultEnvelopeZ = zeroEnvelope;
+    /// Default r envelope. Can be overridden by proto layer
+    Envelope defaultEnvelopeR = zeroEnvelope;
   };
 
   /// Constructor

@@ -73,7 +73,7 @@ class GeoModelBlueprintCreater {
         throw std::runtime_error(
             "GeoModelBlueprintCreater::Blueprint: No top node created");
       }
-      return *(topNode.get());
+      return *topNode;
     }
   };
 

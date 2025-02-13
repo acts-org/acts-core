@@ -12,6 +12,7 @@
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
 #include "Acts/Material/IMaterialDecorator.hpp"
+#include "Acts/Plugins/DD4hep/DD4hepFieldAdapter.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "ActsExamples/DetectorCommons/Detector.hpp"
@@ -83,6 +84,10 @@ class DD4hepDetector : public Detector {
 
   /// Interface method to access to the DD4hep geometry
   dd4hep::Detector& dd4hepDetector();
+
+  /// @brief Access to the DD4hep field
+  /// @return a shared pointer to the DD4hep field
+  std::shared_ptr<Acts::DD4hepFieldAdapter> field() const;
 
   /// Interface method to Access the TGeo geometry
   /// @return The world TGeoNode (physical volume)

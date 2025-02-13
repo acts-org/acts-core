@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <limits>
 
@@ -21,7 +22,7 @@
 // within all column arrays.
 
 static constexpr std::uint32_t kParticlesCount = 6502u;
-static const std::int32_t kParticlesPdgNumber[kParticlesCount] = {
+static const std::array<std::int32_t, kParticlesCount> kParticlesPdgNumber = {
     // Og294~
     -1001182940,
     // Ts294~
@@ -13027,7 +13028,7 @@ static const std::int32_t kParticlesPdgNumber[kParticlesCount] = {
     // Og294
     1001182940,
 };
-static const std::int16_t kParticlesThreeCharge[kParticlesCount] = {
+static const std::array<std::int16_t, kParticlesCount> kParticlesThreeCharge = {
     // Og294~
     -354,
     // Ts294~
@@ -26033,7 +26034,7 @@ static const std::int16_t kParticlesThreeCharge[kParticlesCount] = {
     // Og294
     354,
 };
-static const float kParticlesMassMeV[kParticlesCount] = {
+static const std::array<float, kParticlesCount> kParticlesMassMeV = {
     // Og294~
     0.0f,
     // Ts294~
@@ -39039,7 +39040,7 @@ static const float kParticlesMassMeV[kParticlesCount] = {
     // Og294
     0.0f,
 };
-static const char* const kParticlesName[kParticlesCount] = {
+static const std::array<const char* const, kParticlesCount> kParticlesName = {
     "Og294~",
     "Ts294~",
     "Lv293~",

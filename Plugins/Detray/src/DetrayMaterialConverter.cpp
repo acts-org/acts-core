@@ -108,7 +108,6 @@ Acts::DetrayMaterialConverter::convertHomogeneousSurfaceMaterial(
                                                       << " not found in cache");
     }
   }
-
   return materialPayload;
 }
 

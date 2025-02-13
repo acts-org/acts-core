@@ -113,7 +113,7 @@ Acts::DD4hepDetectorSurfaceFactory::constructSensitiveComponents(
   }
 
   // Attach surface material if present
-  attachSurfaceMaterial(gctx, "acts_surface_", dd4hepElement, *sSurface.get(),
+  attachSurfaceMaterial(gctx, "acts_surface_", dd4hepElement, *sSurface,
                         dd4hepDetElement->thickness(), options);
   // return the surface
   return {dd4hepDetElement, sSurface};

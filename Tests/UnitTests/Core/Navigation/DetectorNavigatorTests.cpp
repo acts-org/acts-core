@@ -97,7 +97,9 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsInitialization) {
 
     Propagator propagator(stepper, navigator);
 
-    BOOST_CHECK_THROW(propagator.makeState(start, options),
+    auto state = propagator.makeState(options);
+
+    BOOST_CHECK_THROW(propagator.initialize(state, start).value(),
                       std::invalid_argument);
   }
 
@@ -115,11 +117,16 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsInitialization) {
                      Acts::Experimental::DetectorNavigator>
         propagator(stepper, navigator);
 
-    auto state = propagator.makeState(start, options);
+    auto state = propagator.makeState(options);
 
-    navigator.initialize(state.navigation, stepper.position(state.stepping),
-                         stepper.direction(state.stepping),
-                         state.options.direction);
+    stepper.initialize(state.stepping, start);
+
+    BOOST_CHECK(navigator
+                    .initialize(state.navigation,
+                                stepper.position(state.stepping),
+                                stepper.direction(state.stepping),
+                                state.options.direction)
+                    .ok());
 
     navigator.nextTarget(state.navigation, stepper.position(state.stepping),
                          stepper.direction(state.stepping));
@@ -147,7 +154,9 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsInitialization) {
                      Acts::Experimental::DetectorNavigator>
         propagator(stepper, navigator);
 
-    BOOST_CHECK_THROW(propagator.makeState(startEoW, options),
+    auto state = propagator.makeState(options);
+
+    BOOST_CHECK_THROW(propagator.initialize(state, startEoW).value(),
                       std::invalid_argument);
   }
 
@@ -162,11 +171,16 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsInitialization) {
                      Acts::Experimental::DetectorNavigator>
         propagator(stepper, navigator);
 
-    auto state = propagator.makeState(start, options);
+    auto state = propagator.makeState(options);
 
-    navigator.initialize(state.navigation, stepper.position(state.stepping),
-                         stepper.direction(state.stepping),
-                         state.options.direction);
+    stepper.initialize(state.stepping, start);
+
+    BOOST_CHECK(navigator
+                    .initialize(state.navigation,
+                                stepper.position(state.stepping),
+                                stepper.direction(state.stepping),
+                                state.options.direction)
+                    .ok());
 
     auto initState = state.navigation;
     BOOST_CHECK_EQUAL(initState.currentDetector, detector.get());
@@ -175,7 +189,7 @@ BOOST_AUTO_TEST_CASE(DetectorNavigatorTestsInitialization) {
         detector->findDetectorVolume(geoContext, start.position()));
     BOOST_CHECK_EQUAL(initState.currentSurface, nullptr);
     BOOST_CHECK_EQUAL(initState.currentPortal, nullptr);
-    BOOST_CHECK_EQUAL(initState.surfaceCandidates.size(), 2u);
+    BOOST_CHECK_EQUAL(initState.surfaceCandidates.size(), 1u);
   }
 }
 

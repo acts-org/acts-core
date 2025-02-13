@@ -92,7 +92,7 @@ class BasePropagatorHelper : public BasePropagator {
 template <typename stepper_t, typename navigator_t = VoidNavigator>
 class Propagator final
     : public std::conditional_t<
-          SupportsBoundParameters_v<stepper_t, navigator_t>,
+          SupportsBoundParameters_v<stepper_t>,
           detail::BasePropagatorHelper<Propagator<stepper_t, navigator_t>>,
           detail::PropagatorStub> {
   /// Re-define bound track parameters dependent on the stepper
@@ -279,43 +279,50 @@ class Propagator final
   /// This function creates the propagator state object from the initial track
   /// parameters and the propagation options.
   ///
-  /// @note This will also initialize the state
-  ///
-  /// @tparam parameters_t Type of initial track parameters to propagate
   /// @tparam propagator_options_t Type of the propagator options
   /// @tparam path_aborter_t The path aborter type to be added
   ///
-  /// @param [in] start Initial track parameters to propagate
   /// @param [in] options Propagation options
   ///
   /// @return Propagator state object
-  template <typename parameters_t, typename propagator_options_t,
+  template <typename propagator_options_t,
             typename path_aborter_t = PathLimitReached>
-  auto makeState(const parameters_t& start,
-                 const propagator_options_t& options) const;
+  auto makeState(const propagator_options_t& options) const;
 
   /// @brief Builds the propagator state object
   ///
   /// This function creates the propagator state object from the initial track
   /// parameters, the target surface, and the propagation options.
   ///
-  /// @note This will also initialize the state
-  ///
-  /// @tparam parameters_t Type of initial track parameters to propagate
   /// @tparam propagator_options_t Type of the propagator options
   /// @tparam target_aborter_t The target aborter type to be added
   /// @tparam path_aborter_t The path aborter type to be added
   ///
-  /// @param [in] start Initial track parameters to propagate
   /// @param [in] target Target surface of to propagate to
   /// @param [in] options Propagation options
   ///
   /// @return Propagator state object
-  template <typename parameters_t, typename propagator_options_t,
+  template <typename propagator_options_t,
             typename target_aborter_t = SurfaceReached,
             typename path_aborter_t = PathLimitReached>
-  auto makeState(const parameters_t& start, const Surface& target,
+  auto makeState(const Surface& target,
                  const propagator_options_t& options) const;
+
+  /// @brief Initialize the propagator state
+  ///
+  /// This function initializes the propagator state for a new propagation.
+  ///
+  /// @tparam propagator_state_t Type of the propagator state object
+  /// @tparam path_aborter_t The path aborter type to be added
+  ///
+  /// @param [in,out] state The propagator state object
+  /// @param [in] start Initial track parameters to propagate
+  ///
+  /// @return Indication if the initialization was successful
+  template <typename propagator_state_t, typename parameters_t,
+            typename path_aborter_t = PathLimitReached>
+  [[nodiscard]] Result<void> initialize(propagator_state_t& state,
+                                        const parameters_t& start) const;
 
   /// @brief Propagate track parameters
   ///
@@ -385,9 +392,6 @@ class Propagator final
 
  private:
   const Logger& logger() const { return *m_logger; }
-
-  template <typename propagator_state_t, typename path_aborter_t>
-  void initialize(propagator_state_t& state) const;
 
   template <typename propagator_state_t, typename result_t>
   void moveStateToResult(propagator_state_t& state, result_t& result) const;

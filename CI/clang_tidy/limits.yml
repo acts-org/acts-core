@@ -20,3 +20,4 @@ limits:
   "readability-inconsistent-declaration-parameter-name": 0
   "readability-named-parameter": 0
   "readability-operators-representation": 0
+  "readability-redundant-smartptr-get": 0

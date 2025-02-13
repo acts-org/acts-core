@@ -14,25 +14,20 @@
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/EventData/MeasurementHelpers.hpp"
 #include "Acts/EventData/MultiTrajectory.hpp"
-#include "Acts/EventData/MultiTrajectoryHelpers.hpp"
 #include "Acts/EventData/SourceLink.hpp"
-#include "Acts/EventData/TrackContainerFrontendConcept.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/EventData/TrackProxyConcept.hpp"
 #include "Acts/EventData/VectorMultiTrajectory.hpp"
 #include "Acts/EventData/VectorTrackContainer.hpp"
+#include "Acts/EventData/detail/CorrectedTransformationFreeToBound.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/TrackingVolume.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
 #include "Acts/Material/Interactions.hpp"
-#include "Acts/Material/MaterialSlab.hpp"
 #include "Acts/Propagator/ActorList.hpp"
-#include "Acts/Propagator/ConstrainedStep.hpp"
 #include "Acts/Propagator/DirectNavigator.hpp"
-#include "Acts/Propagator/Navigator.hpp"
-#include "Acts/Propagator/Propagator.hpp"
+#include "Acts/Propagator/PropagatorOptions.hpp"
 #include "Acts/Propagator/StandardAborters.hpp"
-#include "Acts/Propagator/StraightLineStepper.hpp"
 #include "Acts/Propagator/detail/PointwiseMaterialInteraction.hpp"
 #include "Acts/TrackFitting/GlobalChiSquareFitterError.hpp"
 #include "Acts/TrackFitting/detail/VoidFitterComponents.hpp"
@@ -1256,7 +1251,15 @@ class Gx2Fitter {
       gx2fActor.scatteringMap = &scatteringMap;
       gx2fActor.parametersWithHypothesis = &params;
 
-      auto propagatorState = m_propagator.makeState(params, propagatorOptions);
+      auto propagatorState = m_propagator.makeState(propagatorOptions);
+
+      auto propagatorInitResult =
+          m_propagator.initialize(propagatorState, params);
+      if (!propagatorInitResult.ok()) {
+        ACTS_ERROR("Propagation initialization failed: "
+                   << propagatorInitResult.error());
+        return propagatorInitResult.error();
+      }
 
       auto& r = propagatorState.template get<Gx2FitterResult<traj_t>>();
       r.fittedStates = &trajectoryTempBackend;
@@ -1421,7 +1424,15 @@ class Gx2Fitter {
       gx2fActor.scatteringMap = &scatteringMap;
       gx2fActor.parametersWithHypothesis = &params;
 
-      auto propagatorState = m_propagator.makeState(params, propagatorOptions);
+      auto propagatorState = m_propagator.makeState(propagatorOptions);
+
+      auto propagatorInitResult =
+          m_propagator.initialize(propagatorState, params);
+      if (!propagatorInitResult.ok()) {
+        ACTS_ERROR("Propagation initialization failed: "
+                   << propagatorInitResult.error());
+        return propagatorInitResult.error();
+      }
 
       auto& r = propagatorState.template get<Gx2FitterResult<traj_t>>();
       r.fittedStates = &trajectoryTempBackend;
@@ -1569,7 +1580,15 @@ class Gx2Fitter {
       gx2fActor.scatteringMap = &scatteringMap;
       gx2fActor.parametersWithHypothesis = &params;
 
-      auto propagatorState = m_propagator.makeState(params, propagatorOptions);
+      auto propagatorState = m_propagator.makeState(propagatorOptions);
+
+      auto propagatorInitResult =
+          m_propagator.initialize(propagatorState, params);
+      if (!propagatorInitResult.ok()) {
+        ACTS_ERROR("Propagation initialization failed: "
+                   << propagatorInitResult.error());
+        return propagatorInitResult.error();
+      }
 
       auto& r = propagatorState.template get<Gx2FitterResult<traj_t>>();
       r.fittedStates = &trackContainer.trackStateContainer();

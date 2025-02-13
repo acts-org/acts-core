@@ -87,7 +87,7 @@ std::string PlaneSurface::name() const {
 
 const SurfaceBounds& PlaneSurface::bounds() const {
   if (m_bounds) {
-    return (*m_bounds.get());
+    return *m_bounds;
   }
   return s_noBounds;
 }

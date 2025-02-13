@@ -155,7 +155,7 @@ class BoundarySurfaceT {
 template <class volume_t>
 inline const RegularSurface& BoundarySurfaceT<volume_t>::surfaceRepresentation()
     const {
-  return (*(m_surface.get()));
+  return *m_surface;
 }
 
 template <class volume_t>

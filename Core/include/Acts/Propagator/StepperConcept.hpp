@@ -32,11 +32,6 @@ concept CommonStepper = requires {
   requires requires(const Stepper& s, State& t) {
     { s.transportCovarianceToCurvilinear(t) } -> std::same_as<void>;
 
-    requires requires(const BoundVector& bv, const BoundSquareMatrix& bm,
-                      const Surface& sf, const double d) {
-      { s.resetState(t, bv, bm, sf, d) } -> std::same_as<void>;
-    };
-
     requires requires(const Surface& sf, bool b,
                       const FreeToBoundCorrection& corr) {
       {

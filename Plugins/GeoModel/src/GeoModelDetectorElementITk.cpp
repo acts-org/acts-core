@@ -100,7 +100,7 @@ Acts::GeoModelDetectorElementITk::convertFromGeomodel(
         detEl->physicalVolume(), nullptr, detEl->transform(gctx),
         detEl->thickness(), hardware, barrelEndcap, layerWheel, etaModule,
         phiModule, side);
-    auto surface = Surface::makeShared<surface_t>(bounds, *itkEl.get());
+    auto surface = Surface::makeShared<surface_t>(bounds, *itkEl);
 
     itkEl->attachSurface(surface);
     itkEl->setDatabaseEntryName(detEl->databaseEntryName());

@@ -177,7 +177,7 @@ double CylinderSurface::pathCorrection(const GeometryContext& gctx,
 }
 
 const CylinderBounds& CylinderSurface::bounds() const {
-  return (*m_bounds.get());
+  return *m_bounds;
 }
 
 Polyhedron CylinderSurface::polyhedronRepresentation(
