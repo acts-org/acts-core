@@ -14,4 +14,6 @@ target_link_libraries(
         ActsPluginDetray
 )
 
+acts_compile_headers(ActsExamplesTraccc GLOB "include/**/*.hpp")
+
 install(TARGETS ActsExamplesTraccc LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

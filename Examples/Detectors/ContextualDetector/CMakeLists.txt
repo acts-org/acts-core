@@ -20,6 +20,8 @@ target_link_libraries(
         ActsExamplesDetectorGeneric
 )
 
+acts_compile_headers(ActsExamplesDetectorContextual GLOB "include/**/*.hpp")
+
 install(
     TARGETS ActsExamplesDetectorContextual
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

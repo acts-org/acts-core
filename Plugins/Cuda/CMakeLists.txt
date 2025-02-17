@@ -47,7 +47,11 @@ target_include_directories(
 target_link_libraries(ActsPluginCuda2 PUBLIC ActsCore)
 set_target_properties(
     ActsPluginCuda2
-    PROPERTIES CUDA_SEPARABLE_COMPILATION ON POSITION_INDEPENDENT_CODE ON
+    PROPERTIES
+        CUDA_STANDARD 20
+        CUDA_STANDARD_REQUIRED ON
+        CUDA_SEPARABLE_COMPILATION ON
+        POSITION_INDEPENDENT_CODE ON
 )
 
 # Install all CUDA plugins.

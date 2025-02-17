@@ -6,6 +6,8 @@ add_library(
     src/GenericDetectorElement.cpp
 )
 
+acts_compile_headers(ActsExamplesDetectorGeneric GLOB "include/**/*.hpp")
+
 target_include_directories(
     ActsExamplesDetectorGeneric
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

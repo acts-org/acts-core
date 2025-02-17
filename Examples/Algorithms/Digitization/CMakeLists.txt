@@ -17,6 +17,8 @@ target_link_libraries(
     PUBLIC ActsCore ActsExamplesFramework
 )
 
+acts_compile_headers(ActsExamplesDigitization GLOB "include/**/*.hpp")
+
 install(
     TARGETS ActsExamplesDigitization
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

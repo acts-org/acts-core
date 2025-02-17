@@ -17,6 +17,8 @@ target_link_libraries(
     PRIVATE std::filesystem
 )
 
+acts_compile_headers(ActsExamplesMagneticField GLOB "include/**/*.hpp")
+
 install(
     TARGETS ActsExamplesMagneticField
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

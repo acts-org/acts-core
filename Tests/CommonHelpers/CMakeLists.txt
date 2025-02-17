@@ -4,8 +4,8 @@ file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../Data" acts_test_data_dir)
 add_library(
     ActsTestsCommonHelpers
     SHARED
-    Acts/Tests/CommonHelpers/DataDirectory.cpp
-    Acts/Tests/CommonHelpers/CylindricalDetector.cpp
+    src/DataDirectory.cpp
+    src/CylindricalDetector.cpp
 )
 target_compile_definitions(
     ActsTestsCommonHelpers
@@ -15,10 +15,12 @@ target_compile_definitions(
 )
 target_include_directories(
     ActsTestsCommonHelpers
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
 target_link_libraries(
     ActsTestsCommonHelpers
-    PUBLIC ActsCore
+    PUBLIC ActsCore ActsExamplesFramework
     PRIVATE std::filesystem
 )
+
+acts_compile_headers(ActsTestsCommonHelpers GLOB "include/Acts/**/*.hpp")

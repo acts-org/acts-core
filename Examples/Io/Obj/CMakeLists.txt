@@ -15,4 +15,6 @@ target_link_libraries(
     PUBLIC ActsCore ActsExamplesFramework Threads::Threads
 )
 
+acts_compile_headers(ActsExamplesIoObj GLOB "include/**/*.hpp")
+
 install(TARGETS ActsExamplesIoObj LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})

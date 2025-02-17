@@ -18,7 +18,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_link_libraries(ActsPluginOnnx PUBLIC ActsCore OnnxRuntime)
+target_link_libraries(ActsPluginOnnx PUBLIC ActsCore onnxruntime::onnxruntime)
 
 install(
     TARGETS ActsPluginOnnx

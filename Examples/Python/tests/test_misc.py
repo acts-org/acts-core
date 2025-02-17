@@ -44,7 +44,7 @@ def test_gsf_debugger(tmp_path):
     env = os.environ.copy()
     env["PYTHONPATH"] = f"{scriptdir}:{env['PYTHONPATH']}"
     gsf_result = subprocess.run(
-        [gsf_script], capture_output=True, cwd=tmp_path, env=env
+        [sys.executable, gsf_script], capture_output=True, cwd=tmp_path, env=env
     )
 
     logfile = tmp_path / "test.log"
@@ -54,6 +54,6 @@ def test_gsf_debugger(tmp_path):
     assert gsf_result.returncode == 0
 
     debugger_result = subprocess.run(
-        [debugger, f"--logfile={logfile}", "--nogui"], cwd=tmp_path
+        [sys.executable, debugger, f"--logfile={logfile}", "--nogui"], cwd=tmp_path
     )
     assert debugger_result.returncode == 0

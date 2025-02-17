@@ -114,7 +114,6 @@ else()
   set(_default_examples_unit_tests OFF)
 endif()
 option(ACTS_BUILD_EXAMPLES_UNITTESTS "Build unit tests" ${_default_examples_unit_tests}) # default: ACTS_BUILD_UNITTESTS AND ACTS_BUILD_EXAMPLES
-option(ACTS_BUILD_NONCOMPILE_TESTS "Build tests that check build failure invariants" OFF)
 option(ACTS_RUN_CLANG_TIDY "Run clang-tidy static analysis" OFF)
 # other options
 option(ACTS_BUILD_DOCS "Build documentation" OFF)
@@ -128,6 +127,7 @@ set(ACTS_GPERF_INSTALL_DIR "" CACHE STRING "Hint to help find gperf if profiling
 
 option(ACTS_ENABLE_LOG_FAILURE_THRESHOLD "Enable failing on log messages with level above certain threshold" OFF)
 set(ACTS_LOG_FAILURE_THRESHOLD "" CACHE STRING "Log level above which an exception should be automatically thrown. If ACTS_ENABLE_LOG_FAILURE_THRESHOLD is set and this is unset, this will enable a runtime check of the log level.")
+option(ACTS_COMPILE_HEADERS "Generate targets to compile header files" ON)
 # gersemi: on
 
 # handle option inter-dependencies and the everything flag
@@ -279,6 +279,9 @@ set(_acts_annoy_version 1.17.3)
 # recommended dependency version. if there is an opportunity to reach
 # this version we will try so.
 set(_acts_boost_recommended_version 1.78.0)
+
+# Help with compiler flags discovery
+include(ActsFunctions)
 
 # Include the sources for the external dependencies.
 include(ActsExternSources)
@@ -440,7 +443,7 @@ if(ACTS_BUILD_PLUGIN_EXATRKX)
     endif()
 endif()
 if(ACTS_BUILD_PLUGIN_ONNX OR ACTS_EXATRKX_ENABLE_ONNX)
-    find_package(OnnxRuntime ${_acts_onnxruntime_version} REQUIRED)
+    find_package(onnxruntime ${_acts_onnxruntime_version} CONFIG REQUIRED)
 endif()
 if(ACTS_BUILD_PLUGIN_EDM4HEP OR ACTS_BUILD_PLUGIN_PODIO)
     find_package(podio ${_acts_podio_version} CONFIG)

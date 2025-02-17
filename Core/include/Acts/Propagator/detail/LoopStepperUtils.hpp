@@ -13,6 +13,8 @@
 #include <Acts/Surfaces/Surface.hpp>
 #include <Acts/Utilities/Result.hpp>
 
+#include <type_traits>
+
 namespace Acts::detail {
 
 /// A helper type for providinig a propagation state which can be used with

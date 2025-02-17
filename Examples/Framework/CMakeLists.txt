@@ -58,6 +58,8 @@ if(NOT TBB_FOUND)
 endif()
 target_link_libraries(ActsExamplesFramework PUBLIC TBB::tbb)
 
+acts_compile_headers(ActsExamplesFramework GLOB "include/**/*.hpp")
+
 install(
     TARGETS ActsExamplesFramework
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

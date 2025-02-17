@@ -15,6 +15,8 @@ target_link_libraries(
     PUBLIC ActsCore ActsPluginOnnx ActsExamplesFramework
 )
 
+acts_compile_headers(ActsExamplesTrackFindingML GLOB "include/**/*.hpp")
+
 install(
     TARGETS ActsExamplesTrackFindingML
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

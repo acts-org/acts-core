@@ -278,6 +278,7 @@ def generate_input_test_edm4hep_simhit_reader(input, output):
     ddsim.gun.distribution = "eta"
     ddsim.numberOfEvents = 10
     ddsim.outputFile = output
+    ddsim.outputConfig.forceEDM4HEP = True
     ddsim.run()
 
 

@@ -17,6 +17,8 @@ target_link_libraries(
     PUBLIC ActsCore ActsExamplesFramework ActsExamplesMagneticField
 )
 
+acts_compile_headers(ActsExamplesTrackFitting GLOB "include/**/*.hpp")
+
 install(
     TARGETS ActsExamplesTrackFitting
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

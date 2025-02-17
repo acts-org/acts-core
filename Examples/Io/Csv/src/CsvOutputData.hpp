@@ -9,6 +9,7 @@
 #pragma once
 
 #include <ActsExamples/EventData/Index.hpp>
+#include <ActsExamples/Io/Csv/CsvInputOutput.hpp>
 
 #include <cstdint>
 

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Acts/Utilities/AxisDefinitions.hpp"
+#include "Acts/Utilities/BinningData.hpp"
 #include "Acts/Utilities/Result.hpp"
 #include "ActsExamples/Framework/RandomNumbers.hpp"
 #include "ActsFatras/Digitization/DigitizationError.hpp"
