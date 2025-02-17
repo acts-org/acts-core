@@ -13,7 +13,7 @@ inputs:
   spack_version:
     description: 'Version of Spack to use'
     required: false
-    default: 'develop-acts'
+    default: 'develop'
 
 runs:
   using: 'composite'
