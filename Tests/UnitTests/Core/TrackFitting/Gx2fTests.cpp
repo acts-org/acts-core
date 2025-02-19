@@ -228,7 +228,7 @@ const MeasurementResolution resPixel = {MeasurementType::eLoc01,
 const MeasurementResolution resStrip0 = {MeasurementType::eLoc0, {25_um}};
 const MeasurementResolution resStrip1 = {MeasurementType::eLoc1, {50_um}};
 const MeasurementResolutionMap resMapAllPixel = {
-    {Acts::GeometryIdentifier().setVolume(0), resPixel}};
+    {Acts::GeometryIdentifier().withVolume(0), resPixel}};
 
 // This test checks if the call to the fitter works and no errors occur in the
 // framework, without fitting and updating any parameters
@@ -429,13 +429,13 @@ BOOST_AUTO_TEST_CASE(MixedDetector) {
 
   ACTS_DEBUG("Create the measurements");
   const MeasurementResolutionMap resMap = {
-      {Acts::GeometryIdentifier().setVolume(2).setLayer(2), resPixel},
-      {Acts::GeometryIdentifier().setVolume(2).setLayer(4), resStrip0},
-      {Acts::GeometryIdentifier().setVolume(2).setLayer(6), resStrip1},
-      {Acts::GeometryIdentifier().setVolume(2).setLayer(8), resPixel},
-      {Acts::GeometryIdentifier().setVolume(2).setLayer(10), resStrip0},
-      {Acts::GeometryIdentifier().setVolume(2).setLayer(12), resStrip1},
-      {Acts::GeometryIdentifier().setVolume(2).setLayer(14), resPixel},
+      {Acts::GeometryIdentifier().withVolume(2).withLayer(2), resPixel},
+      {Acts::GeometryIdentifier().withVolume(2).withLayer(4), resStrip0},
+      {Acts::GeometryIdentifier().withVolume(2).withLayer(6), resStrip1},
+      {Acts::GeometryIdentifier().withVolume(2).withLayer(8), resPixel},
+      {Acts::GeometryIdentifier().withVolume(2).withLayer(10), resStrip0},
+      {Acts::GeometryIdentifier().withVolume(2).withLayer(12), resStrip1},
+      {Acts::GeometryIdentifier().withVolume(2).withLayer(14), resPixel},
   };
 
   using SimPropagator =

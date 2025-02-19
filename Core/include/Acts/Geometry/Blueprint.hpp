@@ -56,11 +56,6 @@ class Blueprint : public BlueprintNode {
     /// Determine how much envelope space to produce from the highest volume
     /// in the geometry hierarchy and the world volume.
     ExtentEnvelope envelope = ExtentEnvelope::Zero();
-
-    /// The geometry identifier hook, passed through the `TrackingGeometry`
-    /// constructor. This will be superseded by a more integrated approach to
-    /// the identification scheme
-    GeometryIdentifierHook geometryIdentifierHook = {};
   };
 
   /// Constructor from a config object

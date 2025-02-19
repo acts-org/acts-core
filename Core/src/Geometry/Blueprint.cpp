@@ -11,6 +11,7 @@
 #include "Acts/Geometry/CuboidVolumeBounds.hpp"
 #include "Acts/Geometry/CylinderVolumeBounds.hpp"
 #include "Acts/Geometry/Extent.hpp"
+#include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Geometry/PortalShell.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
 #include "Acts/Navigation/INavigationPolicy.hpp"
@@ -150,8 +151,64 @@ std::unique_ptr<TrackingGeometry> Blueprint::construct(
     names.insert(volume->volumeName());
   });
 
+  // @TODO: Refactor this to ignore already set IDs from inside the tree!
+  class Visitor : public TrackingGeometryMutableVisitor {
+   public:
+    explicit Visitor(const Logger &logger) : m_logger(&logger) {
+      ACTS_VERBOSE("Creating Gen3 geometry closure visitor");
+    }
+
+    const Logger &logger() const { return *m_logger; }
+
+    void visitVolume(TrackingVolume &volume) override {
+      ACTS_VERBOSE("Volume: " << volume.volumeName());
+
+      // Increment the volume ID for this volume
+      m_volumeID = GeometryIdentifier().setVolume(m_volumeID.volume() + 1);
+      // Reset portal id for this volume
+      m_iportal = 0;
+      // Reset sensitive id for this volume
+      m_isensitive = 0;
+
+      // assign the Volume ID to the volume itself
+      volume.assignGeometryId(m_volumeID);
+      ACTS_VERBOSE("~> Volume ID: " << m_volumeID);
+    }
+
+    void visitPortal(Portal &portal) override {
+      // Increment the portal ID for this portal
+      m_iportal += 1;
+      // create the portal ID
+      auto portalID = GeometryIdentifier(m_volumeID).setBoundary(m_iportal);
+      ACTS_VERBOSE("~> Portal ID: " << portalID);
+
+      portal.surface().assignGeometryId(portalID);
+    }
+
+    void visitSurface(Surface &surface) override {
+      if (surface.geometryId() == GeometryIdentifier{}) {
+        // This surface has not been processed yet, assign volume ID
+
+        m_isensitive += 1;
+        auto surfaceID =
+            GeometryIdentifier(m_volumeID).setSensitive(m_isensitive);
+        ACTS_VERBOSE("~> Surface ID: " << surfaceID);
+
+        surface.assignGeometryId(surfaceID);
+      }
+    }
+
+    const Logger *m_logger{nullptr};
+    GeometryIdentifier m_volumeID;
+    GeometryIdentifier::Value m_iportal = 0;
+    GeometryIdentifier::Value m_isensitive = 0;
+  };
+
+  Visitor closureVisitor{logger};
+  world->apply(closureVisitor);
+
   return std::make_unique<TrackingGeometry>(
-      std::move(world), nullptr, m_cfg.geometryIdentifierHook, logger);
+      std::move(world), nullptr, GeometryIdentifierHook{}, logger, false);
 }
 
 }  // namespace Acts

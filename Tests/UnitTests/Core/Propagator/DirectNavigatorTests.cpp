@@ -280,8 +280,8 @@ BOOST_AUTO_TEST_CASE(test_direct_navigator_fwd_bwd) {
     transform.translate(Vector3{0.0_mm, 0.0_mm, i * 100.0_mm});
     auto surface = Surface::makeShared<PlaneSurface>(transform, nullptr);
     surface->assignGeometryId(
-        Acts::GeometryIdentifier().setVolume(1).setLayer(1).setSensitive(i +
-                                                                         1));
+        Acts::GeometryIdentifier().withVolume(1).withLayer(1).withSensitive(i +
+                                                                            1));
     surfaces.push_back(surface);
   }
 

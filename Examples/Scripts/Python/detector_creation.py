@@ -53,7 +53,7 @@ if "__main__" == __name__:
     viewConfig.nSegments = 100
     for vol in detector.volumePtrs():
         for surf in vol.surfacePtrs():
-            if surf.geometryId().sensitive() > 0:
+            if surf.geometryId.sensitive > 0:
                 surfaces.append(surf)
     acts.examples.writeSurfacesObj(surfaces, geoContext, viewConfig, "odd-surfaces.obj")
 

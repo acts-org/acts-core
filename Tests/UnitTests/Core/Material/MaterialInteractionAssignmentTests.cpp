@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(AssignToClosest) {
                                            100.0)};
 
   for (auto [is, surface] : enumerate(surfaces)) {
-    surface->assignGeometryId(GeometryIdentifier().setSensitive(is + 1));
+    surface->assignGeometryId(GeometryIdentifier().withSensitive(is + 1));
   }
 
   std::vector<IAssignmentFinder::SurfaceAssignment> intersectedSurfaces = {
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(AssignToClosest_withGlobalVeto) {
                                            100.0)};
 
   for (auto [is, surface] : enumerate(surfaces)) {
-    surface->assignGeometryId(GeometryIdentifier().setSensitive(is + 1));
+    surface->assignGeometryId(GeometryIdentifier().withSensitive(is + 1));
   }
 
   std::vector<IAssignmentFinder::SurfaceAssignment> intersectedSurfaces = {
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(AssignToClosest_withLocalVeto) {
                                            100.0)};
 
   for (auto [is, surface] : enumerate(surfaces)) {
-    surface->assignGeometryId(GeometryIdentifier().setSensitive(is + 1));
+    surface->assignGeometryId(GeometryIdentifier().withSensitive(is + 1));
   }
 
   std::vector<IAssignmentFinder::SurfaceAssignment> intersectedSurfaces = {
@@ -183,7 +183,8 @@ BOOST_AUTO_TEST_CASE(AssignToClosest_withLocalVeto) {
   // We assign this to
   std::vector<
       std::pair<GeometryIdentifier, MaterialInteractionAssignment::LocalVeto>>
-      localVetoVector = {{GeometryIdentifier().setSensitive(2), VetoThisOne{}}};
+      localVetoVector = {
+          {GeometryIdentifier().withSensitive(2), VetoThisOne{}}};
   GeometryHierarchyMap<MaterialInteractionAssignment::LocalVeto> localVetos(
       localVetoVector);
   MaterialInteractionAssignment::Options options;
@@ -209,7 +210,7 @@ BOOST_AUTO_TEST_CASE(AssignToClosest_withReassignment) {
                                            100.0)};
 
   for (auto [is, surface] : enumerate(surfaces)) {
-    surface->assignGeometryId(GeometryIdentifier().setSensitive(is + 1));
+    surface->assignGeometryId(GeometryIdentifier().withSensitive(is + 1));
   }
 
   std::vector<IAssignmentFinder::SurfaceAssignment> intersectedSurfaces = {
@@ -250,7 +251,7 @@ BOOST_AUTO_TEST_CASE(AssignToClosest_withReassignment) {
   std::vector<std::pair<GeometryIdentifier,
                         MaterialInteractionAssignment::ReAssignment>>
       reassignmentVector = {
-          {GeometryIdentifier().setSensitive(2), ReAssignToNeighbor{}}};
+          {GeometryIdentifier().withSensitive(2), ReAssignToNeighbor{}}};
   GeometryHierarchyMap<MaterialInteractionAssignment::ReAssignment>
       reassignments(reassignmentVector);
   MaterialInteractionAssignment::Options options;
@@ -268,14 +269,14 @@ BOOST_AUTO_TEST_CASE(AssignToClosest_withReassignment) {
 
   // Check that the geoid with number 2 never shows up
   for (const auto& mi : assigned) {
-    BOOST_CHECK_NE(mi.intersectionID, GeometryIdentifier().setSensitive(2));
+    BOOST_CHECK_NE(mi.intersectionID, GeometryIdentifier().withSensitive(2));
   }
 }
 
 BOOST_AUTO_TEST_CASE(AssignWithPathLength) {
   auto surface =
       Surface::makeShared<CylinderSurface>(Transform3::Identity(), 20.0, 100.0);
-  surface->assignGeometryId(GeometryIdentifier().setSensitive(1));
+  surface->assignGeometryId(GeometryIdentifier().withSensitive(1));
 
   Vector3 position = {20., 10., 0.};
   Vector3 direction = position.normalized();

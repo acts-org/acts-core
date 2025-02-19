@@ -53,4 +53,5 @@ target_sources(
         MaterialDesignatorBlueprintNode.cpp
         VolumeAttachmentStrategy.cpp
         VolumeResizeStrategy.cpp
+        TrackingGeometryVisitor.cpp
 )

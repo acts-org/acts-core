@@ -42,6 +42,7 @@ void Acts::TrackingGeometryBuilder::setLogger(
 std::unique_ptr<const Acts::TrackingGeometry>
 Acts::TrackingGeometryBuilder::trackingGeometry(
     const GeometryContext& gctx) const {
+  ACTS_DEBUG("Building tracking geometry");
   MutableTrackingVolumePtr highestVolume = nullptr;
   // loop over the builders and wrap one around the other
   for (auto& volumeBuilder : m_cfg.trackingVolumeBuilders) {

@@ -87,6 +87,7 @@ class Layer : public virtual GeometryObject {
   /// Declare the TrackingVolume as a friend, to be able to register previous,
   /// next and set the enclosing TrackingVolume
   friend class TrackingVolume;
+  friend class Gen1GeometryClosureVisitor;
 
  public:
   /// Default Constructor - deleted

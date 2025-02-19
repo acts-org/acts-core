@@ -21,7 +21,7 @@ namespace {
 constexpr auto eps = std::numeric_limits<double>::epsilon();
 const auto pid = Barcode().setVertexPrimary(12).setParticle(23);
 const auto gid =
-    Acts::GeometryIdentifier().setVolume(1).setLayer(2).setSensitive(3);
+    Acts::GeometryIdentifier().withVolume(1).withLayer(2).withSensitive(3);
 }  // namespace
 
 BOOST_AUTO_TEST_SUITE(FatrasHit)

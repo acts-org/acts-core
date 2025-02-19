@@ -48,7 +48,7 @@ class GeometryObject {
   }
 
   /// @return the geometry id by reference
-  const GeometryIdentifier& geometryId() const;
+  GeometryIdentifier geometryId() const;
 
   /// Force a binning position method
   ///
@@ -77,7 +77,7 @@ class GeometryObject {
   GeometryIdentifier m_geometryId;
 };
 
-inline const GeometryIdentifier& GeometryObject::geometryId() const {
+inline GeometryIdentifier GeometryObject::geometryId() const {
   return m_geometryId;
 }
 

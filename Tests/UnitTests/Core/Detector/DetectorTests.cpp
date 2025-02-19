@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(DetectorConstructionWithHierarchyMap) {
         Acts::Transform3::Identity(),
         std::make_shared<Acts::CylinderBounds>(r, 190.), 0.1);
     auto surface = detElement->surface().getSharedPtr();
-    surface->assignGeometryId(Acts::GeometryIdentifier{}.setSensitive(ir + 1));
+    surface->assignGeometryId(Acts::GeometryIdentifier{}.withSensitive(ir + 1));
     surfaces.push_back(std::move(surface));
     detStore.push_back(std::move(detElement));
   }
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(DetectorConstructionWithHierarchyMap) {
   const auto& sensitiveHierarchyMap = det->sensitiveHierarchyMap();
 
   const Acts::Surface* surface0 =
-      det->findSurface(Acts::GeometryIdentifier{}.setSensitive(1));
+      det->findSurface(Acts::GeometryIdentifier{}.withSensitive(1));
 
   BOOST_CHECK_EQUAL(sensitiveHierarchyMap.size(), 6u);
   BOOST_CHECK_NE(surface0, nullptr);

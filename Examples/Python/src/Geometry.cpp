@@ -30,8 +30,11 @@
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/GeometryHierarchyMap.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
+#include "Acts/Geometry/Portal.hpp"
+#include "Acts/Geometry/PortalLinkBase.hpp"
 #include "Acts/Geometry/ProtoLayer.hpp"
 #include "Acts/Geometry/TrackingGeometry.hpp"
+#include "Acts/Geometry/TrackingGeometryVisitor.hpp"
 #include "Acts/Geometry/Volume.hpp"
 #include "Acts/Geometry/VolumeAttachmentStrategy.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
@@ -91,6 +94,42 @@ struct IdentifierSurfacesCollector {
   }
 };
 
+#define _INVOKE(method, name, arg)                                  \
+  pybind11::gil_scoped_acquire gil;                                 \
+  pybind11::function override = pybind11::get_override(this, name); \
+  if (!override) {                                                  \
+    method(arg);                                                    \
+    return;                                                         \
+  }                                                                 \
+  override(&arg);
+
+// We only implement the mutable visitor here, because pybind11 always casts
+// away const ness in any case
+class PyTrackingGeometryVisitor : public Acts::TrackingGeometryMutableVisitor {
+ public:
+  void visitVolume(Acts::TrackingVolume& volume) override {
+    _INVOKE(Acts::TrackingGeometryMutableVisitor::visitVolume, "visitVolume",
+            volume);
+  }
+
+  void visitPortal(Acts::Portal& portal) override {
+    _INVOKE(Acts::TrackingGeometryMutableVisitor::visitPortal, "visitPortal",
+            portal);
+  }
+
+  void visitLayer(Acts::Layer& layer) override {
+    _INVOKE(Acts::TrackingGeometryMutableVisitor::visitLayer, "visitLayer",
+            layer);
+  }
+
+  void visitSurface(Acts::Surface& surface) override {
+    _INVOKE(Acts::TrackingGeometryMutableVisitor::visitSurface, "visitSurface",
+            surface);
+  }
+};
+
+#undef _INVOKE
+
 }  // namespace
 
 namespace Acts::Python {
@@ -103,19 +142,20 @@ void addGeometry(Context& ctx) {
     py::class_<Acts::GeometryIdentifier>(m, "GeometryIdentifier")
         .def(py::init<>())
         .def(py::init<Acts::GeometryIdentifier::Value>())
-        .def("setVolume", &Acts::GeometryIdentifier::setVolume)
-        .def("setLayer", &Acts::GeometryIdentifier::setLayer)
-        .def("setBoundary", &Acts::GeometryIdentifier::setBoundary)
-        .def("setApproach", &Acts::GeometryIdentifier::setApproach)
-        .def("setSensitive", &Acts::GeometryIdentifier::setSensitive)
-        .def("setExtra", &Acts::GeometryIdentifier::setExtra)
-        .def("volume", &Acts::GeometryIdentifier::volume)
-        .def("layer", &Acts::GeometryIdentifier::layer)
-        .def("boundary", &Acts::GeometryIdentifier::boundary)
-        .def("approach", &Acts::GeometryIdentifier::approach)
-        .def("sensitive", &Acts::GeometryIdentifier::sensitive)
-        .def("extra", &Acts::GeometryIdentifier::extra)
-        .def("value", &Acts::GeometryIdentifier::value)
+
+        .def_property("volume", &Acts::GeometryIdentifier::volume,
+                      &Acts::GeometryIdentifier::setVolume)
+        .def_property("layer", &Acts::GeometryIdentifier::layer,
+                      &Acts::GeometryIdentifier::setLayer)
+        .def_property("boundary", &Acts::GeometryIdentifier::boundary,
+                      &Acts::GeometryIdentifier::setBoundary)
+        .def_property("approach", &Acts::GeometryIdentifier::approach,
+                      &Acts::GeometryIdentifier::setApproach)
+        .def_property("sensitive", &Acts::GeometryIdentifier::sensitive,
+                      &Acts::GeometryIdentifier::setSensitive)
+        .def_property("extra", &Acts::GeometryIdentifier::extra,
+                      &Acts::GeometryIdentifier::setExtra)
+        .def_property_readonly("value", &Acts::GeometryIdentifier::value)
         .def("__str__", [](const Acts::GeometryIdentifier& self) {
           std::stringstream ss;
           ss << self;
@@ -126,12 +166,13 @@ void addGeometry(Context& ctx) {
   {
     py::class_<Acts::Surface, std::shared_ptr<Acts::Surface>>(m, "Surface")
         // Can't bind directly because GeometryObject is virtual base of Surface
-        .def("geometryId",
-             [](const Surface& self) { return self.geometryId(); })
+        .def_property_readonly(
+            "geometryId", [](const Surface& self) { return self.geometryId(); })
         .def("center", &Surface::center)
-        .def("type", &Surface::type)
+        .def_property_readonly("type", &Surface::type)
         .def("visualize", &Surface::visualize)
-        .def("surfaceMaterial", &Acts::Surface::surfaceMaterialSharedPtr);
+        .def_property_readonly("surfaceMaterial",
+                               &Acts::Surface::surfaceMaterialSharedPtr);
   }
 
   {
@@ -187,7 +228,9 @@ void addGeometry(Context& ctx) {
         .def("visualize", &Acts::TrackingGeometry::visualize, py::arg("helper"),
              py::arg("gctx"), py::arg("viewConfig") = s_viewVolume,
              py::arg("portalViewConfig") = s_viewPortal,
-             py::arg("sensitiveViewConfig") = s_viewSensitive);
+             py::arg("sensitiveViewConfig") = s_viewSensitive)
+        .def("apply", py::overload_cast<TrackingGeometryMutableVisitor&>(
+                          &TrackingGeometry::apply));
   }
 
   {
@@ -237,6 +280,13 @@ void addGeometry(Context& ctx) {
           hook->callable = callable;
           return hook;
         }));
+  }
+
+  {
+    py::class_<TrackingGeometryMutableVisitor, PyTrackingGeometryVisitor,
+               std::shared_ptr<TrackingGeometryMutableVisitor>>(
+        m, "TrackingGeometryMutableVisitor")
+        .def(py::init<>());
   }
 
   py::class_<ExtentEnvelope>(m, "ExtentEnvelope")

@@ -15,6 +15,7 @@
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Geometry/Layer.hpp"
 #include "Acts/Geometry/Portal.hpp"
+#include "Acts/Geometry/TrackingGeometryVisitor.hpp"
 #include "Acts/Geometry/TrackingVolumeVisitorConcept.hpp"
 #include "Acts/Geometry/Volume.hpp"
 #include "Acts/Material/IVolumeMaterial.hpp"
@@ -177,56 +178,24 @@ class TrackingVolume : public Volume {
   /// this, e.g. as a private member
   template <SurfaceVisitor visitor_t>
   void visitSurfaces(visitor_t&& visitor, bool restrictToSensitives) const {
-    if (!restrictToSensitives) {
-      // Visit the boundary surfaces
-      for (const auto& bs : m_boundarySurfaces) {
-        visitor(&(bs->surfaceRepresentation()));
-      }
+    struct Visitor : public TrackingGeometryVisitor {
+      std::remove_cv_t<std::remove_reference_t<visitor_t>>* m_visitor{};
+      bool m_restrictToSensitives{};
 
-      for (const auto& portal : portals()) {
-        visitor(&portal.surface());
-      }
-    }
-
-    // Internal structure
-    if (m_confinedVolumes == nullptr) {
-      // no sub volumes => loop over the confined layers
-      if (m_confinedLayers != nullptr) {
-        for (const auto& layer : m_confinedLayers->arrayObjects()) {
-          // Surfaces contained in the surface array
-          if (layer->surfaceArray() != nullptr) {
-            for (const auto& srf : layer->surfaceArray()->surfaces()) {
-              visitor(srf);
-              continue;
-            }
-          }
-          if (!restrictToSensitives) {
-            // Surfaces of the layer
-            visitor(&layer->surfaceRepresentation());
-            // Approach surfaces of the layer
-            if (layer->approachDescriptor() != nullptr) {
-              for (const auto& srf :
-                   layer->approachDescriptor()->containedSurfaces()) {
-                visitor(srf);
-              }
-            }
-          }
+      void visitSurface(const Surface& surface) override {
+        if (m_restrictToSensitives && surface.geometryId().sensitive() == 0) {
+          return;
         }
+        assert(m_visitor != nullptr);
+        (*m_visitor)(&surface);
       }
-    } else {
-      // contains sub volumes
-      for (const auto& volume : m_confinedVolumes->arrayObjects()) {
-        volume->visitSurfaces(visitor, restrictToSensitives);
-      }
-    }
+    };
 
-    for (const auto& surface : surfaces()) {
-      visitor(&surface);
-    }
+    Visitor internal;
+    internal.m_visitor = &visitor;
+    internal.m_restrictToSensitives = restrictToSensitives;
 
-    for (const auto& volume : volumes()) {
-      volume.visitSurfaces(visitor, restrictToSensitives);
-    }
+    apply(internal);
   }
 
   /// @brief Visit all sensitive surfaces
@@ -254,18 +223,23 @@ class TrackingVolume : public Volume {
   /// this, e.g. as a private member
   template <TrackingVolumeVisitor visitor_t>
   void visitVolumes(visitor_t&& visitor) const {
-    visitor(this);
-    if (m_confinedVolumes != nullptr) {
-      // contains sub volumes
-      for (const auto& volume : m_confinedVolumes->arrayObjects()) {
-        volume->visitVolumes(visitor);
-      }
-    }
+    struct Visitor : public TrackingGeometryVisitor {
+      std::remove_cv_t<std::remove_reference_t<visitor_t>>* m_visitor{};
+      bool m_restrictToSensitives{};
 
-    for (const auto& volume : m_volumes) {
-      volume->visitVolumes(visitor);
-    }
+      void visitVolume(const TrackingVolume& volume) override {
+        (*m_visitor)(&volume);
+      }
+    };
+
+    Visitor internal;
+    internal.m_visitor = &visitor;
+
+    apply(internal);
   }
+
+  void apply(TrackingGeometryVisitor& visitor) const;
+  void apply(TrackingGeometryMutableVisitor& visitor);
 
   /// Returns the VolumeName - for debug reason, might be depreciated later
   const std::string& volumeName() const;
@@ -547,22 +521,6 @@ class TrackingVolume : public Volume {
   /// @}
 
  private:
-  /// close the Geometry, i.e. set the GeometryIdentifier and assign material
-  ///
-  /// @param materialDecorator is a dedicated decorator for the
-  ///        material to be assigned (surface, volume based)
-  /// @param volumeMap is a map to find the a volume by identifier
-  /// @param vol is the geometry id of the volume
-  ///        as calculated by the TrackingGeometry
-  /// @param hook Identifier hook to be applied to surfaces
-  /// @param logger A @c Logger instance
-  ///
-  void closeGeometry(
-      const IMaterialDecorator* materialDecorator,
-      std::unordered_map<GeometryIdentifier, const TrackingVolume*>& volumeMap,
-      std::size_t& vol, const GeometryIdentifierHook& hook,
-      const Logger& logger = getDummyLogger());
-
   /// The volume based material the TrackingVolume consists of
   std::shared_ptr<const IVolumeMaterial> m_volumeMaterial{nullptr};
 

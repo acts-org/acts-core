@@ -107,11 +107,11 @@ const MeasurementResolution resPixel = {MeasurementType::eLoc01,
 const MeasurementResolution resStrip = {MeasurementType::eLoc01,
                                         {100_um, 100_um}};
 const MeasurementResolutionMap resolutions = {
-    {GeometryIdentifier().setVolume(2), resPixel},
-    {GeometryIdentifier().setVolume(3).setLayer(2), resStrip},
-    {GeometryIdentifier().setVolume(3).setLayer(4), resStrip},
-    {GeometryIdentifier().setVolume(3).setLayer(6), resStrip},
-    {GeometryIdentifier().setVolume(3).setLayer(8), resStrip},
+    {GeometryIdentifier().withVolume(2), resPixel},
+    {GeometryIdentifier().withVolume(3).withLayer(2), resStrip},
+    {GeometryIdentifier().withVolume(3).withLayer(4), resStrip},
+    {GeometryIdentifier().withVolume(3).withLayer(6), resStrip},
+    {GeometryIdentifier().withVolume(3).withLayer(8), resStrip},
 };
 
 std::default_random_engine rng(42);

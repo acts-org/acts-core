@@ -648,26 +648,27 @@ BOOST_AUTO_TEST_CASE(SubsetHitCountCut) {
   };
 
   auto vol7_lay3_sen2 = makeSurface(
-      GeometryIdentifier{}.setVolume(7).setLayer(3).setSensitive(2));
-  auto vol7_lay4 = makeSurface(GeometryIdentifier{}.setVolume(7).setLayer(4));
+      GeometryIdentifier{}.withVolume(7).withLayer(3).withSensitive(2));
+  auto vol7_lay4 = makeSurface(GeometryIdentifier{}.withVolume(7).withLayer(4));
   auto vol7_lay3_sen8 = makeSurface(
-      GeometryIdentifier{}.setVolume(7).setLayer(3).setSensitive(8));
+      GeometryIdentifier{}.withVolume(7).withLayer(3).withSensitive(8));
   auto vol7_lay5_sen11 = makeSurface(
-      GeometryIdentifier{}.setVolume(7).setLayer(5).setSensitive(11));
+      GeometryIdentifier{}.withVolume(7).withLayer(5).withSensitive(11));
   auto vol7_lay5_sen12 = makeSurface(
-      GeometryIdentifier{}.setVolume(7).setLayer(5).setSensitive(12));
+      GeometryIdentifier{}.withVolume(7).withLayer(5).withSensitive(12));
   auto vol7_lay6_sen3 = makeSurface(
-      GeometryIdentifier{}.setVolume(7).setLayer(6).setSensitive(3));
+      GeometryIdentifier{}.withVolume(7).withLayer(6).withSensitive(3));
 
   auto vol8_lay8_sen1 = makeSurface(
-      GeometryIdentifier{}.setVolume(8).setLayer(8).setSensitive(1));
+      GeometryIdentifier{}.withVolume(8).withLayer(8).withSensitive(1));
   auto vol8_lay8_sen2 = makeSurface(
-      GeometryIdentifier{}.setVolume(8).setLayer(8).setSensitive(2));
+      GeometryIdentifier{}.withVolume(8).withLayer(8).withSensitive(2));
   auto vol8_lay9_sen1 = makeSurface(
-      GeometryIdentifier{}.setVolume(8).setLayer(9).setSensitive(1));
+      GeometryIdentifier{}.withVolume(8).withLayer(9).withSensitive(1));
 
   TrackSelector::Config cfgVol7;
-  cfgVol7.measurementCounter.addCounter({GeometryIdentifier{}.setVolume(7)}, 3);
+  cfgVol7.measurementCounter.addCounter({GeometryIdentifier{}.withVolume(7)},
+                                        3);
   TrackSelector selectorVol7{cfgVol7};
 
   auto trackVol7 = makeTrack();
@@ -687,7 +688,8 @@ BOOST_AUTO_TEST_CASE(SubsetHitCountCut) {
   BOOST_CHECK(selectorVol7.isValidTrack(trackVol7));
 
   TrackSelector::Config cfgVol8;
-  cfgVol8.measurementCounter.addCounter({GeometryIdentifier{}.setVolume(8)}, 2);
+  cfgVol8.measurementCounter.addCounter({GeometryIdentifier{}.withVolume(8)},
+                                        2);
   TrackSelector selectorVol8{cfgVol8};
 
   // Previous trackVol7 has no measurements in volume 8
@@ -705,7 +707,7 @@ BOOST_AUTO_TEST_CASE(SubsetHitCountCut) {
 
   TrackSelector::Config cfgVol7Lay5;
   cfgVol7Lay5.measurementCounter.addCounter(
-      {GeometryIdentifier{}.setVolume(7).setLayer(5)}, 2);
+      {GeometryIdentifier{}.withVolume(7).withLayer(5)}, 2);
   TrackSelector selectorVol7Lay5{cfgVol7Lay5};
 
   // Only one hit on volume 7 layer 5
@@ -716,7 +718,7 @@ BOOST_AUTO_TEST_CASE(SubsetHitCountCut) {
   // Check requirement on volume 7 OR 8
   TrackSelector::Config cfgVol7Or8;
   cfgVol7Or8.measurementCounter.addCounter(
-      {GeometryIdentifier{}.setVolume(7), GeometryIdentifier{}.setVolume(8)},
+      {GeometryIdentifier{}.withVolume(7), GeometryIdentifier{}.withVolume(8)},
       4);
   TrackSelector selectorVol7Or8{cfgVol7Or8};
 
@@ -732,10 +734,10 @@ BOOST_AUTO_TEST_CASE(SubsetHitCountCut) {
   BOOST_CHECK(selectorVol7Or8.isValidTrack(trackVol8));
 
   TrackSelector::Config cfgVol7And8;
-  cfgVol7And8.measurementCounter.addCounter({GeometryIdentifier{}.setVolume(7)},
-                                            4);
-  cfgVol7And8.measurementCounter.addCounter({GeometryIdentifier{}.setVolume(8)},
-                                            2);
+  cfgVol7And8.measurementCounter.addCounter(
+      {GeometryIdentifier{}.withVolume(7)}, 4);
+  cfgVol7And8.measurementCounter.addCounter(
+      {GeometryIdentifier{}.withVolume(8)}, 2);
   TrackSelector selectorVol7And8{cfgVol7And8};
 
   // this track has enough hits in vol 7 but not enough in vol 8

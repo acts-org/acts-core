@@ -27,6 +27,11 @@ class Surface;
 class PerigeeSurface;
 class IMaterialDecorator;
 class TrackingVolume;
+class TrackingGeometryVisitor;
+class TrackingGeometryMutableVisitor;
+
+// Forward declaration only, the implementation is hidden in the .cpp file.
+class Gen1GeometryClosureVisitor;
 
 ///  @class TrackingGeometry
 ///
@@ -48,10 +53,11 @@ class TrackingGeometry {
   ///        surface or volume based material to the TrackingVolume
   /// @param hook Identifier hook to be applied to surfaces
   /// @param logger instance of a logger (defaulting to the "silent" one)
+  /// @param close If true, run the Gen1 geometry closure
   TrackingGeometry(const std::shared_ptr<TrackingVolume>& highestVolume,
                    const IMaterialDecorator* materialDecorator = nullptr,
                    const GeometryIdentifierHook& hook = {},
-                   const Logger& logger = getDummyLogger());
+                   const Logger& logger = getDummyLogger(), bool close = true);
 
   /// Destructor
   ~TrackingGeometry();
@@ -59,6 +65,10 @@ class TrackingGeometry {
   /// Access to the world volume
   /// @return plain pointer to the world volume
   const TrackingVolume* highestTrackingVolume() const;
+
+  /// Access to the world volume
+  /// @return plain pointer to the world volume
+  TrackingVolume* highestTrackingVolume();
 
   /// Access to the world volume
   /// @return shared pointer to the world volume
@@ -126,6 +136,9 @@ class TrackingGeometry {
     highestTrackingVolume()->template visitVolumes<visitor_t>(
         std::forward<visitor_t>(visitor));
   }
+
+  void apply(TrackingGeometryVisitor& visitor) const;
+  void apply(TrackingGeometryMutableVisitor& visitor);
 
   /// Search for a volume with the given identifier.
   ///

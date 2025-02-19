@@ -12,6 +12,7 @@
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "Acts/Geometry/GlueVolumesDescriptor.hpp"
 #include "Acts/Geometry/Portal.hpp"
+#include "Acts/Geometry/TrackingGeometryVisitor.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
 #include "Acts/Material/IMaterialDecorator.hpp"
 #include "Acts/Material/IVolumeMaterial.hpp"
@@ -359,133 +360,6 @@ void TrackingVolume::interlinkLayers() {
   }
 }
 
-void TrackingVolume::closeGeometry(
-    const IMaterialDecorator* materialDecorator,
-    std::unordered_map<GeometryIdentifier, const TrackingVolume*>& volumeMap,
-    std::size_t& vol, const GeometryIdentifierHook& hook,
-    const Logger& logger) {
-  if (m_confinedVolumes && !volumes().empty()) {
-    ACTS_ERROR(
-        "TrackingVolume::closeGeometry: Volume "
-        << volumeName()
-        << " has both confined volumes and volumes. This is not supported.");
-    throw std::invalid_argument("Volume has both confined volumes and volumes");
-  }
-
-  if (m_confinedLayers && !surfaces().empty()) {
-    ACTS_ERROR(
-        "TrackingVolume::closeGeometry: Volume "
-        << volumeName()
-        << " has both confined layers and surfaces. This is not supported.");
-    throw std::invalid_argument("Volume has both confined layers and surfaces");
-  }
-
-  // we can construct the volume ID from this
-  auto volumeID = GeometryIdentifier().setVolume(++vol);
-  // assign the Volume ID to the volume itself
-  auto thisVolume = const_cast<TrackingVolume*>(this);
-  thisVolume->assignGeometryId(volumeID);
-  ACTS_DEBUG("volumeID: " << volumeID << ", name: " << volumeName());
-  // insert the volume into the map
-  volumeMap[volumeID] = thisVolume;
-
-  // assign the material if you have a decorator
-  if (materialDecorator != nullptr) {
-    materialDecorator->decorate(*thisVolume);
-  }
-  if (thisVolume->volumeMaterial() == nullptr &&
-      thisVolume->motherVolume() != nullptr &&
-      thisVolume->motherVolume()->volumeMaterial() != nullptr) {
-    auto protoMaterial = dynamic_cast<const ProtoVolumeMaterial*>(
-        thisVolume->motherVolume()->volumeMaterial());
-    if (protoMaterial == nullptr) {
-      thisVolume->assignVolumeMaterial(
-          thisVolume->motherVolume()->volumeMaterialPtr());
-    }
-  }
-
-  this->assignGeometryId(volumeID);
-  // loop over the boundary surfaces
-  GeometryIdentifier::Value iboundary = 0;
-  // loop over the boundary surfaces
-  for (auto& bSurfIter : boundarySurfaces()) {
-    // get the intersection solution
-    auto& bSurface = bSurfIter->surfaceRepresentation();
-    // create the boundary surface id
-    iboundary++;
-    auto boundaryID = GeometryIdentifier(volumeID).setBoundary(iboundary);
-    // now assign to the boundary surface
-    auto& mutableBSurface = *(const_cast<RegularSurface*>(&bSurface));
-    mutableBSurface.assignGeometryId(boundaryID);
-    // Assign material if you have a decorator
-    if (materialDecorator != nullptr) {
-      materialDecorator->decorate(mutableBSurface);
-    }
-  }
-
-  // A) this is NOT a container volume, volumeID is already incremented
-  if (!m_confinedVolumes) {
-    // loop over the confined layers
-    if (m_confinedLayers) {
-      GeometryIdentifier::Value ilayer = 0;
-      // loop over the layers
-      for (auto& layerPtr : m_confinedLayers->arrayObjects()) {
-        // create the layer identification
-        ilayer++;
-        auto layerID = GeometryIdentifier(volumeID).setLayer(ilayer);
-        // now close the geometry
-        auto mutableLayerPtr = std::const_pointer_cast<Layer>(layerPtr);
-        mutableLayerPtr->closeGeometry(materialDecorator, layerID, hook,
-                                       logger);
-      }
-    }
-  } else {
-    // B) this is a container volume, go through sub volume
-    // do the loop
-    for (auto& volumesIter : m_confinedVolumes->arrayObjects()) {
-      auto mutableVolumesIter =
-          std::const_pointer_cast<TrackingVolume>(volumesIter);
-      mutableVolumesIter->setMotherVolume(this);
-      mutableVolumesIter->closeGeometry(materialDecorator, volumeMap, vol, hook,
-                                        logger);
-    }
-  }
-
-  if (!m_confinedDenseVolumes.empty()) {
-    for (auto& volumesIter : m_confinedDenseVolumes) {
-      auto mutableVolumesIter =
-          std::const_pointer_cast<TrackingVolume>(volumesIter);
-      mutableVolumesIter->setMotherVolume(this);
-      mutableVolumesIter->closeGeometry(materialDecorator, volumeMap, vol, hook,
-                                        logger);
-    }
-  }
-
-  GeometryIdentifier::Value iportal = 0;
-  for (auto& portal : portals()) {
-    iportal++;
-    auto portalId = GeometryIdentifier(volumeID).setBoundary(iportal);
-    assert(portal.isValid() && "Invalid portal encountered during closing");
-
-    portal.surface().assignGeometryId(portalId);
-  }
-
-  GeometryIdentifier::Value isensitive = 0;
-
-  for (auto& surface : surfaces()) {
-    if (surface.associatedDetectorElement() == nullptr) {
-      continue;
-    }
-    isensitive++;
-    auto sensitiveId = GeometryIdentifier(volumeID).setSensitive(isensitive);
-    surface.assignGeometryId(sensitiveId);
-  }
-
-  for (auto& volume : volumes()) {
-    volume.closeGeometry(materialDecorator, volumeMap, vol, hook, logger);
-  }
-}
-
 // Returns the boundary surfaces ordered in probability to hit them based on
 boost::container::small_vector<BoundaryIntersection, 4>
 TrackingVolume::compatibleBoundaries(const GeometryContext& gctx,
@@ -770,6 +644,126 @@ void TrackingVolume::initializeNavigationCandidates(
     const NavigationArguments& args, AppendOnlyNavigationStream& stream,
     const Logger& logger) const {
   m_navigationDelegate(args, stream, logger);
+}
+
+namespace {
+
+void visitLayer(const Acts::Layer& layer, TrackingGeometryVisitor& visitor) {
+  visitor.visitLayer(layer);
+  // Surfaces contained in the surface array
+  if (layer.surfaceArray() != nullptr) {
+    for (const auto& srf : layer.surfaceArray()->surfaces()) {
+      visitor.visitSurface(*srf);
+    }
+  }
+  visitor.visitSurface(layer.surfaceRepresentation());
+  if (layer.approachDescriptor() != nullptr) {
+    for (const auto& srf : layer.approachDescriptor()->containedSurfaces()) {
+      visitor.visitSurface(*srf);
+    }
+  }
+}
+
+}  // namespace
+
+// @TODO: Unify once Gen1 is removed: should share most code between mutable and const
+void TrackingVolume::apply(TrackingGeometryVisitor& visitor) const {
+  visitor.visitVolume(*this);
+
+  // Visit the boundary surfaces
+  for (const auto& bs : m_boundarySurfaces) {
+    visitor.visitBoundarySurface(*bs);
+    visitor.visitSurface(bs->surfaceRepresentation());
+  }
+
+  for (const auto& portal : portals()) {
+    visitor.visitPortal(portal);
+    visitor.visitSurface(portal.surface());
+  }
+
+  // Internal structure
+  if (m_confinedLayers != nullptr) {
+    std::ranges::for_each(
+        m_confinedLayers->arrayObjects(),
+        [&](const auto& layer) { visitLayer(*layer, visitor); });
+  }
+
+  if (m_confinedVolumes != nullptr) {
+    // contains sub volumes
+    for (const auto& volume : m_confinedVolumes->arrayObjects()) {
+      volume->apply(visitor);
+    }
+  }
+
+  for (const auto& surface : surfaces()) {
+    visitor.visitSurface(surface);
+  }
+
+  for (const auto& volume : volumes()) {
+    volume.apply(visitor);
+  }
+}
+
+void Acts::TrackingVolume::apply(TrackingGeometryMutableVisitor& visitor) {
+  visitor.visitVolume(*this);
+
+  // Visit the boundary surfaces
+  // This does const casts because Gen1 substructure does not have transitive
+  // const-ness
+  // @TODO: Remove this when Gen1 is remoeved
+  for (const auto& bs : m_boundarySurfaces) {
+    visitor.visitBoundarySurface(
+        const_cast<BoundarySurfaceT<TrackingVolume>&>(*bs));
+    visitor.visitSurface(
+        const_cast<RegularSurface&>(bs->surfaceRepresentation()));
+  }
+
+  for (auto& portal : portals()) {
+    visitor.visitPortal(portal);
+    visitor.visitSurface(portal.surface());
+  }
+
+  // Internal structure
+  // This does const casts because Gen1 substructure does not have transitive
+  // const-ness
+  // @TODO: Remove this when Gen1 is remoeved
+  if (m_confinedVolumes == nullptr) {
+    // no sub volumes => loop over the confined layers
+    if (m_confinedLayers != nullptr) {
+      for (const auto& layer : m_confinedLayers->arrayObjects()) {
+        visitor.visitLayer(const_cast<Layer&>(*layer));
+        // Surfaces contained in the surface array
+        if (layer->surfaceArray() != nullptr) {
+          for (const auto& srf : layer->surfaceArray()->surfaces()) {
+            visitor.visitSurface(const_cast<Surface&>(*srf));
+          }
+        }
+        // Surfaces of the layer
+        visitor.visitSurface(
+            const_cast<Surface&>(layer->surfaceRepresentation()));
+        // Approach surfaces of the layer
+        if (layer->approachDescriptor() != nullptr) {
+          for (const auto& srf :
+               layer->approachDescriptor()->containedSurfaces()) {
+            visitor.visitSurface(const_cast<Surface&>(*srf));
+          }
+        }
+      }
+    }
+  } else {
+    // contains sub volumes
+    for (const auto& volume : m_confinedVolumes->arrayObjects()) {
+      const_cast<TrackingVolume&>(*volume).apply(visitor);
+    }
+  }
+
+  for (auto& surface : surfaces()) {
+    visitor.visitSurface(surface);
+  }
+
+  for (auto& volume : volumes()) {
+    volume.apply(visitor);
+  }
 }
 
 }  // namespace Acts

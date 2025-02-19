@@ -70,9 +70,10 @@ BOOST_AUTO_TEST_CASE(trajectoryStateVolume) {
   std::vector<GeometryIdentifier::Value> volumes = {searchVolume};
 
   auto searchSurface = Surface::makeShared<PerigeeSurface>(Vector3(0, 0, 0));
-  searchSurface->assignGeometryId(GeometryIdentifier().setVolume(searchVolume));
+  searchSurface->assignGeometryId(
+      GeometryIdentifier().withVolume(searchVolume));
   auto otherSurface = Surface::makeShared<PerigeeSurface>(Vector3(0, 0, 0));
-  otherSurface->assignGeometryId(GeometryIdentifier().setVolume(otherVolume));
+  otherSurface->assignGeometryId(GeometryIdentifier().withVolume(otherVolume));
 
   VectorMultiTrajectory traj;
 

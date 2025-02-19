@@ -1397,3 +1397,33 @@ def test_exatrkx(tmp_path, trk_geo, field, assert_root_hash, backend, hardware):
     assert rfp.exists()
 
     assert_root_hash(root_file, rfp)
+
+
+def test_geometry_visitor(trk_geo):
+    class Visitor(acts.TrackingGeometryMutableVisitor):
+        def __init__(self):
+            super().__init__()
+            self.num_surfaces = 0
+            self.num_layers = 0
+            self.num_volumes = 0
+            self.num_portals = 0
+
+        def visitSurface(self, surface: acts.Surface):
+            self.num_surfaces += 1
+
+        def visitLayer(self, layer: acts.Layer):
+            self.num_layers += 1
+
+        def visitVolume(self, volume: acts.Volume):
+            self.num_volumes += 1
+
+        def visitPortal(self, portal: acts.Portal):
+            self.num_portals += 1
+
+    visitor = Visitor()
+    trk_geo.apply(visitor)
+
+    assert visitor.num_surfaces == 19078
+    assert visitor.num_layers == 111
+    assert visitor.num_volumes == 18
+    assert visitor.num_portals == 0

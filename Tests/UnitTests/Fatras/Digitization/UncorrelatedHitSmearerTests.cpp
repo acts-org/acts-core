@@ -85,7 +85,7 @@ struct Fixture {
 
   Fixture(std::uint64_t rngSeed, std::shared_ptr<Acts::Surface> surf)
       : rng(rngSeed),
-        gid(Acts::GeometryIdentifier().setVolume(1).setLayer(2).setSensitive(
+        gid(Acts::GeometryIdentifier().withVolume(1).withLayer(2).withSensitive(
             3)),
         pid(ActsFatras::Barcode().setVertexPrimary(12).setParticle(23)),
         surface(std::move(surf)) {

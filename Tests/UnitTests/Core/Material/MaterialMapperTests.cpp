@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(MaterialMapperFlowTest) {
                                            100.0)};
 
   for (auto [is, surface] : enumerate(surfaces)) {
-    surface->assignGeometryId(GeometryIdentifier().setSensitive(is + 1));
+    surface->assignGeometryId(GeometryIdentifier().withSensitive(is + 1));
   }
 
   // The assigner

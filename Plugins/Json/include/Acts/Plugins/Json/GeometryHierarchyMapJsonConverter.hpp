@@ -96,12 +96,13 @@ class GeometryHierarchyMapJsonConverter {
   /// @return a valid geometry Identifier
   static GeometryIdentifier decodeIdentifier(const nlohmann::json& encoded) {
     return GeometryIdentifier()
-        .setVolume(encoded.value("volume", GeometryIdentifier::Value{0u}))
-        .setBoundary(encoded.value("boundary", GeometryIdentifier::Value{0u}))
-        .setLayer(encoded.value("layer", GeometryIdentifier::Value{0u}))
-        .setApproach(encoded.value("approach", GeometryIdentifier::Value{0u}))
-        .setSensitive(encoded.value("sensitive", GeometryIdentifier::Value{0u}))
-        .setExtra(encoded.value("extra", GeometryIdentifier::Value{0u}));
+        .withVolume(encoded.value("volume", GeometryIdentifier::Value{0u}))
+        .withBoundary(encoded.value("boundary", GeometryIdentifier::Value{0u}))
+        .withLayer(encoded.value("layer", GeometryIdentifier::Value{0u}))
+        .withApproach(encoded.value("approach", GeometryIdentifier::Value{0u}))
+        .withSensitive(
+            encoded.value("sensitive", GeometryIdentifier::Value{0u}))
+        .withExtra(encoded.value("extra", GeometryIdentifier::Value{0u}));
   }
 
  private:

@@ -22,7 +22,7 @@ using Acts::GeometryIdentifier;
 
 // helper function to create geometry ids
 GeometryIdentifier makeId(int volume = 0, int layer = 0, int sensitive = 0) {
-  return GeometryIdentifier().setVolume(volume).setLayer(layer).setSensitive(
+  return GeometryIdentifier().withVolume(volume).withLayer(layer).withSensitive(
       sensitive);
 }
 

@@ -11,7 +11,7 @@ variables:
 
 .ccache_base:
   cache:
-    - key: ccache-${CI_JOB_NAME}-${CCACHE_KEY_SUFFIX}-${CLONE_URL}_${HEAD_REF}
+    - key: ccache-${CI_JOB_NAME}-${CCACHE_KEY_SUFFIX}-${REPO_SLUG}_${HEAD_REF}
       fallback_keys:
         - ccache-${CI_JOB_NAME}-${CCACHE_KEY_SUFFIX}-https://github.com/acts-project/acts.git-main
       when: always
@@ -510,9 +510,8 @@ linux_ubuntu_2204_clang:
   script:
     - >
       cmake -B build -S src
-      --preset=gitlab-ci
+      --preset=gitlab-ci-lcg
       -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}"
-      -DACTS_BUILD_PLUGIN_GEOMODEL=OFF # GeoModel is not in LCG at this point
 
     - ccache -z
     - cmake --build build -- -j6
@@ -547,3 +546,17 @@ lcg_106a:
           - gcc13
           - gcc14
           - clang16
+
+lcg_107:
+  extends: .lcg_base_job
+
+  variables:
+    LCG_VERSION: "107"
+
+  parallel:
+    matrix:
+      - OS: [alma9]
+        COMPILER:
+          - gcc13
+          - gcc14
+          - clang19

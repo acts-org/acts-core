@@ -59,7 +59,7 @@ def estimateLookup(trackingGeometry, numEvents, outputPath):
     # Set up the track estimation algorithm
     surfaces = list(trackingGeometry.geoIdSurfaceMap().values())
     refSurface = surfaces[0]
-    refGeometryId = refSurface.geometryId()
+    refGeometryId = refSurface.geometryId
 
     trackEstConfig = acts.examples.TrackParamsLookupEstimation.Config(
         refLayers={refGeometryId: refSurface},
