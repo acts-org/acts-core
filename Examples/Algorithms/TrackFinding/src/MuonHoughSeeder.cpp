@@ -9,6 +9,7 @@
 #include "ActsExamples/TrackFinding/MuonHoughSeeder.hpp"
 
 #include "ActsExamples/EventData/MuonSimHit.hpp"
+#include "ActsExamples/EventData/MuonSpacePoint.hpp"
 
 #include <algorithm>
 #include <cmath>
