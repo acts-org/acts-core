@@ -47,6 +47,7 @@ target_link_libraries(
         Threads::Threads
     PRIVATE ROOT::Core ROOT::Hist ROOT::Tree
 )
+target_compile_definitions(ActsExamplesIoRoot PUBLIC ACTS_EXAMPLES_WITH_ROOT)
 
 root_generate_dictionary(
   ActsExamplesIoRootDict MODULE ActsExamplesIoRoot LINKDEF LinkDef.hpp

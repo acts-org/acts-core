@@ -25,11 +25,14 @@
 #include "Acts/Plugins/Python/Utilities.hpp"
 #include "Acts/Utilities/Logger.hpp"
 #include "ActsExamples/Framework/ProcessCode.hpp"
-#include "ActsExamples/Io/Root/RootMaterialDecorator.hpp"
 #include "ActsExamples/MaterialMapping/CoreMaterialMapping.hpp"
 #include "ActsExamples/MaterialMapping/MappingMaterialDecorator.hpp"
 #include "ActsExamples/MaterialMapping/MaterialMapping.hpp"
 #include "ActsExamples/MaterialMapping/MaterialValidation.hpp"
+
+#ifdef ACTS_EXAMPLES_WITH_ROOT
+#include "ActsExamples/Io/Root/RootMaterialDecorator.hpp"
+#endif
 
 #include <array>
 #include <map>
@@ -86,6 +89,7 @@ void addMaterial(Context& ctx) {
                              &Acts::IMaterialDecorator::decorate, py::const_));
   }
 
+#ifdef ACTS_EXAMPLES_WITH_ROOT
   {
     auto rmd =
         py::class_<RootMaterialDecorator, Acts::IMaterialDecorator,
@@ -118,6 +122,7 @@ void addMaterial(Context& ctx) {
     ACTS_PYTHON_MEMBER(fileName);
     ACTS_PYTHON_STRUCT_END();
   }
+#endif
 
   {
     py::class_<MappingMaterialDecorator, Acts::IMaterialDecorator,

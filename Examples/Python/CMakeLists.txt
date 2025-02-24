@@ -55,7 +55,6 @@ target_link_libraries(
         ActsExamplesDetectorContextual
         ActsExamplesDetectorTGeo
         ActsExamplesMagneticField
-        ActsExamplesIoRoot
         ActsExamplesIoCsv
         ActsExamplesIoObj
         ActsExamplesIoJson
@@ -83,6 +82,16 @@ set(py_files
     examples/odd.py
     _adapter.py
 )
+
+if(ACTS_BUILD_EXAMPLES_ROOT)
+    target_link_libraries(ActsPythonBindings PUBLIC ActsExamplesIoRoot)
+    target_sources(
+        ActsPythonBindings
+        PRIVATE src/RootInput.cpp src/RootOutput.cpp
+    )
+else()
+    target_sources(ActsPythonBindings PRIVATE src/RootStub.cpp)
+endif()
 
 if(ACTS_BUILD_PLUGIN_JSON)
     target_link_libraries(ActsPythonBindings PUBLIC ActsPluginJson)

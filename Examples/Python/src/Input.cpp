@@ -17,15 +17,7 @@
 #include "ActsExamples/Io/Csv/CsvSimHitReader.hpp"
 #include "ActsExamples/Io/Csv/CsvSpacePointReader.hpp"
 #include "ActsExamples/Io/Csv/CsvTrackParameterReader.hpp"
-#include "ActsExamples/Io/Root/RootAthenaDumpReader.hpp"
-#include "ActsExamples/Io/Root/RootAthenaNTupleReader.hpp"
-#include "ActsExamples/Io/Root/RootMaterialTrackReader.hpp"
-#include "ActsExamples/Io/Root/RootParticleReader.hpp"
-#include "ActsExamples/Io/Root/RootSimHitReader.hpp"
-#include "ActsExamples/Io/Root/RootTrackSummaryReader.hpp"
-#include "ActsExamples/Io/Root/RootVertexReader.hpp"
-
-#include <memory>
+#include "ActsExamples/TrackFinding/ITrackParamsLookupReader.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -45,24 +37,6 @@ void addInput(Context& ctx) {
                              "BufferedReader", upstreamReader, selectionSeed,
                              bufferSize);
 
-  // ROOT READERS
-  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootParticleReader, mex,
-                             "RootParticleReader", outputParticles, treeName,
-                             filePath);
-
-  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootVertexReader, mex,
-                             "RootVertexReader", outputVertices, treeName,
-                             filePath);
-
-  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootMaterialTrackReader, mex,
-                             "RootMaterialTrackReader", outputMaterialTracks,
-                             treeName, fileList, readCachedSurfaceInformation);
-
-  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootTrackSummaryReader, mex,
-                             "RootTrackSummaryReader", outputTracks,
-                             outputParticles, treeName, filePath);
-
-  // CSV READERS
   ACTS_PYTHON_DECLARE_READER(ActsExamples::CsvParticleReader, mex,
                              "CsvParticleReader", inputDir, inputStem,
                              outputParticles);
@@ -90,33 +64,13 @@ void addInput(Context& ctx) {
                              "CsvTrackParameterReader", inputDir, inputStem,
                              outputTrackParameters, beamspot);
 
-  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootAthenaNTupleReader, mex,
-                             "RootAthenaNTupleReader", inputTreeName,
-                             inputFilePath, outputTrackParameters,
-                             outputTruthVtxParameters, outputRecoVtxParameters,
-                             outputBeamspotConstraint);
-
-  ACTS_PYTHON_DECLARE_READER(
-      ActsExamples::RootAthenaDumpReader, mex, "RootAthenaDumpReader", treename,
-      inputfile, outputMeasurements, outputPixelSpacePoints,
-      outputStripSpacePoints, outputSpacePoints, outputClusters,
-      outputMeasurementParticlesMap, outputParticles, onlyPassedParticles,
-      skipOverlapSPsPhi, skipOverlapSPsEta, geometryIdMap, trackingGeometry,
-      absBoundaryTolerance);
-
-#ifdef WITH_GEOMODEL_PLUGIN
-  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootAthenaDumpGeoIdCollector, mex,
-                             "RootAthenaDumpGeoIdCollector", treename,
-                             inputfile, trackingGeometry, geometryIdMap);
-#endif
-
-  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootSimHitReader, mex,
-                             "RootSimHitReader", treeName, filePath,
-                             outputSimHits);
-
   ACTS_PYTHON_DECLARE_READER(ActsExamples::CsvExaTrkXGraphReader, mex,
                              "CsvExaTrkXGraphReader", inputDir, inputStem,
                              outputGraph);
+
+  py::class_<ActsExamples::ITrackParamsLookupReader,
+             std::shared_ptr<ActsExamples::ITrackParamsLookupReader>>(
+      mex, "ITrackParamsLookupReader");
 }
 
 }  // namespace Acts::Python

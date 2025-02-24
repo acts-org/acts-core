@@ -56,6 +56,9 @@ void addVertexing(Context& ctx);
 void addAmbiguityResolution(Context& ctx);
 void addUtilities(Context& ctx);
 
+void addRootInput(Context& ctx);
+void addRootOutput(Context& ctx);
+
 // Plugins
 void addDigitization(Context& ctx);
 void addPythia8(Context& ctx);
@@ -143,4 +146,7 @@ PYBIND11_MODULE(ActsPythonBindings, m) {
   addCovfie(ctx);
   addTraccc(ctx);
   addHashing(ctx);
+
+  addRootInput(ctx);
+  addRootOutput(ctx);
 }
