@@ -9,6 +9,7 @@ add_library(
     src/HoughTransformSeeder.cpp
     src/TrackParamsEstimationAlgorithm.cpp
     src/MuonHoughSeeder.cpp
+    src/MuonSegmentFinder.cpp
     src/GbtsSeedingAlgorithm.cpp
     src/TrackParamsLookupEstimation.cpp
 )

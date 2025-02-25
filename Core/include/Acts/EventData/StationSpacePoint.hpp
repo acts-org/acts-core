@@ -36,10 +36,4 @@ namespace Acts{
             { sp.time()} -> std::same_as<double>;
         };
 
-        template<StationSpacePoint> 
-            class MeasurementSorter{
-                public:
-                    MeasurementSorter() = default;
-        };
-
 }

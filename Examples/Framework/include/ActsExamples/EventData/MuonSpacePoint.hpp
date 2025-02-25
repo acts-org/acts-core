@@ -3,7 +3,7 @@
 
 #include "Acts/EventData/StationSpacePoint.hpp"
 
-namespace Acts{
+namespace ActsExamples{
     class MuonSpacePoint {
         public:
             /** @brief Return the local meaurement position */
@@ -55,4 +55,13 @@ namespace Acts{
 
     };
     using SpacePointContainer = std::vector<std::vector<MuonSpacePoint>>;
+
+    class MuonSpacePointSorter{
+        public:
+            MuonSpacePointSorter(const std::vector<const MuonSpacePoint*>& spacePoins);
+
+            const std::vector<std::vector<const MuonSpacePoint*>>& strawHits() const;
+
+            const std::vector<std::vector<const MuonSpacePoint*>>& stripHits() const;
+    };
 }

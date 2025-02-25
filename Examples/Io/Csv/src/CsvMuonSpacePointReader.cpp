@@ -61,7 +61,7 @@ ProcessCode CsvMuonSpacePointReader::read(const AlgorithmContext& ctx) {
   MuonSpacePointData data;
 
 //   SimHitContainer::sequence_type unordered;
-    Acts::SpacePointContainer spacePoints{};
+    SpacePointContainer spacePoints{};
 
   while (reader.read(data)) {
     // unordered.push_back(SimHit(compressId(f), data.pdgId, pos, mom, mom, -1));

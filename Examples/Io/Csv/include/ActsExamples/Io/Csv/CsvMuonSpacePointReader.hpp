@@ -59,7 +59,7 @@ class CsvMuonSpacePointReader final : public IReader {
      std::pair<std::size_t, std::size_t> m_eventsRange{};
      std::unique_ptr<const Acts::Logger> m_logger{};
    
-     WriteDataHandle<Acts::SpacePointContainer> m_outputSpacePoints{this, "OutputMuonSpacePoints"};
+     WriteDataHandle<SpacePointContainer> m_outputSpacePoints{this, "OutputMuonSpacePoints"};
    
      const Acts::Logger& logger() const { return *m_logger; }
    };
