@@ -27,7 +27,7 @@ namespace ActsExamples{
 }
 
 ProcessCode MuonSegmentFinder::execute( const AlgorithmContext& ctx) const {
-  Acts::StrawChamberLineSeeder<MuonSpacePoint, MuonSpacePointSorter> seeder{};    
+  Acts::StrawChamberLineSeeder<MuonSpacePoint, MuonSpacePointSorter, MuonSpacePoint> seeder{};    
   return ProcessCode::SUCCESS;
 }
 

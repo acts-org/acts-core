@@ -21,8 +21,8 @@ namespace Acts{
          *  @param linePosB: Arbitrary point on the second line
          *  @param lineDirB: Direction of the second line (Unit-length) */
         template <unsigned N>
-        inline Intersection<N> lineIntersect(const Acts::Vector<N>& linePosA, const Acts::Vector<N>& lineDirA,
-                                             const Acts::Vector<N>& linePosB, const Acts::Vector<N>& lineDirB) {
+        inline Intersection<N> lineIntersect(const ActsVector<N>& linePosA, const ActsVector<N>& lineDirA,
+                                             const ActsVector<N>& linePosB, const ActsVector<N>& lineDirB) {
             
             static_assert(N>=2, "One dimensional intersect not sensible");
             /**  Use the formula
@@ -42,7 +42,7 @@ namespace Acts{
             const ActsVector<N> AminusB = linePosA - linePosB;
             const double pathLength =  (AminusB.dot(lineDirB) - AminusB.dot(lineDirA) * dirDots) / divisor;
             
-            return Intersection<N>{linePosB + pathLength * lineDirB, IntersectionStatus::onSurface};
+            return Intersection<N>{linePosB + pathLength * lineDirB, pathLength, IntersectionStatus::onSurface};
         }
         /** @brief Intersect the lines of two line surfaces using their respective transforms.
          *  @param lineSurfTrf1: local -> global transform of the first surface
@@ -57,7 +57,7 @@ namespace Acts{
          *  @param lineDir: Direction of the line to intersect
          *  @param planeNorm: Normal vector of the plane
          *  @param offSet: Offset to move the plane along the normal vector */
-        inline InterSection3D planeIntersect(const Acts::Vector3& linePos,
+        inline Intersection3D planeIntersect(const Acts::Vector3& linePos,
                                              const Acts::Vector3& lineDir,
                                              const Acts::Vector3& planeNorm,
                                              const double offset) {
@@ -76,7 +76,7 @@ namespace Acts{
          *  @param lineDir: Direction of the line to intersect
          *  @param planeNorm: Normal vector of the plane
          *  @param planePoint: Point on the plane */
-        inline InterSection3D planeIntersect(const Acts::Vector3& linePos,
+        inline Intersection3D planeIntersect(const Acts::Vector3& linePos,
                                              const Acts::Vector3& lineDir,
                                              const Acts::Vector3& planeNorm,
                                              const Acts::Vector3& planePoint) {
