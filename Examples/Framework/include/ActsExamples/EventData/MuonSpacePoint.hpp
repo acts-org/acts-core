@@ -58,10 +58,19 @@ namespace ActsExamples{
 
     class MuonSpacePointSorter{
         public:
-            MuonSpacePointSorter(const std::vector<const MuonSpacePoint*>& spacePoins);
+            MuonSpacePointSorter(const std::vector<const MuonSpacePoint*>& spacePoins) {
+                
+            }
 
-            const std::vector<std::vector<const MuonSpacePoint*>>& strawHits() const;
+            const std::vector<std::vector<const MuonSpacePoint*>>& strawHits() const{
+                return m_strawHits;
+            }
 
-            const std::vector<std::vector<const MuonSpacePoint*>>& stripHits() const;
+            const std::vector<std::vector<const MuonSpacePoint*>>& stripHits() const { 
+                return m_stripHits;
+            }
+        private:
+            std::vector<std::vector<const MuonSpacePoint*>> m_strawHits{};
+            std::vector<std::vector<const MuonSpacePoint*>> m_stripHits{};
     };
 }

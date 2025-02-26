@@ -15,6 +15,7 @@
 
 
 #include <array>
+#include <optional>
 namespace Acts{
 
     /** @brief Define the concept of the space point measurement sorter. The sorter shall take a collection 
@@ -37,11 +38,10 @@ namespace Acts{
  ///                              const Acts::Vector3& seedPos,
  ///                              const Acts::Vector3& seedDir,
  ///                              const double t0,
- ///                              const UnCalibSpType& uncalibSp)} -> std::same_as<std::vector<std::unique_ptr<UnCalibSpType>>;
+ ///                              const UnCalibSpType& uncalibSp)} -> std::same_as<std::unique_ptr<UnCalibSpType>;
  ///   };
     
-    template <StationSpacePoint UncalibSp_t, StationSpacePointSorter<UncalibSp_t> sorter,
-              StationSpacePoint CalibSp_t>
+    template <StationSpacePoint UncalibSp_t, StationSpacePointSorter<UncalibSp_t> Sorter_t>
     class StrawChamberLineSeeder{
         public:
             /** @brief Abbreviation of the uncalibrated hit vectors */
@@ -81,11 +81,33 @@ namespace Acts{
                 /** @brief Precision cut off in the fast segment fit */
                 double precCutOff{1.e-6};
             };
-            struct  DriftCircleSeed {
+
+
+            StrawChamberLineSeeder(const UnCalibHitVec_t& seedHits,
+                                   Config&& cfg,
+                                   std::unique_ptr<const Acts::Logger> logObj);
+
+            /** @brief Remove the copy constructor */
+            StrawChamberLineSeeder(const StrawChamberLineSeeder& other) = delete;
+            /** @brief Remove the copy assignment */
+            StrawChamberLineSeeder& operator=(const StrawChamberLineSeeder& other) = delete;
+
+            /** @brief Returns the number of already generated seeds */
+            unsigned int numGenerated() const {
+                return m_nGenSeeds;
+            }
+
+            /** @brief Seed object returned by the seeder. The seed contains the initial parameter estimate w.r.t
+             *         to the central plane surface inside the chamber. *Note* the parameter q/p is set to zero and 
+             *         does not serve any purpose here.
+             *          
+             *         Further the seed contains the list of associated measurements. If the seeder is run in the 
+             *         fast 2D fit mode, the number of iterations w.r.t. this fit procedure is appended as well. */
+            struct DriftCircleSeed {
                 /** @param Initial straight line seed parameters  */
                 ActsVector<5> parameters{ActsVector<5>::Zero()};
                 /** @brief  */
-                std::vector<std::unique_ptr<CalibSp_t>> measurements{};
+                std::vector<std::unique_ptr<UncalibSp_t>> measurements{};
                 /** @brief Iterations to obtain the seed */
                 unsigned int nIter{0};
                 /** @brief Seed chi2 */
@@ -95,8 +117,10 @@ namespace Acts{
                 /** @brief number of Mdt hits on the seed */
                 unsigned int nMdt{0};
             };
-            
         private:
+            Sorter_t m_hitLayers;
+            Config m_cfg{};
+            std::unique_ptr<const Acts::Logger> m_logger{};
             /** @brief Sign combinations to draw the 4 lines tangent to 2 drift circles s*/
             using SignCombo_t = std::array<int, 2>;
             constexpr static std::array<SignCombo_t, 4> s_signCombos{std::array{ 1, 1}, std::array{ 1,-1}, 
@@ -122,6 +146,11 @@ namespace Acts{
                 std::ostream& print(std::ostream& ostr) const;
             };
 
+            /** @brief Return the reference to the logger */
+            const Logger& logger() const { return *m_logger; }
+
+            /** @brief Prepares the generator to generate the seed from the next pair of drift circles */
+            void moveToNextCandidate();
 
             /** @brief Tries to build the seed from the two hits. Fails if the solution is invalid
              *         or if the seed has already been built before
@@ -156,7 +185,7 @@ namespace Acts{
                 double fitY0{0.};
             };
 
-            struct SeedFitAuxWithT0: public SeedFitAuxilliaries{
+            struct SeedFitAuxWithT0: public SeedFitAuxilliaries {
                 /** @brief Constructor */
                 SeedFitAuxWithT0(SeedFitAuxilliaries&& parent):
                     SeedFitAuxilliaries{std::move(parent)}{}

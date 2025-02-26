@@ -27,7 +27,12 @@ namespace ActsExamples{
 }
 
 ProcessCode MuonSegmentFinder::execute( const AlgorithmContext& ctx) const {
-  Acts::StrawChamberLineSeeder<MuonSpacePoint, MuonSpacePointSorter, MuonSpacePoint> seeder{};    
+  
+  using StrawSeeder_t = Acts::StrawChamberLineSeeder<MuonSpacePoint, MuonSpacePointSorter>;
+  StrawSeeder_t::Config seedCfg{};
+  std::vector<const MuonSpacePoint*> hits{};
+  
+  StrawSeeder_t seeder{hits, std::move(seedCfg), m_logger->clone()};
   return ProcessCode::SUCCESS;
 }
 
