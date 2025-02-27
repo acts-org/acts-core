@@ -55,4 +55,5 @@ target_sources(
         VolumeAttachmentStrategy.cpp
         VolumeResizeStrategy.cpp
         TrackingGeometryVisitor.cpp
+        TrapezoidPortalShell.cpp
 )
