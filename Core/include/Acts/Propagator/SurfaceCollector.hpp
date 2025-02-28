@@ -8,12 +8,15 @@
 
 #pragma once
 
+#include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Propagator/Propagator.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 
 #include <sstream>
 
 namespace Acts {
+
+using Covariance = BoundSquareMatrix;
 
 /// Simple struct to select surfaces
 struct SurfaceSelector {
@@ -54,6 +57,7 @@ struct SurfaceHit {
   const Surface* surface = nullptr;
   Vector3 position;
   Vector3 direction;
+  Covariance covariance;
 };
 
 /// A Surface Collector struct
@@ -108,6 +112,8 @@ struct SurfaceCollector {
       surface_hit.surface = currentSurface;
       surface_hit.position = stepper.position(state.stepping);
       surface_hit.direction = stepper.direction(state.stepping);
+      auto&& [pars,jac,pathLength] = stepper.boundState(state.stepping, *currentSurface).value();
+      surface_hit.covariance = *pars.covariance();
       // Save if in the result
       result.collected.push_back(surface_hit);
       // Screen output
