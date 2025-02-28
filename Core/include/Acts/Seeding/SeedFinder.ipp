@@ -552,8 +552,8 @@ SeedFinder<external_spacepoint_t, grid_t, platform_t>::filterCandidates(
     // eta=infinity: ~8.5%
     float scatteringInRegion2 = options.multipleScattering2 * iSinTheta2;
 
-    float sinTheta = 1 / std::sqrt(iSinTheta2);
-    float cosTheta = cotThetaB * sinTheta;
+    float sinTheta = 0.0f;
+    float cosTheta = 0.0f;
 
     // clear all vectors used in each inner for loop
     state.topSpVec.clear();
@@ -565,6 +565,8 @@ SeedFinder<external_spacepoint_t, grid_t, platform_t>::filterCandidates(
     float rotationTermsUVtoXY[2] = {0, 0};
     if constexpr (detailedMeasurement ==
                   Acts::DetectorMeasurementInfo::eDetailed) {
+      sinTheta = 1 / std::sqrt(iSinTheta2);
+      cosTheta = cotThetaB * sinTheta;
       rotationTermsUVtoXY[0] = cosPhiM * sinTheta;
       rotationTermsUVtoXY[1] = sinPhiM * sinTheta;
     }
@@ -771,7 +773,7 @@ SeedFinder<external_spacepoint_t, grid_t, platform_t>::filterCandidates(
       // convert p(T) to p scaling by sin^2(theta) AND scale by 1/sin^4(theta)
       // from rad to deltaCotTheta
       float p2scatterSigma = iHelixDiameter2 * sigmaSquaredPtDependent;
-      if (!std::isinf(m_config.maxPtScattering)) {
+      if (m_config.maxPtScattering > 0) {
         // if pT > maxPtScattering, calculate allowed scattering angle using
         // maxPtScattering instead of pt.
         // To avoid 0-divison the pT check is skipped in case of B2==0, and
