@@ -117,28 +117,30 @@ CuboidStackPortalShell::CuboidStackPortalShell(
     const GeometryContext& gctx, std::vector<CuboidPortalShell*> shells,
     AxisDirection direction, const Logger& logger)
     : m_direction(direction), m_shells{std::move(shells)} {
+  using enum AxisDirection;
+
   std::tie(m_frontFace, m_backFace, m_sideFaces) =
       CuboidVolumeBounds::facesFromAxisDirection(m_direction);
 
   std::unordered_map<Face, AxisDirection> onSurfaceDirs;
   switch (m_direction) {
-    case AxisDirection::AxisX:
-      onSurfaceDirs = {{NegativeZFace, AxisDirection::AxisX},
-                       {PositiveZFace, AxisDirection::AxisX},
-                       {NegativeYFace, AxisDirection::AxisY},
-                       {PositiveYFace, AxisDirection::AxisY}};
+    case AxisX:
+      onSurfaceDirs = {{NegativeZFace, AxisX},
+                       {PositiveZFace, AxisX},
+                       {NegativeYFace, AxisY},
+                       {PositiveYFace, AxisY}};
       break;
-    case AxisDirection::AxisY:
-      onSurfaceDirs = {{NegativeZFace, AxisDirection::AxisY},
-                       {PositiveZFace, AxisDirection::AxisY},
-                       {NegativeXFace, AxisDirection::AxisX},
-                       {PositiveXFace, AxisDirection::AxisX}};
+    case AxisY:
+      onSurfaceDirs = {{NegativeZFace, AxisY},
+                       {PositiveZFace, AxisY},
+                       {NegativeXFace, AxisX},
+                       {PositiveXFace, AxisX}};
       break;
-    case AxisDirection::AxisZ:
-      onSurfaceDirs = {{NegativeXFace, AxisDirection::AxisY},
-                       {PositiveXFace, AxisDirection::AxisY},
-                       {NegativeYFace, AxisDirection::AxisX},
-                       {PositiveYFace, AxisDirection::AxisX}};
+    case AxisZ:
+      onSurfaceDirs = {{NegativeXFace, AxisY},
+                       {PositiveXFace, AxisY},
+                       {NegativeYFace, AxisX},
+                       {PositiveYFace, AxisX}};
       break;
     default:
       throw std::invalid_argument("CuboidPortalShell: Invalid axis direction");
@@ -159,23 +161,22 @@ CuboidStackPortalShell::CuboidStackPortalShell(
     throw std::invalid_argument("Invalid shell");
   }
 
-  std::sort(m_shells.begin(), m_shells.end(),
-            [*this](const auto& shellA, const auto& shellB) {
-              switch (m_direction) {
-                case AxisDirection::AxisX:
-                  return (shellA->transform().translation().x() <
-                          shellB->transform().translation().x());
-                case AxisDirection::AxisY:
-                  return (shellA->transform().translation().y() <
-                          shellB->transform().translation().y());
-                case AxisDirection::AxisZ:
-                  return (shellA->transform().translation().z() <
-                          shellB->transform().translation().z());
-                default:
-                  throw std::invalid_argument(
-                      "CuboidPortalShell: Invalid axis direction");
-              }
-            });
+  std::ranges::sort(m_shells, [*this](const auto& shellA, const auto& shellB) {
+    switch (m_direction) {
+      case AxisX:
+        return (shellA->transform().translation().x() <
+                shellB->transform().translation().x());
+      case AxisY:
+        return (shellA->transform().translation().y() <
+                shellB->transform().translation().y());
+      case AxisZ:
+        return (shellA->transform().translation().z() <
+                shellB->transform().translation().z());
+      default:
+        throw std::invalid_argument(
+            "CuboidPortalShell: Invalid axis direction");
+    }
+  });
 
   auto merge = [&](Face face) {
     std::vector<std::shared_ptr<Portal>> portals;
