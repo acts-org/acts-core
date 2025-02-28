@@ -61,7 +61,14 @@ nlohmann::json Acts::Transform3JsonConverter::toJson(const Transform3& t,
     jTransform["translation"] = nlohmann::json();
   }
   // Write out the rotation, could be transposed
-  auto rotation = options.transpose ? t.rotation().transpose() : t.rotation();
+  // auto rotation = options.transpose ? t.rotation().transpose() :
+  // t.rotation();
+
+  Acts::RotationMatrix3 rotation = t.rotation();
+  if (options.transpose) {
+    rotation.transposeInPlace();
+  }
+
   if (rotation != Acts::RotationMatrix3::Identity() || options.writeIdentity) {
     std::array<double, 9> rdata = {
         rotation(0, 0), rotation(0, 1), rotation(0, 2),

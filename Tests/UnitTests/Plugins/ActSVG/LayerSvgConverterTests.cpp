@@ -103,7 +103,8 @@ std::shared_ptr<Acts::Layer> generateDiscLayer(double rInner, double rOuter,
         rotation.col(0) = localX;
         rotation.col(1) = localY;
         rotation.col(2) = localZ;
-        Acts::Transform3 placement(Acts::Translation3(center) * rotation);
+        Acts::Transform3 placement(Acts::Translation3(center) *
+                                   Eigen::Isometry3d(rotation));
         // Create the module surface
         auto dModule =
             Acts::Surface::makeShared<Acts::PlaneSurface>(placement, tBounds);

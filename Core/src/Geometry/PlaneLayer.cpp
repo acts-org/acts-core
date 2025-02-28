@@ -56,15 +56,26 @@ void Acts::PlaneLayer::buildApproachDescriptor() {
   //@todo fix with representing volume
   const Transform3& lTransform = transform(GeometryContext());
   RotationMatrix3 lRotation = lTransform.rotation();
+  if (!isIsometry(lRotation)) {
+    throw std::runtime_error(
+        "PlaneLayer::buildApproachDescriptor::ERROR lRotation is not an "
+        "isometry");
+  }
+
   const Vector3& lCenter = center(GeometryContext());
   const Vector3& lVector = normal(GeometryContext(), lCenter);
   // create new surfaces
-  const Transform3 apnTransform = Transform3(
-      Translation3(lCenter - 0.5 * Layer::m_layerThickness * lVector) *
-      lRotation);
-  const Transform3 appTransform = Transform3(
-      Translation3(lCenter + 0.5 * Layer::m_layerThickness * lVector) *
-      lRotation);
+
+  const auto lTrans =
+      Translation3(lCenter - 0.5 * Layer::m_layerThickness * lVector);
+  const auto rTrans =
+      Translation3(lCenter + 0.5 * Layer::m_layerThickness * lVector);
+
+  const Transform3 apnTransform =
+      Transform3(lTrans * Eigen::Isometry3d(lRotation));
+  const Transform3 appTransform =
+      Transform3(rTrans * Eigen::Isometry3d(lRotation));
+
   // create the new surfaces
   aSurfaces.push_back(Surface::makeShared<Acts::PlaneSurface>(
       apnTransform, PlaneSurface::m_bounds));

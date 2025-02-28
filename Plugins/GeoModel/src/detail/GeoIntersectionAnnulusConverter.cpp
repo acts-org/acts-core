@@ -47,7 +47,15 @@ Acts::detail::GeoIntersectionAnnulusConverter::operator()(
     // Get the shift
     const GeoShapeShift* shapeShift = dynamic_cast<const GeoShapeShift*>(opB);
     if (shapeShift != nullptr) {
-      const Transform3& shift = shapeShift->getX();
+      const Transform3& shift = Eigen::Isometry3d(shapeShift->getX().matrix());
+
+      // Check if this transformation can be treated as isometry
+      if (!isIsometry(shift)) {
+        throw std::runtime_error(
+            "GeoIntersectionAnnulusConverter::ERROR Transformation is not a "
+            "valid isometry!");
+      }
+
       const GeoGenericTrap* trap =
           dynamic_cast<const GeoGenericTrap*>(shapeShift->getOp());
       if (trap != nullptr) {

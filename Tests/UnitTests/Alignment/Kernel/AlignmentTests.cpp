@@ -124,7 +124,7 @@ struct TelescopeDetector {
     for (unsigned int i = 0; i < nLayers; ++i) {
       // The transform
       Translation3 trans(0., 0., positions[i]);
-      Transform3 trafo(rotation * trans);
+      Transform3 trafo(Eigen::Isometry3d(rotation) * trans);
       auto detElement = std::make_shared<DetectorElementStub>(
           trafo, rBounds, 1._um, surfaceMaterial);
       // The surface is not right!!!
@@ -142,7 +142,7 @@ struct TelescopeDetector {
 
     // The volume transform
     Translation3 transVol(0, 0, 0);
-    Transform3 trafoVol(rotation * transVol);
+    Transform3 trafoVol(Eigen::Isometry3d(rotation) * transVol);
     auto boundsVol = std::make_shared<CuboidVolumeBounds>(
         rBounds->halfLengthX() + 10._mm, rBounds->halfLengthY() + 10._mm,
         length + 10._mm);

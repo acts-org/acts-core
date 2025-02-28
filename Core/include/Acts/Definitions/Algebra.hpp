@@ -23,6 +23,9 @@
 #include <Eigen/Geometry>
 #endif
 
+#include <concepts>
+#include <type_traits>
+
 namespace Acts {
 
 /// @defgroup acts-algebra-types Vector/matrix types with a common scalar type
@@ -87,8 +90,35 @@ using AngleAxis3 = Eigen::AngleAxis<double>;
 // - 2d affine compact stored as 2x3 matrix
 // - 3d affine stored as 4x4 matrix
 using Transform2 = Eigen::Transform<double, 2, Eigen::AffineCompact>;
-using Transform3 = Eigen::Transform<double, 3, Eigen::Affine>;
+using Transform3 = Eigen::Transform<double, 3, Eigen::Isometry>;
 
 constexpr double s_transformEquivalentTolerance = 1e-9;
+constexpr double s_isometryEquivalentTolerance = 1e-6;
+
+// Check that the linear part of a transform is a pure rotation
+template <typename T>
+inline bool isIsometry(const T& transform) {
+  bool isDetOne = false;
+  bool isOrthogonal = false;
+  using BaseT = std::remove_cvref_t<T>;
+
+  if constexpr (std::same_as<BaseT, Transform3>) {
+    auto R = transform.linear();
+    isDetOne = std::abs(R.determinant() - 1.0) < s_isometryEquivalentTolerance;
+    isOrthogonal =
+        (R.transpose() * R).isIdentity(s_isometryEquivalentTolerance);
+
+  } else if constexpr (std::same_as<BaseT, RotationMatrix3>) {
+    isDetOne =
+        std::abs(transform.determinant() - 1.0) < s_isometryEquivalentTolerance;
+    isOrthogonal = (transform.transpose() * transform)
+                       .isIdentity(s_isometryEquivalentTolerance);
+
+  } else {
+    return false;
+  }
+
+  return (isDetOne && isOrthogonal);
+}
 
 }  // namespace Acts

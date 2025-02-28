@@ -97,18 +97,20 @@ std::vector<OrientedSurface> CylinderVolumeBounds::orientedSurfaces(
   double bevelMaxZ = get(eBevelMaxZ);
   Transform3 transMinZ, transMaxZ;
   if (bevelMinZ != 0.) {
-    double sy = 1 - 1 / std::cos(bevelMinZ);
-    transMinZ = transform * vMinZ *
-                Eigen::AngleAxisd(-bevelMinZ, Eigen::Vector3d(1., 0., 0.)) *
-                Eigen::Scaling(1., 1. + sy, 1.);
+    // double sy = 1 - 1 / std::cos(bevelMinZ);
+    // transMinZ = transform * vMinZ *
+    //             Eigen::AngleAxisd(-bevelMinZ, Eigen::Vector3d(1., 0., 0.)) *
+    //             Eigen::Scaling(1., 1. + sy, 1.);
+    throw std::invalid_argument("Bevel Min Z != 0 is not supported");
   } else {
     transMinZ = transform * vMinZ;
   }
   if (bevelMaxZ != 0.) {
-    double sy = 1 - 1 / std::cos(bevelMaxZ);
-    transMaxZ = transform * vMaxZ *
-                Eigen::AngleAxisd(bevelMaxZ, Eigen::Vector3d(1., 0., 0.)) *
-                Eigen::Scaling(1., 1. + sy, 1.);
+    // double sy = 1 - 1 / std::cos(bevelMaxZ);
+    // transMaxZ = transform * vMaxZ *
+    //             Eigen::AngleAxisd(bevelMaxZ, Eigen::Vector3d(1., 0., 0.)) *
+    //             Eigen::Scaling(1., 1. + sy, 1.);
+    throw std::invalid_argument("Bevel Max Z != 0 is not supported");
   } else {
     transMaxZ = transform * vMaxZ;
   }

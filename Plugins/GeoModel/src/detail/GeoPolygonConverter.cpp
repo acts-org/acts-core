@@ -36,7 +36,7 @@ Acts::detail::GeoPolygonConverter::operator()(
   // Create the surface transform
   Transform3 transform = Transform3::Identity();
   transform.translation() = unitLength * absTransform.translation();
-  auto rotation = absTransform.rotation();
+  RotationMatrix3 rotation = absTransform.linear();
   // Get the half lengths
   int nVertices = polygon.getNVertices();
   std::vector<std::vector<double>> vertices;

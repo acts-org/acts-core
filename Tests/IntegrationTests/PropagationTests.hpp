@@ -170,8 +170,7 @@ inline Acts::Transform3 makeCurvilinearTransform(
   rotation.col(1) = unitV;
   rotation.col(2) = unitW;
   Acts::Translation3 offset(params.position(geoCtx));
-  Acts::Transform3 toGlobal = offset * rotation;
-
+  Acts::Transform3 toGlobal = offset * Eigen::Isometry3d(rotation);
   return toGlobal;
 }
 
