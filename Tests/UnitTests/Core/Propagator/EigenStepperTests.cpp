@@ -217,6 +217,7 @@ BOOST_AUTO_TEST_CASE(eigen_stepper_test) {
 
   EigenStepper<>::Options esOptions(tgContext, mfContext);
   esOptions.maxStepSize = stepSize;
+  esOptions.initialStepSize = 10_m;
 
   // Build the stepper and the state
   EigenStepper<> es(bField);

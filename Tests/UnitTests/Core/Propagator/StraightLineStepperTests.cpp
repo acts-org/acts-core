@@ -31,6 +31,7 @@
 #include <optional>
 #include <string>
 
+using namespace Acts::UnitLiterals;
 using Acts::VectorHelpers::makeVector4;
 
 namespace Acts::Test {
@@ -114,6 +115,7 @@ BOOST_AUTO_TEST_CASE(straight_line_stepper_test) {
 
   StraightLineStepper::Options options(tgContext, mfContext);
   options.maxStepSize = stepSize;
+  options.initialStepSize = 10_m;
 
   // Build the stepper and the state
   StraightLineStepper sls;

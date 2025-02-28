@@ -192,6 +192,7 @@ BOOST_AUTO_TEST_CASE(sympy_stepper_test) {
 
   SympyStepper::Options esOptions(tgContext, mfContext);
   esOptions.maxStepSize = stepSize;
+  esOptions.initialStepSize = 10_m;
 
   // Build the stepper and the state
   SympyStepper es(bField);

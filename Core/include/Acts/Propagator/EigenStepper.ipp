@@ -46,7 +46,9 @@ void Acts::EigenStepper<E>::initialize(State& state,
   state.pathAccumulated = 0;
   state.nSteps = 0;
   state.nStepTrials = 0;
-  state.stepSize = ConstrainedStep(state.options.maxStepSize);
+  state.stepSize = ConstrainedStep();
+  state.stepSize.setAccuracy(state.options.initialStepSize);
+  state.stepSize.setUser(state.options.maxStepSize);
   state.previousStepSize = 0;
   state.statistics = StepperStatistics();
 
