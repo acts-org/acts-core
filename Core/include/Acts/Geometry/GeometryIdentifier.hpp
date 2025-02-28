@@ -161,6 +161,32 @@ class GeometryIdentifier {
     return id;
   }
 
+  /// Get the maximum value for the volume identifier.
+  /// @return the maximum value for the volume identifier
+  static constexpr Value getMaxVolume() { return getMaxValue(kVolumeMask); }
+
+  /// Get the maximum value for the boundary identifier.
+  /// @return the maximum value for the boundary identifier
+  static constexpr Value getMaxBoundary() { return getMaxValue(kBoundaryMask); }
+
+  /// Get the maximum value for the layer identifier.
+  /// @return the maximum value for the layer identifier
+  static constexpr Value getMaxLayer() { return getMaxValue(kLayerMask); }
+
+  /// Get the maximum value for the approach identifier.
+  /// @return the maximum value for the approach identifier
+  static constexpr Value getMaxApproach() { return getMaxValue(kApproachMask); }
+
+  /// Get the maximum value for the sensitive identifier.
+  /// @return the maximum value for the sensitive identifier
+  static constexpr Value getMaxSensitive() {
+    return getMaxValue(kSensitiveMask);
+  }
+
+  /// Get the maximum value for the extra identifier.
+  /// @return the maximum value for the extra identifier
+  static constexpr Value getMaxExtra() { return getMaxValue(kExtraMask); }
+
  private:
   // clang-format off
   /// (2^8)-1 = 255 volumes
@@ -233,7 +259,6 @@ struct GeometryIdentifierHook {
 };
 
 }  // namespace Acts
-
 // specialize std::hash so GeometryIdentifier can be used e.g. in an
 // unordered_map
 namespace std {

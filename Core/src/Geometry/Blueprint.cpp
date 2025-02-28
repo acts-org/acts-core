@@ -9,6 +9,7 @@
 #include "Acts/Geometry/Blueprint.hpp"
 
 #include "Acts/Geometry/CuboidVolumeBounds.hpp"
+#include "Acts/Geometry/CylinderPortalShell.hpp"
 #include "Acts/Geometry/CylinderVolumeBounds.hpp"
 #include "Acts/Geometry/Extent.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
@@ -21,7 +22,7 @@ namespace {
 const std::string s_rootName = "Root";
 }
 
-namespace Acts {
+namespace Acts::Experimental {
 
 Blueprint::Blueprint(const Config &config) : m_cfg(config) {}
 
@@ -175,7 +176,7 @@ std::unique_ptr<TrackingGeometry> Blueprint::construct(
       ACTS_VERBOSE("~> Volume ID: " << m_volumeID);
     }
 
-    void visitPortal(Portal &portal) override {
+    void visitPortal(::Acts::Portal &portal) override {
       // Increment the portal ID for this portal
       m_iportal += 1;
       // create the portal ID
@@ -211,4 +212,4 @@ std::unique_ptr<TrackingGeometry> Blueprint::construct(
       std::move(world), nullptr, GeometryIdentifierHook{}, logger, false);
 }
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

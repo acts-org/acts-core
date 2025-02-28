@@ -84,8 +84,9 @@ class CuboidalContainerBuilder : public IDetectorComponentBuilder {
   /// @note that the naming of the builders is taken from the bluprint nodes
   ///
   /// @return a cylindrical container builder representing this blueprint
-  CuboidalContainerBuilder(const Acts::Experimental::Blueprint::Node& bpNode,
-                           Acts::Logging::Level logLevel = Acts::Logging::INFO);
+  CuboidalContainerBuilder(
+      const Acts::Experimental::Gen2Blueprint::Node& bpNode,
+      Acts::Logging::Level logLevel = Acts::Logging::INFO);
 
   /// The final implementation of the cylindrical container builder
   ///

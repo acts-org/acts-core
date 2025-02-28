@@ -12,19 +12,19 @@
 
 #include <ostream>
 
-namespace Acts {
+namespace Acts::Experimental {
 
 /// The layer node is essentially an auto-sizing wrapper around a set of
 /// surfaces.
 /// @note This implementation is **preliminary** and will likely change
 ///       in the future.
-/// It defers most of the functionality to @ref Acts::StaticBlueprintNode,
+/// It defers most of the functionality to @ref Acts::Experimental::StaticBlueprintNode,
 /// after the initial volume creation is completed.
 ///
 /// The layer volume is created to wrap around the surfaces registered with
 /// this node. The orientation of the resulting volume defaults to the identity
 /// matrix. If another orientation is desired, this can be set with the @ref
-/// Acts::LayerBlueprintNode::setTransform. See @ref Acts::ProtoLayer for
+/// Acts::Experimental::LayerBlueprintNode::setTransform. See @ref Acts::ProtoLayer for
 /// details on the auto-sizing from surfaces.
 ///
 class LayerBlueprintNode : public StaticBlueprintNode {
@@ -56,7 +56,7 @@ class LayerBlueprintNode : public StaticBlueprintNode {
   /// -# Register the surfaces with the volume
   /// -# Return the volume
   /// @note At least one surfaces needs to be registered via
-  ///       @ref Acts::LayerBlueprintNode::setSurfaces before
+  ///       @ref Acts::Experimental::LayerBlueprintNode::setSurfaces before
   ///       geometry construction.
   Volume& build(const BlueprintOptions& options, const GeometryContext& gctx,
                 const Logger& logger = Acts::getDummyLogger()) override;
@@ -121,7 +121,7 @@ class LayerBlueprintNode : public StaticBlueprintNode {
   }
 
  private:
-  /// @copydoc Acts::BlueprintNode::addToGraphviz
+  /// @copydoc Acts::Experimental::BlueprintNode::addToGraphviz
   void addToGraphviz(std::ostream& os) const override;
 
   /// Helper method that performs the volume creation from the configured
@@ -138,4 +138,4 @@ class LayerBlueprintNode : public StaticBlueprintNode {
   LayerType m_layerType = LayerType::Cylinder;
 };
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

@@ -73,8 +73,8 @@ template <TrackContainerFrontend track_container_t>
 std::vector<double> Acts::ScoreBasedAmbiguityResolution::simpleScore(
     const track_container_t& tracks,
     const std::vector<std::vector<TrackFeatures>>& trackFeaturesVectors,
-    const OptionalCuts<typename track_container_t::ConstTrackProxy>&
-        optionalCuts) const {
+    const Optionals<typename track_container_t::ConstTrackProxy>& optionals)
+    const {
   std::vector<double> trackScore;
   trackScore.reserve(tracks.size());
 
@@ -89,43 +89,10 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::simpleScore(
     // get the trackFeatures map for the track
     const auto& trackFeaturesVector = trackFeaturesVectors[iTrack];
     double score = 1;
-    auto pT = Acts::VectorHelpers::perp(track.momentum());
     auto eta = Acts::VectorHelpers::eta(track.momentum());
-    auto phi = Acts::VectorHelpers::phi(track.momentum());
-    // cuts on pT
-    if (pT < m_cfg.pTMin || pT > m_cfg.pTMax) {
-      score = 0;
-      iTrack++;
-      trackScore.push_back(score);
-      ACTS_DEBUG("Track: " << iTrack
-                           << " has score = 0, due to pT cuts --- pT = " << pT);
-      continue;
-    }
-
-    // cuts on phi
-    if (phi > m_cfg.phiMax || phi < m_cfg.phiMin) {
-      score = 0;
-      iTrack++;
-      trackScore.push_back(score);
-      ACTS_DEBUG("Track: " << iTrack
-                           << " has score = 0, due to phi cuts --- phi =  "
-                           << phi);
-      continue;
-    }
-
-    // cuts on eta
-    if (eta > m_cfg.etaMax || eta < m_cfg.etaMin) {
-      score = 0;
-      iTrack++;
-      trackScore.push_back(score);
-      ACTS_DEBUG("Track: " << iTrack
-                           << " has score = 0, due to eta cuts --- eta =  "
-                           << eta);
-      continue;
-    }
 
     // cuts on optional cuts
-    for (const auto& cutFunction : optionalCuts.cuts) {
+    for (const auto& cutFunction : optionals.cuts) {
       if (cutFunction(track)) {
         score = 0;
         ACTS_DEBUG("Track: " << iTrack
@@ -140,6 +107,7 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::simpleScore(
       ACTS_DEBUG("Track: " << iTrack << " score : " << score);
       continue;
     }
+
     // Reject tracks which didn't pass the detector cuts.
     for (std::size_t detectorId = 0; detectorId < m_cfg.detectorConfigs.size();
          detectorId++) {
@@ -147,15 +115,14 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::simpleScore(
 
       const auto& trackFeatures = trackFeaturesVector[detectorId];
 
-      ACTS_DEBUG("---> Found summary information");
-      ACTS_DEBUG("---> Detector ID: " << detectorId);
-      ACTS_DEBUG("---> Number of hits: " << trackFeatures.nHits);
-      ACTS_DEBUG("---> Number of holes: " << trackFeatures.nHoles);
-      ACTS_DEBUG("---> Number of outliers: " << trackFeatures.nOutliers);
+      ACTS_VERBOSE("---> Found summary information");
+      ACTS_VERBOSE("---> Detector ID: " << detectorId);
+      ACTS_VERBOSE("---> Number of hits: " << trackFeatures.nHits);
+      ACTS_VERBOSE("---> Number of holes: " << trackFeatures.nHoles);
+      ACTS_VERBOSE("---> Number of outliers: " << trackFeatures.nOutliers);
 
-      if ((trackFeatures.nHits < detector.minHits) ||
-          (trackFeatures.nHoles > detector.maxHoles) ||
-          (trackFeatures.nOutliers > detector.maxOutliers)) {
+      // eta based cuts
+      if (etaBasedCuts(detector, trackFeatures, eta)) {
         score = 0;
         ACTS_DEBUG("Track: " << iTrack
                              << " has score = 0, due to detector cuts");
@@ -170,9 +137,7 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::simpleScore(
       continue;
     }
 
-    // real scoring starts here
-    // if the ambiguity scoring function is used, the score is processed with a
-    // different algorithm than the simple score.
+    // All cuts passed, now start scoring the track
 
     ACTS_VERBOSE("Using Simple Scoring function");
 
@@ -192,7 +157,7 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::simpleScore(
     }
 
     // Adding scores based on optional weights
-    for (const auto& weightFunction : optionalCuts.weights) {
+    for (const auto& weightFunction : optionals.weights) {
       weightFunction(track, score);
     }
 
@@ -221,8 +186,8 @@ template <TrackContainerFrontend track_container_t>
 std::vector<double> Acts::ScoreBasedAmbiguityResolution::ambiguityScore(
     const track_container_t& tracks,
     const std::vector<std::vector<TrackFeatures>>& trackFeaturesVectors,
-    const OptionalCuts<typename track_container_t::ConstTrackProxy>&
-        optionalCuts) const {
+    const Optionals<typename track_container_t::ConstTrackProxy>& optionals)
+    const {
   std::vector<double> trackScore;
   trackScore.reserve(tracks.size());
 
@@ -241,41 +206,9 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::ambiguityScore(
     double score = 1;
     auto pT = Acts::VectorHelpers::perp(track.momentum());
     auto eta = Acts::VectorHelpers::eta(track.momentum());
-    auto phi = Acts::VectorHelpers::phi(track.momentum());
-    // cuts on pT
-    if (pT < m_cfg.pTMin || pT > m_cfg.pTMax) {
-      score = 0;
-      iTrack++;
-      trackScore.push_back(score);
-      ACTS_DEBUG("Track: " << iTrack
-                           << " has score = 0, due to pT cuts --- pT = " << pT);
-      continue;
-    }
-
-    // cuts on phi
-    if (phi > m_cfg.phiMax || phi < m_cfg.phiMin) {
-      score = 0;
-      iTrack++;
-      trackScore.push_back(score);
-      ACTS_DEBUG("Track: " << iTrack
-                           << " has score = 0, due to phi cuts --- phi =  "
-                           << phi);
-      continue;
-    }
-
-    // cuts on eta
-    if (eta > m_cfg.etaMax || eta < m_cfg.etaMin) {
-      score = 0;
-      iTrack++;
-      trackScore.push_back(score);
-      ACTS_DEBUG("Track: " << iTrack
-                           << " has score = 0, due to eta cuts --- eta =  "
-                           << eta);
-      continue;
-    }
 
     // cuts on optional cuts
-    for (const auto& cutFunction : optionalCuts.cuts) {
+    for (const auto& cutFunction : optionals.cuts) {
       if (cutFunction(track)) {
         score = 0;
         ACTS_DEBUG("Track: " << iTrack
@@ -290,6 +223,7 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::ambiguityScore(
       ACTS_DEBUG("Track: " << iTrack << " score : " << score);
       continue;
     }
+
     // Reject tracks which didn't pass the detector cuts.
     for (std::size_t detectorId = 0; detectorId < m_cfg.detectorConfigs.size();
          detectorId++) {
@@ -297,15 +231,14 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::ambiguityScore(
 
       const auto& trackFeatures = trackFeaturesVector[detectorId];
 
-      ACTS_DEBUG("---> Found summary information");
-      ACTS_DEBUG("---> Detector ID: " << detectorId);
-      ACTS_DEBUG("---> Number of hits: " << trackFeatures.nHits);
-      ACTS_DEBUG("---> Number of holes: " << trackFeatures.nHoles);
-      ACTS_DEBUG("---> Number of outliers: " << trackFeatures.nOutliers);
+      ACTS_VERBOSE("---> Found summary information");
+      ACTS_VERBOSE("---> Detector ID: " << detectorId);
+      ACTS_VERBOSE("---> Number of hits: " << trackFeatures.nHits);
+      ACTS_VERBOSE("---> Number of holes: " << trackFeatures.nHoles);
+      ACTS_VERBOSE("---> Number of outliers: " << trackFeatures.nOutliers);
 
-      if ((trackFeatures.nHits < detector.minHits) ||
-          (trackFeatures.nHoles > detector.maxHoles) ||
-          (trackFeatures.nOutliers > detector.maxOutliers)) {
+      // eta based cuts
+      if (etaBasedCuts(detector, trackFeatures, eta)) {
         score = 0;
         ACTS_DEBUG("Track: " << iTrack
                              << " has score = 0, due to detector cuts");
@@ -319,6 +252,8 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::ambiguityScore(
       ACTS_DEBUG("Track: " << iTrack << " score : " << score);
       continue;
     }
+
+    // All cuts passed, now start scoring the track
 
     // start with larger score for tracks with higher pT.
     score = std::log10(pT / UnitConstants::MeV) - 1.;
@@ -357,7 +292,7 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::ambiguityScore(
                                  << "  New score now: " << score);
     }
 
-    for (const auto& scoreFunction : optionalCuts.scores) {
+    for (const auto& scoreFunction : optionals.scores) {
       scoreFunction(track, score);
     }
 
@@ -370,6 +305,7 @@ std::vector<double> Acts::ScoreBasedAmbiguityResolution::ambiguityScore(
                                         << " is : " << fac
                                         << "  New score now: " << score);
     }
+
     iTrack++;
 
     // Add the score to the vector
@@ -386,8 +322,8 @@ template <TrackContainerFrontend track_container_t, typename source_link_hash_t,
 std::vector<int> Acts::ScoreBasedAmbiguityResolution::solveAmbiguity(
     const track_container_t& tracks, source_link_hash_t sourceLinkHash,
     source_link_equality_t sourceLinkEquality,
-    const OptionalCuts<typename track_container_t::ConstTrackProxy>&
-        optionalCuts) const {
+    const Optionals<typename track_container_t::ConstTrackProxy>& optionals)
+    const {
   ACTS_INFO("Number of tracks before Ambiguty Resolution: " << tracks.size());
   // vector of trackFeaturesVectors. where each trackFeaturesVector contains the
   // number of hits/hole/outliers for each detector in a track.
@@ -397,10 +333,10 @@ std::vector<int> Acts::ScoreBasedAmbiguityResolution::solveAmbiguity(
 
   std::vector<double> trackScore;
   trackScore.reserve(tracks.size());
-  if (m_cfg.useAmbiguityFunction) {
-    trackScore = ambiguityScore(tracks, trackFeaturesVectors, optionalCuts);
+  if (m_cfg.useAmbiguityScoring) {
+    trackScore = ambiguityScore(tracks, trackFeaturesVectors, optionals);
   } else {
-    trackScore = simpleScore(tracks, trackFeaturesVectors, optionalCuts);
+    trackScore = simpleScore(tracks, trackFeaturesVectors, optionals);
   }
 
   auto MeasurementIndexMap =
@@ -440,37 +376,18 @@ std::vector<int> Acts::ScoreBasedAmbiguityResolution::solveAmbiguity(
   std::vector<int> goodTracks;
   int cleanTrackIndex = 0;
 
-  auto optionalHitSelections = optionalCuts.hitSelections;
+  auto optionalHitSelections = optionals.hitSelections;
 
   // Loop over all the tracks in the container
   // For each track, check if the track has too many shared hits to be accepted.
-  // If the track is accepted, remove bad hits and check if the track has a
-  // score higher than the minimum score for shared tracks.
-  // If the track is good, add it to the goodTracks vector.
+  // If the track is good, add it to the goodTracks
   for (std::size_t iTrack = 0; const auto& track : tracks) {
     // Check if the track has too many shared hits to be accepted.
-    auto trackFeaturesVector = trackFeaturesVectors.at(iTrack);
-    bool trkCouldBeAccepted = true;
-    for (std::size_t detectorId = 0; detectorId < m_cfg.detectorConfigs.size();
-         detectorId++) {
-      auto detector = m_cfg.detectorConfigs.at(detectorId);
-      if (trackFeaturesVector[detectorId].nSharedHits >
-          detector.maxSharedHits) {
-        trkCouldBeAccepted = false;
-        break;
-      }
-    }
-    if (!trkCouldBeAccepted) {
-      iTrack++;
-      continue;
-    }
-
-    trkCouldBeAccepted = getCleanedOutTracks(
-        track, trackScore[iTrack], measurementsPerTrackVector[iTrack],
-        nTracksPerMeasurement, optionalHitSelections);
-    if (trkCouldBeAccepted) {
+    if (getCleanedOutTracks(track, trackScore[iTrack],
+                            measurementsPerTrackVector[iTrack],
+                            nTracksPerMeasurement, optionalHitSelections)) {
       cleanTrackIndex++;
-      if (trackScore[iTrack] >= m_cfg.minScore) {
+      if (trackScore[iTrack] > m_cfg.minScore) {
         goodTracks.push_back(track.index());
       }
     }
@@ -541,6 +458,18 @@ bool Acts::ScoreBasedAmbiguityResolution::getCleanedOutTracks(
         ACTS_DEBUG("Track state has no reference surface");
         continue;
       }
+
+      std::size_t ivolume = ts.referenceSurface().geometryId().volume();
+      auto volume_it = m_cfg.volumeMap.find(ivolume);
+      if (volume_it == m_cfg.volumeMap.end()) {
+        ACTS_ERROR("Volume " << ivolume << " not found in the volume map");
+        continue;
+      }
+
+      std::size_t detectorID = volume_it->second;
+
+      const auto& detector = m_cfg.detectorConfigs.at(detectorID);
+
       measurement = measurementsPerTrack[index];
 
       auto it = nTracksPerMeasurement.find(measurement);
@@ -573,7 +502,8 @@ bool Acts::ScoreBasedAmbiguityResolution::getCleanedOutTracks(
       else {
         ACTS_DEBUG("Try to recover shared hit ");
         if (nTracksShared <= m_cfg.maxSharedTracksPerMeasurement &&
-            trackScore > m_cfg.minScoreSharedTracks) {
+            trackScore > m_cfg.minScoreSharedTracks &&
+            !detector.sharedHitsFlag) {
           ACTS_DEBUG("Accepted hit shared with " << nTracksShared << " tracks");
           newMeasurementsPerTrack.push_back(measurement);
           nshared++;
@@ -585,7 +515,7 @@ bool Acts::ScoreBasedAmbiguityResolution::getCleanedOutTracks(
     }
   }
   // Check if the track has enough hits to be accepted.
-  if (newMeasurementsPerTrack.size() < 3) {
+  if (newMeasurementsPerTrack.size() < m_cfg.minUnshared) {
     return false;
   } else {
     return true;

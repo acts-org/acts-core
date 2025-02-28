@@ -297,7 +297,7 @@ void ActsExamples::RootMaterialWriter::writeMaterial(
         Acts::MaterialGrid3D grid = bvMaterial3D->getMapper().getGrid();
         for (std::size_t point = 0; point < points; point++) {
           auto mat = Acts::Material(grid.at(point));
-          if (mat.isValid()) {
+          if (!mat.isVacuum()) {
             x0->SetBinContent(point + 1, mat.X0());
             l0->SetBinContent(point + 1, mat.L0());
             A->SetBinContent(point + 1, mat.Ar());
@@ -311,7 +311,7 @@ void ActsExamples::RootMaterialWriter::writeMaterial(
         Acts::MaterialGrid2D grid = bvMaterial2D->getMapper().getGrid();
         for (std::size_t point = 0; point < points; point++) {
           auto mat = Acts::Material(grid.at(point));
-          if (mat.isValid()) {
+          if (!mat.isVacuum()) {
             x0->SetBinContent(point + 1, mat.X0());
             l0->SetBinContent(point + 1, mat.L0());
             A->SetBinContent(point + 1, mat.Ar());

@@ -44,7 +44,7 @@ struct VolumeMaterialInteraction {
   const Direction navDir;
 
   /// Data evaluated within this struct
-  MaterialSlab slab;
+  MaterialSlab slab = MaterialSlab::Nothing();
   /// The path correction factor due to non-zero incidence on the surface.
   double pathCorrection = 0;
 
@@ -117,9 +117,9 @@ struct VolumeMaterialInteraction {
                               ->material(pos),
                           1);  // state.stepping.StepSize
     } else {
-      slab = MaterialSlab();
+      slab = MaterialSlab::Nothing();
     }
-    return slab.isValid();
+    return !slab.isVacuum();
   }
 };
 

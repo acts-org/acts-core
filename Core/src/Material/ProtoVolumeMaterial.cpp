@@ -11,7 +11,7 @@
 #include <ostream>
 
 Acts::ProtoVolumeMaterial::ProtoVolumeMaterial(const BinUtility& binUtility)
-    : m_binUtility(binUtility), m_material() {}
+    : m_binUtility(binUtility) {}
 
 std::ostream& Acts::ProtoVolumeMaterial::toStream(std::ostream& sl) const {
   sl << "Acts::ProtoVolumeMaterial : " << std::endl;

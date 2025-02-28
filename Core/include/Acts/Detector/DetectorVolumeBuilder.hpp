@@ -9,10 +9,10 @@
 #pragma once
 
 #include "Acts/Detector/DetectorComponents.hpp"
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Detector/interface/IDetectorComponentBuilder.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Utilities/Logger.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <memory>
 #include <string>
@@ -43,7 +43,7 @@ class DetectorVolumeBuilder : public IDetectorComponentBuilder {
     /// The geometry id generator
     std::shared_ptr<const IGeometryIdGenerator> geoIdGenerator = nullptr;
     /// Material binning to be assigned to portals
-    std::map<unsigned int, BinningDescription> portalMaterialBinning = {};
+    std::map<unsigned int, std::vector<ProtoAxis>> portalMaterialBinning = {};
     /// Add eventual internal volume to root
     bool addInternalsToRoot = false;
     /// Auxiliary information

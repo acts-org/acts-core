@@ -40,6 +40,8 @@ class Material {
  public:
   using ParametersVector = Eigen::Matrix<float, 5, 1>;
 
+  static constexpr Material Vacuum() { return Material(); }
+
   // Both mass and molar density are stored as a float and can thus not be
   // distinguished by their types. Just changing the last element in the
   // previously existing constructor that took five floats as input to represent
@@ -57,6 +59,7 @@ class Material {
   /// @param molarRho is the molar density
   static Material fromMolarDensity(float x0, float l0, float ar, float z,
                                    float molarRho);
+
   /// Construct from material parameters using the mass density.
   ///
   /// @param x0 is the radiation length
@@ -70,19 +73,12 @@ class Material {
   ///   computations with values differing by 20+ orders of magnitude.
   static Material fromMassDensity(float x0, float l0, float ar, float z,
                                   float massRho);
-  /// Construct a vacuum representation.
-  Material() = default;
+
   /// Construct from an encoded parameters vector.
   explicit Material(const ParametersVector& parameters);
 
-  Material(Material&& mat) = default;
-  Material(const Material& mat) = default;
-  ~Material() = default;
-  Material& operator=(Material&& mat) = default;
-  Material& operator=(const Material& mat) = default;
-
-  /// Check if the material is valid, i.e. it is not vacuum.
-  bool isValid() const { return 0.0f < m_ar; }
+  /// Check if the material is vacuum.
+  bool isVacuum() const { return m_ar <= 0.f; }
 
   /// Return the radiation length. Infinity in case of vacuum.
   constexpr float X0() const { return m_x0; }
@@ -110,6 +106,8 @@ class Material {
   float m_ar = 0.0f;
   float m_z = 0.0f;
   float m_molarRho = 0.0f;
+
+  constexpr Material() = default;
 
   /// @brief Check if two materials are exactly equal.
   ///

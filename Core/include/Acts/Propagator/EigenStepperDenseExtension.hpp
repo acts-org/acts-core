@@ -36,7 +36,7 @@ struct EigenStepperDenseExtension {
   double initialMomentum = 0.;
   /// Material that will be passed
   /// TODO : Might not be needed anymore
-  Material material;
+  Material material = Material::Vacuum();
   /// Derivatives dLambda''dlambda at each sub-step point
   std::array<double, 4> dLdl{};
   /// q/p at each sub-step

@@ -1,10 +1,12 @@
+import sys
+
 import numpy as np
 
 import sympy as sym
 from sympy import Symbol, Matrix, ImmutableMatrix, MatrixSymbol
 from sympy.codegen.ast import Assignment
 
-from sympy_common import (
+from codegen.sympy_common import (
     NamedExpr,
     name_expr,
     find_by_name,
@@ -12,6 +14,11 @@ from sympy_common import (
     cxx_printer,
     my_expression_print,
 )
+
+
+output = sys.stdout
+if len(sys.argv) > 1:
+    output = open(sys.argv[1], "w")
 
 
 # lambda for q/p
@@ -271,7 +278,7 @@ code = my_step_function_print(
     run_cse=True,
 )
 
-print(
+output.write(
     """// This file is part of the ACTS project.
 //
 // Copyright (C) 2016 CERN for the benefit of the ACTS project
@@ -290,4 +297,7 @@ print(
 #include <cmath>
 """
 )
-print(code)
+output.write(code + "\n")
+
+if output is not sys.stdout:
+    output.close()

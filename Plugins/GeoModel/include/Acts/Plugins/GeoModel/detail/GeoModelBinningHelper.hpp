@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Geometry/Extent.hpp"
 #include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <exception>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace Acts::detail::GeoModelBinningHelper {
@@ -44,8 +45,8 @@ inline AxisDirection toAxisDirection(const std::string& binning) {
 /// @param binning the binning string
 /// @param extent the extent of the binning
 ///
-/// @return a ProtoBinning object
-Acts::Experimental::ProtoBinning toProtoBinning(
+/// @return a ProtoAxis object
+std::tuple<Acts::ProtoAxis, std::size_t> toProtoAxis(
     const std::string& binning,
     const std::optional<Extent>& extent = std::nullopt);
 

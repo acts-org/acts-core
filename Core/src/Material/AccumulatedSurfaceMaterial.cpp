@@ -140,7 +140,7 @@ Acts::AccumulatedSurfaceMaterial::totalAverage() {
   // Create the properties matrix
   MaterialSlabMatrix mpMatrix(
       m_binUtility.bins(1),
-      MaterialSlabVector(m_binUtility.bins(0), MaterialSlab()));
+      MaterialSlabVector(m_binUtility.bins(0), MaterialSlab::Nothing()));
   // Loop over and fill
   for (std::size_t ib1 = 0; ib1 < m_binUtility.bins(1); ++ib1) {
     for (std::size_t ib0 = 0; ib0 < m_binUtility.bins(0); ++ib0) {

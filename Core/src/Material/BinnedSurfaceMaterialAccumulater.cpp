@@ -53,7 +53,7 @@ Acts::BinnedSurfaceMaterialAccumulater::createState() const {
     // Second attempt from ProtoGridSurfaceMaterial
     auto psgm = dynamic_cast<const ProtoGridSurfaceMaterial*>(surfaceMaterial);
     if (psgm != nullptr) {
-      auto binUtility = psgm->binning().toBinUtility();
+      BinUtility binUtility(psgm->binning());
       // Screen output for Binned Surface material
       ACTS_DEBUG("       - (proto) binning from ProtoGridSurfaceMaterial is "
                  << binUtility);

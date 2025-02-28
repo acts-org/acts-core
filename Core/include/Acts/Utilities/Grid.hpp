@@ -8,15 +8,12 @@
 
 #pragma once
 
-#include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Utilities/IAxis.hpp"
 #include "Acts/Utilities/Interpolation.hpp"
 #include "Acts/Utilities/TypeTag.hpp"
 #include "Acts/Utilities/detail/grid_helper.hpp"
 
 #include <array>
-#include <numeric>
-#include <set>
 #include <tuple>
 #include <type_traits>
 #include <utility>

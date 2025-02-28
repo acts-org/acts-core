@@ -72,7 +72,7 @@ if "__main__" == __name__:
     # matDeco = acts.IMaterialDecorator.fromFile("material.root")
 
     ## Generic detector: Default
-    detector = GenericDetector(mdecorator=matDeco)
+    detector = GenericDetector(materialDecorator=matDeco)
 
     ## Alternative: Aligned detector in a couple of modes
     # detector = AlignedDetector(

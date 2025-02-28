@@ -13,7 +13,6 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Geometry/Blueprint.hpp"
 #include "Acts/Geometry/CylinderContainerBlueprintNode.hpp"
 #include "Acts/Geometry/CylinderVolumeBounds.hpp"
@@ -30,6 +29,7 @@
 #include "Acts/Surfaces/RectangleBounds.hpp"
 #include "Acts/Tests/CommonHelpers/DetectorElementStub.hpp"
 #include "Acts/Utilities/Logger.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 #include "Acts/Visualization/GeometryView3D.hpp"
 #include "Acts/Visualization/ObjVisualization3D.hpp"
 
@@ -38,6 +38,10 @@
 #include <vector>
 
 using namespace Acts::UnitLiterals;
+
+using Acts::Experimental::Blueprint;
+using Acts::Experimental::LayerBlueprintNode;
+using Acts::Experimental::MaterialDesignatorBlueprintNode;
 
 namespace Acts::Test {
 
@@ -262,11 +266,9 @@ BOOST_AUTO_TEST_CASE(NodeApiTestContainers) {
 
   root->addMaterial("GlobalMaterial", [&](MaterialDesignatorBlueprintNode&
                                               mat) {
-    Experimental::ProtoBinning zBinning{AxisDirection::AxisZ,
-                                        AxisBoundaryType::Bound, 20};
+    ProtoAxis zBinning{AxisDirection::AxisZ, AxisBoundaryType::Bound, 20};
 
-    Experimental::ProtoBinning rPhiBinning{AxisDirection::AxisRPhi,
-                                           AxisBoundaryType::Bound, 20};
+    ProtoAxis rPhiBinning{AxisDirection::AxisRPhi, AxisBoundaryType::Bound, 20};
 
     mat.setBinning(std::vector{std::tuple{
         CylinderVolumeBounds::Face::OuterCylinder, rPhiBinning, zBinning}});

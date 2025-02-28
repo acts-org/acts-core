@@ -10,10 +10,10 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Definitions/Common.hpp"
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningData.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <optional>
 #include <stdexcept>
@@ -63,7 +63,7 @@ struct ProtoSupport {
   std::shared_ptr<Surface> surface = nullptr;
 
   /// The (optional) binning description for proto material
-  std::optional<BinningDescription> protoMaterialBinning = std::nullopt;
+  std::optional<std::vector<ProtoAxis>> protoMaterialBinning = std::nullopt;
 
   /// Potential splits into planar approximations (valid for cylinder/disc)
   unsigned int splits = 1u;

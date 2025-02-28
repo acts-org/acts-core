@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(Square_Grid_test) {
   std::vector<std::pair<MaterialSlab, std::vector<Vector3>>> matRecord;
   Material mat1 = Material::fromMolarDensity(1., 2., 3., 4., 5.);
   Material mat2 = Material::fromMolarDensity(6., 7., 8., 9., 10.);
-  Material vacuum;
+  Material vacuum = Material::Vacuum();
 
   MaterialSlab matprop1(mat1, 1);
   MaterialSlab matprop2(mat2, 1);
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(PhiZ_Grid_test) {
   std::vector<std::pair<MaterialSlab, std::vector<Vector3>>> matRecord;
   Material mat1 = Material::fromMolarDensity(1., 2., 3., 4., 5.);
   Material mat2 = Material::fromMolarDensity(6., 7., 8., 9., 10.);
-  Material vacuum;
+  Material vacuum = Material::Vacuum();
 
   MaterialSlab matprop1(mat1, 1);
   MaterialSlab matprop2(mat2, 1);
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE(Cubic_Grid_test) {
   std::vector<std::pair<MaterialSlab, std::vector<Vector3>>> matRecord;
   Material mat1 = Material::fromMolarDensity(1., 2., 3., 4., 5.);
   Material mat2 = Material::fromMolarDensity(6., 7., 8., 9., 10.);
-  Material vacuum;
+  Material vacuum = Material::Vacuum();
 
   MaterialSlab matprop1(mat1, 1);
   MaterialSlab matprop2(mat2, 1);
@@ -377,7 +377,7 @@ BOOST_AUTO_TEST_CASE(Cylindrical_Grid_test) {
   std::vector<std::pair<MaterialSlab, std::vector<Vector3>>> matRecord;
   Material mat1 = Material::fromMolarDensity(1., 2., 3., 4., 5.);
   Material mat2 = Material::fromMolarDensity(6., 7., 8., 9., 10.);
-  Material vacuum;
+  Material vacuum = Material::Vacuum();
 
   MaterialSlab matprop1(mat1, 1);
   MaterialSlab matprop2(mat2, 1);

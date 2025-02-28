@@ -93,9 +93,9 @@ class AccumulatedMaterialSlab {
 
  private:
   /// Averaged properties for a single track.
-  MaterialSlab m_trackAverage;
+  MaterialSlab m_trackAverage = MaterialSlab::Nothing();
   /// Averaged properties over multiple tracks.
-  MaterialSlab m_totalAverage;
+  MaterialSlab m_totalAverage = MaterialSlab::Nothing();
   /// Averaged variance over multiple tracks.
   float m_totalVariance = 0.0;
   // Number of tracks contributing to the total average.

@@ -44,13 +44,8 @@ Acts::ScoreBasedAmbiguityResolution::Config transformConfig(
   result.minScoreSharedTracks = cfg.minScoreSharedTracks;
   result.maxSharedTracksPerMeasurement = cfg.maxSharedTracksPerMeasurement;
   result.maxShared = cfg.maxShared;
-  result.pTMin = cfg.pTMin;
-  result.pTMax = cfg.pTMax;
-  result.phiMin = cfg.phiMin;
-  result.phiMax = cfg.phiMax;
-  result.etaMin = cfg.etaMin;
-  result.etaMax = cfg.etaMax;
-  result.useAmbiguityFunction = cfg.useAmbiguityFunction;
+  result.minUnshared = cfg.minUnshared;
+  result.useAmbiguityScoring = cfg.useAmbiguityScoring;
   return result;
 }
 
@@ -116,11 +111,10 @@ ActsExamples::ScoreBasedAmbiguityResolutionAlgorithm::execute(
   const auto& tracks = m_inputTracks(ctx);  // Read input data
   ACTS_VERBOSE("Number of input tracks: " << tracks.size());
 
-  Acts::ScoreBasedAmbiguityResolution::OptionalCuts<ConstTrackProxy>
-      optionalCuts;
-  optionalCuts.cuts.push_back(doubleHolesFilter);
+  Acts::ScoreBasedAmbiguityResolution::Optionals<ConstTrackProxy> optionals;
+  optionals.cuts.push_back(doubleHolesFilter);
   std::vector<int> goodTracks = m_ambi.solveAmbiguity(
-      tracks, &sourceLinkHash, &sourceLinkEquality, optionalCuts);
+      tracks, &sourceLinkHash, &sourceLinkEquality, optionals);
   // Prepare the output track collection from the IDs
   TrackContainer solvedTracks{std::make_shared<Acts::VectorTrackContainer>(),
                               std::make_shared<Acts::VectorMultiTrajectory>()};

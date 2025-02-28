@@ -69,7 +69,7 @@ class ProtoVolumeMaterial : public IVolumeMaterial {
 
  private:
   BinUtility m_binUtility;
-  Material m_material;
+  Material m_material = Material::Vacuum();
 };
 
 inline const Acts::Material Acts::ProtoVolumeMaterial::material(

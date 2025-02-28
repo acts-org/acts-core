@@ -10,11 +10,11 @@
 
 #include <numbers>
 
-std::vector<Acts::Experimental::ProtoBinning>
+std::vector<std::tuple<Acts::ProtoAxis, std::size_t>>
 Acts::DD4hepBinningHelpers::convertBinning(
     const dd4hep::DetElement &dd4hepElement, const std::string &bname) {
   // Return proto binning vector
-  std::vector<Experimental::ProtoBinning> protoBinnings;
+  std::vector<std::tuple<ProtoAxis, std::size_t>> protoBinnings;
 
   for (const auto &[ab, bVal] : allowedBinnings) {
     auto type =
@@ -34,8 +34,8 @@ Acts::DD4hepBinningHelpers::convertBinning(
       // Equidistant binning
       if (aType == AxisType::Equidistant) {
         if (autoRange) {
-          protoBinnings.push_back(
-              Experimental::ProtoBinning(bVal, bType, nBins, nExpansion));
+          protoBinnings.emplace_back(std::tuple<ProtoAxis, std::size_t>{
+              ProtoAxis(bVal, bType, nBins), nExpansion});
         } else {
           // Equidistant binning
           double minDefault =
@@ -51,8 +51,8 @@ Acts::DD4hepBinningHelpers::convertBinning(
               (max - min) > 1.9 * std::numbers::pi) {
             bType = Acts::AxisBoundaryType::Closed;
           }
-          protoBinnings.push_back(Experimental::ProtoBinning(
-              bVal, bType, min, max, nBins, nExpansion));
+          protoBinnings.emplace_back(std::tuple<ProtoAxis, std::size_t>{
+              ProtoAxis(bVal, bType, min, max, nBins), nExpansion});
         }
       } else {
         // Variable binning
@@ -66,8 +66,8 @@ Acts::DD4hepBinningHelpers::convertBinning(
             (edges.back() - edges.front()) > 1.9 * std::numbers::pi) {
           bType = Acts::AxisBoundaryType::Closed;
         }
-        protoBinnings.push_back(
-            Experimental::ProtoBinning(bVal, bType, edges, nExpansion));
+        protoBinnings.emplace_back(std::tuple<ProtoAxis, std::size_t>{
+            ProtoAxis(bVal, bType, edges), nExpansion});
       }
     }
   }

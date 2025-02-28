@@ -109,7 +109,7 @@ const TrackingVolume* TrackingVolume::lowestTrackingVolume(
 }
 
 const TrackingVolumeBoundaries& TrackingVolume::boundarySurfaces() const {
-  return (m_boundarySurfaces);
+  return m_boundarySurfaces;
 }
 
 void TrackingVolume::connectDenseBoundarySurfaces(
@@ -172,6 +172,10 @@ void TrackingVolume::createBoundarySurfaces() {
     m_boundarySurfaces.push_back(std::make_shared<const Boundary>(
         std::move(osf.surface), opposite, along));
   }
+}
+
+void TrackingVolume::clearBoundarySurfaces() {
+  m_boundarySurfaces.clear();
 }
 
 void TrackingVolume::glueTrackingVolume(const GeometryContext& gctx,

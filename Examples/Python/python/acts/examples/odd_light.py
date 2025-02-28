@@ -13,7 +13,7 @@ from acts import (
     KdtSurfaces2D,
     KdtSurfacesProvider2D,
     IndexedRootVolumeFinderBuilder,
-    ProtoBinning,
+    ProtoAxis,
 )
 
 
@@ -180,7 +180,7 @@ def get_detector(geoContext, ssurfaces, psurfaces, llevel=acts.logging.DEBUG):
     bpRrange = [detRrange[0], 25.0]
     bpExtent = Extent([[Binning.r, bpRrange], [Binning.z, detZrange]])
     bpProvider = KdtSurfacesProvider2D(passivesKdt, bpExtent)
-    bpBinning = [ProtoBinning(Binning.r, Binning.bound, 0, 25, 1, 0)]
+    bpBinning = [ProtoAxis(Binning.r, Binning.bound, 0, 25, 1, 0)]
     bp = detector.CylindricalDetectorVolume(
         "ODD_beampipe", bpExtent, bpProvider, bpBinning, [], llevel
     )
@@ -191,12 +191,12 @@ def get_detector(geoContext, ssurfaces, psurfaces, llevel=acts.logging.DEBUG):
     pixNecPositionsZ = [-1520, -1320, -1120, -980, -840, -720, -620]
     pixNecHalfThickness = 5
     pixNecBinning = [
-        ProtoBinning(Binning.r, Binning.bound, 40, 175, 2, 1),
+        ProtoAxis(Binning.r, Binning.bound, 40, 175, 2, 1),
         detector.phiBinning(56, 1),
     ]
     pixBarrelPositionsR = [34, 70, 116, 172]
     pixBarrelHalfThickness = 5
-    pixBarrelZbinning = ProtoBinning(Binning.z, Binning.bound, -500, 500, 14, 1)
+    pixBarrelZbinning = ProtoAxis(Binning.z, Binning.bound, -500, 500, 14, 1)
     pixBarrelPhiBinnings = [[16, 1], [32, 1], [52, 1], [78, 1]]
     pixBarrelBinning = [
         [pixBarrelZbinning, detector.phiBinning(phiBinning[0], phiBinning[1])]
@@ -222,7 +222,7 @@ def get_detector(geoContext, ssurfaces, psurfaces, llevel=acts.logging.DEBUG):
     pstRrange = [pixRrange[1], 220]
     pstExtent = Extent([[Binning.r, pstRrange], [Binning.z, detZrange]])
     pstProvider = KdtSurfacesProvider2D(passivesKdt, pstExtent)
-    pstBinning = [ProtoBinning(Binning.r, Binning.bound, pixRrange[1], 220, 1, 0)]
+    pstBinning = [ProtoAxis(Binning.r, Binning.bound, pixRrange[1], 220, 1, 0)]
     pst = detector.CylindricalDetectorVolume(
         "ODD_pst", pstExtent, pstProvider, pstBinning, [], llevel
     )
@@ -234,12 +234,12 @@ def get_detector(geoContext, ssurfaces, psurfaces, llevel=acts.logging.DEBUG):
     sstripNecPositionsZ = [-2950, -2550, -2200, -1850, -1550, -1300]
     sstripNecHalfThickness = 15
     sstripNecBinning = [
-        ProtoBinning(Binning.r, Binning.bound, 230, 710, 3, 1),
+        ProtoAxis(Binning.r, Binning.bound, 230, 710, 3, 1),
         detector.phiBinning(40, 1),
     ]
     sstripBarrelPositionsR = [260, 360, 500, 660]
     sstripBarrelHalfThickness = 25
-    sstripBarrelZbinning = ProtoBinning(Binning.z, Binning.bound, -1100, 1100, 21, 1)
+    sstripBarrelZbinning = ProtoAxis(Binning.z, Binning.bound, -1100, 1100, 21, 1)
     sstripBarrelPhiBinnings = [[40, 1], [56, 1], [78, 1], [102, 1]]
     sstripBarrelBinning = [
         [sstripBarrelZbinning, detector.phiBinning(phiBinning[0], phiBinning[1])]
@@ -269,12 +269,12 @@ def get_detector(geoContext, ssurfaces, psurfaces, llevel=acts.logging.DEBUG):
     lstripNecPositionsZ = [-3000, -2600, -2250, -1900, -1600, -1300]
     lstripNecHalfThickness = 15
     lstripNecBinning = [
-        ProtoBinning(Binning.r, Binning.bound, 720, 1020, 2, 1),
+        ProtoAxis(Binning.r, Binning.bound, 720, 1020, 2, 1),
         detector.phiBinning(40, 1),
     ]
     lstripBarrelPositionsR = [830, 1030]
     lstripBarrelHalfThickness = 35
-    lstripBarrelZbinning = ProtoBinning(Binning.z, Binning.bound, -1100, 1100, 21, 1)
+    lstripBarrelZbinning = ProtoAxis(Binning.z, Binning.bound, -1100, 1100, 21, 1)
     lstripBarrelPhiBinnings = [[40, 1], [56, 1]]
     lstripBarrelBinning = [
         [lstripBarrelZbinning, detector.phiBinning(phiBinning[0], phiBinning[1])]

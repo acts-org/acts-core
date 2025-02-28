@@ -11,7 +11,7 @@
 #include "Acts/Geometry/NavigationPolicyFactory.hpp"
 #include "Acts/Navigation/TryAllNavigationPolicy.hpp"
 
-namespace Acts {
+namespace Acts::Experimental {
 
 void BlueprintOptions::validate() const {
   if (!defaultNavigationPolicyFactory) {
@@ -26,4 +26,4 @@ BlueprintOptions::makeDefaultNavigationPolicyFactory() {
       .asUniquePtr();
 }
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

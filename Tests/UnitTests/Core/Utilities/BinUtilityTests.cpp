@@ -9,8 +9,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinUtility.hpp"
 #include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <array>
 #include <cmath>
@@ -128,6 +130,21 @@ BOOST_AUTO_TEST_CASE(BinUtility_transform) {
     BOOST_CHECK_EQUAL(withTranform.bin(pos5, i),
                       noTranform.bin(transform_GtoL * pos5, i));
   }
+}
+
+BOOST_AUTO_TEST_CASE(BinUtility_from_ProtoAxis) {
+  using enum AxisDirection;
+  using enum AxisBoundaryType;
+
+  ProtoAxis epabX(AxisX, Bound, 0.0, 1.0, 10);
+  BinUtility buX(epabX);
+  BOOST_CHECK_EQUAL(buX.bins(), std::size_t{10});
+  BOOST_CHECK_EQUAL(buX.dimensions(), std::size_t{1});
+
+  ProtoAxis epabY(AxisY, Bound, 0.0, 1.0, 10);
+  BinUtility buXY({epabX, epabY});
+  BOOST_CHECK_EQUAL(buXY.bins(), std::size_t{100});
+  BOOST_CHECK_EQUAL(buXY.dimensions(), std::size_t{2});
 }
 
 }  // namespace Acts::Test

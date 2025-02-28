@@ -379,11 +379,6 @@ class SympyStepper {
  protected:
   /// Magnetic field inside of the detector
   std::shared_ptr<const MagneticFieldProvider> m_bField;
-
- private:
-  Result<double> stepImpl(State& state, Direction propDir, double stepTolerance,
-                          double stepSizeCutOff,
-                          std::size_t maxRungeKuttaStepTrials) const;
 };
 
 template <>

@@ -84,22 +84,3 @@ jobs:
       - name: Check
         run: >
           CI/check_unused_files.py
-
-  codegen:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install dependencies
-        run: >
-          pip install -r codegen/requirements.txt
-      - name: Check
-        run: >
-          CI/check_codegen
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: changed
-          path: changed

@@ -8,28 +8,26 @@
 
 #include "Acts/Detector/detail/ProtoMaterialHelper.hpp"
 
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Geometry/Extent.hpp"
 #include "Acts/Material/ProtoSurfaceMaterial.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 
-Acts::Experimental::BinningDescription
+std::vector<Acts::ProtoAxis>
 Acts::Experimental::detail::ProtoMaterialHelper::attachProtoMaterial(
     const GeometryContext& gctx, Surface& surface,
-    const BinningDescription& bDescription) {
+    const std::vector<ProtoAxis>& bDescription) {
   // The binning description, with eventually fixed range
-  BinningDescription fbDescription;
+  std::vector<ProtoAxis> fbDescription;
   // Measure the surface
   Extent sExtent = surface.polyhedronRepresentation(gctx, 1).extent();
-  for (const auto& b : bDescription.binning) {
-    ProtoBinning fBinning = b;
+  for (const auto& b : bDescription) {
+    ProtoAxis fBinning(b);
     // Check if the binning needs to be fixed
-    if (fBinning.autorange) {
-      auto range = sExtent.range(b.axisDir);
-      fBinning = ProtoBinning(b.axisDir, b.boundaryType, range.min(),
-                              range.max(), b.bins(), b.expansion);
+    if (fBinning.isAutorange()) {
+      auto range = sExtent.range(b.getAxisDirection());
+      fBinning.setRange(range.min(), range.max());
     }
-    fbDescription.binning.push_back(fBinning);
+    fbDescription.emplace_back(std::move(fBinning));
   }
   // Create the new proto material description and assign it
   auto protoMaterial =

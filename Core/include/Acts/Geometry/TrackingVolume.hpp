@@ -22,7 +22,6 @@
 #include "Acts/Navigation/NavigationDelegate.hpp"
 #include "Acts/Navigation/NavigationStream.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "Acts/Surfaces/SurfaceArray.hpp"
 #include "Acts/Surfaces/SurfaceVisitorConcept.hpp"
 #include "Acts/Utilities/BinnedArray.hpp"
 #include "Acts/Utilities/Logger.hpp"
@@ -178,24 +177,12 @@ class TrackingVolume : public Volume {
   /// this, e.g. as a private member
   template <SurfaceVisitor visitor_t>
   void visitSurfaces(visitor_t&& visitor, bool restrictToSensitives) const {
-    struct Visitor : public TrackingGeometryVisitor {
-      std::remove_cv_t<std::remove_reference_t<visitor_t>>* m_visitor{};
-      bool m_restrictToSensitives{};
-
-      void visitSurface(const Surface& surface) override {
-        if (m_restrictToSensitives && surface.geometryId().sensitive() == 0) {
-          return;
-        }
-        assert(m_visitor != nullptr);
-        (*m_visitor)(&surface);
+    apply([&visitor, restrictToSensitives](const Surface& surface) {
+      if (restrictToSensitives && surface.geometryId().sensitive() == 0) {
+        return;
       }
-    };
-
-    Visitor internal;
-    internal.m_visitor = &visitor;
-    internal.m_restrictToSensitives = restrictToSensitives;
-
-    apply(internal);
+      visitor(&surface);
+    });
   }
 
   /// @brief Visit all sensitive surfaces
@@ -223,23 +210,51 @@ class TrackingVolume : public Volume {
   /// this, e.g. as a private member
   template <TrackingVolumeVisitor visitor_t>
   void visitVolumes(visitor_t&& visitor) const {
-    struct Visitor : public TrackingGeometryVisitor {
-      std::remove_cv_t<std::remove_reference_t<visitor_t>>* m_visitor{};
-      bool m_restrictToSensitives{};
-
-      void visitVolume(const TrackingVolume& volume) override {
-        (*m_visitor)(&volume);
-      }
-    };
-
-    Visitor internal;
-    internal.m_visitor = &visitor;
-
-    apply(internal);
+    apply([&visitor](const TrackingVolume& volume) { visitor(&volume); });
   }
 
+  /// @brief Apply a visitor to the tracking volume
+  ///
+  /// @param visitor The visitor to apply
+  ///
   void apply(TrackingGeometryVisitor& visitor) const;
+
+  /// @brief Apply a mutable visitor to the tracking volume
+  ///
+  /// @param visitor The visitor to apply
+  ///
   void apply(TrackingGeometryMutableVisitor& visitor);
+
+  /// @brief Apply an arbitrary callable as a visitor to the tracking volume
+  ///
+  /// @param callable The callable to apply
+  ///
+  /// @note The visitor can be overloaded on any of the arguments that
+  ///       the methods in @c TrackingGeometryVisitor receive.
+  template <typename Callable>
+  void apply(Callable&& callable)
+    requires(detail::callableWithAnyMutable<Callable>() &&
+             !detail::callableWithAnyConst<Callable>())
+  {
+    detail::TrackingGeometryLambdaMutableVisitor visitor{
+        std::forward<Callable>(callable)};
+    apply(visitor);
+  }
+
+  /// @brief Apply an arbitrary callable as a visitor to the tracking volume
+  ///
+  /// @param callable The callable to apply
+  ///
+  /// @note The visitor can be overloaded on any of the arguments that
+  ///       the methods in @c TrackingGeometryMutableVisitor receive.
+  template <typename Callable>
+  void apply(Callable&& callable) const
+    requires(detail::callableWithAnyConst<Callable>())
+  {
+    detail::TrackingGeometryLambdaVisitor visitor{
+        std::forward<Callable>(callable)};
+    apply(visitor);
+  }
 
   /// Returns the VolumeName - for debug reason, might be depreciated later
   const std::string& volumeName() const;
@@ -452,6 +467,9 @@ class TrackingVolume : public Volume {
   ///
   /// @param gvd register a new GlueVolumeDescriptor
   void registerGlueVolumeDescriptor(std::unique_ptr<GlueVolumesDescriptor> gvd);
+
+  /// Clear boundary surfaces for this tracking volume
+  void clearBoundarySurfaces();
 
   /// Register the outside glue volumes -
   /// ordering is in the TrackingVolume Frame:

@@ -36,7 +36,7 @@ class SurfaceMaterialStub : public ISurfaceMaterial {
     return sl;
   };
 
-  MaterialSlab m_fullMaterial{};
+  MaterialSlab m_fullMaterial = MaterialSlab::Nothing();
 };
 
 /// Test the constructors

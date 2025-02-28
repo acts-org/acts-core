@@ -51,7 +51,7 @@ Acts::MaterialSlab Acts::detail::combineSlabs(const MaterialSlab& slab1,
 
   // handle vacuum specially
   if (!(0.0 < molarAmount)) {
-    return {Material(), static_cast<float>(thickness)};
+    return {Material::Vacuum(), static_cast<float>(thickness)};
   }
 
   // radiation/interaction length follows from consistency argument

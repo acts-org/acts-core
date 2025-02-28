@@ -169,7 +169,7 @@ void CuboidVolumeBounds::set(
   }
 }
 
-CuboidVolumeBounds::BoundValues CuboidVolumeBounds::fromAxisDirection(
+CuboidVolumeBounds::BoundValues CuboidVolumeBounds::boundsFromAxisDirection(
     AxisDirection direction) {
   using enum AxisDirection;
   switch (direction) {
@@ -181,6 +181,28 @@ CuboidVolumeBounds::BoundValues CuboidVolumeBounds::fromAxisDirection(
       return BoundValues::eHalfLengthZ;
     default:
       throw std::invalid_argument("Invalid axis direction");
+  }
+}
+
+std::tuple<CuboidVolumeBounds::Face, CuboidVolumeBounds::Face,
+           std::array<CuboidVolumeBounds::Face, 4>>
+CuboidVolumeBounds::facesFromAxisDirection(AxisDirection direction) {
+  using enum AxisDirection;
+  using enum CuboidVolumeBounds::Face;
+  if (direction == AxisX) {
+    return {NegativeXFace,
+            PositiveXFace,
+            {NegativeZFace, PositiveZFace, NegativeYFace, PositiveYFace}};
+  } else if (direction == AxisY) {
+    return {NegativeYFace,
+            PositiveYFace,
+            {NegativeZFace, PositiveZFace, NegativeXFace, PositiveXFace}};
+  } else if (direction == AxisZ) {
+    return {NegativeZFace,
+            PositiveZFace,
+            {NegativeXFace, PositiveXFace, NegativeYFace, PositiveYFace}};
+  } else {
+    throw std::invalid_argument("Invalid axis direction");
   }
 }
 

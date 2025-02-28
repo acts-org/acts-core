@@ -51,7 +51,7 @@ struct PointwiseMaterialInteraction {
   const Direction navDir;
 
   /// The effective, passed material properties including the path correction.
-  MaterialSlab slab = MaterialSlab(0.);
+  MaterialSlab slab = MaterialSlab::Nothing();
   /// The path correction factor due to non-zero incidence on the surface.
   double pathCorrection = 0.;
   /// Expected phi variance due to the interactions.
@@ -122,7 +122,7 @@ struct PointwiseMaterialInteraction {
     slab.scaleThickness(pathCorrection);
 
     // Check if the evaluated material is valid
-    return slab.isValid();
+    return !slab.isVacuum();
   }
 
   /// @brief This function evaluate the material effects

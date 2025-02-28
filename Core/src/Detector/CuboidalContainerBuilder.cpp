@@ -47,7 +47,7 @@ Acts::Experimental::CuboidalContainerBuilder::CuboidalContainerBuilder(
 }
 
 Acts::Experimental::CuboidalContainerBuilder::CuboidalContainerBuilder(
-    const Acts::Experimental::Blueprint::Node& bpNode,
+    const Acts::Experimental::Gen2Blueprint::Node& bpNode,
     Acts::Logging::Level logLevel)
     : IDetectorComponentBuilder(),
       m_logger(getDefaultLogger(bpNode.name + "_cont", logLevel)) {

@@ -28,7 +28,7 @@ class AccumulatedVolumeMaterial {
   const Material& average() { return m_average.material(); }
 
  private:
-  MaterialSlab m_average;
+  MaterialSlab m_average = MaterialSlab::Nothing();
 };
 
 }  // namespace Acts

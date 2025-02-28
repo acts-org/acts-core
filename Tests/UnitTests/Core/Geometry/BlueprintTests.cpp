@@ -29,12 +29,19 @@
 #include "Acts/Tests/CommonHelpers/DetectorElementStub.hpp"
 #include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/Logger.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <fstream>
 #include <stdexcept>
 #include <vector>
 
 using namespace Acts::UnitLiterals;
+
+using Acts::Experimental::Blueprint;
+using Acts::Experimental::BlueprintNode;
+using Acts::Experimental::BlueprintOptions;
+using Acts::Experimental::LayerBlueprintNode;
+using Acts::Experimental::StaticBlueprintNode;
 
 namespace Acts::Test {
 
@@ -489,10 +496,10 @@ BOOST_AUTO_TEST_CASE(Material) {
   root.addMaterial("Material", [&](auto& mat) {
     // @TODO: This API is not great
     mat.setBinning(std::vector{
-        std::tuple{NegativeDisc, Experimental::ProtoBinning{AxisR, Bound, 5},
-                   Experimental::ProtoBinning{AxisPhi, Bound, 10}},
-        std::tuple{PositiveDisc, Experimental::ProtoBinning{AxisR, Bound, 15},
-                   Experimental::ProtoBinning{AxisPhi, Bound, 20}},
+        std::tuple{NegativeDisc, ProtoAxis{AxisR, Bound, 5},
+                   ProtoAxis{AxisPhi, Bound, 10}},
+        std::tuple{PositiveDisc, ProtoAxis{AxisR, Bound, 15},
+                   ProtoAxis{AxisPhi, Bound, 20}},
     });
 
     mat.addStaticVolume(std::move(cyl));
@@ -514,10 +521,10 @@ BOOST_AUTO_TEST_CASE(Material) {
   const auto& posDiscMat =
       dynamic_cast<const ProtoGridSurfaceMaterial&>(*posDisc);
 
-  BOOST_CHECK_EQUAL(negDiscMat.binning().binning.at(0).bins(), 5);
-  BOOST_CHECK_EQUAL(negDiscMat.binning().binning.at(1).bins(), 10);
-  BOOST_CHECK_EQUAL(posDiscMat.binning().binning.at(0).bins(), 15);
-  BOOST_CHECK_EQUAL(posDiscMat.binning().binning.at(1).bins(), 20);
+  BOOST_CHECK_EQUAL(negDiscMat.binning().at(0).getAxis().getNBins(), 5);
+  BOOST_CHECK_EQUAL(negDiscMat.binning().at(1).getAxis().getNBins(), 10);
+  BOOST_CHECK_EQUAL(posDiscMat.binning().at(0).getAxis().getNBins(), 15);
+  BOOST_CHECK_EQUAL(posDiscMat.binning().at(1).getAxis().getNBins(), 20);
 
   for (std::size_t i = 2; i < child.portals().size(); i++) {
     BOOST_CHECK_EQUAL(child.portals().at(i).surface().surfaceMaterial(),

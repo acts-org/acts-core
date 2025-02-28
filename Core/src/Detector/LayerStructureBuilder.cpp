@@ -9,7 +9,6 @@
 #include "Acts/Detector/LayerStructureBuilder.hpp"
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Detector/detail/IndexedSurfacesGenerator.hpp"
 #include "Acts/Detector/detail/ReferenceGenerators.hpp"
 #include "Acts/Detector/detail/SupportSurfacesHelper.hpp"
@@ -22,8 +21,8 @@
 #include "Acts/Utilities/BinningData.hpp"
 #include "Acts/Utilities/Enumerate.hpp"
 #include "Acts/Utilities/Grid.hpp"
-#include "Acts/Utilities/GridAxisGenerators.hpp"
 #include "Acts/Utilities/Helpers.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -44,137 +43,24 @@ namespace {
 /// @param pBinning the proto binning
 /// @param extent the extent from which the range is taken
 ///
-void adaptBinningRange(std::vector<Acts::Experimental::ProtoBinning>& pBinning,
-                       const Acts::Extent& extent) {
-  for (auto& pb : pBinning) {
+void adaptBinningRange(
+    std::vector<std::tuple<Acts::ProtoAxis, std::size_t>>& pBinning,
+    const Acts::Extent& extent) {
+  for (auto& [pb, pe] : pBinning) {
     // Starting values
-    double vmin = pb.edges.front();
-    double vmax = pb.edges.back();
-    // Get the number of bins
-    std::size_t nBins = pb.bins();
+    const auto& axis = pb.getAxis();
+    const auto& edges = axis.getBinEdges();
+    double vmin = edges.front();
+    double vmax = edges.back();
     // Check if extent overwrites that
-    if (extent.constrains(pb.axisDir)) {
-      const auto& range = extent.range(pb.axisDir);
+    if (extent.constrains(pb.getAxisDirection())) {
+      const auto& range = extent.range(pb.getAxisDirection());
       // Patch the edges values from the range
       vmin = range.min();
       vmax = range.max();
     }
-    // Possibly update the edges
-    if (pb.axisType == Acts::AxisType::Equidistant) {
-      double binWidth = (vmax - vmin) / nBins;
-      // Fill the edges
-      pb.edges = {vmin};
-      pb.edges.resize(nBins + 1);
-      for (std::size_t ib = 0; ib <= nBins; ++ib) {
-        pb.edges[ib] = vmin + ib * binWidth;
-      }
-    } else {
-      pb.edges.front() = vmin;
-      pb.edges.back() = vmax;
-    }
+    pb.setRange(vmin, vmax);
   }
-}
-
-/// Helper for 1-dimensional generators
-///
-/// @tparam aType is the axis boundary type: closed or bound
-///
-/// @param gctx the geometry context
-/// @param lSurfaces the surfaces of the layer
-/// @param assignToAll the indices assigned to all
-/// @param binning the binning struct
-///
-/// @return a configured surface candidate updators
-template <Acts::AxisBoundaryType aType>
-Acts::Experimental::InternalNavigationDelegate createUpdater(
-    const Acts::GeometryContext& gctx,
-    std::vector<std::shared_ptr<Acts::Surface>> lSurfaces,
-    std::vector<std::size_t> assignToAll,
-    const Acts::Experimental::ProtoBinning& binning) {
-  // The surface candidate updator & a generator for polyhedrons
-  Acts::Experimental::InternalNavigationDelegate sfCandidates;
-  Acts::Experimental::detail::PolyhedronReferenceGenerator rGenerator;
-  // Indexed Surface generator for this case
-  Acts::Experimental::detail::IndexedSurfacesGenerator<
-      decltype(lSurfaces), Acts::Experimental::IndexedSurfacesNavigation>
-      isg{std::move(lSurfaces),
-          std::move(assignToAll),
-          {binning.axisDir},
-          {binning.expansion}};
-  if (binning.axisType == Acts::AxisType::Equidistant) {
-    // Equidistant
-    Acts::GridAxisGenerators::Eq<aType> aGenerator{
-        {binning.edges.front(), binning.edges.back()}, binning.bins()};
-    sfCandidates = isg(gctx, aGenerator, rGenerator);
-  } else {
-    // Variable
-    Acts::GridAxisGenerators::Var<aType> aGenerator{binning.edges};
-    sfCandidates = isg(gctx, aGenerator, rGenerator);
-  }
-  return sfCandidates;
-}
-
-/// Helper for 2-dimensional generators
-///
-/// @tparam aType is the axis boundary type, axis a: closed or bound
-/// @tparam bType is the axis boundary type, axis b: closed or bound
-///
-/// @param gctx the geometry context
-/// @param lSurfaces the surfaces of the layer
-/// @param assignToAll the indices assigned to all
-/// @param aBinning the binning struct of axis a
-/// @param bBinning the binning struct of axis b
-///
-/// @return a configured surface candidate updators
-template <Acts::AxisBoundaryType aType, Acts::AxisBoundaryType bType>
-Acts::Experimental::InternalNavigationDelegate createUpdater(
-    const Acts::GeometryContext& gctx,
-    const std::vector<std::shared_ptr<Acts::Surface>>& lSurfaces,
-    const std::vector<std::size_t>& assignToAll,
-    const Acts::Experimental::ProtoBinning& aBinning,
-    const Acts::Experimental::ProtoBinning& bBinning) {
-  // The surface candidate updator & a generator for polyhedrons
-  Acts::Experimental::InternalNavigationDelegate sfCandidates;
-  Acts::Experimental::detail::PolyhedronReferenceGenerator rGenerator;
-  // Indexed Surface generator for this case
-  Acts::Experimental::detail::IndexedSurfacesGenerator<
-      decltype(lSurfaces), Acts::Experimental::IndexedSurfacesNavigation>
-      isg{lSurfaces,
-          assignToAll,
-          {aBinning.axisDir, bBinning.axisDir},
-          {aBinning.expansion, bBinning.expansion}};
-  // Run through the cases
-  if (aBinning.axisType == Acts::AxisType::Equidistant &&
-      bBinning.axisType == Acts::AxisType::Equidistant) {
-    // Equidistant-Equidistant
-    Acts::GridAxisGenerators::EqEq<aType, bType> aGenerator{
-        {aBinning.edges.front(), aBinning.edges.back()},
-        aBinning.bins(),
-        {bBinning.edges.front(), bBinning.edges.back()},
-        bBinning.bins()};
-    sfCandidates = isg(gctx, aGenerator, rGenerator);
-  } else if (bBinning.axisType == Acts::AxisType::Equidistant) {
-    // Variable-Equidistant
-    Acts::GridAxisGenerators::VarEq<aType, bType> aGenerator{
-        aBinning.edges,
-        {bBinning.edges.front(), bBinning.edges.back()},
-        bBinning.bins()};
-    sfCandidates = isg(gctx, aGenerator, rGenerator);
-  } else if (aBinning.axisType == Acts::AxisType::Equidistant) {
-    // Equidistant-Variable
-    Acts::GridAxisGenerators::EqVar<aType, bType> aGenerator{
-        {aBinning.edges.front(), aBinning.edges.back()},
-        aBinning.bins(),
-        bBinning.edges};
-    sfCandidates = isg(gctx, aGenerator, rGenerator);
-  } else {
-    // Variable-Variable
-    Acts::GridAxisGenerators::VarVar<aType, bType> aGenerator{aBinning.edges,
-                                                              bBinning.edges};
-    sfCandidates = isg(gctx, aGenerator, rGenerator);
-  }
-  // Return the candidates
-  return sfCandidates;
 }
 
 }  // namespace
@@ -312,59 +198,42 @@ Acts::Experimental::LayerStructureBuilder::construct(
       ACTS_DEBUG(
           "No surface binning provided, navigation will be 'tryAll' "
           "(potentially slow).");
-    } else if (binnings.size() == 1u) {
+    } else {
+      // Sort the binning for conventions
+      std::ranges::sort(binnings, {}, [](const auto& b) {
+        return std::get<ProtoAxis>(b).getAxisDirection();
+      });
       // Check if autorange for binning applies
       if (m_cfg.extent.has_value()) {
         ACTS_DEBUG("- adapting the proto binning range to the surface extent.");
         adaptBinningRange(binnings, m_cfg.extent.value());
       }
-      ACTS_DEBUG("- 1-dimensional surface binning detected.");
-      // Capture the binning
-      auto binning = binnings[0u];
-      if (binning.boundaryType == Acts::AxisBoundaryType::Closed) {
-        ACTS_VERBOSE("-- closed binning option.");
-        internalCandidatesUpdater =
-            createUpdater<Acts::AxisBoundaryType::Closed>(
-                gctx, internalSurfaces, assignToAll, binning);
-      } else {
-        ACTS_VERBOSE("-- bound binning option.");
-        internalCandidatesUpdater =
-            createUpdater<Acts::AxisBoundaryType::Bound>(gctx, internalSurfaces,
-                                                         assignToAll, binning);
-      }
-    } else if (binnings.size() == 2u) {
-      // Check if autorange for binning applies
-      if (m_cfg.extent.has_value()) {
-        ACTS_DEBUG(
-            "- adapting the proto binning range(s) to the surface extent.");
-        adaptBinningRange(binnings, m_cfg.extent.value());
-      }
-      // Sort the binning for conventions
-      std::ranges::sort(binnings, {}, [](const auto& b) { return b.axisDir; });
 
-      ACTS_DEBUG("- 2-dimensional surface binning detected.");
-      // Capture the binnings
-      const auto& binning0 = binnings[0u];
-      const auto& binning1 = binnings[1u];
+      // Provide a reference generator
+      Acts::Experimental::detail::PolyhedronReferenceGenerator rGenerator;
 
-      if (binning0.boundaryType == Acts::AxisBoundaryType::Closed) {
-        ACTS_VERBOSE("-- closed/bound binning option.");
+      // 1D surface binning
+      if (binnings.size() == 1) {
+        ACTS_DEBUG("- creating a 1D internal binning and portal navigation");
+        auto [protoAxis, fillExpansion] = binnings.at(0);
         internalCandidatesUpdater =
-            createUpdater<Acts::AxisBoundaryType::Closed,
-                          Acts::AxisBoundaryType::Bound>(
-                gctx, internalSurfaces, assignToAll, binning0, binning1);
-      } else if (binning1.boundaryType == Acts::AxisBoundaryType::Closed) {
-        ACTS_VERBOSE("-- bound/closed binning option.");
+            Acts::detail::IndexedSurfacesGenerator::createInternalNavigation<
+                Experimental::IndexedSurfacesNavigation>(
+                gctx, internalSurfaces, rGenerator, protoAxis, fillExpansion,
+                assignToAll);
+      } else if (binnings.size() == 2u) {
+        ACTS_DEBUG("- creating a 2D internal binning and portal navigation");
+        auto [protoAxisA, fillExpansionA] = binnings.at(0);
+        auto [protoAxisB, fillExpansionB] = binnings.at(1);
         internalCandidatesUpdater =
-            createUpdater<Acts::AxisBoundaryType::Bound,
-                          Acts::AxisBoundaryType::Closed>(
-                gctx, internalSurfaces, assignToAll, binning0, binning1);
+            Acts::detail::IndexedSurfacesGenerator::createInternalNavigation<
+                Experimental::IndexedSurfacesNavigation>(
+                gctx, internalSurfaces, rGenerator, protoAxisA, fillExpansionA,
+                protoAxisB, fillExpansionB, assignToAll);
       } else {
-        ACTS_VERBOSE("-- bound/bound binning option.");
-        internalCandidatesUpdater =
-            createUpdater<Acts::AxisBoundaryType::Bound,
-                          Acts::AxisBoundaryType::Bound>(
-                gctx, internalSurfaces, assignToAll, binning0, binning1);
+        throw std::runtime_error(
+            "LayerStructureBuilder: only 1D or 2D surface binning "
+            "supported.");
       }
     }
   } else {

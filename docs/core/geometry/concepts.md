@@ -54,6 +54,15 @@ Not complete yet
 :::{doxygenclass} Acts::CylinderStackPortalShell
 :::
 
+:::{doxygenclass} Acts::CuboidPortalShell
+:::
+
+:::{doxygenclass} Acts::SingleCuboidPortalShell
+:::
+
+:::{doxygenclass} Acts::CuboidStackPortalShell
+:::
+
 ### Navigation policy
 
 :::{doxygenclass} Acts::INavigationPolicy

@@ -17,6 +17,8 @@ namespace Acts {
 
 class GeometryContext;
 
+namespace Experimental {
+
 /// This class is the top-level entry point to build a tracking geometry using
 /// the blueprint building mechanism. It forms the root of a tree of nodes where
 /// each node performs a portion of the construction. This top-level class has
@@ -97,4 +99,5 @@ class Blueprint : public BlueprintNode {
   Config m_cfg;
 };
 
+}  // namespace Experimental
 }  // namespace Acts

@@ -10,8 +10,10 @@
 
 #include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
+#include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningData.hpp"
 #include "Acts/Utilities/BinningType.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -420,6 +422,39 @@ BOOST_AUTO_TEST_CASE(BinningData_phi_modules) {
   Vector3 underscaledPos(cos(underscaledAngle), sin(underscaledAngle), 0.);
   BOOST_CHECK_EQUAL(phiData_mod.search(underscaledAngle), std::size_t{4});
   BOOST_CHECK_EQUAL(phiData_mod.searchGlobal(underscaledPos), std::size_t{4});
+}
+
+// special test for phi binning
+BOOST_AUTO_TEST_CASE(BinningData_from_ProtoAxis) {
+  using enum AxisDirection;
+  using enum AxisBoundaryType;
+
+  // Bound, equidistant axis
+  ProtoAxis epab(AxisX, Bound, 0.0, 1.0, 10);
+  BinningData bEpab(epab);
+
+  BOOST_CHECK_EQUAL(bEpab.bins(), std::size_t{10});
+  BOOST_CHECK_EQUAL(bEpab.min, 0.);
+  BOOST_CHECK_EQUAL(bEpab.max, 1.);
+  BOOST_CHECK(bEpab.binvalue == AxisX);
+  BOOST_CHECK(bEpab.option == open);
+  BOOST_CHECK(bEpab.type == equidistant);
+
+  // Bound, equidistant axis, autorange
+  ProtoAxis epa(AxisY, Bound, 10);
+  BinningData bEpa(epa);
+  BOOST_CHECK(bEpa.binvalue == AxisY);
+  BOOST_CHECK_EQUAL(bEpa.bins(), std::size_t{10});
+  BOOST_CHECK(bEpa.option == open);
+  BOOST_CHECK(bEpa.type == equidistant);
+
+  // Bound, equidistant axis
+  ProtoAxis vpab(AxisZ, Bound, {0.0, 1.0, 10});
+  BinningData bVpab(vpab);
+  BOOST_CHECK(bVpab.binvalue == AxisZ);
+  BOOST_CHECK_EQUAL(bVpab.bins(), std::size_t{2});
+  BOOST_CHECK(bVpab.option == open);
+  BOOST_CHECK(bVpab.type == arbitrary);
 }
 
 }  // namespace Acts::Test

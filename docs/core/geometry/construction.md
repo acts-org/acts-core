@@ -6,30 +6,30 @@ Not complete yet
 
 ## Blueprint tracking geometry construction
 
-:::{doxygenclass} Acts::BlueprintNode
+:::{doxygenclass} Acts::Experimental::BlueprintNode
 :::
 
-:::{doxygenclass} Acts::Blueprint
+:::{doxygenclass} Acts::Experimental::Blueprint
 :::
 
 ### Container nodes
 
-:::{doxygenclass} Acts::CylinderContainerBlueprintNode
+:::{doxygenclass} Acts::Experimental::CylinderContainerBlueprintNode
 :::
 
 ### Material nodes
 
-:::{doxygenclass} Acts::MaterialDesignatorBlueprintNode
+:::{doxygenclass} Acts::Experimental::MaterialDesignatorBlueprintNode
 :::
 
 ### Geometry identification specification
 
 ### *Layers* and other nodes
 
-:::{doxygenclass} Acts::StaticBlueprintNode
+:::{doxygenclass} Acts::Experimental::StaticBlueprintNode
 :::
 
-:::{doxygenclass} Acts::LayerBlueprintNode
+:::{doxygenclass} Acts::Experimental::LayerBlueprintNode
 :::
 
 ## API

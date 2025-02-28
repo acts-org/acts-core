@@ -12,6 +12,7 @@
 #include "Acts/Material/Material.hpp"
 
 #include <iosfwd>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -24,6 +25,14 @@ namespace Acts {
 /// @see Material for a description of the available parameters.
 class MaterialSlab {
  public:
+  static constexpr MaterialSlab Nothing() {
+    return MaterialSlab(Material::Vacuum(), 0, false);
+  }
+
+  static constexpr MaterialSlab Vacuum(float thickness) {
+    return MaterialSlab(Material::Vacuum(), thickness, false);
+  }
+
   /// Combine material properties of two layers by averaging them.
   ///
   /// @param layerA Input layer A to average over.
@@ -31,7 +40,7 @@ class MaterialSlab {
   ///
   /// @return The resulting object has the combined thickness of all layers but just
   ///         one set of appropriately averaged material constants.
-  static MaterialSlab averageLayers(const MaterialSlab& layerA,
+  static MaterialSlab combineLayers(const MaterialSlab& layerA,
                                     const MaterialSlab& layerB);
 
   /// Combine material properties of multiple layers by averaging them.
@@ -40,29 +49,24 @@ class MaterialSlab {
   ///
   /// @return The resulting object has the combined thickness of all layers but just
   ///         one set of appropriately averaged material constants.
-  static MaterialSlab averageLayers(const std::vector<MaterialSlab>& layers);
+  static MaterialSlab combineLayers(const std::vector<MaterialSlab>& layers);
 
-  /// Construct vacuum without thickness.
-  MaterialSlab() = default;
-  /// Construct vacuum with thickness.
-  explicit MaterialSlab(float thickness);
+  /// Default constructor.
+  ///
+  /// TODO consider removing. currently needed for default construction in grids
+  constexpr MaterialSlab() : m_material(Material::Vacuum()) {}
+
   /// Construct from material description.
   ///
   /// @param material  is the material description
   /// @param thickness is the thickness of the material
   MaterialSlab(const Material& material, float thickness);
-  ~MaterialSlab() = default;
-
-  MaterialSlab(MaterialSlab&&) = default;
-  MaterialSlab(const MaterialSlab&) = default;
-  MaterialSlab& operator=(MaterialSlab&&) = default;
-  MaterialSlab& operator=(const MaterialSlab&) = default;
 
   /// Scale the material thickness by the given factor.
   void scaleThickness(float scale);
 
-  /// Check if the material is valid, i.e. it is finite and not vacuum.
-  bool isValid() const { return m_material.isValid() && (0.0f < m_thickness); }
+  /// Check if the material is vacuum.
+  bool isVacuum() const { return m_material.isVacuum() || m_thickness <= 0; }
 
   /// Access the (average) material parameters.
   constexpr const Material& material() const { return m_material; }
@@ -78,6 +82,17 @@ class MaterialSlab {
   float m_thickness = 0.0f;
   float m_thicknessInX0 = 0.0f;
   float m_thicknessInL0 = 0.0f;
+
+  static constexpr auto eps = 2 * std::numeric_limits<float>::epsilon();
+
+  constexpr MaterialSlab(const Material& material, float thickness,
+                         [[maybe_unused]] bool dummy)
+      : m_material(material),
+        m_thickness(thickness),
+        m_thicknessInX0((eps < material.X0()) ? (thickness / material.X0())
+                                              : 0),
+        m_thicknessInL0((eps < material.L0()) ? (thickness / material.L0())
+                                              : 0) {}
 
   /// @brief Check if two materials are exactly equal.
   ///

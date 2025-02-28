@@ -102,7 +102,7 @@ BOOST_DATA_TEST_CASE(multiple_scattering_consistency,
 
 // no material -> no interactions
 BOOST_DATA_TEST_CASE(vacuum, thickness* particle* momentum, x, i, m, q, p) {
-  const auto vacuum = Acts::MaterialSlab(Acts::Material(), x);
+  const auto vacuum = Acts::MaterialSlab::Vacuum(x);
   const auto qOverP = q / p;
   const auto absQ = std::abs(q);
   const auto absPdg = Acts::makeAbsolutePdgParticle(i);

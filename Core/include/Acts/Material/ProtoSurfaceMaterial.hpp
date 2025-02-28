@@ -9,12 +9,13 @@
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Material/ISurfaceMaterial.hpp"
 #include "Acts/Material/MaterialSlab.hpp"
 #include "Acts/Utilities/BinUtility.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <iosfwd>
+#include <vector>
 
 namespace Acts {
 
@@ -96,7 +97,7 @@ class ProtoSurfaceMaterialT : public ISurfaceMaterial {
   /// @param sl is the output stream
   std::ostream& toStream(std::ostream& sl) const final {
     sl << "Acts::ProtoSurfaceMaterial : " << std::endl;
-    sl << m_binning.toString() << std::endl;
+    sl << m_binning << std::endl;
     return sl;
   }
 
@@ -105,12 +106,11 @@ class ProtoSurfaceMaterialT : public ISurfaceMaterial {
   BinningType m_binning;
 
   /// Dummy material properties
-  MaterialSlab m_materialSlab;
+  MaterialSlab m_materialSlab = MaterialSlab::Nothing();
 };
 
 using ProtoSurfaceMaterial = ProtoSurfaceMaterialT<Acts::BinUtility>;
 
-using ProtoGridSurfaceMaterial =
-    ProtoSurfaceMaterialT<Acts::Experimental::BinningDescription>;
+using ProtoGridSurfaceMaterial = ProtoSurfaceMaterialT<std::vector<ProtoAxis>>;
 
 }  // namespace Acts

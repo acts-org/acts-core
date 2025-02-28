@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   std::vector<double> detectorBounds = {detectorX, detectorY, detectorZ};
 
   // The root node - detector
-  auto detectorBpr = std::make_unique<Acts::Experimental::Blueprint::Node>(
+  auto detectorBpr = std::make_unique<Acts::Experimental::Gen2Blueprint::Node>(
       "detector", Acts::Transform3::Identity(), Acts::VolumeBounds::eCuboid,
       detectorBounds, detectorBins);
 
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
       Acts::Transform3::Identity() *
       Acts::Translation3(-detectorX * 0.5, 0., 0);
 
-  auto leftArm = std::make_unique<Acts::Experimental::Blueprint::Node>(
+  auto leftArm = std::make_unique<Acts::Experimental::Gen2Blueprint::Node>(
       "leftArm", leftArmTransform, Acts::VolumeBounds::eCuboid, leftArmBounds,
       leftArmBins);
 
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   auto pixelL1Structure = std::make_shared<SurfaceBuilder>(
       pixelL1Transform, Acts::RectangleBounds(pixelX * 0.8, pixelY * 0.8));
 
-  auto pixelL1 = std::make_unique<Acts::Experimental::Blueprint::Node>(
+  auto pixelL1 = std::make_unique<Acts::Experimental::Gen2Blueprint::Node>(
       "pixelL1", pixelL1Transform, Acts::VolumeBounds::eCuboid,
       pixelL1Boundaries, pixelL1Structure);
 
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   auto pixelL2Structure = std::make_shared<SurfaceBuilder>(
       pixelL2Transform, Acts::RectangleBounds(pixelX * 0.8, pixelY * 0.8));
 
-  auto pixelL2 = std::make_unique<Acts::Experimental::Blueprint::Node>(
+  auto pixelL2 = std::make_unique<Acts::Experimental::Gen2Blueprint::Node>(
       "pixelL2", pixelL2Transform, Acts::VolumeBounds::eCuboid,
       pixelL2Boundaries, pixelL2Structure);
 
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   Acts::Transform3 rightArmTransform =
       Acts::Transform3::Identity() * Acts::Translation3(detectorX * 0.5, 0., 0);
 
-  auto rightArm = std::make_unique<Acts::Experimental::Blueprint::Node>(
+  auto rightArm = std::make_unique<Acts::Experimental::Gen2Blueprint::Node>(
       "rightArm", rightArmTransform, Acts::VolumeBounds::eCuboid,
       rightArmBounds, rightArmBins);
 
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   auto pixelR1Structure = std::make_shared<SurfaceBuilder>(
       pixelR1Transform, Acts::RectangleBounds(pixelX * 0.8, pixelY * 0.8));
 
-  auto pixelR1 = std::make_unique<Acts::Experimental::Blueprint::Node>(
+  auto pixelR1 = std::make_unique<Acts::Experimental::Gen2Blueprint::Node>(
       "pixelR1", pixelR1Transform, Acts::VolumeBounds::eCuboid,
       pixelR1Boundaries, pixelR1Structure);
 
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(CuboidalDetectorFromBlueprintTest) {
   auto pixelR2Structure = std::make_shared<SurfaceBuilder>(
       pixelR2Transform, Acts::RectangleBounds(pixelX * 0.8, pixelY * 0.8));
 
-  auto pixelR2 = std::make_unique<Acts::Experimental::Blueprint::Node>(
+  auto pixelR2 = std::make_unique<Acts::Experimental::Gen2Blueprint::Node>(
       "pixelR2", pixelR2Transform, Acts::VolumeBounds::eCuboid,
       pixelR2Boundaries, pixelR2Structure);
 

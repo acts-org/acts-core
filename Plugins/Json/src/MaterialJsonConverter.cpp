@@ -18,6 +18,7 @@
 #include "Acts/Material/IVolumeMaterial.hpp"
 #include "Acts/Material/InterpolatedMaterialMap.hpp"
 #include "Acts/Material/MaterialGridHelper.hpp"
+#include "Acts/Material/MaterialSlab.hpp"
 #include "Acts/Material/ProtoSurfaceMaterial.hpp"
 #include "Acts/Material/ProtoVolumeMaterial.hpp"
 #include "Acts/Plugins/Json/GeometryJsonKeys.hpp"
@@ -26,15 +27,12 @@
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/BinUtility.hpp"
 #include "Acts/Utilities/Grid.hpp"
-#include "Acts/Utilities/GridAccessHelpers.hpp"
 #include "Acts/Utilities/GridAxisGenerators.hpp"
 #include "Acts/Utilities/TypeList.hpp"
 
 #include <algorithm>
 #include <cstddef>
 #include <functional>
-#include <iosfwd>
-#include <memory>
 #include <numbers>
 #include <stdexcept>
 #include <string>
@@ -149,7 +147,9 @@ Acts::ISurfaceMaterial* indexedMaterialFromJson(nlohmann::json& jMaterial) {
                                Acts::IndexedMaterialAccessor>) {
     // It's actually locally indexed
     for (const auto& msl : jMaterialAccessor["storage_vector"]) {
-      materialAccessor.material.push_back(msl);
+      Acts::MaterialSlab mat = Acts::MaterialSlab::Nothing();
+      from_json(msl, mat);
+      materialAccessor.material.push_back(mat);
     }
   }
 
@@ -284,7 +284,7 @@ Acts::ISurfaceMaterial* indexedMaterialFromJson(nlohmann::json& jMaterial) {
 }  // namespace
 
 void Acts::to_json(nlohmann::json& j, const Material& t) {
-  if (!t.isValid()) {
+  if (t.isVacuum()) {
     return;
   }
   for (unsigned i = 0; i < t.parameters().size(); ++i) {
@@ -313,7 +313,8 @@ void Acts::to_json(nlohmann::json& j, const MaterialSlab& t) {
 }
 
 void Acts::from_json(const nlohmann::json& j, MaterialSlab& t) {
-  Material mat(j["material"].get<Material>());
+  Material mat = Material::Vacuum();
+  from_json(j.at("material"), mat);
   t = Acts::MaterialSlab(mat, j.at("thickness").get<float>());
 }
 
@@ -322,7 +323,8 @@ void Acts::from_json(const nlohmann::json& j, MaterialSlabMatrix& t) {
   for (auto& outer : j) {
     Acts::MaterialSlabVector mpVector;
     for (auto& inner : outer) {
-      MaterialSlab mat = inner.get<MaterialSlab>();
+      MaterialSlab mat = MaterialSlab::Nothing();
+      from_json(inner, mat);
       mpVector.emplace_back(mat);
     }
     t.push_back(std::move(mpVector));
@@ -604,7 +606,8 @@ void Acts::from_json(const nlohmann::json& j, volumeMaterialPointer& material) {
     }
     if (key == Acts::jsonKey().datakey && !value.empty()) {
       for (const auto& bin : value) {
-        Acts::Material mat(bin.get<Acts::Material>());
+        Acts::Material mat = Material::Vacuum();
+        from_json(bin, mat);
         mmat.push_back(mat);
       }
     }

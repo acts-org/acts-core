@@ -55,7 +55,7 @@ std::string labelStr(
 }  // namespace
 
 void Acts::Experimental::detail::BlueprintDrawer::dotStream(
-    std::ostream& ss, const Acts::Experimental::Blueprint::Node& node,
+    std::ostream& ss, const Acts::Experimental::Gen2Blueprint::Node& node,
     const Options& options) {
   // Replace the "/" in node names
   std::string nodeName = node.name;

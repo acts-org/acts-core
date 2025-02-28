@@ -129,14 +129,7 @@ void SympyStepper::transportCovarianceToBound(
 Result<double> SympyStepper::step(State& state, Direction propDir,
                                   const IVolumeMaterial* material) const {
   (void)material;
-  return stepImpl(state, propDir, state.options.stepTolerance,
-                  state.options.stepSizeCutOff,
-                  state.options.maxRungeKuttaStepTrials);
-}
 
-Result<double> SympyStepper::stepImpl(
-    State& state, Direction propDir, double stepTolerance,
-    double stepSizeCutOff, std::size_t maxRungeKuttaStepTrials) const {
   auto pos = position(state);
   auto dir = direction(state);
   double t = time(state);
@@ -155,7 +148,7 @@ Result<double> SympyStepper::stepImpl(
     // This is given by the order of the Runge-Kutta method
     constexpr double exponent = 0.25;
 
-    double x = stepTolerance / errorEstimate_;
+    double x = state.options.stepTolerance / errorEstimate_;
 
     if constexpr (exponent == 0.25) {
       // This is 3x faster than std::pow
@@ -179,7 +172,8 @@ Result<double> SympyStepper::stepImpl(
     // For details about the factor 4 see ATL-SOFT-PUB-2009-001
     Result<bool> res =
         rk4(pos.data(), dir.data(), t, h, qop, m, p_abs, getB, &errorEstimate,
-            4 * stepTolerance, state.pars.template segment<3>(eFreePos0).data(),
+            4 * state.options.stepTolerance,
+            state.pars.template segment<3>(eFreePos0).data(),
             state.pars.template segment<3>(eFreeDir0).data(),
             state.pars.template segment<1>(eFreeTime).data(),
             state.derivative.data(),
@@ -201,14 +195,14 @@ Result<double> SympyStepper::stepImpl(
 
     // If step size becomes too small the particle remains at the initial
     // place
-    if (std::abs(h) < std::abs(stepSizeCutOff)) {
+    if (std::abs(h) < std::abs(state.options.stepSizeCutOff)) {
       // Not moving due to too low momentum needs an aborter
       return EigenStepperError::StepSizeStalled;
     }
 
     // If the parameter is off track too much or given stepSize is not
     // appropriate
-    if (nStepTrials > maxRungeKuttaStepTrials) {
+    if (nStepTrials > state.options.maxRungeKuttaStepTrials) {
       // Too many trials, have to abort
       return EigenStepperError::StepSizeAdjustmentFailed;
     }

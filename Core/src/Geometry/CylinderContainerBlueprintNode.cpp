@@ -9,9 +9,9 @@
 #include "Acts/Geometry/CylinderContainerBlueprintNode.hpp"
 
 #include "Acts/Geometry/BlueprintNode.hpp"
+#include "Acts/Geometry/CylinderPortalShell.hpp"
 #include "Acts/Geometry/CylinderVolumeStack.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
-#include "Acts/Geometry/PortalShell.hpp"
 #include "Acts/Geometry/TrackingVolume.hpp"
 #include "Acts/Navigation/INavigationPolicy.hpp"
 #include "Acts/Utilities/GraphViz.hpp"
@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <utility>
 
-namespace Acts {
+namespace Acts::Experimental {
 
 CylinderContainerBlueprintNode::CylinderContainerBlueprintNode(
     const std::string& name, AxisDirection direction,
@@ -253,4 +253,4 @@ VolumeResizeStrategy CylinderContainerBlueprintNode::resizeStrategy() const {
   return m_resizeStrategy;
 }
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

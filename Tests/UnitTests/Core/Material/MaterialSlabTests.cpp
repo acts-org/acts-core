@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(construct_compound) {
   MaterialSlab b(Material::fromMolarDensity(2., 4., 6., 8., 10.), 2.);
   MaterialSlab c(Material::fromMolarDensity(4., 8., 12., 16., 20.), 3.);
   std::vector<MaterialSlab> components = {a, b, c};
-  MaterialSlab abc = MaterialSlab::averageLayers(components);
+  MaterialSlab abc = MaterialSlab::combineLayers(components);
 
   // consistency checks
   CHECK_CLOSE_REL(abc.thickness() / abc.material().X0(), abc.thicknessInX0(),

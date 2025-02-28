@@ -1,8 +1,19 @@
+import sys
+
 import sympy as sym
 from sympy import MatrixSymbol
 
-from sympy_common import name_expr, find_by_name, cxx_printer, my_expression_print
+from codegen.sympy_common import (
+    name_expr,
+    find_by_name,
+    cxx_printer,
+    my_expression_print,
+)
 
+
+output = sys.stdout
+if len(sys.argv) > 1:
+    output = open(sys.argv[1], "w")
 
 step_path_derivatives = (
     MatrixSymbol("step_path_derivatives", 8, 1).as_explicit().as_mutable()
@@ -114,7 +125,7 @@ def my_full_transport_jacobian_curvilinear_function_print(name_exprs, run_cse=Tr
     return "\n".join(lines)
 
 
-print(
+output.write(
     """// This file is part of the ACTS project.
 //
 // Copyright (C) 2016 CERN for the benefit of the ACTS project
@@ -137,12 +148,15 @@ code = my_full_transport_jacobian_generic_function_print(
     all_name_exprs,
     run_cse=True,
 )
-print(code)
-print()
+output.write(code)
+output.write("\n")
 
 all_name_exprs = full_transport_jacobian_curvilinear(MatrixSymbol("dir", 3, 1))
 code = my_full_transport_jacobian_curvilinear_function_print(
     all_name_exprs,
     run_cse=True,
 )
-print(code)
+output.write(code + "\n")
+
+if output is not sys.stdout:
+    output.close()

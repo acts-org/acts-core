@@ -13,7 +13,7 @@
 #include "Acts/Geometry/PortalShell.hpp"
 #include "Acts/Geometry/TrackingVolume.hpp"
 
-namespace Acts {
+namespace Acts::Experimental {
 
 /// The static blueprint node wraps a single already-constructred @c TrackingVolume.
 /// The node will present this volume to its hierarchy. The volume is given as
@@ -64,4 +64,4 @@ class StaticBlueprintNode : public BlueprintNode {
   std::shared_ptr<NavigationPolicyFactory> m_navigationPolicyFactory;
 };
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

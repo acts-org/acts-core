@@ -626,6 +626,8 @@ RootAthenaDumpReader::readSpacepoints(
   ACTS_DEBUG("Created " << spacePoints.size() << " overall space points");
   ACTS_DEBUG("Created " << pixelSpacePoints.size() << " "
                         << " pixel space points");
+  ACTS_DEBUG("Created " << stripSpacePoints.size() << " "
+                        << " strip space points");
 
   return {spacePoints, pixelSpacePoints, stripSpacePoints};
 }

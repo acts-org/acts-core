@@ -9,8 +9,8 @@
 #pragma once
 
 #include "Acts/Geometry/BlueprintNode.hpp"
+#include "Acts/Geometry/CylinderPortalShell.hpp"
 #include "Acts/Geometry/CylinderVolumeStack.hpp"
-#include "Acts/Geometry/PortalShell.hpp"
 #include "Acts/Geometry/VolumeAttachmentStrategy.hpp"
 #include "Acts/Geometry/VolumeResizeStrategy.hpp"
 #include "Acts/Utilities/AxisDefinitions.hpp"
@@ -18,7 +18,7 @@
 
 #include <map>
 
-namespace Acts {
+namespace Acts::Experimental {
 
 /// This class handles the case of wrapping a set of cylinder-shaped children
 /// and stacking them in a configured direction.
@@ -154,4 +154,4 @@ class CylinderContainerBlueprintNode final : public BlueprintNode {
   std::unique_ptr<CylinderStackPortalShell> m_shell{nullptr};
 };
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

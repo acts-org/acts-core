@@ -25,7 +25,6 @@
 #include "Acts/Surfaces/RadialBounds.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Surfaces/SurfaceMergingException.hpp"
-#include "Acts/Utilities/BinningType.hpp"
 #include "Acts/Utilities/ThrowAssert.hpp"
 
 #include <stdexcept>
@@ -215,8 +214,8 @@ BOOST_AUTO_TEST_CASE(Cylinder) {
       AssertionFailureException);
 
   // Can't merge because surface has material
-  auto material =
-      std::make_shared<HomogeneousSurfaceMaterial>(MaterialSlab{});  // vacuum
+  auto material = std::make_shared<HomogeneousSurfaceMaterial>(
+      MaterialSlab::Nothing());  // vacuum
   cyl2->assignSurfaceMaterial(material);
   portal1 = Portal{gctx, {.alongNormal = {cyl1, *vol1}}};
   portal2 = Portal{gctx, {.alongNormal = {cyl2, *vol2}}};
@@ -326,8 +325,8 @@ BOOST_AUTO_TEST_CASE(Disc) {
       vol4.get());
 
   // Can't merge because surface has material
-  auto material =
-      std::make_shared<HomogeneousSurfaceMaterial>(MaterialSlab{});  // vacuum
+  auto material = std::make_shared<HomogeneousSurfaceMaterial>(
+      MaterialSlab::Nothing());  // vacuum
   disc2->assignSurfaceMaterial(material);
   portal1 = Portal{
       gctx, {.alongNormal = {disc1, *vol1}, .oppositeNormal = {disc1, *vol2}}};
@@ -497,8 +496,8 @@ BOOST_AUTO_TEST_CASE(Material) {
   Portal portal1{gctx, {.oppositeNormal = {cyl1, *vol1}}};
   Portal portal2{gctx, {.alongNormal = {cyl2, *vol2}}};
 
-  auto material =
-      std::make_shared<HomogeneousSurfaceMaterial>(MaterialSlab{});  // vacuum
+  auto material = std::make_shared<HomogeneousSurfaceMaterial>(
+      MaterialSlab::Nothing());  // vacuum
 
   cyl1->assignSurfaceMaterial(material);
 

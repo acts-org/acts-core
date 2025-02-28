@@ -8,15 +8,15 @@
 
 #include "Acts/Geometry/MaterialDesignatorBlueprintNode.hpp"
 
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Geometry/CylinderVolumeBounds.hpp"
 #include "Acts/Geometry/Portal.hpp"
 #include "Acts/Material/ProtoSurfaceMaterial.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/GraphViz.hpp"
 #include "Acts/Utilities/Helpers.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
-namespace Acts {
+namespace Acts::Experimental {
 
 const std::string& MaterialDesignatorBlueprintNode::name() const {
   return m_name;
@@ -46,41 +46,41 @@ Volume& MaterialDesignatorBlueprintNode::build(const BlueprintOptions& options,
 }
 
 void MaterialDesignatorBlueprintNode::handleCylinderBinning(
+
     CylinderPortalShell& cylShell,
     const std::vector<
-        std::tuple<CylinderPortalShell::Face, Experimental::ProtoBinning,
-                   Experimental::ProtoBinning>>& binning,
+        std::tuple<CylinderPortalShell::Face, ProtoAxis, ProtoAxis>>& binning,
     const Logger& logger) {
   ACTS_DEBUG(prefix() << "Binning is set to compatible type");
   using enum CylinderVolumeBounds::Face;
 
   for (auto& [face, loc0, loc1] : binning) {
     if (face == OuterCylinder || face == InnerCylinder) {
-      if (loc0.axisDir != AxisDirection::AxisRPhi) {
+      if (loc0.getAxisDirection() != AxisDirection::AxisRPhi) {
         ACTS_ERROR(prefix() << "Binning is not in RPhi");
         throw std::runtime_error("Binning is not in RPhi");
       }
 
-      if (loc1.axisDir != AxisDirection::AxisZ) {
+      if (loc1.getAxisDirection() != AxisDirection::AxisZ) {
         ACTS_ERROR(prefix() << "Binning is not in Z");
         throw std::runtime_error("Binning is not in Z");
       }
     }
 
     if (face == PositiveDisc || face == NegativeDisc) {
-      if (loc0.axisDir != AxisDirection::AxisR) {
+      if (loc0.getAxisDirection() != AxisDirection::AxisR) {
         ACTS_ERROR(prefix() << "Binning is not in R");
         throw std::runtime_error("Binning is not in R");
       }
-      if (loc1.axisDir != AxisDirection::AxisPhi) {
+      if (loc1.getAxisDirection() != AxisDirection::AxisPhi) {
         ACTS_ERROR(prefix() << "Binning is not in Phi");
         throw std::runtime_error("Binning is not in Phi");
       }
     }
 
-    Experimental::BinningDescription desc{.binning = {loc0, loc1}};
-    ACTS_DEBUG(prefix() << "~> Assigning proto binning " << desc.toString()
-                        << " to face " << face);
+    std::vector<ProtoAxis> desc{loc0, loc1};
+    ACTS_DEBUG(prefix() << "~> Assigning proto binning " << desc << " to face "
+                        << face);
 
     auto material = std::make_shared<ProtoGridSurfaceMaterial>(std::move(desc));
 
@@ -118,8 +118,8 @@ PortalShellBase& MaterialDesignatorBlueprintNode::connect(
     ACTS_DEBUG(prefix() << "Connecting cylinder shell");
 
     if (const auto* binning = std::get_if<std::vector<
-            std::tuple<CylinderPortalShell::Face, Experimental::ProtoBinning,
-                       Experimental::ProtoBinning>>>(&m_binning.value());
+            std::tuple<CylinderPortalShell::Face, ProtoAxis, ProtoAxis>>>(
+            &m_binning.value());
         binning != nullptr) {
       handleCylinderBinning(*cylShell, *binning, logger);
     } else {
@@ -159,13 +159,14 @@ void MaterialDesignatorBlueprintNode::addToGraphviz(std::ostream& os) const {
 
   std::visit(
       overloaded{
-          [&](const std::vector<
-              std::tuple<CylinderPortalShell::Face, Experimental::ProtoBinning,
-                         Experimental::ProtoBinning>>& binning) {
+          [&](const std::vector<std::tuple<CylinderPortalShell::Face, ProtoAxis,
+                                           ProtoAxis>>& binning) {
             for (const auto& [face, loc0, loc1] : binning) {
               ss << "<br/>" << face;
-              ss << ": " << loc0.axisDir << "=" << loc0.bins();
-              ss << ", " << loc1.axisDir << "=" << loc1.bins();
+              ss << ": " << loc0.getAxisDirection() << "="
+                 << loc0.getAxis().getNBins();
+              ss << ", " << loc1.getAxisDirection() << "="
+                 << loc1.getAxis().getNBins();
             }
           },
           [](const auto& /*binning*/) {
@@ -188,4 +189,4 @@ MaterialDesignatorBlueprintNode& MaterialDesignatorBlueprintNode::setBinning(
   return *this;
 }
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

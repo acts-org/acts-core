@@ -62,7 +62,7 @@ class DD4hepBlueprintFactory {
   /// @param dd4hepElement the dd4hep detector element tree
   ///
   /// @return a new blueprint top node
-  std::unique_ptr<Blueprint::Node> create(
+  std::unique_ptr<Gen2Blueprint::Node> create(
       Cache& cache, const GeometryContext& gctx,
       const dd4hep::DetElement& dd4hepElement) const;
 
@@ -87,7 +87,7 @@ class DD4hepBlueprintFactory {
   /// @param gctx the geometry context
   /// @param dd4hepElement the detector element at current level
   /// @param hiearchyLevel the current hierarchy level
-  void recursiveParse(Cache& cache, Blueprint::Node& mother,
+  void recursiveParse(Cache& cache, Gen2Blueprint::Node& mother,
                       const GeometryContext& gctx,
                       const dd4hep::DetElement& dd4hepElement,
                       unsigned int hiearchyLevel = 0) const;

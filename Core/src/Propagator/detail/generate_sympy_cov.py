@@ -1,9 +1,21 @@
+import sys
 import numpy as np
 
 import sympy as sym
 from sympy import MatrixSymbol
 
-from sympy_common import name_expr, find_by_name, cxx_printer, my_expression_print
+
+from codegen.sympy_common import (
+    name_expr,
+    find_by_name,
+    cxx_printer,
+    my_expression_print,
+)
+
+
+output = sys.stdout
+if len(sys.argv) > 1:
+    output = open(sys.argv[1], "w")
 
 
 C = MatrixSymbol("C", 6, 6).as_explicit().as_mutable()
@@ -45,7 +57,7 @@ def my_covariance_transport_generic_function_print(name_exprs, run_cse=True):
     return "\n".join(lines)
 
 
-print(
+output.write(
     """// This file is part of the ACTS project.
 //
 // Copyright (C) 2016 CERN for the benefit of the ACTS project
@@ -68,4 +80,7 @@ code = my_covariance_transport_generic_function_print(
     all_name_exprs,
     run_cse=True,
 )
-print(code)
+output.write(code + "\n")
+
+if output is not sys.stdout:
+    output.close()

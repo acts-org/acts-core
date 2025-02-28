@@ -85,9 +85,9 @@ BOOST_DATA_TEST_CASE(BaselineLocal,
   auto dirIdx = CuboidVolumeStack::axisToIndex(dir);
   auto dirOrth1Idx = CuboidVolumeStack::axisToIndex(dirOrth1);
 
-  auto boundDir = CuboidVolumeBounds::fromAxisDirection(dir);
-  auto boundDirOrth1 = CuboidVolumeBounds::fromAxisDirection(dirOrth1);
-  auto boundDirOrth2 = CuboidVolumeBounds::fromAxisDirection(dirOrth2);
+  auto boundDir = CuboidVolumeBounds::boundsFromAxisDirection(dir);
+  auto boundDirOrth1 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth1);
+  auto boundDirOrth2 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth2);
 
   auto bounds1 = std::make_shared<CuboidVolumeBounds>(
       std::initializer_list<std::pair<CuboidVolumeBounds::BoundValues, double>>{
@@ -339,75 +339,6 @@ BOOST_DATA_TEST_CASE(BaselineLocal,
   }
 }
 
-BOOST_DATA_TEST_CASE(BaselineGlobal,
-                     (boost::unit_test::data::xrange(-135, 180, 45) *
-                      boost::unit_test::data::xrange(0, 2, 1) *
-                      boost::unit_test::data::make(1.0, 1.2) *
-                      boost::unit_test::data::make(Vector3{0_mm, 0_mm, 0_mm},
-                                                   Vector3{20_mm, 0_mm, 0_mm},
-                                                   Vector3{0_mm, 20_mm, 0_mm},
-                                                   Vector3{20_mm, 20_mm, 0_mm},
-                                                   Vector3{0_mm, 0_mm, 20_mm}) *
-                      boost::unit_test::data::make(strategies)),
-                     angle, rotate, shift, offset, strategy) {
-  double halfDir = 400_mm;
-
-  auto bounds1 = std::make_shared<CuboidVolumeBounds>(100_mm, 400_mm, halfDir);
-  auto bounds2 = std::make_shared<CuboidVolumeBounds>(200_mm, 600_mm, halfDir);
-  auto bounds3 = std::make_shared<CuboidVolumeBounds>(300_mm, 500_mm, halfDir);
-
-  AngleAxis3 baseRotation = AngleAxis3(angle, Vector3::UnitX());
-  Transform3 base = baseRotation * Translation3(offset);
-
-  Vector3 orientation = baseRotation * Vector3::UnitZ();
-
-  Translation3 translation1(Vector3::UnitZ() * (-2 * halfDir * shift));
-  Transform3 transform1 = base * translation1;
-  auto vol1Orientation = std::make_shared<Volume>(transform1, bounds1);
-  auto vol1AxisDirection = std::make_shared<Volume>(transform1, bounds1);
-
-  Transform3 transform2 = base;
-  auto vol2Orientation = std::make_shared<Volume>(transform2, bounds2);
-  auto vol2AxisDirection = std::make_shared<Volume>(transform2, bounds2);
-
-  Translation3 translation3(Vector3::UnitZ() * (2 * halfDir * shift));
-  Transform3 transform3 = base * translation3;
-  auto vol3Orientation = std::make_shared<Volume>(transform3, bounds3);
-  auto vol3AxisDirection = std::make_shared<Volume>(transform3, bounds3);
-
-  std::vector<Volume*> volumesOrientation = {
-      vol1Orientation.get(), vol2Orientation.get(), vol3Orientation.get()};
-  std::vector<Volume*> volumesAxisDirection = {vol1AxisDirection.get(),
-                                               vol2AxisDirection.get(),
-                                               vol3AxisDirection.get()};
-
-  // Rotate to simulate unsorted volumes: all results should be the same!
-  std::rotate(volumesOrientation.begin(), volumesOrientation.begin() + rotate,
-              volumesOrientation.end());
-  std::rotate(volumesAxisDirection.begin(),
-              volumesAxisDirection.begin() + rotate,
-              volumesAxisDirection.end());
-
-  CuboidVolumeStack stackOrientation(volumesOrientation, orientation, strategy,
-                                     VolumeResizeStrategy::Gap, *logger);
-  CuboidVolumeStack stackAxisDirection(volumesAxisDirection,
-                                       AxisDirection::AxisZ, strategy,
-                                       VolumeResizeStrategy::Gap, *logger);
-
-  auto stackBoundsOrientation =
-      dynamic_cast<const CuboidVolumeBounds*>(&stackOrientation.volumeBounds());
-  auto stackBoundsAxisDirection = dynamic_cast<const CuboidVolumeBounds*>(
-      &stackAxisDirection.volumeBounds());
-
-  // Global vector direction and local axis direction should
-  // produce the same results
-  BOOST_CHECK_NE(stackBoundsOrientation, nullptr);
-  BOOST_CHECK_NE(stackBoundsAxisDirection, nullptr);
-  BOOST_CHECK_EQUAL(*stackBoundsOrientation, *stackBoundsAxisDirection);
-  CHECK_CLOSE_OR_SMALL(stackOrientation.transform().matrix(),
-                       stackAxisDirection.transform().matrix(), 1e-10, 1e-12);
-}
-
 BOOST_DATA_TEST_CASE(Asymmetric,
                      boost::unit_test::data::make(Acts::AxisDirection::AxisX,
                                                   Acts::AxisDirection::AxisY,
@@ -424,9 +355,9 @@ BOOST_DATA_TEST_CASE(Asymmetric,
 
   auto dirIdx = CuboidVolumeStack::axisToIndex(dir);
 
-  auto boundDir = CuboidVolumeBounds::fromAxisDirection(dir);
-  auto boundDirOrth1 = CuboidVolumeBounds::fromAxisDirection(dirOrth1);
-  auto boundDirOrth2 = CuboidVolumeBounds::fromAxisDirection(dirOrth2);
+  auto boundDir = CuboidVolumeBounds::boundsFromAxisDirection(dir);
+  auto boundDirOrth1 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth1);
+  auto boundDirOrth2 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth2);
 
   auto bounds1 = std::make_shared<CuboidVolumeBounds>(
       std::initializer_list<std::pair<CuboidVolumeBounds::BoundValues, double>>{
@@ -501,9 +432,9 @@ BOOST_DATA_TEST_CASE(UpdateStack,
   auto dirIdx = CuboidVolumeStack::axisToIndex(dir);
   auto dirOrth1Idx = CuboidVolumeStack::axisToIndex(dirOrth1);
 
-  auto boundDir = CuboidVolumeBounds::fromAxisDirection(dir);
-  auto boundDirOrth1 = CuboidVolumeBounds::fromAxisDirection(dirOrth1);
-  auto boundDirOrth2 = CuboidVolumeBounds::fromAxisDirection(dirOrth2);
+  auto boundDir = CuboidVolumeBounds::boundsFromAxisDirection(dir);
+  auto boundDirOrth1 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth1);
+  auto boundDirOrth2 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth2);
 
   auto bounds1 = std::make_shared<CuboidVolumeBounds>(
       std::initializer_list<std::pair<CuboidVolumeBounds::BoundValues, double>>{
@@ -762,9 +693,9 @@ BOOST_DATA_TEST_CASE(
   auto dirOrth1Idx = CuboidVolumeStack::axisToIndex(dirOrth1);
   auto dirOrth2Idx = CuboidVolumeStack::axisToIndex(dirOrth2);
 
-  auto boundDir = CuboidVolumeBounds::fromAxisDirection(dir);
-  auto boundDirOrth1 = CuboidVolumeBounds::fromAxisDirection(dirOrth1);
-  auto boundDirOrth2 = CuboidVolumeBounds::fromAxisDirection(dirOrth2);
+  auto boundDir = CuboidVolumeBounds::boundsFromAxisDirection(dir);
+  auto boundDirOrth1 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth1);
+  auto boundDirOrth2 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth2);
 
   auto bounds1 = std::make_shared<CuboidVolumeBounds>(
       std::initializer_list<std::pair<CuboidVolumeBounds::BoundValues, double>>{
@@ -927,9 +858,9 @@ BOOST_DATA_TEST_CASE(ResizeGapMultiple,
 
   auto dirIdx = CuboidVolumeStack::axisToIndex(dir);
 
-  auto boundDir = CuboidVolumeBounds::fromAxisDirection(dir);
-  auto boundDirOrth1 = CuboidVolumeBounds::fromAxisDirection(dirOrth1);
-  auto boundDirOrth2 = CuboidVolumeBounds::fromAxisDirection(dirOrth2);
+  auto boundDir = CuboidVolumeBounds::boundsFromAxisDirection(dir);
+  auto boundDirOrth1 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth1);
+  auto boundDirOrth2 = CuboidVolumeBounds::boundsFromAxisDirection(dirOrth2);
 
   auto bounds = std::make_shared<CuboidVolumeBounds>(
       std::initializer_list<std::pair<CuboidVolumeBounds::BoundValues, double>>{

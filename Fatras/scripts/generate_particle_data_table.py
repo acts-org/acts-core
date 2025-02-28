@@ -13,11 +13,13 @@
 import io
 import sys
 import subprocess
+import argparse
+from pathlib import Path
 
 from particle import Particle
 
 
-def main(output_file):
+def main(output_file, format: bool):
     """
     Generate the code and write it to the given output file.
     """
@@ -27,7 +29,8 @@ def main(output_file):
         table.append((int(p.pdgid), int(p.three_charge), p.mass, p.name))
     # use the extracted table to generate the code
     code = generate_code(table)
-    code = clang_format(code)
+    if format:
+        code = clang_format(code)
     output_file.write(code)
 
 
@@ -117,12 +120,17 @@ def clang_format(content):
 
 
 if __name__ == "__main__":
-    if 2 < len(sys.argv):
-        print("usage: {} [<output_file>]".format(sys.argv[0]))
-        sys.exit(2)
-    if len(sys.argv) == 1:
+    p = argparse.ArgumentParser(description="Generate the particle data table.")
+    p.add_argument("output", type=Path, default=None, help="Output file.")
+    p.add_argument(
+        "--format", action="store_true", help="Run clang-format on the output."
+    )
+
+    args = p.parse_args()
+    if args.output is None:
         output_file = sys.stdout
     else:
         # will overwrite existing file
-        output_file = io.open(sys.argv[1], mode="wt", encoding="utf-8")
-    main(output_file)
+        output_file = io.open(args.output, mode="wt", encoding="utf-8")
+
+    main(output_file, args.format)

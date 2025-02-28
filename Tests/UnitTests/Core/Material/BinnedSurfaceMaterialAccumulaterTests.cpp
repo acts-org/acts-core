@@ -13,17 +13,14 @@
 #include "Acts/Material/BinnedSurfaceMaterial.hpp"
 #include "Acts/Material/BinnedSurfaceMaterialAccumulater.hpp"
 #include "Acts/Material/HomogeneousSurfaceMaterial.hpp"
-#include "Acts/Material/Material.hpp"
 #include "Acts/Material/MaterialSlab.hpp"
 #include "Acts/Material/ProtoSurfaceMaterial.hpp"
 #include "Acts/Surfaces/CylinderSurface.hpp"
 #include "Acts/Surfaces/Surface.hpp"
-#include "Acts/Tests/CommonHelpers/FloatComparisons.hpp"
 #include "Acts/Utilities/BinUtility.hpp"
 #include "Acts/Utilities/Logger.hpp"
 
 #include <numbers>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -44,7 +41,7 @@ BOOST_AUTO_TEST_CASE(InvalidSetupTest) {
   }
 
   // First is homogeneous
-  MaterialSlab mp;
+  MaterialSlab mp = MaterialSlab::Nothing();
   surfaces[0u]->assignSurfaceMaterial(
       std::make_shared<HomogeneousSurfaceMaterial>(mp, 1.));
 
@@ -81,7 +78,7 @@ BOOST_AUTO_TEST_CASE(AccumulationTest) {
   // - Binned (remapping)
 
   // First is homogeneous
-  MaterialSlab mp;
+  MaterialSlab mp = MaterialSlab::Nothing();
   surfaces[0u]->assignSurfaceMaterial(
       std::make_shared<HomogeneousSurfaceMaterial>(mp, 1.));
 

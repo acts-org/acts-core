@@ -53,8 +53,14 @@ class ProtoAxis {
   /// @note that auto-range is only supported for equidistant binning
   ProtoAxis(AxisDirection aDir, AxisBoundaryType abType, std::size_t nbins);
 
-  ProtoAxis(const ProtoAxis&) = delete;
-  ProtoAxis& operator=(const ProtoAxis&) = delete;
+  /// Custom copy constructor
+  /// @param other is the right hand side ProtoAxis
+  ProtoAxis(const ProtoAxis& other);
+
+  /// Custom assignment operator
+  /// @param other is the right hand side ProtoAxis
+  ProtoAxis& operator=(const ProtoAxis& other);
+
   ProtoAxis(ProtoAxis&&) = default;
   ProtoAxis& operator=(ProtoAxis&&) = default;
 
@@ -68,10 +74,17 @@ class ProtoAxis {
   /// @return @c AxisType of this axis
   const IAxis& getAxis() const;
 
-  /// Set the range, this will change auto-range to false
+  /// Set the range, in case of autorange, this
+  /// will toggle the autorange flag to false
   ///
-  /// @throws std::invalid_argument if the axis is not auto-range
-  /// @throws std::invalid_argument if the axis is not equidistant
+  /// @throws an exception if minE > maxE
+  ///
+  /// @note In case of variable binning, it will clip the bins outside
+  /// the new range off, i.e. it will potentially change the number
+  /// of bins.
+  ///
+  /// @note In case of equidistant binning, it will adapt the bin size,
+  /// and NOT change the number of bins.
   ///
   /// @param minE the lowest edge of the binning
   /// @param maxE the highest edge of the binning
@@ -85,6 +98,15 @@ class ProtoAxis {
   std::string toString() const;
 
  private:
+  /// @brief Hidden friend ostream operator
+  /// @param os the output stream
+  /// @param a the proto axis
+  /// @return the streamed into operator
+  friend std::ostream& operator<<(std::ostream& os, const ProtoAxis& a) {
+    os << a.toString();
+    return os;
+  }
+
   /// Dispatch to the correct stream operator
   /// @param os output stream
   void toStream(std::ostream& os) const;
@@ -152,5 +174,7 @@ std::unique_ptr<IGrid> makeGrid(const ProtoAxis& a, const ProtoAxis& b) {
     });
   });
 }
+
+std::ostream& operator<<(std::ostream& os, const std::vector<ProtoAxis>& a);
 
 }  // namespace Acts

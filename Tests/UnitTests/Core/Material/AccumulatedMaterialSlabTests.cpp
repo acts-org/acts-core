@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(Nothing) {
   AccumulatedMaterialSlab a;
   auto [average, trackCount] = a.totalAverage();
   // material is vacuum
-  BOOST_CHECK(!average.isValid());
+  BOOST_CHECK(average.isVacuum());
   BOOST_CHECK_EQUAL(trackCount, 0u);
 }
 
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(EmptyTracksIgnored) {
   a.trackAverage();
   a.trackAverage();
   auto [average, trackCount] = a.totalAverage();
-  BOOST_CHECK(!average.isValid());
+  BOOST_CHECK(average.isVacuum());
   BOOST_CHECK_EQUAL(trackCount, 0u);
 }
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(EmptyTracks) {
   a.trackAverage(true);
   a.trackAverage(true);
   auto [average, trackCount] = a.totalAverage();
-  BOOST_CHECK(!average.isValid());
+  BOOST_CHECK(average.isVacuum());
   BOOST_CHECK_EQUAL(trackCount, 3u);
 }
 
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(MultipleDifferentTracks) {
   }
   // add vacuum w/ given the same thickness as the current average
   {
-    MaterialSlab vac(2 * unit.thickness());
+    MaterialSlab vac = MaterialSlab::Vacuum(2 * unit.thickness());
     // add vacuum twice to counteract the existing two tracks stored
     a.accumulate(vac);
     a.trackAverage();

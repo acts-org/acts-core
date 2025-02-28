@@ -200,37 +200,43 @@ void addGeometry(Context& ctx) {
   }
 
   {
-    py::class_<Acts::TrackingGeometry, std::shared_ptr<Acts::TrackingGeometry>>(
-        m, "TrackingGeometry")
-        .def(py::init([](const MutableTrackingVolumePtr& volPtr,
-                         std::shared_ptr<const IMaterialDecorator> matDec,
-                         const GeometryIdentifierHook& hook,
-                         Acts::Logging::Level level) {
-          auto logger = Acts::getDefaultLogger("TrackingGeometry", level);
-          auto trkGeo = std::make_shared<Acts::TrackingGeometry>(
-              volPtr, matDec.get(), hook, *logger);
-          return trkGeo;
-        }))
-        .def("visitSurfaces",
-             [](Acts::TrackingGeometry& self, py::function& func) {
-               self.visitSurfaces(func);
-             })
-        .def("geoIdSurfaceMap", &Acts::TrackingGeometry::geoIdSurfaceMap)
-        .def("extractMaterialSurfaces",
-             [](Acts::TrackingGeometry& self) {
-               MaterialSurfaceSelector selector;
-               self.visitSurfaces(selector, false);
-               return selector.surfaces;
-             })
-        .def_property_readonly(
-            "highestTrackingVolume",
-            &Acts::TrackingGeometry::highestTrackingVolumePtr)
-        .def("visualize", &Acts::TrackingGeometry::visualize, py::arg("helper"),
-             py::arg("gctx"), py::arg("viewConfig") = s_viewVolume,
-             py::arg("portalViewConfig") = s_viewPortal,
-             py::arg("sensitiveViewConfig") = s_viewSensitive)
-        .def("apply", py::overload_cast<TrackingGeometryMutableVisitor&>(
-                          &TrackingGeometry::apply));
+    auto trkGeo =
+        py::class_<Acts::TrackingGeometry,
+                   std::shared_ptr<Acts::TrackingGeometry>>(m,
+                                                            "TrackingGeometry")
+            .def(py::init([](const MutableTrackingVolumePtr& volPtr,
+                             std::shared_ptr<const IMaterialDecorator> matDec,
+                             const GeometryIdentifierHook& hook,
+                             Acts::Logging::Level level) {
+              auto logger = Acts::getDefaultLogger("TrackingGeometry", level);
+              auto obj = std::make_shared<Acts::TrackingGeometry>(
+                  volPtr, matDec.get(), hook, *logger);
+              return obj;
+            }))
+            .def("visitSurfaces",
+                 [](Acts::TrackingGeometry& self, py::function& func) {
+                   self.visitSurfaces(func);
+                 })
+            .def("geoIdSurfaceMap", &Acts::TrackingGeometry::geoIdSurfaceMap)
+            .def("extractMaterialSurfaces",
+                 [](Acts::TrackingGeometry& self) {
+                   MaterialSurfaceSelector selector;
+                   self.visitSurfaces(selector, false);
+                   return selector.surfaces;
+                 })
+            .def_property_readonly(
+                "highestTrackingVolume",
+                &Acts::TrackingGeometry::highestTrackingVolumePtr)
+            .def("visualize", &Acts::TrackingGeometry::visualize,
+                 py::arg("helper"), py::arg("gctx"),
+                 py::arg("viewConfig") = s_viewVolume,
+                 py::arg("portalViewConfig") = s_viewPortal,
+                 py::arg("sensitiveViewConfig") = s_viewSensitive);
+
+    using apply_ptr_t =
+        void (TrackingGeometry::*)(TrackingGeometryMutableVisitor&);
+
+    trkGeo.def("apply", static_cast<apply_ptr_t>(&TrackingGeometry::apply));
   }
 
   {
@@ -439,16 +445,16 @@ void addExperimentalGeometry(Context& ctx) {
 
   {
     // Be able to construct a proto binning
-    py::class_<ProtoBinning>(m, "ProtoBinning")
+    py::class_<ProtoAxis>(m, "ProtoAxis")
         .def(py::init<Acts::AxisDirection, Acts::AxisBoundaryType,
-                      const std::vector<double>&, std::size_t>(),
-             "bValue"_a, "bType"_a, "e"_a, "exp"_a = 0u)
+                      const std::vector<double>&>(),
+             "bValue"_a, "bType"_a, "e"_a)
         .def(py::init<Acts::AxisDirection, Acts::AxisBoundaryType, double,
-                      double, std::size_t, std::size_t>(),
-             "bValue"_a, "bType"_a, "minE"_a, "maxE"_a, "nbins"_a, "exp"_a = 0u)
-        .def(py::init<Acts::AxisDirection, Acts::AxisBoundaryType, std::size_t,
+                      double, std::size_t>(),
+             "bValue"_a, "bType"_a, "minE"_a, "maxE"_a, "nbins"_a)
+        .def(py::init<Acts::AxisDirection, Acts::AxisBoundaryType,
                       std::size_t>(),
-             "bValue"_a, "bType"_a, "nbins"_a, "exp"_a = 0u);
+             "bValue"_a, "bType"_a, "nbins"_a);
   }
 
   {

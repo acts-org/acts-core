@@ -15,7 +15,7 @@
 #include "Acts/Geometry/VolumeBounds.hpp"
 #include "Acts/Utilities/GraphViz.hpp"
 
-namespace Acts {
+namespace Acts::Experimental {
 
 Volume& LayerBlueprintNode::build(const BlueprintOptions& options,
                                   const GeometryContext& gctx,
@@ -146,4 +146,4 @@ void LayerBlueprintNode::addToGraphviz(std::ostream& os) const {
   BlueprintNode::addToGraphviz(os);
 }
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

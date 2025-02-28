@@ -211,6 +211,14 @@ void pseudoNavigation(const TrackingGeometry& trackingGeometry,
 }  // namespace
 
 void addBlueprint(Context& ctx) {
+  using Acts::Experimental::Blueprint;
+  using Acts::Experimental::BlueprintNode;
+  using Acts::Experimental::BlueprintOptions;
+  using Acts::Experimental::CylinderContainerBlueprintNode;
+  using Acts::Experimental::LayerBlueprintNode;
+  using Acts::Experimental::MaterialDesignatorBlueprintNode;
+  using Acts::Experimental::StaticBlueprintNode;
+
   auto m = ctx.get("main");
 
   auto blueprintNode =
@@ -293,8 +301,7 @@ void addBlueprint(Context& ctx) {
           py::keep_alive<0, 1>())
       .def(
           "__getitem__",
-          [](BlueprintNode::MutableChildRange& self,
-             int i) -> Acts::BlueprintNode& {
+          [](BlueprintNode::MutableChildRange& self, int i) -> BlueprintNode& {
             if (i < 0) {
               i += self.size();
             }
@@ -306,21 +313,20 @@ void addBlueprint(Context& ctx) {
       });
 
   auto staticNode =
-      py::class_<Acts::StaticBlueprintNode, Acts::BlueprintNode,
-                 std::shared_ptr<Acts::StaticBlueprintNode>>(
-          m, "StaticBlueprintNode")
+      py::class_<StaticBlueprintNode, BlueprintNode,
+                 std::shared_ptr<StaticBlueprintNode>>(m, "StaticBlueprintNode")
           .def(py::init([](const Transform3& transform,
                            const std::shared_ptr<VolumeBounds>& bounds,
                            const std::string& name) {
-                 return std::make_shared<Acts::StaticBlueprintNode>(
+                 return std::make_shared<StaticBlueprintNode>(
                      std::make_unique<Acts::TrackingVolume>(transform, bounds,
                                                             name));
                }),
                py::arg("transform"), py::arg("bounds"),
                py::arg("name") = "undefined")
           .def_property("navigationPolicyFactory",
-                        &Acts::StaticBlueprintNode::navigationPolicyFactory,
-                        &Acts::StaticBlueprintNode::setNavigationPolicyFactory);
+                        &StaticBlueprintNode::navigationPolicyFactory,
+                        &StaticBlueprintNode::setNavigationPolicyFactory);
 
   addContextManagerProtocol(staticNode);
 
@@ -328,33 +334,30 @@ void addBlueprint(Context& ctx) {
       "StaticVolume",
       [](BlueprintNode& self, const Transform3& transform,
          const std::shared_ptr<VolumeBounds>& bounds, const std::string& name) {
-        auto node = std::make_shared<Acts::StaticBlueprintNode>(
-            std::make_unique<Acts::TrackingVolume>(transform, bounds, name));
+        auto node = std::make_shared<StaticBlueprintNode>(
+            std::make_unique<TrackingVolume>(transform, bounds, name));
         self.addChild(node);
         return node;
       },
       py::arg("transform"), py::arg("bounds"), py::arg("name") = "undefined");
 
   auto cylNode =
-      py::class_<Acts::CylinderContainerBlueprintNode, Acts::BlueprintNode,
-                 std::shared_ptr<Acts::CylinderContainerBlueprintNode>>(
+      py::class_<CylinderContainerBlueprintNode, BlueprintNode,
+                 std::shared_ptr<CylinderContainerBlueprintNode>>(
           m, "CylinderContainerBlueprintNode")
           .def(py::init<const std::string&, AxisDirection,
                         VolumeAttachmentStrategy, VolumeResizeStrategy>(),
                py::arg("name"), py::arg("direction"),
                py::arg("attachmentStrategy") = VolumeAttachmentStrategy::Gap,
                py::arg("resizeStrategy") = VolumeResizeStrategy::Gap)
-          .def_property(
-              "attachmentStrategy",
-              &Acts::CylinderContainerBlueprintNode::attachmentStrategy,
-              &Acts::CylinderContainerBlueprintNode::setAttachmentStrategy)
-          .def_property(
-              "resizeStrategy",
-              &Acts::CylinderContainerBlueprintNode::resizeStrategy,
-              &Acts::CylinderContainerBlueprintNode::setResizeStrategy)
-          .def_property("direction",
-                        &Acts::CylinderContainerBlueprintNode::direction,
-                        &Acts::CylinderContainerBlueprintNode::setDirection);
+          .def_property("attachmentStrategy",
+                        &CylinderContainerBlueprintNode::attachmentStrategy,
+                        &CylinderContainerBlueprintNode::setAttachmentStrategy)
+          .def_property("resizeStrategy",
+                        &CylinderContainerBlueprintNode::resizeStrategy,
+                        &CylinderContainerBlueprintNode::setResizeStrategy)
+          .def_property("direction", &CylinderContainerBlueprintNode::direction,
+                        &CylinderContainerBlueprintNode::setDirection);
 
   addContextManagerProtocol(cylNode);
 
@@ -389,27 +392,26 @@ void addBlueprint(Context& ctx) {
       "name"_a);
 
   auto layerNode =
-      py::class_<Acts::LayerBlueprintNode, Acts::StaticBlueprintNode,
-                 std::shared_ptr<Acts::LayerBlueprintNode>>(
-          m, "LayerBlueprintNode")
+      py::class_<LayerBlueprintNode, StaticBlueprintNode,
+                 std::shared_ptr<LayerBlueprintNode>>(m, "LayerBlueprintNode")
           .def(py::init<const std::string&>(), py::arg("name"))
-          .def_property_readonly("name", &Acts::LayerBlueprintNode::name)
-          .def_property("surfaces", &Acts::LayerBlueprintNode::surfaces,
-                        &Acts::LayerBlueprintNode::setSurfaces)
-          .def_property("transform", &Acts::LayerBlueprintNode::transform,
-                        &Acts::LayerBlueprintNode::setTransform)
-          .def_property("envelope", &Acts::LayerBlueprintNode::envelope,
-                        &Acts::LayerBlueprintNode::setEnvelope)
-          .def_property("layerType", &Acts::LayerBlueprintNode::layerType,
-                        &Acts::LayerBlueprintNode::setLayerType)
+          .def_property_readonly("name", &LayerBlueprintNode::name)
+          .def_property("surfaces", &LayerBlueprintNode::surfaces,
+                        &LayerBlueprintNode::setSurfaces)
+          .def_property("transform", &LayerBlueprintNode::transform,
+                        &LayerBlueprintNode::setTransform)
+          .def_property("envelope", &LayerBlueprintNode::envelope,
+                        &LayerBlueprintNode::setEnvelope)
+          .def_property("layerType", &LayerBlueprintNode::layerType,
+                        &LayerBlueprintNode::setLayerType)
           .def_property("navigationPolicyFactory",
-                        &Acts::LayerBlueprintNode::navigationPolicyFactory,
-                        &Acts::LayerBlueprintNode::setNavigationPolicyFactory);
+                        &LayerBlueprintNode::navigationPolicyFactory,
+                        &LayerBlueprintNode::setNavigationPolicyFactory);
 
-  py::enum_<Acts::LayerBlueprintNode::LayerType>(layerNode, "LayerType")
-      .value("Cylinder", Acts::LayerBlueprintNode::LayerType::Cylinder)
-      .value("Disc", Acts::LayerBlueprintNode::LayerType::Disc)
-      .value("Plane", Acts::LayerBlueprintNode::LayerType::Plane);
+  py::enum_<LayerBlueprintNode::LayerType>(layerNode, "LayerType")
+      .value("Cylinder", LayerBlueprintNode::LayerType::Cylinder)
+      .value("Disc", LayerBlueprintNode::LayerType::Disc)
+      .value("Plane", LayerBlueprintNode::LayerType::Plane);
 
   addContextManagerProtocol(layerNode);
 

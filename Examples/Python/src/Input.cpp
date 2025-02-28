@@ -100,9 +100,9 @@ void addInput(Context& ctx) {
       ActsExamples::RootAthenaDumpReader, mex, "RootAthenaDumpReader", treename,
       inputfile, outputMeasurements, outputPixelSpacePoints,
       outputStripSpacePoints, outputSpacePoints, outputClusters,
-      outputMeasurementParticlesMap, outputParticles, onlyPassedParticles,
-      skipOverlapSPsPhi, skipOverlapSPsEta, geometryIdMap, trackingGeometry,
-      absBoundaryTolerance);
+      outputMeasurementParticlesMap, outputParticles, onlySpacepoints,
+      onlyPassedParticles, skipOverlapSPsPhi, skipOverlapSPsEta, geometryIdMap,
+      trackingGeometry, absBoundaryTolerance);
 
 #ifdef WITH_GEOMODEL_PLUGIN
   ACTS_PYTHON_DECLARE_READER(ActsExamples::RootAthenaDumpGeoIdCollector, mex,

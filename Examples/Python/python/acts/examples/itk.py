@@ -59,7 +59,7 @@ def buildITkGeometry(
             surfaceLogLevel=customLogLevel(),
             layerLogLevel=customLogLevel(),
             volumeLogLevel=customLogLevel(),
-            mdecorator=matDeco,
+            materialDecorator=matDeco,
         )
 
     Volume = TGeoDetector.Config.Volume
@@ -85,7 +85,7 @@ def buildITkGeometry(
     # This specification should be kept in sync with `itk-hgtd/tgeo-atlas-itk-hgtd.json`.
     return TGeoDetector(
         fileName=str(tgeo_fileName),
-        mdecorator=matDeco,
+        materialDecorator=matDeco,
         buildBeamPipe=True,
         unitScalor=1.0,  # explicit units
         beamPipeRadius=23.934 * u.mm,
@@ -581,6 +581,7 @@ def itkSeedingAlgConfig(
         zBinNeighborsTop=zBinNeighborsTop,
         zBinNeighborsBottom=zBinNeighborsBottom,
         numPhiNeighbors=numPhiNeighbors,
+        useExtraCuts=highOccupancyConfig,
     )
 
     return (

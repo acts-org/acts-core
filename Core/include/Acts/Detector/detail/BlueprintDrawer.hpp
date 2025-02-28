@@ -55,7 +55,7 @@ struct Options {
 /// @param ss the stream into which the dot output should be written
 /// @param node the node to be drawn
 /// @param options the options for the drawer
-void dotStream(std::ostream& ss, const Blueprint::Node& node,
+void dotStream(std::ostream& ss, const Gen2Blueprint::Node& node,
                const Options& options = Options{});
 
 }  // namespace Acts::Experimental::detail::BlueprintDrawer

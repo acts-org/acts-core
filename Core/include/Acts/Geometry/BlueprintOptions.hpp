@@ -12,7 +12,7 @@
 
 #include <memory>
 
-namespace Acts {
+namespace Acts::Experimental {
 
 struct BlueprintOptions {
   std::shared_ptr<NavigationPolicyFactory> defaultNavigationPolicyFactory{
@@ -25,4 +25,4 @@ struct BlueprintOptions {
   makeDefaultNavigationPolicyFactory();
 };
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

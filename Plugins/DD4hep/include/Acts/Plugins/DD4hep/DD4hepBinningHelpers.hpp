@@ -9,11 +9,11 @@
 #pragma once
 
 #include "Acts/Definitions/Units.hpp"
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Geometry/Extent.hpp"
 #include "Acts/Plugins/DD4hep/DD4hepConversionHelpers.hpp"
 #include "Acts/Utilities/AxisDefinitions.hpp"
 #include "Acts/Utilities/BinningData.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <optional>
 #include <sstream>
@@ -78,13 +78,13 @@ inline std::vector<AxisDirection> stringToAxisDirections(
 
 namespace DD4hepBinningHelpers {
 
-/// @brief This method converts the DD4hep binning into the Acts ProtoBinning
+/// @brief This method converts the DD4hep binning into the Acts ProtoAxis
 ///
 /// @param dd4hepElement the element which has a binning description attached
 /// @param bname the binning base name, e.g. surface_binning, material_binning
 ///
 /// @return a vector of proto binning descriptions
-std::vector<Acts::Experimental::ProtoBinning> convertBinning(
+std::vector<std::tuple<Acts::ProtoAxis, std::size_t>> convertBinning(
     const dd4hep::DetElement &dd4hepElement, const std::string &bname);
 
 }  // namespace DD4hepBinningHelpers

@@ -14,10 +14,10 @@
 #include "Acts/Definitions/Common.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/Detector/LayerStructureBuilder.hpp"
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Geometry/Extent.hpp"
 #include "Acts/Surfaces/Surface.hpp"
 #include "Acts/Utilities/BinningData.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <tuple>
 #include <vector>
@@ -62,7 +62,7 @@ class DD4hepDetectorSurfaceFactory {
     /// matching and conversion statistics: materials
     std::size_t convertedMaterials = 0;
     /// The collected binnings
-    std::vector<Experimental::ProtoBinning> binnings = {};
+    std::vector<std::tuple<ProtoAxis, std::size_t>> binnings = {};
     /// The collected supports
     std::vector<Experimental::ProtoSupport> supports = {};
     /// Optionally provide an Extent object to measure the sensitives

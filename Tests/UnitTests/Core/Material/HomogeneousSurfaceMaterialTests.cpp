@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(HomogeneousSurfaceMaterial_access_test) {
   MaterialSlab matHalf = mat;
   matHalf.scaleThickness(0.5);
 
-  MaterialSlab vacuum = MaterialSlab();
+  MaterialSlab vacuum = MaterialSlab::Nothing();
 
   // Constructor from arguments
   HomogeneousSurfaceMaterial hsmfwd(mat, 1.);

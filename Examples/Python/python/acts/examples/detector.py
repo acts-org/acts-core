@@ -6,7 +6,7 @@ from acts import (
     logging,
     Binning,
     Extent,
-    ProtoBinning,
+    ProtoAxis,
     LayerStructureBuilder,
     VolumeBoundsType,
     VolumeStructureBuilder,
@@ -24,9 +24,7 @@ def phiBinning(phiBins, extraBins=1):
     :param extraBins: number of phi bins
 
     """
-    return ProtoBinning(
-        Binning.phi, Binning.closed, -math.pi, math.pi, phiBins, extraBins
-    )
+    return ProtoAxis(Binning.phi, Binning.closed, -math.pi, math.pi, phiBins, extraBins)
 
 
 class CylindricalDetectorVolume:

@@ -103,3 +103,12 @@ repos:
       language: system
       entry: CI/check_math_macros.py
       files: \.(cpp|hpp|ipp|cu|cuh)$
+
+  - repo: local
+    hooks:
+    - id: codegen_dependencies
+      name: codegen_dependencies
+      language: python
+      entry: CI/check_codegen_dependencies.sh
+      additional_dependencies: ["uv"]
+      files: pyproject.toml$

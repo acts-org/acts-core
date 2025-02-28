@@ -8,13 +8,13 @@
 
 #pragma once
 
-#include "Acts/Detector/ProtoBinning.hpp"
 #include "Acts/Geometry/BlueprintNode.hpp"
-#include "Acts/Geometry/PortalShell.hpp"
+#include "Acts/Geometry/CylinderPortalShell.hpp"
+#include "Acts/Utilities/ProtoAxis.hpp"
 
 #include <variant>
 
-namespace Acts {
+namespace Acts::Experimental {
 
 /// This node type registers material proxies into its child volume during the
 /// blueprint construction. It is configured ahead of time which volume faces to
@@ -27,8 +27,7 @@ class MaterialDesignatorBlueprintNode final : public BlueprintNode {
   // @TODO: This needs cuboid volume storage as well
   // @TODO: I don't love the type
   using BinningConfig = std::variant<std::vector<
-      std::tuple<CylinderVolumeBounds::Face, Experimental::ProtoBinning,
-                 Experimental::ProtoBinning>>>;
+      std::tuple<CylinderVolumeBounds::Face, ProtoAxis, ProtoAxis>>>;
 
   /// Main constructor for the material designator node.
   /// @param name The name of the node (for debug only)
@@ -89,8 +88,7 @@ class MaterialDesignatorBlueprintNode final : public BlueprintNode {
   void handleCylinderBinning(
       CylinderPortalShell& cylShell,
       const std::vector<
-          std::tuple<CylinderPortalShell::Face, Experimental::ProtoBinning,
-                     Experimental::ProtoBinning>>& binning,
+          std::tuple<CylinderPortalShell::Face, ProtoAxis, ProtoAxis>>& binning,
       const Logger& logger);
 
   std::string m_name{};
@@ -98,4 +96,4 @@ class MaterialDesignatorBlueprintNode final : public BlueprintNode {
   std::optional<BinningConfig> m_binning{};
 };
 
-}  // namespace Acts
+}  // namespace Acts::Experimental

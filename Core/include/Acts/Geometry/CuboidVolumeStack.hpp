@@ -55,28 +55,6 @@ class CuboidVolumeStack : public Volume {
       VolumeResizeStrategy resizeStrategy = VolumeResizeStrategy::Expand,
       const Logger& logger = Acts::getDummyLogger());
 
-  /// Constructor from a vector of volumes and direction
-  /// @param volumes is the vector of volumes
-  /// @param direction is the vector specifying the global direction
-  /// @param strategy is the attachment strategy
-  /// @param resizeStrategy is the resize strategy
-  /// @note @p resizeStrategy only affects resizing along
-  ///       @p direction. Resizing in the other direction
-  ///       is always delegated to the child volumes,
-  ///       which might in turn be @c CuboidVolumeStack
-  /// @param logger is the logger
-  /// @pre The volumes need to have a common coordinate
-  ///      system relative to @p direction. I.e. they need
-  ///      to be aligned in @c z and cannot have a rotation
-  ///      in @c x or @c y.
-  /// @pre The volumes all need to have @c CuboidVolumeBounds
-  /// @note Preconditions are checked on construction
-  CuboidVolumeStack(
-      std::vector<Volume*>& volumes, const Vector3& direction,
-      VolumeAttachmentStrategy strategy = VolumeAttachmentStrategy::Midpoint,
-      VolumeResizeStrategy resizeStrategy = VolumeResizeStrategy::Expand,
-      const Logger& logger = Acts::getDummyLogger());
-
   /// Update the volume bounds and transform. This
   /// will update the bounds of all volumes in the stack
   /// to accommodate the new bounds and optionally create
@@ -170,7 +148,7 @@ class CuboidVolumeStack : public Volume {
 
   /// Merging direction of the stack
   /// in local group coordinates
-  AxisDirection m_dir{};
+  AxisDirection m_direction{};
 
   /// Directions orthogonal to the
   /// merging direction of the stack

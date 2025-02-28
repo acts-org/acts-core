@@ -16,8 +16,6 @@
 #include "Acts/Utilities/GridAccessHelpers.hpp"
 #include "Acts/Utilities/GridAxisGenerators.hpp"
 
-#include <array>
-#include <fstream>
 #include <memory>
 #include <numbers>
 #include <vector>
@@ -28,7 +26,7 @@ BOOST_AUTO_TEST_SUITE(MaterialJsonIO)
 
 BOOST_AUTO_TEST_CASE(IndexedSurfaceMaterial1DTests) {
   std::vector<Acts::MaterialSlab> material;
-  material.emplace_back(Acts::Material(), 0.0);  // vacuum
+  material.emplace_back(Acts::Material::Vacuum(), 0.0);  // vacuum
   material.emplace_back(
       Acts::Material::fromMolarDensity(1.0, 2.0, 3.0, 4.0, 5.0), 1.0);
   material.emplace_back(
@@ -96,7 +94,7 @@ BOOST_AUTO_TEST_CASE(IndexedSurfaceMaterial1DTests) {
 
 BOOST_AUTO_TEST_CASE(IndexedSurfaceMaterial2DTests) {
   std::vector<Acts::MaterialSlab> material;
-  material.emplace_back(Acts::Material(), 1.0);  // vacuum
+  material.emplace_back(Acts::Material::Vacuum(), 1.0);  // vacuum
   material.emplace_back(
       Acts::Material::fromMolarDensity(1.0, 2.0, 3.0, 4.0, 5.0), 1.0);
   material.emplace_back(

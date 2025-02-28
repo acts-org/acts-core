@@ -9,7 +9,6 @@
 #include <boost/test/unit_test.hpp>
 
 #include "Acts/Definitions/Algebra.hpp"
-#include "Acts/Definitions/Direction.hpp"
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
 #include "Acts/Geometry/CuboidVolumeBuilder.hpp"
@@ -43,7 +42,6 @@
 #include <memory>
 #include <random>
 #include <string>
-#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -70,7 +68,7 @@ struct MaterialCollector {
               ? navigator.currentVolume(state.navigation)
                     ->volumeMaterial()
                     ->material(position)
-              : Material());
+              : Material::Vacuum());
 
       result.position.push_back(position);
     }
@@ -170,7 +168,7 @@ BOOST_AUTO_TEST_CASE(VolumeMaterialMapper_comparison_tests) {
   vCfg1.length = Vector3(1_m, 1_m, 1_m);
   vCfg1.name = "Vacuum volume";
   vCfg1.volumeMaterial =
-      std::make_shared<const HomogeneousVolumeMaterial>(Material());
+      std::make_shared<const HomogeneousVolumeMaterial>(Material::Vacuum());
 
   // Build a material volume
   CuboidVolumeBuilder::VolumeConfig vCfg2;
@@ -186,7 +184,7 @@ BOOST_AUTO_TEST_CASE(VolumeMaterialMapper_comparison_tests) {
   vCfg3.length = Vector3(1_m, 1_m, 1_m);
   vCfg3.name = "Second material volume";
   vCfg3.volumeMaterial =
-      std::make_shared<const HomogeneousVolumeMaterial>(Material());
+      std::make_shared<const HomogeneousVolumeMaterial>(Material::Vacuum());
 
   // Configure world
   CuboidVolumeBuilder::Config cfg;
@@ -227,7 +225,7 @@ BOOST_AUTO_TEST_CASE(VolumeMaterialMapper_comparison_tests) {
         (detector->lowestTrackingVolume(gc, pos)->volumeMaterial() != nullptr)
             ? (detector->lowestTrackingVolume(gc, pos)->volumeMaterial())
                   ->material(pos)
-            : Material();
+            : Material::Vacuum();
     MaterialSlab matProp(tv, 1);
     matRecord.push_back(std::make_pair(matProp, volPos));
   }
