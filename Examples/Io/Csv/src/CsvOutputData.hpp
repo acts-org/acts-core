@@ -103,6 +103,49 @@ struct MuonDriftCircleData {
                  tubelayer, tube);
 };
 
+struct MuonSpacePointData{
+  /** @brief Identifier hash encoding the spectrometer sector, layer & detector side */
+  int sectorId{0};
+  /** @brief Number of the associated bucket inside the container. A change of bucket Id
+   *         pushes the space point into a new bucket container */
+  int bucketId{0};
+  /** @brief Local position of the space point measurement */
+  float localPositionX{0.f};
+  float localPositionY{0.f};
+  float localPositionZ{0.f};
+  /** @brief Direction of the sensor line */
+  float locSensorDirX{0.f};
+  float locSensorDirY{0.f};
+  float locSensorDirZ{0.f};
+  /** @brief Direction of the vector normal to the plane */
+  float locPlaneNormX{0.f};
+  float locPlaneNormY{0.f};
+  float locPlaneNormZ{0.f};
+  /** @brief Measurement covariance entries in the local x-y plane */
+  float covX{0.f};
+  float covXY{0.f};
+  float covYX{0.f};
+  float covY{0.f};
+  /** @brief Drift radius */
+  float driftR{0.f};
+  /** @brief Technology type */
+  unsigned short technology{0u};
+  /** @brief Associated gasGap type */
+  unsigned short gasGap{0u};
+  /** @brief Primary measurement channel */
+  unsigned short primaryCh{0u};
+  /** @brief Secondary measurement channel */
+  int secondaryCh{-1};
+
+  DFE_NAMEDTUPLE(MuonSpacePointData, sectorId, bucketId, 
+                localPositionX ,localPositionY ,localPositionZ,
+                locSensorDirX, locSensorDirY, locSensorDirZ, 
+                locPlaneNormX, locPlaneNormY, locPlaneNormZ, 
+                covX, covXY, covYX, covY, driftR,
+                technology, gasGap, primaryCh, secondaryCh);
+
+};
+
 struct TruthHitData {
   /// Event-unique hit identifier. As defined for the simulated hit below and
   /// used to link back to it; same value can appear multiple times here due to

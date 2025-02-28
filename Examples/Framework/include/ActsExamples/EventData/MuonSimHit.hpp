@@ -15,6 +15,7 @@
 #include "ActsExamples/EventData/IndexSourceLink.hpp"
 #include "ActsExamples/EventData/SimHit.hpp"
 
+#include "ActsExamples/EventData/MuonSpacePoint.hpp"
 #include <cmath>
 #include <vector>
 
