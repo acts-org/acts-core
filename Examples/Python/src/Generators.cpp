@@ -138,6 +138,24 @@ void addGenerators(Context& ctx) {
           &ActsExamples::GaussianDisplacedVertexPositionGenerator::tStdDev);
 
   py::class_<
+      ActsExamples::UniformPrimaryVertexPositionGenerator,
+      ActsExamples::EventGenerator::PrimaryVertexPositionGenerator,
+      std::shared_ptr<ActsExamples::UniformPrimaryVertexPositionGenerator>>(
+      mex, "UniformVertexGenerator")
+      .def(py::init<>())
+      .def(py::init([](const Acts::Vector4& min, const Acts::Vector4& max) {
+             ActsExamples::UniformPrimaryVertexPositionGenerator g;
+             g.min = min;
+             g.max = max;
+             return g;
+           }),
+           py::arg("min"), py::arg("max"))
+      .def_readwrite("min",
+                     &ActsExamples::UniformPrimaryVertexPositionGenerator::min)
+      .def_readwrite("max",
+                     &ActsExamples::UniformPrimaryVertexPositionGenerator::max);
+
+  py::class_<
       ActsExamples::FixedPrimaryVertexPositionGenerator,
       ActsExamples::EventGenerator::PrimaryVertexPositionGenerator,
       std::shared_ptr<ActsExamples::FixedPrimaryVertexPositionGenerator>>(
