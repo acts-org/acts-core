@@ -82,6 +82,22 @@ if(ACTS_ENABLE_MEMORY_PROFILING)
     endif()
 endif()
 
+add_custom_command(
+    TARGET ActsCore
+    POST_BUILD
+    COMMAND
+        strings "$<TARGET_FILE:ActsCore>" | grep -qE
+        \"ACTS::EigenAlignment=[[:digit:]]{4}\" ||
+        (
+            echo
+            "ERROR: $<TARGET_FILE:ActsCore> does not contain any Eigen3 alignment information"
+            &&
+            false
+        )
+    COMMENT
+        "Verifying that the ActsCore library contains Eigen3 alignment information"
+)
+
 install(
     TARGETS ActsCore
     EXPORT ActsCoreTargets

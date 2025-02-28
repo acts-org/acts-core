@@ -117,3 +117,30 @@ foreach(_component ${Acts_COMPONENTS})
   # include the targets file to create the imported targets for the user
   include(${CMAKE_CURRENT_LIST_DIR}/Acts${_component}Targets.cmake)
 endforeach()
+
+if (@ACTS_ENFORCE_EIGEN3_ALIGNMENT@)
+  if (NOT TARGET ActsCore)
+    message(FATAL_ERROR "Eigen3 alignment enforcement is enabled, but the ActsCore target does not exist.")
+  endif()
+
+  set(_ACTS_CORE_EIGEN3_ALIGNMENT_REGEX "ACTS::EigenAlignment=([0-9]+)")
+  get_target_property(_ACTS_CORE_LOCATION ActsCore LOCATION)
+
+  file(
+    STRINGS ${_ACTS_CORE_LOCATION} _ACTS_CORE_EIGEN3_ALIGNMENT_VALUE_STRING
+    LIMIT_COUNT 1
+    REGEX ${_ACTS_CORE_EIGEN3_ALIGNMENT_REGEX}
+  )
+
+  if (_ACTS_CORE_EIGEN3_ALIGNMENT_VALUE_STRING STREQUAL "")
+    message(WARNING "Eigen3 alignment enforcement is enabled, but string was not found in object file.")
+  else()
+    string(REGEX REPLACE ${_ACTS_CORE_EIGEN3_ALIGNMENT_REGEX} "\\1" _ACTS_CORE_EIGEN3_ALIGNMENT_VALUE_PADDED ${_ACTS_CORE_EIGEN3_ALIGNMENT_VALUE_STRING})
+
+    math(EXPR _ACTS_CORE_EIGEN3_ALIGNMENT_VALUE ${_ACTS_CORE_EIGEN3_ALIGNMENT_VALUE_PADDED})
+
+    message(STATUS "Setting ACTS Eigen3 alignment to ${_ACTS_CORE_EIGEN3_ALIGNMENT_VALUE}")
+
+    target_compile_definitions(ActsCore INTERFACE -DEIGEN_MAX_ALIGN_BYTES=${_ACTS_CORE_EIGEN3_ALIGNMENT_VALUE})
+  endif()
+endif()

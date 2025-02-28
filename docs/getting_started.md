@@ -316,6 +316,7 @@ components.
 | ACTS_ENABLE_LOG_FAILURE_THRESHOLD   | Enable failing on log messages with<br>level above certain threshold<br> type: `bool`, default: `OFF`                                                                                                                              |
 | ACTS_LOG_FAILURE_THRESHOLD          | Log level above which an exception<br>should be automatically thrown. If<br>ACTS_ENABLE_LOG_FAILURE_THRESHOLD is set<br>and this is unset, this will enable a<br>runtime check of the log level.<br> type: `string`, default: `""` |
 | ACTS_COMPILE_HEADERS                | Generate targets to compile header files<br> type: `bool`, default: `ON`                                                                                                                                                           |
+| ACTS_ENFORCE_EIGEN3_ALIGNMENT       | Add public Eigen3 compiler definitions<br>for alignment<br> type: `bool`, default: `OFF`                                                                                                                                           |
 <!-- CMAKE_OPTS_END -->
 
 All ACTS-specific options are disabled or empty by default and must be

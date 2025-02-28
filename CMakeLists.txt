@@ -128,6 +128,8 @@ set(ACTS_GPERF_INSTALL_DIR "" CACHE STRING "Hint to help find gperf if profiling
 option(ACTS_ENABLE_LOG_FAILURE_THRESHOLD "Enable failing on log messages with level above certain threshold" OFF)
 set(ACTS_LOG_FAILURE_THRESHOLD "" CACHE STRING "Log level above which an exception should be automatically thrown. If ACTS_ENABLE_LOG_FAILURE_THRESHOLD is set and this is unset, this will enable a runtime check of the log level.")
 option(ACTS_COMPILE_HEADERS "Generate targets to compile header files" ON)
+# eigen3 options
+option(ACTS_ENFORCE_EIGEN3_ALIGNMENT "Add public Eigen3 compiler definitions for alignment" OFF)
 # gersemi: on
 
 # handle option inter-dependencies and the everything flag

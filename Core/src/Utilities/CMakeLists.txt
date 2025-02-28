@@ -10,4 +10,5 @@ target_sources(
         IAxis.cpp
         GraphViz.cpp
         ProtoAxis.cpp
+        Eigen3Alignment.cpp
 )
