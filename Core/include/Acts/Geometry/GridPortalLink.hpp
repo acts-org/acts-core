@@ -310,6 +310,10 @@ class GridPortalLink : public PortalLinkBase {
   /// @return The grid
   virtual const IGrid& grid() const = 0;
 
+  /// Return the associated grid in a type-erased form
+  /// @return The grid
+  virtual IGrid& grid() = 0;
+
   /// Set the volume on all grid bins
   /// @param volume The volume to set
   virtual void setVolume(TrackingVolume* volume) = 0;
@@ -401,23 +405,6 @@ class GridPortalLink : public PortalLinkBase {
   static void fillGrid1dTo2d(FillDirection dir, const GridPortalLink& grid1d,
                              GridPortalLink& grid2d);
 
-  /// Index type for type earsed (**slow**) bin access
-  using IndexType = boost::container::static_vector<std::size_t, 2>;
-
-  /// Helper function to get grid bin count in type-eraased way.
-  /// @return The number of bins in each direction
-  virtual IndexType numLocalBins() const = 0;
-
-  /// Helper function to get grid bin content in type-eraased way.
-  /// @param indices The bin indices
-  /// @return The tracking volume at the bin
-  virtual const TrackingVolume*& atLocalBins(IndexType indices) = 0;
-
-  /// Helper function to get grid bin content in type-eraased way.
-  /// @param indices The bin indices
-  /// @return The tracking volume at the bin
-  virtual const TrackingVolume* atLocalBins(IndexType indices) const = 0;
-
  private:
   AxisDirection m_direction;
 };
@@ -491,7 +478,7 @@ class GridPortalLinkT : public GridPortalLink {
 
   /// Get the grid
   /// @return The grid
-  GridType& grid() { return m_grid; }
+  GridType& grid() override { return m_grid; }
 
   /// Get the number of dimensions of the grid
   /// @return The number of dimensions
@@ -573,41 +560,6 @@ class GridPortalLinkT : public GridPortalLink {
     throw_assert(surface().insideBounds(position, BoundaryTolerance::None()),
                  "Checking volume outside of bounds");
     return m_grid.atPosition(m_projection(position));
-  }
-
-  /// Type erased access to the number of bins
-  /// @return The number of bins in each direction
-  IndexType numLocalBins() const override {
-    typename GridType::index_t idx = m_grid.numLocalBins();
-    IndexType result;
-    for (std::size_t i = 0; i < DIM; i++) {
-      result.push_back(idx[i]);
-    }
-    return result;
-  }
-
-  /// Type erased local bin access
-  /// @param indices The bin indices
-  /// @return The tracking volume at the bin
-  const TrackingVolume*& atLocalBins(IndexType indices) override {
-    throw_assert(indices.size() == DIM, "Invalid number of indices");
-    typename GridType::index_t idx;
-    for (std::size_t i = 0; i < DIM; i++) {
-      idx[i] = indices[i];
-    }
-    return m_grid.atLocalBins(idx);
-  }
-
-  /// Type erased local bin access
-  /// @param indices The bin indices
-  /// @return The tracking volume at the bin
-  const TrackingVolume* atLocalBins(IndexType indices) const override {
-    throw_assert(indices.size() == DIM, "Invalid number of indices");
-    typename GridType::index_t idx;
-    for (std::size_t i = 0; i < DIM; i++) {
-      idx[i] = indices[i];
-    }
-    return m_grid.atLocalBins(idx);
   }
 
  private:

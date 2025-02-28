@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(Eq1D) {
   BOOST_CHECK(axisC.getBoundaryType() == AxisBoundaryType::Closed);
 
   // Test that we can make a grid out of this
-  EqBound::grid_type<bool> eqbGrid(std::move(axisTupleB));
+  EqBound::grid_type<std::byte> eqbGrid(std::move(axisTupleB));
 }
 
 BOOST_AUTO_TEST_CASE(EqEq2D) {
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(EqEq2D) {
   BOOST_CHECK(axisEq.getBoundaryType() == AxisBoundaryType::Closed);
   BOOST_CHECK(axisEq.isEquidistant());
   // Test that we can make a grid out of this
-  EqOpenEqClosed::grid_type<bool> eoecGrid(std::move(axisTuple));
+  EqOpenEqClosed::grid_type<std::byte> eoecGrid(std::move(axisTuple));
 }
 
 BOOST_AUTO_TEST_CASE(EqVar2D) {
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(EqVar2D) {
   BOOST_CHECK(axisEq.getBoundaryType() == AxisBoundaryType::Open);
   BOOST_CHECK(axisEq.isVariable());
   // Test that we can make a grid out of this
-  EqBoundVarOpen::grid_type<bool> ebvoGrid(std::move(axisTuple));
+  EqBoundVarOpen::grid_type<std::byte> ebvoGrid(std::move(axisTuple));
 }
 
 BOOST_AUTO_TEST_CASE(VarEq2D) {
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(VarEq2D) {
   BOOST_CHECK(axisEq.getBoundaryType() == AxisBoundaryType::Closed);
   BOOST_CHECK(axisEq.isEquidistant());
   // Test that we can make a grid out of this
-  VarBoundEqClosed::grid_type<bool> vbecGrid(std::move(axisTuple));
+  VarBoundEqClosed::grid_type<std::byte> vbecGrid(std::move(axisTuple));
 }
 
 BOOST_AUTO_TEST_CASE(VarVar2D) {
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(VarVar2D) {
   BOOST_CHECK(axisEq.getBoundaryType() == AxisBoundaryType::Bound);
   BOOST_CHECK(axisEq.isVariable());
   // Test that we can make a grid out of this
-  VarBoundVarBound::grid_type<bool> vbvbGrid(std::move(axisTuple));
+  VarBoundVarBound::grid_type<std::byte> vbvbGrid(std::move(axisTuple));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

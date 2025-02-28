@@ -8,26 +8,35 @@
 
 #pragma once
 
+#include "Acts/Definitions/Algebra.hpp"
 #include "Acts/Utilities/IAxis.hpp"
 #include "Acts/Utilities/Interpolation.hpp"
 #include "Acts/Utilities/TypeTag.hpp"
+#include "Acts/Utilities/TypeTraits.hpp"
 #include "Acts/Utilities/detail/grid_helper.hpp"
 
+#include <any>
 #include <array>
 #include <tuple>
 #include <type_traits>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 
 namespace Acts {
+
 template <typename T, class... Axes>
 class GridGlobalIterator;
 
 template <typename T, class... Axes>
 class GridLocalIterator;
-}  // namespace Acts
 
-namespace Acts {
+namespace detail {
+
+template <typename T, bool isConst>
+class AnyGridViewBase;
+
+}  // namespace detail
 
 /// Base class for all grid types
 class IGrid {
@@ -37,6 +46,45 @@ class IGrid {
   /// Get a dynamically sized vector of axis objects for inspection
   /// @return a vector of axis pointers
   virtual boost::container::small_vector<const IAxis*, 3> axes() const = 0;
+
+  /// @brief Get the number of dimensions of the grid
+  /// @return The number of dimensions of the grid
+  virtual std::size_t dimensions() const = 0;
+
+  /// @brief Get the type of the values stored in the grid
+  /// @return The type of the values stored in the grid
+  virtual std::type_info const& valueType() const = 0;
+
+  /// Type-erased interface to access the contents of the grid
+  ///
+  /// @note This interface has non-negligible runtime overhead due to packing
+  ///       and unpacking from/to @c std::any and the dynamically sized index and
+  ///       point types. **USE WITH CARE!**
+  ///
+  /// @{
+  using AnyIndexType = boost::container::small_vector<std::size_t, 3>;
+  using AnyPointType = boost::container::small_vector<double, 3>;
+
+  /// @brief Get the lower left edge of a bin for a given set of indices
+  /// @param indices The indices to get the lower left edge of the bin for
+  /// @return The lower left edge of the bin
+  virtual AnyPointType lowerLeftBinEdgeAny(AnyIndexType indices) const = 0;
+
+  /// @brief Get the upper right edge of a bin for a given set of indices
+  /// @param indices The indices to get the upper right edge of the bin for
+  /// @return The upper right edge of the bin
+  virtual AnyPointType upperRightBinEdgeAny(AnyIndexType indices) const = 0;
+
+  /// @brief Get the center of a bin for a given set of indices
+  /// @param indices The indices to get the center of the bin for
+  /// @return The center of the bin
+  virtual AnyPointType binCenterAny(AnyIndexType indices) const = 0;
+
+  /// @brief Get the number of local bins for a given set of indices
+  /// @return The number of local bins
+  virtual AnyIndexType numLocalBinsAny() const = 0;
+
+  /// @}
 
   /// Helper to print out the grid
   /// @param os the output stream
@@ -57,6 +105,21 @@ class IGrid {
 
  protected:
   virtual void toStream(std::ostream& os) const = 0;
+
+  /// @brief Get the value of a bin for a given set of indices
+  /// @param indices The indices to get the value of the bin for
+  /// @return The value of the bin: the @c std::any contains a const pointer to
+  ///         the value
+  virtual std::any atLocalBinsAny(AnyIndexType indices) const = 0;
+
+  /// @brief Get the value of a bin for a given set of indices
+  /// @param indices The indices to get the value of the bin for
+  /// @return The value of the bin: the @c std::any contains a pointer to the
+  ///         value
+  virtual std::any atLocalBinsAny(AnyIndexType indices) = 0;
+
+  template <typename T, bool isConst>
+  friend class detail::AnyGridViewBase;
 };
 
 /// @brief class for describing a regular multi-dimensional grid
@@ -69,7 +132,10 @@ class IGrid {
 /// either by global bin index, local bin indices or position.
 ///
 /// @note @c T must be default-constructible.
+/// @note @c T must not be @c bool, because @c std::vector<bool> is special
+///          and does not return references to its elements.
 template <typename T, class... Axes>
+  requires(std::is_default_constructible_v<T> && !std::is_same_v<T, bool>)
 class Grid final : public IGrid {
  public:
   /// number of dimensions of the grid
@@ -196,6 +262,12 @@ class Grid final : public IGrid {
     return m_values.at(globalBinFromLocalBins(localBins));
   }
 
+  /// @copydoc Acts::IGrid::atLocalBinsAny
+  std::any atLocalBinsAny(AnyIndexType indices) const override {
+    const_reference cref = atLocalBins(toIndexType(indices));
+    return &cref;
+  }
+
   /// @brief access value stored in bin with given local bin numbers
   ///
   /// @param  [in] localBins local bin indices along each axis
@@ -206,6 +278,12 @@ class Grid final : public IGrid {
   ///      axis (including the under-/overflow bin for this axis).
   const_reference atLocalBins(const index_t& localBins) const {
     return m_values.at(globalBinFromLocalBins(localBins));
+  }
+
+  /// @copydoc Acts::IGrid::atLocalBinsAny
+  std::any atLocalBinsAny(AnyIndexType indices) override {
+    reference ref = atLocalBins(toIndexType(indices));
+    return &ref;
   }
 
   /// @brief get global bin indices for closest points on grid
@@ -228,7 +306,10 @@ class Grid final : public IGrid {
   /// @brief dimensionality of grid
   ///
   /// @return number of axes spanning the grid
-  static constexpr std::size_t dimensions() { return DIM; }
+  std::size_t dimensions() const override { return DIM; }
+
+  /// @copydoc Acts::IGrid::valueType
+  const std::type_info& valueType() const override { return typeid(T); }
 
   /// @brief get center position of bin with given local bin numbers
   ///
@@ -237,8 +318,12 @@ class Grid final : public IGrid {
   ///
   /// @pre All local bin indices must be a valid index for the corresponding
   ///      axis (excluding the under-/overflow bins for each axis).
-  std::array<double, DIM> binCenter(const index_t& localBins) const {
+  point_t binCenter(const index_t& localBins) const {
     return detail::grid_helper::getBinCenter(localBins, m_axes);
+  }
+
+  AnyPointType binCenterAny(AnyIndexType indices) const override {
+    return toAnyPointType(binCenter(toIndexType(indices)));
   }
 
   /// @brief determine global index for bin containing the given point
@@ -348,6 +433,11 @@ class Grid final : public IGrid {
     return detail::grid_helper::getLowerLeftBinEdge(localBins, m_axes);
   }
 
+  /// @copydoc Acts::IGrid::lowerLeftBinEdgeAny
+  AnyPointType lowerLeftBinEdgeAny(AnyIndexType indices) const override {
+    return toAnyPointType(lowerLeftBinEdge(toIndexType(indices)));
+  }
+
   /// @brief retrieve upper-right bin edge from set of local bin indices
   ///
   /// @param  [in] localBins local bin indices along each axis
@@ -357,6 +447,11 @@ class Grid final : public IGrid {
   ///      overflow bins).
   point_t upperRightBinEdge(const index_t& localBins) const {
     return detail::grid_helper::getUpperRightBinEdge(localBins, m_axes);
+  }
+
+  /// @copydoc Acts::IGrid::upperRightBinEdgeAny
+  AnyPointType upperRightBinEdgeAny(AnyIndexType indices) const override {
+    return toAnyPointType(upperRightBinEdge(toIndexType(indices)));
   }
 
   /// @brief get bin width along each specific axis
@@ -370,6 +465,11 @@ class Grid final : public IGrid {
   ///
   /// @note Not including under- and overflow bins
   index_t numLocalBins() const { return detail::grid_helper::getNBins(m_axes); }
+
+  /// @copydoc Acts::IGrid::numLocalBinsAny
+  AnyIndexType numLocalBinsAny() const override {
+    return toAnyIndexType(numLocalBins());
+  }
 
   /// @brief get the minimum value of all axes of one grid
   ///
@@ -630,6 +730,29 @@ class Grid final : public IGrid {
       os << std::get<index>(m_axes);
     };
     (printOne(std::integral_constant<std::size_t, Is>()), ...);
+  }
+
+  static AnyIndexType toAnyIndexType(const index_t& indices) {
+    AnyIndexType anyIndices;
+    anyIndices.reserve(indices.size());
+    std::ranges::copy(indices, std::back_inserter(anyIndices));
+    return anyIndices;
+  }
+
+  static AnyPointType toAnyPointType(const point_t& point) {
+    AnyPointType anyPoint;
+    anyPoint.reserve(point.size());
+    std::ranges::copy(point, std::back_inserter(anyPoint));
+    return anyPoint;
+  }
+
+  static index_t toIndexType(const AnyIndexType& indices) {
+    if (indices.size() != DIM) {
+      throw std::invalid_argument("Invalid number of indices");
+    }
+    index_t concrete;
+    std::ranges::copy(indices, concrete.begin());
+    return concrete;
   }
 };
 
