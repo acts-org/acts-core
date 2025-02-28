@@ -201,4 +201,7 @@ class CuboidVolumeBounds : public VolumeBounds {
   /// will throw a logic_exception if consistency is not given
   void checkConsistency() noexcept(false);
 };
+
+std::ostream& operator<<(std::ostream& os, CuboidVolumeBounds::Face face);
+
 }  // namespace Acts

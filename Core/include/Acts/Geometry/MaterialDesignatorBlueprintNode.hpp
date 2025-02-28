@@ -9,6 +9,8 @@
 #pragma once
 
 #include "Acts/Geometry/BlueprintNode.hpp"
+#include "Acts/Geometry/CuboidPortalShell.hpp"
+#include "Acts/Geometry/CuboidVolumeBounds.hpp"
 #include "Acts/Geometry/CylinderPortalShell.hpp"
 #include "Acts/Utilities/ProtoAxis.hpp"
 
@@ -21,13 +23,11 @@ namespace Acts::Experimental {
 /// mark up, and how do to so.
 /// @note This node can only have a single child. This is not an error during
 ///       tree building, but during geometry construction.
-/// @note This currently only supports a cylinder volume child
 class MaterialDesignatorBlueprintNode final : public BlueprintNode {
  public:
-  // @TODO: This needs cuboid volume storage as well
-  // @TODO: I don't love the type
-  using BinningConfig = std::variant<std::vector<
-      std::tuple<CylinderVolumeBounds::Face, ProtoAxis, ProtoAxis>>>;
+  using BinningConfig = std::variant<
+      std::vector<std::tuple<CylinderVolumeBounds::Face, ProtoAxis, ProtoAxis>>,
+      std::vector<std::tuple<CuboidVolumeBounds::Face, ProtoAxis, ProtoAxis>>>;
 
   /// Main constructor for the material designator node.
   /// @param name The name of the node (for debug only)
@@ -73,13 +73,31 @@ class MaterialDesignatorBlueprintNode final : public BlueprintNode {
   void finalize(const BlueprintOptions& options, const GeometryContext& gctx,
                 TrackingVolume& parent, const Logger& logger) override;
 
-  /// Retrieve the binning configuration
-  /// @return The binning configuration
-  const std::optional<BinningConfig>& binning() const;
+  /// Configure the designator with a cylinder face and corresponding binning
+  /// information.
+  /// @note This method can be called multiple times to configure different faces.
+  /// @param face The face of the cylinder to configure
+  /// @param loc0 The first binning configuration along local axis 0
+  /// @param loc1 The second binning configuration along local axis 1
+  /// @return The material designator node
+  /// @note If this node has previously been configured with a different volume
+  ///       shape, this will throw an exception.
+  MaterialDesignatorBlueprintNode& configureFace(
+      CylinderVolumeBounds::Face face, const ProtoAxis& loc0,
+      const ProtoAxis& loc1);
 
-  /// Set the binning configuration
-  /// @param binning The binning configuration
-  MaterialDesignatorBlueprintNode& setBinning(BinningConfig binning);
+  /// Configure the designator with a cuboid face and corresponding binning
+  /// information.
+  /// @note This method can be called multiple times to configure different faces.
+  /// @param face The face of the cuboid to configure
+  /// @param loc0 The first binning configuration along local axis 0
+  /// @param loc1 The second binning configuration along local axis 1
+  /// @return The material designator node
+  /// @note If this node has previously been configured with a different volume
+  ///       shape, this will throw an exception.
+  MaterialDesignatorBlueprintNode& configureFace(CuboidVolumeBounds::Face face,
+                                                 const ProtoAxis& loc0,
+                                                 const ProtoAxis& loc1);
 
  private:
   /// @copydoc BlueprintNode::addToGraphviz
@@ -90,6 +108,19 @@ class MaterialDesignatorBlueprintNode final : public BlueprintNode {
       const std::vector<
           std::tuple<CylinderPortalShell::Face, ProtoAxis, ProtoAxis>>& binning,
       const Logger& logger);
+
+  void handleCuboidBinning(
+      CuboidPortalShell& cuboidShell,
+      const std::vector<
+          std::tuple<CuboidVolumeBounds::Face, ProtoAxis, ProtoAxis>>& binning,
+      const Logger& logger);
+
+  void validateCylinderFaceConfig(CylinderVolumeBounds::Face face,
+                                  const ProtoAxis& loc0, const ProtoAxis& loc1,
+                                  const Logger& logger = getDummyLogger());
+
+  void validateCuboidFaceConfig(const ProtoAxis& loc0, const ProtoAxis& loc1,
+                                const Logger& logger = getDummyLogger());
 
   std::string m_name{};
 

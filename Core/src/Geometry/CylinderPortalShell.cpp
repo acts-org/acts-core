@@ -36,7 +36,8 @@ void CylinderPortalShell::fill(TrackingVolume& volume) {
 SingleCylinderPortalShell::SingleCylinderPortalShell(TrackingVolume& volume)
     : m_volume{&volume} {
   if (m_volume->volumeBounds().type() != VolumeBounds::BoundsType::eCylinder) {
-    throw std::invalid_argument("Invalid volume bounds type");
+    throw std::invalid_argument(
+        "CylinderPortalShell: Invalid volume bounds type");
   }
 
   const auto& bounds =

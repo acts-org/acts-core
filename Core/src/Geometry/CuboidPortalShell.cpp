@@ -28,6 +28,7 @@
 namespace Acts {
 
 void CuboidPortalShell::fill(TrackingVolume& volume) {
+  using enum CuboidVolumeBounds::Face;
   for (Face face : {NegativeZFace, PositiveZFace, NegativeXFace, PositiveXFace,
                     NegativeYFace, PositiveYFace}) {
     const auto& portalAtFace = portalPtr(face);
@@ -40,8 +41,10 @@ void CuboidPortalShell::fill(TrackingVolume& volume) {
 
 SingleCuboidPortalShell::SingleCuboidPortalShell(TrackingVolume& volume)
     : m_volume{&volume} {
+  using enum CuboidVolumeBounds::Face;
   if (m_volume->volumeBounds().type() != VolumeBounds::BoundsType::eCuboid) {
-    throw std::invalid_argument("Invalid volume bounds type");
+    throw std::invalid_argument(
+        "CuboidPortalShell: Invalid volume bounds type");
   }
 
   const auto& bounds =
@@ -117,6 +120,8 @@ CuboidStackPortalShell::CuboidStackPortalShell(
     const GeometryContext& gctx, std::vector<CuboidPortalShell*> shells,
     AxisDirection direction, const Logger& logger)
     : m_direction(direction), m_shells{std::move(shells)} {
+  using enum CuboidVolumeBounds::Face;
+  using enum AxisDirection;
   std::tie(m_frontFace, m_backFace, m_sideFaces) =
       CuboidVolumeBounds::facesFromAxisDirection(m_direction);
 

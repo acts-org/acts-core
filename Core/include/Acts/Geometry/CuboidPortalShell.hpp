@@ -28,8 +28,6 @@ class CuboidPortalShell : public PortalShellBase {
  public:
   using Face = CuboidVolumeBounds::Face;
 
-  using enum CuboidVolumeBounds::Face;
-
   /// Retrieve the portal associated to the given face. Can be nullptr if unset.
   /// @param face The face to retrieve the portal for
   /// @return The portal associated to the face
@@ -142,12 +140,13 @@ class CuboidStackPortalShell final : public CuboidPortalShell {
   AxisDirection m_direction;
 
   /// The cuboid face positioned first along the stacking direction
-  CuboidVolumeBounds::Face m_frontFace = NegativeXFace;
+  CuboidVolumeBounds::Face m_frontFace = Face::NegativeXFace;
   /// The cuboid face positioned last along the stacking direction
-  CuboidVolumeBounds::Face m_backFace = PositiveXFace;
+  CuboidVolumeBounds::Face m_backFace = Face::PositiveXFace;
   /// The cuboid faces parallel to the stacking direction
   std::array<CuboidVolumeBounds::Face, 4> m_sideFaces{
-      NegativeZFace, PositiveZFace, NegativeYFace, PositiveYFace};
+      Face::NegativeZFace, Face::PositiveZFace, Face::NegativeYFace,
+      Face::PositiveYFace};
 
   std::vector<CuboidPortalShell*> m_shells;
 };

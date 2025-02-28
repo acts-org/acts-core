@@ -8,6 +8,7 @@
 
 #include "Acts/Geometry/StaticBlueprintNode.hpp"
 
+#include "Acts/Geometry/CuboidPortalShell.hpp"
 #include "Acts/Geometry/CylinderPortalShell.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
@@ -23,7 +24,7 @@ StaticBlueprintNode::StaticBlueprintNode(std::unique_ptr<TrackingVolume> volume)
 Volume& StaticBlueprintNode::build(const BlueprintOptions& options,
                                    const GeometryContext& gctx,
                                    const Logger& logger) {
-  ACTS_DEBUG(prefix() << "static build");
+  ACTS_DEBUG(prefix() << "Static build");
   if (!m_volume) {
     throw std::runtime_error("Volume is not built");
   }
@@ -60,7 +61,7 @@ PortalShellBase& StaticBlueprintNode::connect(const BlueprintOptions& options,
     m_shell = std::make_unique<SingleCylinderPortalShell>(*m_volume);
 
   } else if (type == VolumeBounds::eCuboid) {
-    throw std::logic_error("Cuboid is not implemented yet");
+    m_shell = std::make_unique<SingleCuboidPortalShell>(*m_volume);
 
   } else {
     throw std::logic_error("Volume type is not supported");
