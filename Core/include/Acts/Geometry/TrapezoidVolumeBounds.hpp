@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Acts/Definitions/Algebra.hpp"
+#include "Acts/Geometry/BoundarySurfaceFace.hpp"
 #include "Acts/Geometry/Volume.hpp"
 #include "Acts/Geometry/VolumeBounds.hpp"
 
@@ -58,6 +59,20 @@ class TrapezoidVolumeBounds : public VolumeBounds {
     eAlpha = 4,            //!< opening angle alpha (in point A)
     eBeta = 5,             //!< opening angle beta  (in point B)
     eSize                  //!< length of the bounds vector
+  };
+
+  /// Enum describing the possible faces of a trapezoidal volume
+  /// @note These values are synchronized with the BoundarySurfaceFace enum.
+  ///       Once Gen1 is removed, this can be changed.
+  enum class Face : unsigned int {
+
+    NegativeZFaceXY = BoundarySurfaceFace::negativeFaceXY,
+    PositiveZFaceXY = BoundarySurfaceFace::positiveFaceXY,
+    TrapezoidFaceAlpha = BoundarySurfaceFace::trapezoidFaceAlpha,
+    TrapezoidFaceBeta = BoundarySurfaceFace::trapezoidFaceBeta,
+    NegativeYFaceZX = BoundarySurfaceFace::negativeFaceZX,
+    PositiveYFaceZX = BoundarySurfaceFace::positiveFaceZX
+
   };
 
   TrapezoidVolumeBounds() = delete;
