@@ -7,6 +7,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #include "Acts/Detector/Detector.hpp"
+#include "Acts/Plugins/Detray/DetrayConversionUtils.hpp"
 #include "Acts/Plugins/Detray/DetrayConverter.hpp"
 #include "Acts/Plugins/Python/Utilities.hpp"
 
@@ -32,9 +33,8 @@ void addDetray(Context& ctx) {
 
   auto detray = m.def_submodule("detray");
   {
-    py::class_<detector<default_metadata>,
-               std::shared_ptr<detector<default_metadata>>>(detray,
-                                                            "detray_detector");
+    py::class_<DetrayHostDetector, std::shared_ptr<DetrayHostDetector>>(
+        detray, "detray_detector");
   }
 
   {

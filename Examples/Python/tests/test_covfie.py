@@ -13,8 +13,11 @@ def test_constant_field_conversion():
     cf = covfie.makeCovfieField(af)
     view = covfie.toView(cf)
     points = [(0, 0, 1), (1, 1, 1), (1, 0, 2)]
-    for x, y, z in points:
-        assert view.at(x, y, z) == [1, 2, 3]
+    for [x, y, z] in points:
+        field = view.at(x, y, z)
+        assert field.at(0) == 1
+        assert field.at(1) == 2
+        assert field.at(2) == 3
 
 
 @pytest.mark.skipif(not covfieEnabled, reason="Covfie plugin not available")
@@ -51,10 +54,11 @@ def test_root_field_conversion():
 
     error_margin_half_width = 0.0001
     for x, y, z in points:
-        val = af.getField(acts.Vector3(x, y, z), fc)
-        Bx1, By1, Bz1 = val[0], val[1], val[2]
+        rfield = af.getField(acts.Vector3(x, y, z), fc)
+        Bx1, By1, Bz1 = rfield[0], rfield[1], rfield[2]
 
-        Bx2, By2, Bz2 = tuple(view.at(x, y, z))
+        tfield = view.at(x, y, z)
+        Bx2, By2, Bz2 = tfield.at(0), tfield.at(1), tfield.at(2)
 
         assert (
             abs(Bx1 - Bx2) < error_margin_half_width

@@ -20,7 +20,7 @@ using namespace pybind11::literals;
 namespace Acts::Python {
 
 namespace {
-template <typename field_t>
+template <typename field_t, typename scalar_type>
 void declareCovfieField(py::module& m, const std::string& fieldName) {
   using view_t = typename field_t::view_t;
   m.def("toView",
@@ -28,7 +28,7 @@ void declareCovfieField(py::module& m, const std::string& fieldName) {
   py::class_<field_t, std::shared_ptr<field_t>>(m, fieldName.c_str());
   py::class_<view_t, std::shared_ptr<view_t>>(
       m, (fieldName + std::string("View")).c_str())
-      .def("at", &view_t::template at<float, float, float>);
+      .def("at", &view_t::template at<scalar_type, scalar_type, scalar_type>);
 }
 }  // namespace
 
@@ -36,9 +36,15 @@ void addCovfie(Context& ctx) {
   auto main = ctx.get("main");
   auto m = main.def_submodule("covfie", "Submodule for covfie conversion");
 
-  declareCovfieField<Acts::CovfiePlugin::ConstantField>(m,
-                                                        "CovfieConstantField");
-  declareCovfieField<Acts::CovfiePlugin::InterpolatedField>(
+  py::class_<covfie::array::array<float, 3ul>,
+             std::shared_ptr<covfie::array::array<float, 3ul>>>(m,
+                                                                "ArrayFloat3")
+      .def("at", [](const covfie::array::array<float, 3ul>& self,
+                    std::size_t i) { return self[i]; });
+
+  declareCovfieField<Acts::CovfiePlugin::ConstantField, float>(
+      m, "CovfieConstantField");
+  declareCovfieField<Acts::CovfiePlugin::InterpolatedField, float>(
       m, "CovfieAffineLinearStridedField");
 
   m.def("makeCovfieField",

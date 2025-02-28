@@ -15,7 +15,9 @@
 #include <map>
 
 #include <detray/core/detector.hpp>
+#include <detray/definitions/detail/algebra.hpp>
 #include <detray/definitions/grid_axis.hpp>
+#include <detray/detectors/default_metadata.hpp>
 #include <detray/io/frontend/payloads.hpp>
 
 namespace Acts {
@@ -24,7 +26,9 @@ namespace Experimental {
 class DetectorVolume;
 }
 
-using DetrayHostDetector = detray::detector<detray::default_metadata>;
+using DetrayMetaData = detray::default_metadata<detray::array<double>>;
+
+using DetrayHostDetector = detray::detector<DetrayMetaData>;
 
 namespace DetrayConversionUtils {
 
