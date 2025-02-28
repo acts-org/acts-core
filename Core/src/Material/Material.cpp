@@ -26,17 +26,23 @@ enum MaterialClassificationNumberIndices {
 
 // Avogadro constant
 constexpr double kAvogadro = 6.02214076e23 / UnitConstants::mol;
+
+constexpr float calculateMolarElectronDensity(float z, float molarRho) {
+  return z * molarRho;
+}
+
+constexpr float approximateMeanExcitationEnergy(float z) {
+  using namespace UnitLiterals;
+
+  // use approximative computation as defined in ATL-SOFT-PUB-2008-003
+  return 16_eV * std::pow(z, 0.9f);
+}
 }  // namespace
 
 Material Material::fromMassDensity(float x0, float l0, float ar, float z,
                                    float massRho) {
   using namespace UnitLiterals;
 
-  Material mat;
-  mat.m_x0 = x0;
-  mat.m_l0 = l0;
-  mat.m_ar = ar;
-  mat.m_z = z;
   // mass density is defined as
   //
   //     mass-density = atomic-mass * number-of-atoms / volume
@@ -49,18 +55,30 @@ Material Material::fromMassDensity(float x0, float l0, float ar, float z,
   //
   // perform computations in double precision to avoid loss of precision
   const double atomicMass = static_cast<double>(ar) * 1_u;
-  mat.m_molarRho = static_cast<double>(massRho) / (atomicMass * kAvogadro);
-  return mat;
+  float molarRho = static_cast<float>(massRho / (atomicMass * kAvogadro));
+
+  return Material::fromMolarDensity(x0, l0, ar, z, molarRho);
 }
 
 Material Material::fromMolarDensity(float x0, float l0, float ar, float z,
                                     float molarRho) {
+  return Material::fromMolarDensity(x0, l0, ar, z, molarRho,
+                                    calculateMolarElectronDensity(z, molarRho),
+                                    std::nullopt);
+}
+
+Material Material::fromMolarDensity(float x0, float l0, float ar, float z,
+                                    float molarRho, float molarElectronRho,
+                                    std::optional<float> meanExcitationEnergy) {
   Material mat;
   mat.m_x0 = x0;
   mat.m_l0 = l0;
   mat.m_ar = ar;
   mat.m_z = z;
   mat.m_molarRho = molarRho;
+  mat.m_molarElectronRho = molarElectronRho;
+  mat.m_meanExcitationEnergy =
+      meanExcitationEnergy.value_or(approximateMeanExcitationEnergy(z));
   return mat;
 }
 
@@ -69,7 +87,9 @@ Material::Material(const ParametersVector& parameters)
       m_l0(parameters[eInteractionLength]),
       m_ar(parameters[eRelativeAtomicMass]),
       m_z(parameters[eNuclearCharge]),
-      m_molarRho(parameters[eMolarDensity]) {}
+      m_molarRho(parameters[eMolarDensity]),
+      m_molarElectronRho(calculateMolarElectronDensity(m_z, m_molarRho)),
+      m_meanExcitationEnergy(approximateMeanExcitationEnergy(m_z)) {}
 
 float Material::massDensity() const {
   using namespace UnitLiterals;
@@ -78,13 +98,6 @@ float Material::massDensity() const {
   const double atomicMass = static_cast<double>(m_ar) * 1_u;
   const double numberDensity = static_cast<double>(m_molarRho) * kAvogadro;
   return atomicMass * numberDensity;
-}
-
-float Material::meanExcitationEnergy() const {
-  using namespace UnitLiterals;
-
-  // use approximative computation as defined in ATL-SOFT-PUB-2008-003
-  return 16_eV * std::pow(m_z, 0.9f);
 }
 
 Material::ParametersVector Material::parameters() const {
@@ -106,6 +119,8 @@ std::ostream& operator<<(std::ostream& os, const Material& material) {
     os << "|ar=" << material.Ar();
     os << "|z=" << material.Z();
     os << "|molar_rho=" << material.molarDensity();
+    os << "|molar_e_rho=" << material.molarElectronDensity();
+    os << "|mean_excitation_energy=" << material.meanExcitationEnergy();
   }
   return os;
 }

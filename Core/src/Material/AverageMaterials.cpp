@@ -32,6 +32,13 @@ Acts::MaterialSlab Acts::detail::combineSlabs(const MaterialSlab& slab1,
   const double thickness1 = static_cast<double>(slab1.thickness());
   const double thickness2 = static_cast<double>(slab2.thickness());
 
+  if (thickness1 == 0) {
+    return slab2;
+  }
+  if (thickness2 == 0) {
+    return slab1;
+  }
+
   // the thickness properties are purely additive
   const double thickness = thickness1 + thickness2;
 
@@ -120,6 +127,26 @@ Acts::MaterialSlab Acts::detail::combineSlabs(const MaterialSlab& slab1,
   // the total volume for the same unit area, i.e. volume = totalThickness*1*1
   const float molarDensity = static_cast<float>(molarAmount / thickness);
 
-  return {Material::fromMolarDensity(x0, l0, ar, z, molarDensity),
-          static_cast<float>(thickness)};
+  const double molarElectronAmount1 = mat1.molarElectronDensity() * thickness1;
+  const double molarElectronAmount2 = mat2.molarElectronDensity() * thickness2;
+  const double molarElectronAmount =
+      molarElectronAmount1 + molarElectronAmount2;
+  const float molarElectronDensity =
+      static_cast<float>(molarElectronAmount / thickness);
+
+  float meanExcitationEnergy = 0.f;
+  if (mat1.meanExcitationEnergy() > 0 && mat2.meanExcitationEnergy() > 0) {
+    meanExcitationEnergy = static_cast<float>(
+        std::exp(thicknessWeight1 * std::log(mat1.meanExcitationEnergy())) *
+        std::exp(thicknessWeight2 * std::log(mat2.meanExcitationEnergy())));
+  } else {
+    meanExcitationEnergy =
+        static_cast<float>(thicknessWeight1 * mat1.meanExcitationEnergy() +
+                           thicknessWeight2 * mat2.meanExcitationEnergy());
+  }
+
+  return {
+      Material::fromMolarDensity(x0, l0, ar, z, molarDensity,
+                                 molarElectronDensity, meanExcitationEnergy),
+      static_cast<float>(thickness)};
 }
