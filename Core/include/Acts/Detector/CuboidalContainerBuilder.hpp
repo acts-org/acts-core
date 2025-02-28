@@ -65,10 +65,10 @@ class CuboidalContainerBuilder : public IDetectorComponentBuilder {
   ///
   /// @param cfg is the configuration struct
   /// @param logger logging instance for screen output
-  CuboidalContainerBuilder(const Config& cfg,
-                           std::unique_ptr<const Logger> logger =
-                               getDefaultLogger("CuboidalContainerBuilder",
-                                                Logging::INFO));
+  explicit CuboidalContainerBuilder(
+      const Config& cfg,
+      std::unique_ptr<const Logger> logger =
+          getDefaultLogger("CuboidalContainerBuilder", Logging::INFO));
 
   /// Constructor from blueprint and logging level
   ///
@@ -84,7 +84,7 @@ class CuboidalContainerBuilder : public IDetectorComponentBuilder {
   /// @note that the naming of the builders is taken from the bluprint nodes
   ///
   /// @return a cylindrical container builder representing this blueprint
-  CuboidalContainerBuilder(
+  explicit CuboidalContainerBuilder(
       const Acts::Experimental::Gen2Blueprint::Node& bpNode,
       Acts::Logging::Level logLevel = Acts::Logging::INFO);
 

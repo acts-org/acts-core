@@ -59,10 +59,10 @@ class TrackingGeometryBuilder : public ITrackingGeometryBuilder {
   ///
   /// @param [in] cgbConfig is the configuration struct for this builder
   /// @param [in] logger logging instance
-  TrackingGeometryBuilder(const Config& cgbConfig,
-                          std::unique_ptr<const Logger> logger =
-                              getDefaultLogger("TrackingGeometryBuilder",
-                                               Logging::INFO));
+  explicit TrackingGeometryBuilder(
+      const Config& cgbConfig,
+      std::unique_ptr<const Logger> logger =
+          getDefaultLogger("TrackingGeometryBuilder", Logging::INFO));
 
   /// Destructor
   ~TrackingGeometryBuilder() override = default;

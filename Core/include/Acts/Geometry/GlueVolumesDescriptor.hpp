@@ -38,7 +38,7 @@ class GlueVolumesDescriptor {
   /// Constructor - with arguments
   ///
   /// @param gvs are the glue volume arrays mapped to the volume faces
-  GlueVolumesDescriptor(
+  explicit GlueVolumesDescriptor(
       const std::map<BoundarySurfaceFace,
                      std::shared_ptr<const TrackingVolumeArray>>& gvs);
 

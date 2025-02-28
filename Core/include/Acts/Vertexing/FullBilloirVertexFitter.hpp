@@ -61,10 +61,10 @@ class FullBilloirVertexFitter {
   ///
   /// @param cfg Configuration object
   /// @param logger Logging instance
-  FullBilloirVertexFitter(const Config& cfg,
-                          std::unique_ptr<const Logger> logger =
-                              getDefaultLogger("FullBilloirVertexFitter",
-                                               Logging::INFO))
+  explicit FullBilloirVertexFitter(
+      const Config& cfg,
+      std::unique_ptr<const Logger> logger =
+          getDefaultLogger("FullBilloirVertexFitter", Logging::INFO))
       : m_cfg(cfg), m_logger(std::move(logger)) {
     if (!m_cfg.extractParameters.connected()) {
       throw std::invalid_argument(

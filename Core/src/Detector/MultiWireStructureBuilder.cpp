@@ -47,8 +47,7 @@ class MultiWireInternalStructureBuilder
   };
 
   // Constructor
-
-  MultiWireInternalStructureBuilder(
+  explicit MultiWireInternalStructureBuilder(
       const Config& cfg,
       std::unique_ptr<const Acts::Logger> mlogger = Acts::getDefaultLogger(
           "MUltiWireInternalBuilder", Acts::Logging::INFO))

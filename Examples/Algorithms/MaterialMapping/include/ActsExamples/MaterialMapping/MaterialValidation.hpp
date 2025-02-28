@@ -56,8 +56,8 @@ class MaterialValidation : public IAlgorithm {
   ///
   /// @param cfg The configuration struct carrying the used tools
   /// @param level The output logging level
-  MaterialValidation(const Config& cfg,
-                     Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit MaterialValidation(const Config& cfg,
+                              Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Destructor
   /// - it also writes out the file

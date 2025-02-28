@@ -59,7 +59,7 @@ class SimVertexBarcode {
  private:
   /// The vertex ID
   /// Note that only primary, secondary and generation should be set
-  SimBarcode m_id = 0;
+  SimBarcode m_id;
 
   friend constexpr bool operator<(SimVertexBarcode lhs, SimVertexBarcode rhs) {
     return lhs.m_id < rhs.m_id;

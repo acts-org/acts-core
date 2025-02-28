@@ -21,12 +21,12 @@ namespace Acts {
 /// Surface derived class stub
 class SurfaceStub : public RegularSurface {
  public:
-  SurfaceStub(const Transform3& htrans = Transform3::Identity())
+  explicit SurfaceStub(const Transform3& htrans = Transform3::Identity())
       : GeometryObject(), RegularSurface(htrans) {}
   SurfaceStub(const GeometryContext& gctx, const SurfaceStub& sf,
               const Transform3& transf)
       : GeometryObject(), RegularSurface(gctx, sf, transf) {}
-  SurfaceStub(const DetectorElementBase& detelement)
+  explicit SurfaceStub(const DetectorElementBase& detelement)
       : GeometryObject(), RegularSurface(detelement) {}
 
   ~SurfaceStub() override = default;

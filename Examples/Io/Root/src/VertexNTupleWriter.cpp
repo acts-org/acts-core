@@ -295,7 +295,8 @@ ProcessCode VertexNTupleWriter::writeT(
 
     const TrackMatchEntry& particleMatch = imatched->second;
 
-    auto iparticle = particles.find(particleMatch.particle->value());
+    auto iparticle =
+        particles.find(SimBarcode{particleMatch.particle->value()});
     if (iparticle == particles.end()) {
       ACTS_DEBUG(
           "Truth particle found but not monitored with this track, index = "

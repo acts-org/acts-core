@@ -86,7 +86,7 @@ class SingleObjectNavigation : public navigation_type {
  public:
   /// Convenience constructor
   /// @param so the single object
-  SingleObjectNavigation(const object_type* so) : m_object(so) {
+  explicit SingleObjectNavigation(const object_type* so) : m_object(so) {
     if (so == nullptr) {
       throw std::invalid_argument("SingleObjectNavigation: object is nullptr");
     }
@@ -262,7 +262,7 @@ class ChainedNavigation : public navigation_type {
   /// the tuple and call them in sequence
   ///
   /// @param upts the updators to be called in chain
-  ChainedNavigation(const std::tuple<updators_t...>&& upts)
+  explicit ChainedNavigation(const std::tuple<updators_t...>&& upts)
       : updators(std::move(upts)) {}
 
   /// A combined navigation state updated to fill the candidates from

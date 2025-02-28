@@ -43,8 +43,8 @@ class ObjPropagationStepsWriter : public WriterT<PropagationSummaries> {
   ///
   /// @param cfg configuration struct
   /// @param level Output logging level
-  ObjPropagationStepsWriter(const Config& cfg,
-                            Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit ObjPropagationStepsWriter(
+      const Config& cfg, Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Virtual destructor
   ~ObjPropagationStepsWriter() override = default;

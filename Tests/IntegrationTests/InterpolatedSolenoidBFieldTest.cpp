@@ -82,7 +82,7 @@ auto bFieldMap = makeFieldMap(bSolenoidField);
 auto bCache = bFieldMap.makeCache(Acts::MagneticFieldContext{});
 
 struct StreamWrapper {
-  StreamWrapper(std::ofstream ofstr) : m_ofstr(std::move(ofstr)) {
+  explicit StreamWrapper(std::ofstream ofstr) : m_ofstr(std::move(ofstr)) {
     m_ofstr << "x;y;z;B_x;B_y;B_z;Bm_x;Bm_y;Bm_z" << std::endl;
   }
 

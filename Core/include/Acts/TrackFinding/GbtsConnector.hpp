@@ -36,7 +36,7 @@ class GbtsConnector {
         m_sources;  // the source layers of the group
   };
 
-  GbtsConnector(std::ifstream &inFile);
+  explicit GbtsConnector(std::ifstream &inFile);
 
   float m_etaBin{};
 

@@ -42,10 +42,10 @@ template <typename T>
 class TransitiveConstPointer {
  public:
   TransitiveConstPointer() = default;
-  TransitiveConstPointer(T* ptr) : m_ptr{ptr} {}
+  explicit TransitiveConstPointer(T* ptr) : m_ptr{ptr} {}
 
   template <typename U>
-  TransitiveConstPointer(const TransitiveConstPointer<U>& other)
+  explicit TransitiveConstPointer(const TransitiveConstPointer<U>& other)
       : m_ptr{other.ptr()} {}
 
   template <typename U>
@@ -214,17 +214,29 @@ class TrackStateProxy {
   ///
   /// @{
 
-  /// Constructor and assignment operator to construct TrackStateProxy
-  /// from mutable
+  /// Copy constructor: const to const or mutable to mutable
   /// @param other The other TrackStateProxy to construct from
-  TrackStateProxy(const TrackStateProxy<Trajectory, M, false>& other)
+  TrackStateProxy(const TrackStateProxy& other) = default;
+
+  /// Copy assignment operator: const to const or mutable to mutable
+  /// @param other The other TrackStateProxy to assign from
+  /// @return Reference to this TrackStateProxy
+  TrackStateProxy& operator=(const TrackStateProxy& other) = default;
+
+  /// Constructor from mutable TrackStateProxy
+  /// @note Only available if the track state proxy is read-only
+  /// @param other The other TrackStateProxy to construct from
+  explicit TrackStateProxy(const TrackStateProxy<Trajectory, M, false>& other)
+    requires ReadOnly
       : m_traj{other.m_traj}, m_istate{other.m_istate} {}
 
   /// Assignment operator to from mutable @c TrackStateProxy
-  /// @param other The other TrackStateProxy to construct from
+  /// @param other The other TrackStateProxy to assign from
+  /// @note Only available if the track state proxy is read-only
   /// @return Reference to this TrackStateProxy
-  TrackStateProxy& operator=(
-      const TrackStateProxy<Trajectory, M, false>& other) {
+  TrackStateProxy& operator=(const TrackStateProxy<Trajectory, M, false>& other)
+    requires ReadOnly
+  {
     m_traj = other.m_traj;
     m_istate = other.m_istate;
 

@@ -51,7 +51,7 @@ class RootPropagationSummaryWriter : public WriterT<PropagationSummaries> {
   /// Constructor with
   /// @param cfg configuration struct
   /// @param output logging level
-  RootPropagationSummaryWriter(
+  explicit RootPropagationSummaryWriter(
       const Config& cfg, Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Virtual destructor

@@ -28,8 +28,8 @@ class HelloWhiteBoardAlgorithm : public ActsExamples::IAlgorithm {
     std::string output;
   };
 
-  HelloWhiteBoardAlgorithm(const Config& cfg,
-                           Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit HelloWhiteBoardAlgorithm(
+      const Config& cfg, Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Read input and copy to the output
   ActsExamples::ProcessCode execute(const AlgorithmContext& ctx) const override;

@@ -135,9 +135,10 @@ class IterativeVertexFinder final : public IVertexFinder {
   ///
   /// @param cfg Configuration object
   /// @param logger The logging instance
-  IterativeVertexFinder(Config cfg,
-                        std::unique_ptr<const Logger> logger = getDefaultLogger(
-                            "IterativeVertexFinder", Logging::INFO));
+  explicit IterativeVertexFinder(Config cfg,
+                                 std::unique_ptr<const Logger> logger =
+                                     getDefaultLogger("IterativeVertexFinder",
+                                                      Logging::INFO));
 
   /// @brief Finds vertices corresponding to input trackVector
   ///

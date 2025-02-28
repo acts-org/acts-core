@@ -113,12 +113,14 @@ auto makeDefaultGsfOptions() {
 struct MultiCmpsParsInterface : public BoundTrackParameters {
   MultiComponentBoundTrackParameters multi_pars;
 
-  MultiCmpsParsInterface(const MultiComponentBoundTrackParameters &p)
+  explicit MultiCmpsParsInterface(const MultiComponentBoundTrackParameters &p)
       : BoundTrackParameters(p.referenceSurface().getSharedPtr(),
                              p.parameters(), p.covariance(), electron),
         multi_pars(p) {}
 
-  operator MultiComponentBoundTrackParameters() const { return multi_pars; }
+  explicit operator MultiComponentBoundTrackParameters() const {
+    return multi_pars;
+  }
 };
 
 auto makeParameters() {

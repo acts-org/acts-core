@@ -268,8 +268,9 @@ class NamedTupleDsvWriter {
   ///
   /// \param path       Path to the output file
   /// \param precision  Output floating point precision
-  NamedTupleDsvWriter(const std::string& path,
-                      int precision = std::numeric_limits<double>::max_digits10)
+  explicit NamedTupleDsvWriter(
+      const std::string& path,
+      int precision = std::numeric_limits<double>::max_digits10)
       : m_writer(colum_names(), path, precision) {}
 
   /// Append a record to the file.
@@ -330,9 +331,10 @@ class NamedTupleDsvReader {
   ///
   /// The set of optional columns must match names in the record. When allowing
   /// optional columns, header verification must be set to true.
-  NamedTupleDsvReader(const std::string& path,
-                      const std::vector<std::string>& optional_columns = {},
-                      bool verify_header = true);
+  explicit NamedTupleDsvReader(
+      const std::string& path,
+      const std::vector<std::string>& optional_columns = {},
+      bool verify_header = true);
 
   /// Read the next record from the file.
   ///

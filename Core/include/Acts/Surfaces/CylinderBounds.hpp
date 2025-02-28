@@ -73,10 +73,10 @@ class CylinderBounds : public SurfaceBounds {
     checkConsistency();
   }
 
-  /// Constructor - from fixed size array
-  ///
-  /// @param values The parameter values
-  CylinderBounds(const std::array<double, eSize>& values) noexcept(false)
+  /// Constructor from array
+  /// @param values The bound values stored in an array
+  explicit CylinderBounds(const std::array<double, eSize>& values) noexcept(
+      false)
       : m_values(values),
         m_closed(std::abs(values[eHalfPhiSector] - std::numbers::pi) <
                  s_epsilon) {

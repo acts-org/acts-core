@@ -44,7 +44,7 @@ class AnnealingUtility {
   };
 
   /// Constructor
-  AnnealingUtility(const Config& cfg = Config()) : m_cfg(cfg) {
+  explicit AnnealingUtility(const Config& cfg = Config()) : m_cfg(cfg) {
     // Set Gaussian cut-off terms for each temperature
     for (double temp : cfg.setOfTemperatures) {
       m_gaussCutTempVec.push_back(std::exp(-cfg.cutOff / (2. * temp)));

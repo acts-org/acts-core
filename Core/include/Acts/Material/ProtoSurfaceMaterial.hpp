@@ -37,8 +37,8 @@ class ProtoSurfaceMaterialT : public ISurfaceMaterial {
   /// Constructor with BinningType
   /// @param binning a binning description for the material map binning
   /// @param mappingType is the type of surface mapping associated to the surface
-  ProtoSurfaceMaterialT(const BinningType& binning,
-                        MappingType mappingType = MappingType::Default)
+  explicit ProtoSurfaceMaterialT(const BinningType& binning,
+                                 MappingType mappingType = MappingType::Default)
       : ISurfaceMaterial(1., mappingType), m_binning(binning) {}
 
   /// Copy constructor

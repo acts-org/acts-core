@@ -108,13 +108,13 @@ class TrackStateRange {
     ProxyType operator*() { return *proxy; }
   };
 
-  TrackStateRange(ProxyType _begin) : m_begin{_begin} {}
+  explicit TrackStateRange(ProxyType _begin) : m_begin{_begin} {}
   TrackStateRange() : m_begin{std::nullopt} {}
 
-  Iterator begin() { return m_begin; }
+  Iterator begin() { return Iterator{m_begin}; }
   Iterator end() { return Iterator{std::nullopt}; }
 
-  Iterator cbegin() const { return m_begin; }
+  Iterator cbegin() const { return Iterator{m_begin}; }
   Iterator cend() const { return Iterator{std::nullopt}; }
 
  private:

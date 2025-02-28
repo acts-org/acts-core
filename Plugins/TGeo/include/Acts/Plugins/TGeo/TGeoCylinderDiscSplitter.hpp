@@ -43,7 +43,7 @@ class TGeoCylinderDiscSplitter : public ITGeoDetectorElementSplitter {
   ///
   /// @param cfg the configuration struct
   /// @param logger the logging object
-  TGeoCylinderDiscSplitter(
+  explicit TGeoCylinderDiscSplitter(
       const Config& cfg,
       std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
           "TGeoCylinderDiscSplitter", Acts::Logging::INFO));

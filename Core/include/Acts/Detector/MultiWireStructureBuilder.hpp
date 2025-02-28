@@ -52,7 +52,7 @@ class MultiWireStructureBuilder {
   /// @param config The configure of the MultiWireStructureBuilder
   /// @param logger logging instance for screen output
 
-  MultiWireStructureBuilder(
+  explicit MultiWireStructureBuilder(
       const Config& config,
       std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
           "MultiWireStructureBuilder", Acts::Logging::VERBOSE));

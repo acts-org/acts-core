@@ -30,8 +30,10 @@ class SpacePointContainer {
   // the memory backend is independetly handled. This is only interfacing it to
   // ACTS
   SpacePointContainer(CollectionType&& container) = delete;
-  SpacePointContainer(CollectionType& container) : m_storage(container) {}
-  SpacePointContainer(CollectionType* container) : m_storage(container) {}
+  explicit SpacePointContainer(CollectionType& container)
+      : m_storage(container) {}
+  explicit SpacePointContainer(CollectionType* container)
+      : m_storage(container) {}
 
   // No copy constructor or copy operation allowed
   SpacePointContainer(const SpacePointContainer<collection_t>&) = delete;

@@ -39,13 +39,13 @@ class GenericCuboidVolumeBounds : public VolumeBounds {
   /// - the first 4 vertices are the "top" face
   /// - the second 4 vertices are the "bottom" face
   /// - both faces are given in counter clock wise order
-  GenericCuboidVolumeBounds(
+  explicit GenericCuboidVolumeBounds(
       const std::array<Acts::Vector3, 8>& vertices) noexcept(false);
 
   /// Constructor from a fixed size array
   ///
   /// @param values The input values
-  GenericCuboidVolumeBounds(
+  explicit GenericCuboidVolumeBounds(
       const std::array<double, BoundValues::eSize>& values) noexcept(false);
 
   ~GenericCuboidVolumeBounds() override = default;

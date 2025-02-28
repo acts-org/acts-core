@@ -33,7 +33,7 @@
 
 class CompBuilder final : public Acts::Experimental::IDetectorComponentBuilder {
  public:
-  CompBuilder(
+  explicit CompBuilder(
       const std::vector<std::shared_ptr<Acts::Surface>>& sensitives = {})
       : m_sensitives(sensitives) {}
 

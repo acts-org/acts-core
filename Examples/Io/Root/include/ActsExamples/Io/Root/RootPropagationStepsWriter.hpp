@@ -54,8 +54,8 @@ class RootPropagationStepsWriter : public WriterT<PropagationSummaries> {
   /// Constructor with
   /// @param cfg configuration struct
   /// @param output logging level
-  RootPropagationStepsWriter(const Config& cfg,
-                             Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit RootPropagationStepsWriter(
+      const Config& cfg, Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Virtual destructor
   ~RootPropagationStepsWriter() override;

@@ -77,7 +77,7 @@ class DD4hepDetectorElement : public TGeoDetectorElement {
   ///       TGeoTubeSeg should be translated to a disc surface. Per default it
   ///       will be translated into a cylindrical surface.
   /// @param material Optional material of detector element
-  DD4hepDetectorElement(
+  explicit DD4hepDetectorElement(
       const dd4hep::DetElement detElement, const std::string& axes = "XYZ",
       double scalor = 1., bool isDisc = false,
       std::shared_ptr<const ISurfaceMaterial> material = nullptr);

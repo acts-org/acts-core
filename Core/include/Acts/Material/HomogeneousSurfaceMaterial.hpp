@@ -30,8 +30,9 @@ class HomogeneousSurfaceMaterial : public ISurfaceMaterial {
   /// @param full are the full material properties
   /// @param splitFactor is the split for pre/post update
   /// @param mappingType is the type of surface mapping associated to the surface
-  HomogeneousSurfaceMaterial(const MaterialSlab& full, double splitFactor = 1.,
-                             MappingType mappingType = MappingType::Default);
+  explicit HomogeneousSurfaceMaterial(
+      const MaterialSlab& full, double splitFactor = 1.,
+      MappingType mappingType = MappingType::Default);
 
   /// Copy Constructor
   ///

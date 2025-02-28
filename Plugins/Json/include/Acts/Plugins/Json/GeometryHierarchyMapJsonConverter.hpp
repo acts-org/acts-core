@@ -194,7 +194,7 @@ auto GeometryHierarchyMapJsonConverter<value_t, decorator_t>::fromJson(
     auto value = entry.at("value").get<Value>();
     elements.emplace_back(id, std::move(value));
   }
-  return elements;
+  return Container(std::move(elements));
 }
 
 }  // namespace Acts

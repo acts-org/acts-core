@@ -35,10 +35,10 @@ class TrackingVolumeArrayCreator : public ITrackingVolumeArrayCreator {
   /// Constructor
   ///
   /// @param logger logging instance
-  TrackingVolumeArrayCreator(const Config& /*cfg*/,
-                             std::unique_ptr<const Logger> logger =
-                                 getDefaultLogger("LayerArrayCreator",
-                                                  Logging::INFO))
+  explicit TrackingVolumeArrayCreator(const Config& /*cfg*/,
+                                      std::unique_ptr<const Logger> logger =
+                                          getDefaultLogger("LayerArrayCreator",
+                                                           Logging::INFO))
       : m_logger(std::move(logger)) {}
 
   /// create a tracking volume array

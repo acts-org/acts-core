@@ -88,8 +88,8 @@ class Geant4SurfaceProvider : public Acts::Experimental::ISurfacesProvider {
   /// Constructor
   /// @param config The configuration struct
   /// @param options The optional configuration for KDTree
-  Geant4SurfaceProvider(const Config& config,
-                        const kdtOptions& options = kdtOptions()) {
+  explicit Geant4SurfaceProvider(const Config& config,
+                                 const kdtOptions& options = kdtOptions()) {
     if (config.g4World == nullptr) {
       throw std::invalid_argument(
           "Geant4SurfaceProvider: No World volume provided");

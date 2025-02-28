@@ -53,10 +53,10 @@ class VolumeStructureBuilder : public IExternalStructureBuilder {
   ///
   /// @param cfg is the configuration struct
   /// @param mlogger logging instance for screen output
-  VolumeStructureBuilder(const Config& cfg,
-                         std::unique_ptr<const Logger> mlogger =
-                             getDefaultLogger("VolumeStructureBuilder",
-                                              Logging::INFO));
+  explicit VolumeStructureBuilder(const Config& cfg,
+                                  std::unique_ptr<const Logger> mlogger =
+                                      getDefaultLogger("VolumeStructureBuilder",
+                                                       Logging::INFO));
 
   /// The interface definition for internal structure creation
   ///

@@ -187,7 +187,8 @@ BOOST_AUTO_TEST_CASE(zscan_finder_test) {
 
 // Dummy user-defined InputTrackStub type
 struct InputTrackStub {
-  InputTrackStub(const BoundTrackParameters& params) : m_parameters(params) {}
+  explicit InputTrackStub(const BoundTrackParameters& params)
+      : m_parameters(params) {}
 
   const BoundTrackParameters& parameters() const { return m_parameters; }
 

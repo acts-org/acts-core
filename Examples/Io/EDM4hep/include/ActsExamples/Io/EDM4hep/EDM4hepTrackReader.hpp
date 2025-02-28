@@ -40,8 +40,8 @@ class EDM4hepTrackReader : public IReader {
   /// constructor
   /// @param config is the configuration object
   /// @param level is the output logging level
-  EDM4hepTrackReader(const Config& config,
-                     Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit EDM4hepTrackReader(const Config& config,
+                              Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Readonly access to the config
   const Config& config() const { return m_cfg; }

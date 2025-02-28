@@ -25,7 +25,7 @@ struct TimedConnect : public Acts::Ccl::DefaultConnect<Cell, N> {
   double timeTolerance{std::numeric_limits<double>::max()};
 
   TimedConnect() = default;
-  TimedConnect(double time);
+  explicit TimedConnect(double time);
   TimedConnect(double time, bool commonCorner)
     requires(N == 2);
   ~TimedConnect() override = default;

@@ -69,7 +69,7 @@ struct MockTrack {
 
     ConstTrackStateType typeFlags() const {
       static const ConstTrackStateType::raw_type raw{0};
-      return {raw};
+      return ConstTrackStateType{raw};
     }
   };
 

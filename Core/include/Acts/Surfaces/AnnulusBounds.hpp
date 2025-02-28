@@ -46,25 +46,25 @@ class AnnulusBounds : public DiscBounds {
   };
 
   /// @brief Default constructor from parameters
-  /// @param minR inner radius, in module system
-  /// @param maxR outer radius, in module system
-  /// @param minPhiRel right angular edge, in strip system, rel to avgPhi
-  /// @param maxPhiRel left angular edge, in strip system, rel to avgPhi
-  /// @param moduleOrigin The origin offset between the two systems.
-  /// @param avgPhi (Optional) internal rotation of this bounds object's local
-  /// frame
+  /// @param minR The inner radius of the annulus
+  /// @param maxR The outer radius of the annulus
+  /// @param minPhiRel The minimum phi relative to average phi
+  /// @param maxPhiRel The maximum phi relative to average phi
+  /// @param moduleOrigin The origin of the module in the strip frame
+  /// @param avgPhi The average phi value
   /// @note For @c morigin you need to actually calculate the cartesian
   /// offset
-  AnnulusBounds(double minR, double maxR, double minPhiRel, double maxPhiRel,
-                const Vector2& moduleOrigin = {0, 0},
-                double avgPhi = 0) noexcept(false)
+  explicit AnnulusBounds(double minR, double maxR, double minPhiRel,
+                         double maxPhiRel, const Vector2& moduleOrigin = {0, 0},
+                         double avgPhi = 0) noexcept(false)
       : AnnulusBounds({minR, maxR, minPhiRel, maxPhiRel, avgPhi,
                        moduleOrigin.x(), moduleOrigin.y()}) {}
 
-  /// Constructor - from parameters array
+  /// Constructor - from fixed size array
   ///
-  /// @param values The parameter array
-  AnnulusBounds(const std::array<double, eSize>& values) noexcept(false);
+  /// @param values The bound values stored in a fixed size array
+  explicit AnnulusBounds(const std::array<double, eSize>& values) noexcept(
+      false);
 
   AnnulusBounds(const AnnulusBounds& source) = default;
 

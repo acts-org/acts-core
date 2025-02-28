@@ -78,7 +78,8 @@ class ConeVolumeBounds : public VolumeBounds {
   /// Constructor - from a fixed size array
   ///
   /// @param values The bound values
-  ConeVolumeBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit ConeVolumeBounds(const std::array<double, eSize>& values) noexcept(
+      false)
       : m_values(values) {
     checkConsistency();
     buildSurfaceBounds();

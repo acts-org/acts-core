@@ -8,17 +8,17 @@
 
 #pragma once
 
-#include <Acts/EventData/detail/CorrectedTransformationFreeToBound.hpp>
-#include <Acts/Propagator/detail/CovarianceEngine.hpp>
-#include <Acts/Surfaces/Surface.hpp>
-#include <Acts/Utilities/Result.hpp>
+#include "Acts/EventData/detail/CorrectedTransformationFreeToBound.hpp"
+#include "Acts/Propagator/detail/CovarianceEngine.hpp"
+#include "Acts/Surfaces/Surface.hpp"
+#include "Acts/Utilities/Result.hpp"
 
 #include <type_traits>
 
 namespace Acts::detail {
 
-/// A helper type for providinig a propagation state which can be used with
-/// functions expecting single-component steppers and states
+/// A helper struct to store a reference to a single-component state and its
+/// associated navigation state and options
 template <typename stepping_t, typename navigation_t, typename options_t,
           typename geoctx_t>
 struct SinglePropState {
@@ -44,7 +44,7 @@ struct LoopComponentProxyBase {
 
   component_t& cmp;
 
-  LoopComponentProxyBase(component_t& c) : cmp(c) {}
+  explicit LoopComponentProxyBase(component_t& c) : cmp(c) {}
 
   // These are the const accessors, which are shared between the mutable
   // ComponentProxy and the ConstComponentProxy

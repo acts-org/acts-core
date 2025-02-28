@@ -111,7 +111,7 @@ class GenericFreeTrackParameters {
 
   /// Converts a free track parameter with a different hypothesis.
   template <typename other_particle_hypothesis_t>
-  GenericFreeTrackParameters(
+  explicit GenericFreeTrackParameters(
       const GenericFreeTrackParameters<other_particle_hypothesis_t>& other)
       : GenericFreeTrackParameters(other.parameters(),
                                    other.particleHypothesis(),

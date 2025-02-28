@@ -1013,8 +1013,10 @@ class MultiTrajectoryTestsCommon {
     auto i0 = t.addTrackState(kMask);
 
     typename trajectory_t::TrackStateProxy tp = t.getTrackState(i0);  // mutable
-    typename trajectory_t::TrackStateProxy tp2{tp};       // mutable to mutable
+    typename trajectory_t::TrackStateProxy tp2{tp};  // mutable to mutable
+    static_cast<void>(tp2);
     typename trajectory_t::ConstTrackStateProxy tp3{tp};  // mutable to const
+    static_cast<void>(tp3);
     // const to mutable: this won't compile
     // MultiTrajectory::TrackStateProxy tp4{tp3};
   }

@@ -269,8 +269,6 @@ BOOST_AUTO_TEST_CASE(RoundTripTests) {
   auto trackStateContainer = std::make_shared<Acts::VectorMultiTrajectory>();
   TrackContainer tracks(trackContainer, trackStateContainer);
 
-  using const_proxy_t = decltype(tracks)::ConstTrackProxy;
-
   std::mt19937 rng{42};
   std::normal_distribution<double> gauss(0., 1.);
   std::uniform_real_distribution<double> f(-1, 1);
@@ -352,7 +350,7 @@ BOOST_AUTO_TEST_CASE(RoundTripTests) {
 
   auto logger = getDefaultLogger("EDM4hep", Logging::INFO);
 
-  for (const_proxy_t track : tracks) {
+  for (const auto& track : tracks) {
     auto to = edm4hepTracks.create();
     EDM4hepUtil::writeTrack(gctx, track, to, Bz, *logger);
   }
@@ -374,7 +372,8 @@ BOOST_AUTO_TEST_CASE(RoundTripTests) {
                             std::make_shared<Acts::VectorMultiTrajectory>());
 
   for (const auto edm4hepTrack : edm4hepTracksConst) {
-    EDM4hepUtil::readTrack(edm4hepTrack, readTracks.makeTrack(), Bz, *logger);
+    auto track = readTracks.makeTrack();
+    EDM4hepUtil::readTrack(edm4hepTrack, track, Bz, *logger);
   }
 
   BOOST_CHECK_EQUAL(tracks.size(), readTracks.size());

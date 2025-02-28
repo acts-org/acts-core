@@ -179,7 +179,7 @@ void HepMC3Event::removeParticle(HepMC3::GenEvent& event,
   const auto id = particle->particleId();
   // Search HepMC3::GenParticle with the same id as the Acts particle
   for (auto& genParticle : genParticles) {
-    if (genParticle->id() == id) {
+    if (genParticle->id() == static_cast<int>(id.value())) {
       // Remove particle if found
       event.remove_particle(genParticle);
       break;

@@ -37,7 +37,7 @@ class AccumulatedSurfaceMaterial {
   /// Default Constructor - for homogeneous material
   ///
   /// @param splitFactor is the pre/post splitting directive
-  AccumulatedSurfaceMaterial(double splitFactor = 0.);
+  explicit AccumulatedSurfaceMaterial(double splitFactor = 0.);
 
   /// Explicit constructor with only full MaterialSlab,
   /// for one-dimensional binning.
@@ -49,8 +49,8 @@ class AccumulatedSurfaceMaterial {
   ///
   /// @param binUtility defines the binning structure on the surface
   /// @param splitFactor is the pre/post splitting directive
-  AccumulatedSurfaceMaterial(const BinUtility& binUtility,
-                             double splitFactor = 0.);
+  explicit AccumulatedSurfaceMaterial(const BinUtility& binUtility,
+                                      double splitFactor = 0.);
 
   /// Copy Constructor
   ///

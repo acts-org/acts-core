@@ -38,9 +38,10 @@ class AmbiguityResolutionML {
   ///
   /// @param cfg is the algorithm configuration
   /// @param logger is the logging instance
-  AmbiguityResolutionML(const Config& cfg,
-                        std::unique_ptr<const Logger> logger = getDefaultLogger(
-                            "AmbiguityResolutionML", Logging::INFO))
+  explicit AmbiguityResolutionML(const Config& cfg,
+                                 std::unique_ptr<const Logger> logger =
+                                     getDefaultLogger("AmbiguityResolutionML",
+                                                      Logging::INFO))
       : m_cfg{cfg},
         m_duplicateClassifier(m_cfg.inputDuplicateNN.c_str()),
         m_logger{std::move(logger)} {}

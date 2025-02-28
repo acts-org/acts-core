@@ -11,6 +11,7 @@
 #include "Acts/Definitions/Units.hpp"
 #include "Acts/Geometry/GeometryIdentifier.hpp"
 #include "ActsExamples/EventData/MuonSimHit.hpp"
+#include "ActsExamples/EventData/SimParticle.hpp"
 #include "ActsExamples/Framework/AlgorithmContext.hpp"
 #include "ActsExamples/Io/Csv/CsvInputOutput.hpp"
 #include "ActsExamples/Utilities/Paths.hpp"
@@ -79,7 +80,10 @@ ActsExamples::ProcessCode ActsExamples::CsvMuonSimHitReader::read(
     f.stationPhi = data.StationPhi;
     f.stationName = data.StationName;
 
-    unordered.push_back(SimHit(compressId(f), data.pdgId, pos, mom, mom, -1));
+    unordered.push_back(
+        SimHit(Acts::GeometryIdentifier(compressId(f)),
+               SimBarcode{static_cast<SimBarcode::Value>(data.pdgId)}, pos, mom,
+               mom, -1));
   }
   SimHitContainer simHits;
   simHits.insert(unordered.begin(), unordered.end());

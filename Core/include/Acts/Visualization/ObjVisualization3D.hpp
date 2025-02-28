@@ -36,7 +36,7 @@ class ObjVisualization3D : public IVisualization3D {
   /// Constructor that allows to set scalor and precision
   /// @param prec The output precision with std::setprecision
   /// @param scale An (optional) scaling for the writing out
-  ObjVisualization3D(unsigned int prec = 4, double scale = 1.)
+  explicit ObjVisualization3D(unsigned int prec = 4, double scale = 1.)
       : m_outputPrecision(prec), m_outputScalor(scale) {}
 
   /// @copydoc Acts::IVisualization3D::vertex()

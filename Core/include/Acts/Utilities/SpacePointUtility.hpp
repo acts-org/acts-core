@@ -64,7 +64,8 @@ struct SpacePointParameters {
 class SpacePointUtility {
  public:
   /// Constructor
-  SpacePointUtility(SpacePointBuilderConfig cfg) : m_config(std::move(cfg)) {}
+  explicit SpacePointUtility(SpacePointBuilderConfig cfg)
+      : m_config(std::move(cfg)) {}
 
   /// @brief Getter method for the global coordinates of a SourceLink
   ///

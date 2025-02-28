@@ -48,14 +48,16 @@ class DiscTrapezoidBounds : public DiscBounds {
   /// @param maxR outer radius
   /// @param avgPhi average phi value
   /// @param stereo optional stero angle applied
-  DiscTrapezoidBounds(double halfXminR, double halfXmaxR, double minR,
-                      double maxR, double avgPhi = std::numbers::pi / 2.,
-                      double stereo = 0.) noexcept(false);
+  explicit DiscTrapezoidBounds(double halfXminR, double halfXmaxR, double minR,
+                               double maxR,
+                               double avgPhi = std::numbers::pi / 2.,
+                               double stereo = 0.) noexcept(false);
 
   /// Constructor - from fixed size array
   ///
   /// @param values The parameter values
-  DiscTrapezoidBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit DiscTrapezoidBounds(
+      const std::array<double, eSize>& values) noexcept(false)
       : m_values(values) {
     checkConsistency();
   }

@@ -87,9 +87,9 @@ class BinUtility {
   /// @param opt is the binning option : open, closed
   /// @param value is the axis direction : AxisX, AxisY, AxisZ, etc.
   /// @param tForm is the (optional) transform
-  BinUtility(std::vector<float>& bValues, BinningOption opt = open,
-             AxisDirection value = AxisDirection::AxisPhi,
-             const Transform3& tForm = Transform3::Identity())
+  explicit BinUtility(std::vector<float>& bValues, BinningOption opt = open,
+                      AxisDirection value = AxisDirection::AxisPhi,
+                      const Transform3& tForm = Transform3::Identity())
       : m_binningData(), m_transform(tForm), m_itransform(tForm.inverse()) {
     m_binningData.reserve(3);
     m_binningData.emplace_back(opt, value, bValues);

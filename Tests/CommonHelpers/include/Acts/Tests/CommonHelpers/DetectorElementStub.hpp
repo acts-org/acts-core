@@ -33,7 +33,7 @@ class DetectorElementStub : public DetectorElementBase {
  public:
   DetectorElementStub() : DetectorElementBase() {}
 
-  DetectorElementStub(const Transform3& transform)
+  explicit DetectorElementStub(const Transform3& transform)
       : DetectorElementBase(), m_elementTransform(transform) {}
 
   /// Constructor for single sided detector element

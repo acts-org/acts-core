@@ -39,7 +39,7 @@ class LinkToVolumeImpl : public IExternalNavigation {
   std::shared_ptr<DetectorVolume> dVolume = nullptr;
 
   /// Constructor from volume
-  LinkToVolumeImpl(std::shared_ptr<DetectorVolume> dv)
+  explicit LinkToVolumeImpl(std::shared_ptr<DetectorVolume> dv)
       : dVolume(std::move(dv)) {}
 
   /// @return the link to the contained volume

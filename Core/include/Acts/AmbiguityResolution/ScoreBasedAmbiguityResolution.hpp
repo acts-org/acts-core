@@ -151,7 +151,7 @@ class ScoreBasedAmbiguityResolution {
     std::vector<OptionalHitSelection> hitSelections = {};
   };
 
-  ScoreBasedAmbiguityResolution(
+  explicit ScoreBasedAmbiguityResolution(
       const Config& cfg,
       std::unique_ptr<const Logger> logger =
           getDefaultLogger("ScoreBasedAmbiguityResolution", Logging::INFO))

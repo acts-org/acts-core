@@ -37,7 +37,8 @@ class AdaptiveGridDensityVertexFinder final : public IVertexFinder {
   /// @brief The Config struct
   struct Config {
     ///@param gDensity The grid density
-    Config(const AdaptiveGridTrackDensity& gDensity) : gridDensity(gDensity) {}
+    explicit Config(const AdaptiveGridTrackDensity& gDensity)
+        : gridDensity(gDensity) {}
 
     // The grid density object
     AdaptiveGridTrackDensity gridDensity;
@@ -110,7 +111,7 @@ class AdaptiveGridDensityVertexFinder final : public IVertexFinder {
   /// @brief Constructor for user-defined InputTrack type
   ///
   /// @param cfg Configuration object
-  AdaptiveGridDensityVertexFinder(const Config& cfg) : m_cfg(cfg) {}
+  explicit AdaptiveGridDensityVertexFinder(const Config& cfg) : m_cfg(cfg) {}
 
  private:
   /// @brief Checks if a track passes the selection criteria for seeding

@@ -249,7 +249,7 @@ class AnyBase : public AnyBaseAll {
     return *this;
   }
 
-  operator bool() const { return m_handler != nullptr; }
+  explicit operator bool() const { return m_handler != nullptr; }
 
  private:
   void* dataPtr() {

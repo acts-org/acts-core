@@ -53,10 +53,10 @@ class DetrayPropagator : public PropagatorInterface {
   ///
   /// @param cfg configuration struct
   /// @param logger The logger instance
-  DetrayPropagator(const Config& cfg,
-                   std::unique_ptr<const Acts::Logger> logger =
-                       Acts::getDefaultLogger("DetrayPropagator",
-                                              Acts::Logging::INFO))
+  explicit DetrayPropagator(const Config& cfg,
+                            std::unique_ptr<const Acts::Logger> logger =
+                                Acts::getDefaultLogger("DetrayPropagator",
+                                                       Acts::Logging::INFO))
       : PropagatorInterface(), m_cfg(cfg), m_logger(std::move(logger)) {}
 
   ///@brief  Execute a propagation for charged particle parameters

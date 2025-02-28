@@ -125,10 +125,10 @@ class ProtoLayerCreatorT {
   /// Constructor
   /// @param cfg is the configuration class
   /// @param logger is the logging class for screen output
-  ProtoLayerCreatorT(const Config& cfg,
-                     std::unique_ptr<const Acts::Logger> logger =
-                         Acts::getDefaultLogger("ProtoLayerCreatorT",
-                                                Acts::Logging::INFO));
+  explicit ProtoLayerCreatorT(const Config& cfg,
+                              std::unique_ptr<const Acts::Logger> logger =
+                                  Acts::getDefaultLogger("ProtoLayerCreatorT",
+                                                         Acts::Logging::INFO));
 
   /// @brief construct the negative side layers
   /// @param gctx The geometry context for this construction call

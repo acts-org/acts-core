@@ -76,10 +76,10 @@ class LayerBuilderT : public Acts::ILayerBuilder {
 
   /// Constructor
   /// @param glbConfig is the configuration class
-  LayerBuilderT(const Config& cfg,
-                std::unique_ptr<const Acts::Logger> logger =
-                    Acts::getDefaultLogger("LayerBuilderT",
-                                           Acts::Logging::INFO));
+  explicit LayerBuilderT(const Config& cfg,
+                         std::unique_ptr<const Acts::Logger> logger =
+                             Acts::getDefaultLogger("LayerBuilderT",
+                                                    Acts::Logging::INFO));
 
   /// LayerBuilder interface method - returning the layers at negative side
   const Acts::LayerVector negativeLayers(

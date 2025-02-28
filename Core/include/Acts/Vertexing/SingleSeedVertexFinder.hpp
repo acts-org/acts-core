@@ -99,9 +99,10 @@ class SingleSeedVertexFinder {
   /// @brief Constructor
   /// @param cfg Configuration object
   /// @param lgr Logging instance
-  SingleSeedVertexFinder(const Config& cfg,
-                         std::unique_ptr<const Logger> lgr = getDefaultLogger(
-                             "SingleSeedVertexFinder", Logging::INFO));
+  explicit SingleSeedVertexFinder(const Config& cfg,
+                                  std::unique_ptr<const Logger> lgr =
+                                      getDefaultLogger("SingleSeedVertexFinder",
+                                                       Logging::INFO));
 
   /// @brief Destructor
   ~SingleSeedVertexFinder() = default;

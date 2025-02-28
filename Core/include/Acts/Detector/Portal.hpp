@@ -47,7 +47,7 @@ class Portal {
   /// Constructor from surface w/o portal links
   ///
   /// @param surface is the representing surface
-  Portal(std::shared_ptr<RegularSurface> surface);
+  explicit Portal(std::shared_ptr<RegularSurface> surface);
 
   /// The vector of attached volumes forward/backward, this is useful in the
   /// geometry building

@@ -37,9 +37,7 @@ class MultiIndex {
 
   /// The type of their underlying storage value.
   using Value = T;
-  enum : std::size_t {
-    NumLevels = sizeof...(BitsPerLevel),
-  };
+  static constexpr std::size_t kNumLevels = sizeof...(BitsPerLevel);
 
   /// Construct a MultiIndex with all levels set to zero.
   static constexpr MultiIndex Zeros() { return MultiIndex(0u); }
@@ -52,7 +50,7 @@ class MultiIndex {
   /// signature and could not be distinguished.
   template <typename... Us>
   static constexpr MultiIndex Encode(Us&&... us) {
-    static_assert(sizeof...(Us) <= NumLevels,
+    static_assert(sizeof...(Us) <= kNumLevels,
                   "Can only encode as many levels as in the MultiIndex");
 
     MultiIndex index(0u);
@@ -64,7 +62,7 @@ class MultiIndex {
   }
 
   /// Construct a MultiIndex from an already encoded value.
-  constexpr MultiIndex(Value encoded) : m_value(encoded) {}
+  explicit constexpr MultiIndex(Value encoded) : m_value(encoded) {}
   /// Construct a default MultiIndex with undefined values for each level.
   MultiIndex() = default;
   MultiIndex(const MultiIndex&) = default;
@@ -81,12 +79,12 @@ class MultiIndex {
   constexpr Value value() const { return m_value; }
   /// Get the value for the index level.
   constexpr Value level(std::size_t lvl) const {
-    assert((lvl < NumLevels) && "Index level outside allowed range");
+    assert((lvl < kNumLevels) && "Index level outside allowed range");
     return (m_value >> shift(lvl)) & mask(lvl);
   }
   /// Set the value of the index level.
   constexpr MultiIndex& set(std::size_t lvl, Value val) {
-    assert((lvl < NumLevels) && "Index level outside allowed range");
+    assert((lvl < kNumLevels) && "Index level outside allowed range");
     // mask of valid bits at the encoded positions for the index level
     Value shiftedMask = (mask(lvl) << shift(lvl));
     // value of the index level shifted to its encoded position
@@ -98,30 +96,30 @@ class MultiIndex {
 
   /// Create index with the selected level increased and levels below zeroed.
   constexpr MultiIndex makeNextSibling(std::size_t lvl) const {
-    assert((lvl < NumLevels) && "Index level outside allowed range");
+    assert((lvl < kNumLevels) && "Index level outside allowed range");
     // remove lower levels by shifting the upper levels to the left edge
     Value upper = (m_value >> shift(lvl));
     // increase to create sibling and shift back to zero lower levels again
-    return ((upper + 1u) << shift(lvl));
+    return MultiIndex{(upper + 1u) << shift(lvl)};
   }
   /// Create index with every level below the selected level maximized.
   constexpr MultiIndex makeLastDescendant(std::size_t lvl) const {
-    assert((lvl < NumLevels) && "Index level outside allowed range");
+    assert((lvl < kNumLevels) && "Index level outside allowed range");
     // mask everything below the selected level
     Value maskLower = (Value{1u} << shift(lvl)) - 1u;
     // replace the masked lower levels w/ ones
-    return (m_value & ~maskLower) | maskLower;
+    return MultiIndex{(m_value & ~maskLower) | maskLower};
   }
 
   /// Get the number of bits for the associated level
   static constexpr std::size_t bits(std::size_t lvl) {
-    assert((lvl < NumLevels) && "Index level outside allowed range");
+    assert((lvl < kNumLevels) && "Index level outside allowed range");
     return s_bits[lvl];
   }
 
  private:
   // per-level mask and right-most bit position for shifting
-  static constexpr std::array<std::size_t, NumLevels> s_bits{BitsPerLevel...};
+  static constexpr std::array<std::size_t, kNumLevels> s_bits{BitsPerLevel...};
   static constexpr std::size_t shift(std::size_t lvl) {
     std::size_t s = 0u;
     // sum up all bits below the requested level
@@ -147,7 +145,7 @@ class MultiIndex {
   friend inline std::ostream& operator<<(std::ostream& os, MultiIndex idx) {
     // one level is always defined
     os << idx.level(0u);
-    for (std::size_t lvl = 1; lvl < NumLevels; ++lvl) {
+    for (std::size_t lvl = 1; lvl < kNumLevels; ++lvl) {
       os << '|' << idx.level(lvl);
     }
     return os;

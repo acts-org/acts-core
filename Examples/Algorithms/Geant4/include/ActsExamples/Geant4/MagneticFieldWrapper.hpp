@@ -34,10 +34,10 @@ class MagneticFieldWrapper : public G4MagneticField {
   ///
   /// @param cfg the configuration struct
   /// @param logger the ACTS logging instance
-  MagneticFieldWrapper(const Config& cfg,
-                       std::unique_ptr<const Acts::Logger> logger =
-                           Acts::getDefaultLogger("MagneticFieldWrapper",
-                                                  Acts::Logging::INFO));
+  explicit MagneticFieldWrapper(
+      const Config& cfg,
+      std::unique_ptr<const Acts::Logger> logger =
+          Acts::getDefaultLogger("MagneticFieldWrapper", Acts::Logging::INFO));
   ~MagneticFieldWrapper() override = default;
 
   /// Public get field interface

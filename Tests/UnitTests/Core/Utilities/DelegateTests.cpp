@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(StatefullLambdas) {
 }
 
 struct CheckDestructor {
-  CheckDestructor(bool* _out) : destructorCalled{_out} {}
+  explicit CheckDestructor(bool* _out) : destructorCalled{_out} {}
 
   bool* destructorCalled;
 

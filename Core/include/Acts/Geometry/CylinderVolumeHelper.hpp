@@ -56,9 +56,10 @@ class CylinderVolumeHelper : public ITrackingVolumeHelper {
   /// Constructor
   /// @param cvhConfig is the configuration struct for this builder
   /// @param logger logging instance
-  CylinderVolumeHelper(const Config& cvhConfig,
-                       std::unique_ptr<const Logger> logger = getDefaultLogger(
-                           "CylinderVolumeHelper", Logging::INFO));
+  explicit CylinderVolumeHelper(const Config& cvhConfig,
+                                std::unique_ptr<const Logger> logger =
+                                    getDefaultLogger("CylinderVolumeHelper",
+                                                     Logging::INFO));
 
   /// Create a TrackingVolume* from a set of layers and (optional) parameters
   ///

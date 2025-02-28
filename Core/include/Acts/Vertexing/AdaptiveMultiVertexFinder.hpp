@@ -169,10 +169,9 @@ class AdaptiveMultiVertexFinder final : public IVertexFinder {
   ///
   /// @param cfg Configuration object
   /// @param logger The logging instance
-  AdaptiveMultiVertexFinder(Config cfg,
-                            std::unique_ptr<const Logger> logger =
-                                getDefaultLogger("AdaptiveMultiVertexFinder",
-                                                 Logging::INFO))
+  explicit AdaptiveMultiVertexFinder(
+      Config cfg, std::unique_ptr<const Logger> logger = getDefaultLogger(
+                      "AdaptiveMultiVertexFinder", Logging::INFO))
       : m_cfg(std::move(cfg)), m_logger(std::move(logger)) {
     if (!m_cfg.extractParameters.connected()) {
       throw std::invalid_argument(

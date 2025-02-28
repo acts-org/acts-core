@@ -89,9 +89,10 @@ class SeedFinder {
   /// The only constructor. Requires a config object.
   /// @param config the configuration for the SeedFinder
   /// @param logger the ACTS logger
-  SeedFinder(const Acts::SeedFinderConfig<external_spacepoint_t>& config,
-             std::unique_ptr<const Acts::Logger> logger =
-                 getDefaultLogger("Finder", Logging::Level::INFO));
+  explicit SeedFinder(
+      const Acts::SeedFinderConfig<external_spacepoint_t>& config,
+      std::unique_ptr<const Acts::Logger> logger =
+          getDefaultLogger("Finder", Logging::Level::INFO));
   SeedFinder(SeedFinder<external_spacepoint_t, grid_t, platform_t>&&) noexcept =
       default;
   SeedFinder& operator=(SeedFinder<external_spacepoint_t, grid_t,

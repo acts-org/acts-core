@@ -53,8 +53,7 @@ Result<typename track_proxy_t::ConstTrackStateProxy> findFirstMeasurementState(
 
   // TODO specialize if track is forward linked
 
-  auto result = Result<TrackStateProxy>::failure(
-      TrackExtrapolationError::CompatibleTrackStateNotFound);
+  std::optional<TrackStateProxy> firstMeasurementOpt;
 
   for (const auto &trackState : track.trackStatesReversed()) {
     bool isMeasurement =
@@ -62,11 +61,16 @@ Result<typename track_proxy_t::ConstTrackStateProxy> findFirstMeasurementState(
     bool isOutlier = trackState.typeFlags().test(TrackStateFlag::OutlierFlag);
 
     if (isMeasurement && !isOutlier) {
-      result = trackState;
+      firstMeasurementOpt = trackState;
     }
   }
 
-  return result;
+  if (firstMeasurementOpt) {
+    return Result<TrackStateProxy>::success(*firstMeasurementOpt);
+  }
+
+  return Result<TrackStateProxy>::failure(
+      TrackExtrapolationError::CompatibleTrackStateNotFound);
 }
 
 template <TrackProxyConcept track_proxy_t>
@@ -80,7 +84,7 @@ Result<typename track_proxy_t::ConstTrackStateProxy> findLastMeasurementState(
     bool isOutlier = trackState.typeFlags().test(TrackStateFlag::OutlierFlag);
 
     if (isMeasurement && !isOutlier) {
-      return trackState;
+      return TrackStateProxy{trackState};
     }
   }
 
@@ -378,8 +382,6 @@ template <TrackProxyConcept track_proxy_t>
 void calculateTrackQuantities(track_proxy_t track)
   requires(!track_proxy_t::ReadOnly)
 {
-  using ConstTrackStateProxy = typename track_proxy_t::ConstTrackStateProxy;
-
   track.chi2() = 0;
   track.nDoF() = 0;
 
@@ -388,7 +390,7 @@ void calculateTrackQuantities(track_proxy_t track)
   track.nSharedHits() = 0;
   track.nOutliers() = 0;
 
-  for (ConstTrackStateProxy trackState : track.trackStatesReversed()) {
+  for (const auto &trackState : track.trackStatesReversed()) {
     ConstTrackStateType typeFlags = trackState.typeFlags();
 
     if (typeFlags.test(Acts::TrackStateFlag::HoleFlag)) {

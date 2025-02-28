@@ -70,8 +70,8 @@ class DBScan {
   /// @param minPoints The minimum number of points to form a cluster.
   /// @param onePointCluster If true, all the noise points are considered as
   /// individual one point clusters.
-  DBScan(scalar_t epsilon = 1.0, std::size_t minPoints = 1,
-         bool onePointCluster = false)
+  explicit DBScan(scalar_t epsilon = 1.0, std::size_t minPoints = 1,
+                  bool onePointCluster = false)
       : m_eps(epsilon),
         m_minPoints(minPoints),
         m_onePointCluster(onePointCluster) {}

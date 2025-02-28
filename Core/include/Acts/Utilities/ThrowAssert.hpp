@@ -25,7 +25,7 @@ class AssertionFailureException : public std::exception {
 
    public:
     /// @brief Converts to string
-    operator std::string() const { return stream.str(); }
+    explicit operator std::string() const { return stream.str(); }
 
     /// @brief Stream operator which takes everything and forwards
     ///        it to the stringstream.
@@ -67,11 +67,12 @@ class AssertionFailureException : public std::exception {
 
 }  // namespace Acts
 
-#define throw_assert(EXPRESSION, MESSAGE)                                   \
-  do {                                                                      \
-    if (!(EXPRESSION)) {                                                    \
-      throw Acts::AssertionFailureException(                                \
-          #EXPRESSION, __FILE__, __LINE__,                                  \
-          (Acts::AssertionFailureException::StreamFormatter() << MESSAGE)); \
-    }                                                                       \
+#define throw_assert(EXPRESSION, MESSAGE)                                      \
+  do {                                                                         \
+    if (!(EXPRESSION)) {                                                       \
+      throw Acts::AssertionFailureException(                                   \
+          #EXPRESSION, __FILE__, __LINE__,                                     \
+          static_cast<std::string>(                                            \
+              Acts::AssertionFailureException::StreamFormatter() << MESSAGE)); \
+    }                                                                          \
   } while (0)

@@ -104,7 +104,7 @@ struct Detector {
       {Acts::GeometryIdentifier().withVolume(3).withLayer(8), resStrip1},
   };
 
-  Detector(const Acts::GeometryContext& geoCtx)
+  explicit Detector(const Acts::GeometryContext& geoCtx)
       : store(geoCtx), geometry(store()) {}
 };
 
@@ -208,7 +208,7 @@ struct Fixture {
 
   std::unique_ptr<const Acts::Logger> logger;
 
-  Fixture(double bz)
+  explicit Fixture(double bz)
       : detector(geoCtx),
         ckf(makeConstantFieldPropagator(detector.geometry, bz)),
         logger(Acts::getDefaultLogger("CkfTest", Acts::Logging::INFO)) {

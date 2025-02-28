@@ -299,7 +299,7 @@ Acts::Result<void> Acts::Propagator<S, N>::initialize(
   static_assert(BoundTrackParametersConcept<parameters_t>,
                 "Parameters do not fulfill bound parameters concept.");
 
-  m_stepper.initialize(state.stepping, start);
+  m_stepper.initialize(state.stepping, start.toBound());
 
   state.position = m_stepper.position(state.stepping);
   state.direction =

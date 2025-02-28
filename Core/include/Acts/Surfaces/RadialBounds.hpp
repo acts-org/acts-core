@@ -42,8 +42,9 @@ class RadialBounds : public DiscBounds {
   /// @param maxR The outer radius
   /// @param halfPhi The half opening angle (Pi for full angular coverage)
   /// @param avgPhi The average phi for the disc/ring sector
-  RadialBounds(double minR, double maxR, double halfPhi = std::numbers::pi,
-               double avgPhi = 0.) noexcept(false)
+  explicit RadialBounds(double minR, double maxR,
+                        double halfPhi = std::numbers::pi,
+                        double avgPhi = 0.) noexcept(false)
       : m_values({minR, maxR, halfPhi, avgPhi}) {
     checkConsistency();
   }
@@ -51,7 +52,7 @@ class RadialBounds : public DiscBounds {
   /// Constructor from array values
   ///
   /// @param values The bound values
-  RadialBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit RadialBounds(const std::array<double, eSize>& values) noexcept(false)
       : m_values(values) {
     checkConsistency();
   }

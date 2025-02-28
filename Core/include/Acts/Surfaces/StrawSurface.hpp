@@ -49,16 +49,16 @@ class StrawSurface : public LineSurface {
   /// frame
   /// @param lbounds are the bounds describing the straw dimensions, can be
   /// optionally nullptr
-  StrawSurface(const Transform3& transform,
-               std::shared_ptr<const LineBounds> lbounds = nullptr);
+  explicit StrawSurface(const Transform3& transform,
+                        std::shared_ptr<const LineBounds> lbounds = nullptr);
 
   /// Constructor from DetectorElementBase : Element proxy
   ///
   /// @param lbounds are the bounds describing the straw dimensions, they must
   /// not be nullptr
   /// @param detelement for which this surface is (at least) one representation
-  StrawSurface(const std::shared_ptr<const LineBounds>& lbounds,
-               const DetectorElementBase& detelement);
+  explicit StrawSurface(const std::shared_ptr<const LineBounds>& lbounds,
+                        const DetectorElementBase& detelement);
 
   /// Copy constructor
   ///

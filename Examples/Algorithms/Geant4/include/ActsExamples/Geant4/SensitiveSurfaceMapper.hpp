@@ -103,10 +103,10 @@ class SensitiveSurfaceMapper {
   ///
   /// @param cfg the configuration struct
   /// @param logger the logging instance
-  SensitiveSurfaceMapper(const Config& cfg,
-                         std::unique_ptr<const Acts::Logger> logger =
-                             Acts::getDefaultLogger("SensitiveSurfaceMapper",
-                                                    Acts::Logging::INFO));
+  explicit SensitiveSurfaceMapper(
+      const Config& cfg,
+      std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
+          "SensitiveSurfaceMapper", Acts::Logging::INFO));
   ~SensitiveSurfaceMapper() = default;
 
   /// Recursive mapping function that walks through the Geant4

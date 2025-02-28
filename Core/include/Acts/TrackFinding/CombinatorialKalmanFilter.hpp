@@ -159,10 +159,13 @@ class CombinatorialKalmanFilter {
  public:
   /// Default constructor is deleted
   CombinatorialKalmanFilter() = delete;
-  /// Constructor from arguments
-  CombinatorialKalmanFilter(propagator_t pPropagator,
-                            std::unique_ptr<const Logger> _logger =
-                                getDefaultLogger("CKF", Logging::INFO))
+
+  /// Constructor with propagator and logging level
+  /// @param pPropagator The propagator used for the track finding
+  /// @param _logger The logger for messages
+  explicit CombinatorialKalmanFilter(propagator_t pPropagator,
+                                     std::unique_ptr<const Logger> _logger =
+                                         getDefaultLogger("CKF", Logging::INFO))
       : m_propagator(std::move(pPropagator)),
         m_logger(std::move(_logger)),
         m_actorLogger{m_logger->cloneWithSuffix("Actor")},

@@ -60,9 +60,10 @@ class MaterialMapper {
   ///
   /// @param cfg the configuration struct
   /// @param mlogger the logger instance
-  MaterialMapper(const Config& cfg,
-                 std::unique_ptr<const Logger> mlogger = getDefaultLogger(
-                     "BinnedSurfaceMaterialAccumulater", Logging::INFO));
+  explicit MaterialMapper(
+      const Config& cfg,
+      std::unique_ptr<const Logger> mlogger =
+          getDefaultLogger("BinnedSurfaceMaterialAccumulater", Logging::INFO));
 
   /// @brief Factory for creating the state
   std::unique_ptr<State> createState() const;

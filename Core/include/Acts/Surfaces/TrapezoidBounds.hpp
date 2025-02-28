@@ -43,13 +43,14 @@ class TrapezoidBounds : public PlanarBounds {
   /// @param halfXposY maximal half length X, definition at positive Y
   /// @param halfY half length Y - defined at x=0
   /// @param rotAngle: rotation angle of the bounds w.r.t coordinate axes
-  TrapezoidBounds(double halfXnegY, double halfXposY, double halfY,
-                  double rotAngle = 0.) noexcept(false);
+  explicit TrapezoidBounds(double halfXnegY, double halfXposY, double halfY,
+                           double rotAngle = 0.) noexcept(false);
 
   /// Constructor for symmetric Trapezoid - from fixed size array
   ///
   /// @param values the values to be stream in
-  TrapezoidBounds(const std::array<double, eSize>& values) noexcept(false);
+  explicit TrapezoidBounds(const std::array<double, eSize>& values) noexcept(
+      false);
 
   BoundsType type() const final { return SurfaceBounds::eTrapezoid; }
 

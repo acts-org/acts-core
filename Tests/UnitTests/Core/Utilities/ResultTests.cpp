@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(TestErrorCodes) {
 }
 
 struct NoCopy {
-  NoCopy(int i) : num(i) {}
+  explicit NoCopy(int i) : num(i) {}
   NoCopy(const NoCopy&) = delete;
   NoCopy& operator=(const NoCopy&) = delete;
   NoCopy(NoCopy&&) = default;
@@ -253,7 +253,7 @@ Result<NoCopy> make_nocopy(int i, bool v = true) {
   if (!v) {
     return MyError::Failure;
   }
-  return i;
+  return NoCopy{i};
 }
 
 BOOST_AUTO_TEST_CASE(CopyBehaviour) {

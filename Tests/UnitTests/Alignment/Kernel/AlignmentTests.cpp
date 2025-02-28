@@ -93,7 +93,7 @@ struct TelescopeDetector {
   /// Default constructor for the Cubic tracking geometry
   ///
   /// @param gctx the geometry context for this geometry at building time
-  TelescopeDetector(std::reference_wrapper<const GeometryContext> gctx)
+  explicit TelescopeDetector(std::reference_wrapper<const GeometryContext> gctx)
       : geoContext(gctx) {
     // Construct the rotation
     rotation.col(0) = Acts::Vector3(0, 0, -1);

@@ -58,8 +58,8 @@ class CsvSeedWriter : public WriterT<TrackParametersContainer> {
   ///
   /// @param config Configuration struct
   /// @param level Message level declaration
-  CsvSeedWriter(const Config& config,
-                Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit CsvSeedWriter(const Config& config,
+                         Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Get readonly access to the config parameters
   const Config& config() const { return m_cfg; }

@@ -164,7 +164,7 @@ class HoughPlane {
 
   /// @brief instantiate the (empty) hough plane
   /// @param cfg: configuration
-  HoughPlane(const HoughPlaneConfig& cfg);
+  explicit HoughPlane(const HoughPlaneConfig& cfg);
 
   /// fill and reset methods to modify the grid content
 
@@ -329,7 +329,7 @@ class LayerGuidedCombinatoric {
   };
   /// @brief constructor
   /// @param cfg: Configuration object
-  LayerGuidedCombinatoric(const LayerGuidedCombinatoricConfig& cfg);
+  explicit LayerGuidedCombinatoric(const LayerGuidedCombinatoricConfig& cfg);
 
   /// @brief main peak finder method.
   /// @param plane: Filled hough plane to search
@@ -378,7 +378,7 @@ class IslandsAroundMax {
   };
   /// @brief constructor.
   /// @param cfg: configuration object
-  IslandsAroundMax(const IslandsAroundMaxConfig& cfg);
+  explicit IslandsAroundMax(const IslandsAroundMaxConfig& cfg);
 
   /// @brief main peak finder method.
   /// @param plane: The filled hough plane to search

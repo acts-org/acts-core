@@ -21,7 +21,8 @@ namespace {
 ///
 /// @brief Struct to cache track-specific matrix operations in Billoir fitter
 struct BilloirTrack {
-  BilloirTrack(const Acts::InputTrack& params) : originalTrack(params) {}
+  explicit BilloirTrack(const Acts::InputTrack& params)
+      : originalTrack(params) {}
 
   BilloirTrack(const BilloirTrack& arg) = default;
 

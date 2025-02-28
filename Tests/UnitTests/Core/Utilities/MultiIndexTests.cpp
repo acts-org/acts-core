@@ -44,14 +44,6 @@ BOOST_AUTO_TEST_CASE(index32_construct) {
     BOOST_CHECK_EQUAL(idx.level(1), 0x24u);
     BOOST_CHECK_EQUAL(idx.level(2), 0x00u);
   }
-  // assign from encoded value
-  {
-    Index32 idx = 0xabcd2400u;
-    BOOST_CHECK_EQUAL(idx.value(), 0xabcd2400u);
-    BOOST_CHECK_EQUAL(idx.level(0), 0xabcdu);
-    BOOST_CHECK_EQUAL(idx.level(1), 0x24u);
-    BOOST_CHECK_EQUAL(idx.level(2), 0x00u);
-  }
 }
 
 BOOST_AUTO_TEST_CASE(index32_set) {
@@ -214,9 +206,9 @@ BOOST_AUTO_TEST_CASE(index32_as_key) {
   BOOST_CHECK(!set.count(Index32(0u)));
   BOOST_CHECK(!set.count(Index32(std::numeric_limits<std::uint32_t>::max())));
   BOOST_CHECK_EQUAL(set.size(), 3);
-  // automatically converts encoded value to MultiIndex
-  BOOST_CHECK(set.count(0x00010204u));
-  BOOST_CHECK(set.count(0x00010304u));
+  // Does not automatically convert encoded value to MultiIndex
+  BOOST_CHECK(set.count(Index32{0x00010204u}));
+  BOOST_CHECK(set.count(Index32{0x00010304u}));
   BOOST_CHECK(set.count(Index32::Encode(2u)));
 }
 

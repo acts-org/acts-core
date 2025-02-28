@@ -25,7 +25,7 @@ struct SurfaceBinningMatcher {
 
   SurfaceBinningMatcher() = default;
 
-  SurfaceBinningMatcher(const std::vector<Range>& tolpars)
+  explicit SurfaceBinningMatcher(const std::vector<Range>& tolpars)
       : tolerances(tolpars) {}
 
   /// Check function for surface equivalent

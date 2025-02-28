@@ -48,8 +48,8 @@ struct GbtsSP {
 template <typename space_point_t>
 class GbtsNode {
  public:
-  GbtsNode(const GbtsSP<space_point_t> &spGbts, float minT = -100.0,
-           float maxT = 100.0)
+  explicit GbtsNode(const GbtsSP<space_point_t> &spGbts, float minT = -100.0,
+                    float maxT = 100.0)
       : m_spGbts(spGbts), m_minCutOnTau(minT), m_maxCutOnTau(maxT) {}
 
   inline void addIn(int i) {
@@ -137,7 +137,7 @@ class GbtsEtaBin {
 template <typename space_point_t>
 class GbtsDataStorage {
  public:
-  GbtsDataStorage(const GbtsGeometry<space_point_t> &g) : m_geo(g) {
+  explicit GbtsDataStorage(const GbtsGeometry<space_point_t> &g) : m_geo(g) {
     m_etaBins.reserve(g.num_bins());
     for (int k = 0; k < g.num_bins(); k++) {
       m_etaBins.emplace_back(GbtsEtaBin<space_point_t>());

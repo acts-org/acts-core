@@ -48,7 +48,8 @@ class RectangleBounds : public PlanarBounds {
   /// Constructor - from fixed size array - generic
   ///
   /// @param values The parameter values
-  RectangleBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit RectangleBounds(const std::array<double, eSize>& values) noexcept(
+      false)
       : m_min({values[eMinX], values[eMinY]}),
         m_max({values[eMaxX], values[eMaxY]}) {
     checkConsistency();

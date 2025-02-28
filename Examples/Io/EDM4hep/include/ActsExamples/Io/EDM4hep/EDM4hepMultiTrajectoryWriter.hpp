@@ -49,7 +49,7 @@ class EDM4hepMultiTrajectoryWriter : public WriterT<TrajectoriesContainer> {
   /// constructor
   /// @param config is the configuration object
   /// @param level is the output logging level
-  EDM4hepMultiTrajectoryWriter(
+  explicit EDM4hepMultiTrajectoryWriter(
       const Config& config, Acts::Logging::Level level = Acts::Logging::INFO);
 
   ProcessCode finalize() final;

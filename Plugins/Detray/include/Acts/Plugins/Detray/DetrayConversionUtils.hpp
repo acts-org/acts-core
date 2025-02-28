@@ -36,7 +36,8 @@ struct Cache {
   /// Explicit constructor with detector volumes
   ///
   /// @param detectorVolumes the number of detector volumes
-  Cache(const std::vector<const Acts::Experimental::DetectorVolume*>& dVolumes)
+  explicit Cache(
+      const std::vector<const Acts::Experimental::DetectorVolume*>& dVolumes)
       : detectorVolumes(dVolumes) {}
 
   /// The volumes of the detector for index lookup

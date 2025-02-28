@@ -26,7 +26,7 @@ class DynamicKeyIterator {
   using pointer = void;
   using reference = void;
 
-  DynamicKeyIterator(typename map_t::const_iterator it) : m_it{it} {}
+  explicit DynamicKeyIterator(typename map_t::const_iterator it) : m_it{it} {}
   DynamicKeyIterator() = default;
 
   DynamicKeyIterator& operator++() {
@@ -56,8 +56,15 @@ static_assert(std::forward_iterator<DynamicKeyIterator<int>>,
 template <typename C>
 class DynamicKeyRange {
  public:
+  using map_t = std::unordered_map<HashedString, std::unique_ptr<C>>;
+
   DynamicKeyRange(DynamicKeyIterator<C> begin, DynamicKeyIterator<C> end)
       : m_begin{begin}, m_end{end} {}
+
+  DynamicKeyRange(typename map_t::const_iterator begin,
+                  typename map_t::const_iterator end)
+      : m_begin{DynamicKeyIterator<C>{begin}},
+        m_end{DynamicKeyIterator<C>{end}} {}
 
   DynamicKeyIterator<C> begin() const { return m_begin; }
   DynamicKeyIterator<C> end() const { return m_end; }

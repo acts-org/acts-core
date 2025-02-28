@@ -123,7 +123,7 @@ class FiniteStateMachine {
 
   /// Constructor from an explicit state. The FSM is initialized to this state.
   /// @param state Initial state for the FSM.
-  FiniteStateMachine(StateVariant state) : m_state(std::move(state)) {}
+  explicit FiniteStateMachine(StateVariant state) : m_state(std::move(state)) {}
 
   /// Get the current state of the FSM (as a variant).
   /// @return StateVariant The current state of the FSM.

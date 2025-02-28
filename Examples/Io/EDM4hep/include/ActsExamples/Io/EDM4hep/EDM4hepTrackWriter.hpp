@@ -37,8 +37,8 @@ class EDM4hepTrackWriter : public WriterT<ConstTrackContainer> {
   /// constructor
   /// @param config is the configuration object
   /// @param level is the output logging level
-  EDM4hepTrackWriter(const Config& config,
-                     Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit EDM4hepTrackWriter(const Config& config,
+                              Acts::Logging::Level level = Acts::Logging::INFO);
 
   ProcessCode finalize() final;
 

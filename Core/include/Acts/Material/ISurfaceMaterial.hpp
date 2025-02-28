@@ -35,13 +35,13 @@ class ISurfaceMaterial {
   /// Constructor
   ///
   /// @param splitFactor is the splitting ratio between pre/post update
-  ISurfaceMaterial(double splitFactor) : m_splitFactor(splitFactor) {}
+  explicit ISurfaceMaterial(double splitFactor) : m_splitFactor(splitFactor) {}
 
   /// Constructor
   ///
   /// @param splitFactor is the splitting ratio between pre/post update
   /// @param mappingType is the type of surface mapping associated to the surface
-  ISurfaceMaterial(double splitFactor, Acts::MappingType mappingType)
+  explicit ISurfaceMaterial(double splitFactor, Acts::MappingType mappingType)
       : m_splitFactor(splitFactor), m_mappingType(mappingType) {}
 
   /// Destructor

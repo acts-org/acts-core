@@ -38,11 +38,13 @@ struct SeedFilterState {
 template <typename external_spacepoint_t>
 class SeedFilter final {
  public:
-  SeedFilter(const SeedFilterConfig& config,
-             IExperimentCuts<external_spacepoint_t>* expCuts = nullptr);
-  SeedFilter(const SeedFilterConfig& config,
-             std::unique_ptr<const Acts::Logger> logger,
-             IExperimentCuts<external_spacepoint_t>* expCuts = nullptr);
+  explicit SeedFilter(
+      const SeedFilterConfig& config,
+      IExperimentCuts<external_spacepoint_t>* expCuts = nullptr);
+  explicit SeedFilter(
+      const SeedFilterConfig& config,
+      std::unique_ptr<const Acts::Logger> logger,
+      IExperimentCuts<external_spacepoint_t>* expCuts = nullptr);
   SeedFilter(const SeedFilter<external_spacepoint_t>&) = delete;
   SeedFilter& operator=(const SeedFilter<external_spacepoint_t>&) = delete;
   SeedFilter(SeedFilter<external_spacepoint_t>&&) noexcept = default;

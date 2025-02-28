@@ -47,10 +47,10 @@ class ParticleKillAction : public G4UserSteppingAction {
   ///
   /// @param cfg the configuration struct
   /// @param logger the ACTS logging instance
-  ParticleKillAction(const Config& cfg,
-                     std::unique_ptr<const Acts::Logger> logger =
-                         Acts::getDefaultLogger("ParticleKillAction",
-                                                Acts::Logging::INFO));
+  explicit ParticleKillAction(const Config& cfg,
+                              std::unique_ptr<const Acts::Logger> logger =
+                                  Acts::getDefaultLogger("ParticleKillAction",
+                                                         Acts::Logging::INFO));
   ~ParticleKillAction() override = default;
 
   /// @brief Called every step, conditionally sets the tracking state to `fStopAndKill`

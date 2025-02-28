@@ -41,7 +41,7 @@ class ScalableBField final : public Acts::MagneticFieldProvider {
   /// @param [in] Bx magnetic field component in global x-direction
   /// @param [in] By magnetic field component in global y-direction
   /// @param [in] Bz magnetic field component in global z-direction
-  ScalableBField(double Bx = 0, double By = 0, double Bz = 0)
+  explicit ScalableBField(double Bx = 0, double By = 0, double Bz = 0)
       : m_BField(Bx, By, Bz) {}
 
   /// @brief retrieve magnetic field value

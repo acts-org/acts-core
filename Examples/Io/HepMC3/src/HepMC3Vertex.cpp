@@ -73,7 +73,7 @@ HepMC3::GenParticlePtr matchParticles(
   const auto id = actsParticle->particleId();
   // Search HepMC3::GenParticle with the same id as the Acts particle
   for (auto& genParticle : genParticles) {
-    if (genParticle->id() == id) {
+    if (genParticle->id() == static_cast<int>(id.value())) {
       // Return particle if found
       return genParticle;
     }

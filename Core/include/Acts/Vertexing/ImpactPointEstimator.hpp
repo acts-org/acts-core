@@ -57,15 +57,15 @@ class ImpactPointEstimator {
     ///
     /// @param bIn The magnetic field
     /// @param prop The propagator
-    Config(std::shared_ptr<const MagneticFieldProvider> bIn,
-           std::shared_ptr<const BasePropagator> prop)
+    explicit Config(std::shared_ptr<const MagneticFieldProvider> bIn,
+                    std::shared_ptr<const BasePropagator> prop)
         : bField(std::move(bIn)), propagator(std::move(prop)) {}
 
     /// @brief Config constructor without B field -> uses NullBField
     /// provided)
     ///
     /// @param prop The propagator
-    Config(std::shared_ptr<const BasePropagator> prop)
+    explicit Config(std::shared_ptr<const BasePropagator> prop)
         : bField{std::make_shared<NullBField>()}, propagator(std::move(prop)) {}
 
     /// Magnetic field
@@ -82,9 +82,10 @@ class ImpactPointEstimator {
   ///
   /// @param cfg Configuration object
   /// @param logger Logging instance
-  ImpactPointEstimator(const Config& cfg,
-                       std::unique_ptr<const Logger> logger = getDefaultLogger(
-                           "ImpactPointEstimator", Logging::INFO))
+  explicit ImpactPointEstimator(const Config& cfg,
+                                std::unique_ptr<const Logger> logger =
+                                    getDefaultLogger("ImpactPointEstimator",
+                                                     Logging::INFO))
       : m_cfg(cfg), m_logger(std::move(logger)) {}
 
   /// @brief Copy constructor to clone logger (class owns a unique pointer to it,

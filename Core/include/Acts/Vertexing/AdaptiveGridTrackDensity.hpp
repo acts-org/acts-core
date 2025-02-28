@@ -87,7 +87,8 @@ class AdaptiveGridTrackDensity {
     double maxRelativeDensityDev = 0.01;
   };
 
-  AdaptiveGridTrackDensity(const Config& cfg);
+  /// Constructor
+  explicit AdaptiveGridTrackDensity(const Config& cfg);
 
   /// @brief Returns the z and t coordinate of maximum (surrounding)
   /// track density

@@ -38,7 +38,7 @@ class DelegateChainBuilder<R(callable_args...), TypeList<payload_types...>,
   DelegateChainBuilder() = default;
 
   template <typename D>
-  DelegateChainBuilder(const D& /*unused*/) {}
+  explicit DelegateChainBuilder(const D& /*unused*/) {}
 
   template <auto Callable, typename payload_type>
   constexpr auto add(payload_type payload)
@@ -87,7 +87,7 @@ class DelegateChainBuilder<R(callable_args...), TypeList<payload_types...>,
   }
 
  private:
-  DelegateChainBuilder(std::tuple<payload_types...> payloads)
+  explicit DelegateChainBuilder(std::tuple<payload_types...> payloads)
       : m_payloads(payloads) {}
 
   struct DispatchBlock {
@@ -130,7 +130,8 @@ class DelegateChainBuilder<R(callable_args...), TypeList<payload_types...>,
       }
     }
 
-    DispatchBlock(tuple_type payloads) : m_payloads(std::move(payloads)) {}
+    explicit DispatchBlock(tuple_type payloads)
+        : m_payloads(std::move(payloads)) {}
 
     tuple_type m_payloads{};
 

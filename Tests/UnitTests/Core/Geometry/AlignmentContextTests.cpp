@@ -40,8 +40,9 @@ struct AlignmentContext {
   AlignmentContext() = default;
 
   /// Constructor with Store and context index
-  AlignmentContext(std::shared_ptr<const std::array<Transform3, 2>> aStore,
-                   unsigned int aIndex = 0)
+  explicit AlignmentContext(
+      std::shared_ptr<const std::array<Transform3, 2>> aStore,
+      unsigned int aIndex = 0)
       : alignmentStore(std::move(aStore)), alignmentIndex(aIndex) {}
 };
 

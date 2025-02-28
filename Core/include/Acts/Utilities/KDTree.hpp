@@ -75,7 +75,7 @@ class KDTree {
   ///
   /// @param d The vector of position-value pairs to construct the k-d tree
   /// from.
-  KDTree(vector_t &&d) : m_elems(d) {
+  explicit KDTree(vector_t &&d) : m_elems(d) {
     // To start out, we need to check whether we need to construct a leaf node
     // or an internal node. We create a leaf only if we have at most as many
     // elements as the number of elements that can fit into a leaf node.

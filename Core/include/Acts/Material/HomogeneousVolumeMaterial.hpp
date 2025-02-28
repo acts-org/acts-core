@@ -25,7 +25,7 @@ class HomogeneousVolumeMaterial : public IVolumeMaterial {
   /// Explicit constructor
   ///
   /// @param material is the material held by this
-  HomogeneousVolumeMaterial(const Material& material);
+  explicit HomogeneousVolumeMaterial(const Material& material);
 
   /// Copy Constructor
   ///

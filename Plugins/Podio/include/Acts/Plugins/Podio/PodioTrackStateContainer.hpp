@@ -207,7 +207,8 @@ class ConstPodioTrackStateContainer final
   /// @warning If the source mutable container is modified, this container
   ///          will be corrupted, as surface buffer and dynamic column state can
   ///          not be synchronized!
-  ConstPodioTrackStateContainer(const MutablePodioTrackStateContainer& other);
+  explicit ConstPodioTrackStateContainer(
+      const MutablePodioTrackStateContainer& other);
 
   ConstPodioTrackStateContainer(const PodioUtil::ConversionHelper& helper,
                                 const podio::Frame& frame,
@@ -356,7 +357,7 @@ class MutablePodioTrackStateContainer final
     : public PodioTrackStateContainerBase,
       public MultiTrajectory<MutablePodioTrackStateContainer> {
  public:
-  MutablePodioTrackStateContainer(PodioUtil::ConversionHelper& helper)
+  explicit MutablePodioTrackStateContainer(PodioUtil::ConversionHelper& helper)
       : m_helper{helper} {
     m_collection = std::make_unique<ActsPodioEdm::TrackStateCollection>();
     m_jacs = std::make_unique<ActsPodioEdm::JacobianCollection>();

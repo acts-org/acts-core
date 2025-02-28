@@ -21,8 +21,8 @@ class LineSurfaceStub : public LineSurface {
   LineSurfaceStub(const Transform3& htrans, double radius, double halfz)
       : GeometryObject(), LineSurface(htrans, radius, halfz) { /* nop */ }
   //
-  LineSurfaceStub(const Transform3& htrans,
-                  std::shared_ptr<const LineBounds> lbounds = nullptr)
+  explicit LineSurfaceStub(const Transform3& htrans,
+                           std::shared_ptr<const LineBounds> lbounds = nullptr)
       : GeometryObject(), LineSurface(htrans, std::move(lbounds)) { /*nop */ }
   //
   LineSurfaceStub(std::shared_ptr<const LineBounds> lbounds,

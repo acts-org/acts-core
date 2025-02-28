@@ -17,7 +17,7 @@ namespace ActsExamples {
 SimBarcode HepMC3Particle::barcode(
     const HepMC3::ConstGenParticlePtr& particle) {
   // TODO this is probably not quite right
-  return particle->id();
+  return SimBarcode{static_cast<SimBarcode::Value>(particle->id())};
 }
 
 SimParticle HepMC3Particle::particle(

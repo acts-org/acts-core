@@ -54,9 +54,10 @@ class PassiveLayerBuilder : public ILayerBuilder {
   ///
   /// @param plConfig is the ocnfiguration struct that steers behavior
   /// @param logger logging instance
-  PassiveLayerBuilder(const Config& plConfig,
-                      std::unique_ptr<const Logger> logger = getDefaultLogger(
-                          "PassiveLayerBuilder", Logging::INFO));
+  explicit PassiveLayerBuilder(const Config& plConfig,
+                               std::unique_ptr<const Logger> logger =
+                                   getDefaultLogger("PassiveLayerBuilder",
+                                                    Logging::INFO));
 
   /// Destructor
   ~PassiveLayerBuilder() override = default;

@@ -57,7 +57,7 @@ class LayerStructureBuilder : public IInternalStructureBuilder {
    public:
     /// Constructor with predefined surfaces
     /// @param isurfaces is the vector of surfaces
-    SurfacesHolder(std::vector<std::shared_ptr<Surface>> isurfaces)
+    explicit SurfacesHolder(std::vector<std::shared_ptr<Surface>> isurfaces)
         : m_surfaces(std::move(isurfaces)) {}
 
     /// Return the surfaces from the holder
@@ -101,9 +101,10 @@ class LayerStructureBuilder : public IInternalStructureBuilder {
   ///
   /// @param cfg is the configuration struct
   /// @param logger logging instance for screen output
-  LayerStructureBuilder(const Config& cfg,
-                        std::unique_ptr<const Logger> logger = getDefaultLogger(
-                            "LayerStructureBuilder", Logging::INFO));
+  explicit LayerStructureBuilder(const Config& cfg,
+                                 std::unique_ptr<const Logger> logger =
+                                     getDefaultLogger("LayerStructureBuilder",
+                                                      Logging::INFO));
 
   /// The interface definition for internal structure creation
   ///

@@ -54,10 +54,10 @@ class DetectorVolumeBuilder : public IDetectorComponentBuilder {
   ///
   /// @param cfg is the configuration struct
   /// @param mlogger logging instance for screen output
-  DetectorVolumeBuilder(const Config& cfg,
-                        std::unique_ptr<const Logger> mlogger =
-                            getDefaultLogger("DetectorVolumeBuilder",
-                                             Logging::INFO));
+  explicit DetectorVolumeBuilder(const Config& cfg,
+                                 std::unique_ptr<const Logger> mlogger =
+                                     getDefaultLogger("DetectorVolumeBuilder",
+                                                      Logging::INFO));
 
   /// Final implementation of a volume builder that is purely defined
   /// by an internal and external structure builder

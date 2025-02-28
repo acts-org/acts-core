@@ -63,14 +63,14 @@ class NumericalTrackLinearizer {
     ///
     /// @param bIn The magnetic field
     /// @param prop The propagator
-    Config(std::shared_ptr<const MagneticFieldProvider> bIn,
-           std::shared_ptr<const BasePropagator> prop)
+    explicit Config(std::shared_ptr<const MagneticFieldProvider> bIn,
+                    std::shared_ptr<const BasePropagator> prop)
         : bField(std::move(bIn)), propagator(std::move(prop)) {}
 
     /// @brief Config constructor without B field -> uses NullBField
     ///
     /// @param prop Propagator
-    Config(std::shared_ptr<const BasePropagator> prop)
+    explicit Config(std::shared_ptr<const BasePropagator> prop)
         : bField{std::make_shared<NullBField>()}, propagator(std::move(prop)) {}
 
     std::shared_ptr<const MagneticFieldProvider> bField;
@@ -89,10 +89,11 @@ class NumericalTrackLinearizer {
   /// @brief Constructor
   ///
   /// @param config Configuration object
-  /// @param _logger Logger instance
-  NumericalTrackLinearizer(const Config& config,
-                           std::unique_ptr<const Logger> _logger =
-                               getDefaultLogger("NumTrkLinProp", Logging::INFO))
+  /// @param _logger Logging instance
+  explicit NumericalTrackLinearizer(
+      const Config& config,
+      std::unique_ptr<const Logger> _logger = getDefaultLogger("NumTrkLinProp",
+                                                               Logging::INFO))
       : m_cfg(config), m_logger{std::move(_logger)} {}
 
   /// @brief Function that linearizes BoundTrackParameters at

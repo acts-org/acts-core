@@ -59,8 +59,8 @@ class RootTrackParameterWriter final
   ///
   /// @param config Configuration struct
   /// @param level Message level declaration
-  RootTrackParameterWriter(const Config& config,
-                           Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit RootTrackParameterWriter(
+      const Config& config, Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Virtual destructor
   ~RootTrackParameterWriter() override;

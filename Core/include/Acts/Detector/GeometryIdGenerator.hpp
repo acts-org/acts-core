@@ -70,9 +70,10 @@ class GeometryIdGenerator final : public IGeometryIdGenerator {
   ///
   /// @param cfg is the geometry configuration object
   /// @param mlogger is the logging instance
-  GeometryIdGenerator(const Config& cfg,
-                      std::unique_ptr<const Logger> mlogger = getDefaultLogger(
-                          "GeometryIdGenerator", Logging::INFO))
+  explicit GeometryIdGenerator(const Config& cfg,
+                               std::unique_ptr<const Logger> mlogger =
+                                   getDefaultLogger("GeometryIdGenerator",
+                                                    Logging::INFO))
       : m_cfg(cfg), m_logger(std::move(mlogger)) {}
 
   ~GeometryIdGenerator() override = default;
@@ -142,10 +143,10 @@ class ChainedGeometryIdGenerator : public IGeometryIdGenerator {
   ///
   /// @param gens the updators to be called in chain
   /// @param mlogger is the logging instance
-  ChainedGeometryIdGenerator(const std::tuple<generators_t...>&& gens,
-                             std::unique_ptr<const Logger> mlogger =
-                                 getDefaultLogger("ChainedGeometryIdGenerator",
-                                                  Logging::INFO))
+  explicit ChainedGeometryIdGenerator(
+      const std::tuple<generators_t...>&& gens,
+      std::unique_ptr<const Logger> mlogger =
+          getDefaultLogger("ChainedGeometryIdGenerator", Logging::INFO))
       : generators(std::move(gens)), m_logger(std::move(mlogger)) {}
 
   /// @brief Interface method to generate a geometry id cache

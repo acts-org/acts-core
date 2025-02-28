@@ -36,7 +36,7 @@ class GlobalToZPhi final : public Acts::GridAccess::IGlobalToGridLocal {
  public:
   double zShift = 0.;
 
-  GlobalToZPhi(double shift) : zShift(shift) {}
+  explicit GlobalToZPhi(double shift) : zShift(shift) {}
 
   std::array<double, 2u> g2ZPhi(const Acts::Vector3& global) const {
     return {global.z() + zShift, Acts::VectorHelpers::phi(global)};
@@ -48,7 +48,7 @@ class LocalToZPhi final : public Acts::GridAccess::IBoundToGridLocal {
  public:
   double radius = 1.;
 
-  LocalToZPhi(double r) : radius(r) {}
+  explicit LocalToZPhi(double r) : radius(r) {}
 
   std::array<double, 2u> l2ZPhi(const Acts::Vector2& local) const {
     return {local[1u], local[0u] / radius};

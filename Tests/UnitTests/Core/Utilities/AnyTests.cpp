@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(AnyConstructCustom) {
 BOOST_AUTO_TEST_CASE(AnyConstructCustomInPlace) {
   struct A {
     int value;
-    A(int v) { value = v; }
+    explicit A(int v) { value = v; }
   };
 
   Any a{std::in_place_type<A>, 42};
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(AnyCopy) {
 
 struct D {
   bool* destroyed;
-  D(bool* d) : destroyed{d} {}
+  explicit D(bool* d) : destroyed{d} {}
   ~D() { *destroyed = true; }
 };
 
@@ -182,7 +182,7 @@ struct D2 {
   bool* destroyed{nullptr};
   std::array<char, 512> blob{};
 
-  D2(bool* d) : destroyed{d} {}
+  explicit D2(bool* d) : destroyed{d} {}
 
   ~D2() { *destroyed = true; }
 };
@@ -337,7 +337,7 @@ struct D3 {
   std::size_t* destroyed{nullptr};
   std::array<char, 512> blob{};
 
-  D3(std::size_t* d) : destroyed{d} {}
+  explicit D3(std::size_t* d) : destroyed{d} {}
 
   ~D3() { (*destroyed)++; }
 };
@@ -372,7 +372,7 @@ template <>
 struct Lifecycle<0> {
   LifecycleCounters* counters;
 
-  Lifecycle(LifecycleCounters* _counters) : counters{_counters} {}
+  explicit Lifecycle(LifecycleCounters* _counters) : counters{_counters} {}
 
   Lifecycle(Lifecycle&& o) {
     counters = o.counters;
@@ -403,7 +403,7 @@ template <std::size_t PADDING>
 struct Lifecycle : public Lifecycle<0> {
   std::array<char, PADDING> m_padding{};
 
-  Lifecycle(LifecycleCounters* _counters) : Lifecycle<0>(_counters) {}
+  explicit Lifecycle(LifecycleCounters* _counters) : Lifecycle<0>(_counters) {}
 };
 
 template <std::size_t PADDING>

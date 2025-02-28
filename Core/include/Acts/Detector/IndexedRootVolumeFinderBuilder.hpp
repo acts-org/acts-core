@@ -26,7 +26,8 @@ class IndexedRootVolumeFinderBuilder final : public IRootVolumeFinderBuilder {
  public:
   /// @brief Constructor with binning casts
   /// @param binning the cast values for the grid binning
-  IndexedRootVolumeFinderBuilder(std::vector<Acts::AxisDirection> binning);
+  explicit IndexedRootVolumeFinderBuilder(
+      std::vector<Acts::AxisDirection> binning);
 
   /// The virtual interface definition for root volume finder builders
   ///

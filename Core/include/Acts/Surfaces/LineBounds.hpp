@@ -27,16 +27,17 @@ class LineBounds : public SurfaceBounds {
 
   /// Constructor
   ///
-  /// @param r is the radius of the cylinder, default = 0.
-  /// @param halfZ is the half length in z, default = 0.
-  LineBounds(double r, double halfZ) noexcept(false) : m_values({r, halfZ}) {
+  /// @param r The radius of the line
+  /// @param halfZ The half length in z
+  explicit LineBounds(double r, double halfZ) noexcept(false)
+      : m_values({r, halfZ}) {
     checkConsistency();
   }
 
   /// Constructor - from fixed size array
   ///
-  /// @param values The parameter values
-  LineBounds(const std::array<double, eSize>& values) noexcept(false)
+  /// @param values The bound values stored in a fixed size array
+  explicit LineBounds(const std::array<double, eSize>& values) noexcept(false)
       : m_values(values) {
     checkConsistency();
   }

@@ -50,6 +50,8 @@ auto kalmanHandleMeasurement(
   typename traj_t::TrackStateProxy trackStateProxy =
       fittedStates.makeTrackState(mask, lastTrackIndex);
 
+  typename traj_t::ConstTrackStateProxy trackStateProxyConst{trackStateProxy};
+
   // Set the trackStateProxy components with the state from the ongoing
   // propagation
   {
@@ -91,7 +93,7 @@ auto kalmanHandleMeasurement(
     // - tag it as a measurement
     // - update the stepping state.
     // Else, just tag it as an outlier
-    if (!extensions.outlierFinder(trackStateProxy)) {
+    if (!extensions.outlierFinder(trackStateProxyConst)) {
       // Run Kalman update
       auto updateRes =
           extensions.updater(state.geoContext, trackStateProxy, logger);

@@ -55,10 +55,11 @@ class TrackingGeometry {
   /// @param hook Identifier hook to be applied to surfaces
   /// @param logger instance of a logger (defaulting to the "silent" one)
   /// @param close If true, run the Gen1 geometry closure
-  TrackingGeometry(const std::shared_ptr<TrackingVolume>& highestVolume,
-                   const IMaterialDecorator* materialDecorator = nullptr,
-                   const GeometryIdentifierHook& hook = {},
-                   const Logger& logger = getDummyLogger(), bool close = true);
+  explicit TrackingGeometry(
+      const std::shared_ptr<TrackingVolume>& highestVolume,
+      const IMaterialDecorator* materialDecorator = nullptr,
+      const GeometryIdentifierHook& hook = {},
+      const Logger& logger = getDummyLogger(), bool close = true);
 
   /// Destructor
   ~TrackingGeometry();

@@ -52,10 +52,10 @@ class SimParticleTranslation final : public G4VUserPrimaryGeneratorAction {
   ///
   /// @param cfg the configuration struct
   /// @param logger the ACTS logging instance
-  SimParticleTranslation(const Config& cfg,
-                         std::unique_ptr<const Acts::Logger> logger =
-                             Acts::getDefaultLogger("SimParticleTranslation",
-                                                    Acts::Logging::INFO));
+  explicit SimParticleTranslation(
+      const Config& cfg,
+      std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
+          "SimParticleTranslation", Acts::Logging::INFO));
 
   ~SimParticleTranslation() override;
 

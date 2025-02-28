@@ -94,7 +94,8 @@ std::uniform_int_distribution<std::uint32_t> nTracksDist(3, 10);
 
 // Dummy user-defined InputTrack type
 struct InputTrackStub {
-  InputTrackStub(const BoundTrackParameters& params) : m_parameters(params) {}
+  explicit InputTrackStub(const BoundTrackParameters& params)
+      : m_parameters(params) {}
 
   const BoundTrackParameters& parameters() const { return m_parameters; }
 

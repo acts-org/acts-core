@@ -25,8 +25,8 @@ struct VolumeSelector {
   /// @param sMaterial is the directive to select material volumes
   /// @param sLayer is the directive to select volumes with layers
   /// @param sPassive is the directive to select passive volumes
-  VolumeSelector(bool sMaterial = true, bool sLayer = false,
-                 bool sPassive = false)
+  explicit VolumeSelector(bool sMaterial = true, bool sLayer = false,
+                          bool sPassive = false)
       : selectMaterial(sMaterial),
         selectLayer(sLayer),
         selectPassive(sPassive) {}

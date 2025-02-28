@@ -106,7 +106,7 @@ struct PropagatorOptions : public detail::PurePropagatorPlainOptions {
         navigation(gctx) {}
 
   /// PropagatorOptions with context and plain options
-  PropagatorOptions(const PropagatorPlainOptions& pOptions)
+  explicit PropagatorOptions(const PropagatorPlainOptions& pOptions)
       : geoContext(pOptions.geoContext),
         magFieldContext(pOptions.magFieldContext),
         stepping(pOptions.geoContext, pOptions.magFieldContext),
@@ -115,7 +115,7 @@ struct PropagatorOptions : public detail::PurePropagatorPlainOptions {
   }
 
   /// @brief Convert to plain options
-  operator PropagatorPlainOptions() const {
+  explicit operator PropagatorPlainOptions() const {
     PropagatorPlainOptions pOptions(geoContext, magFieldContext);
     static_cast<PurePropagatorPlainOptions&>(pOptions) =
         static_cast<const PurePropagatorPlainOptions&>(*this);

@@ -37,7 +37,7 @@ class ZScanVertexFinder final : public IVertexFinder {
     /// @brief Finder configuration
     ///
     /// @param ipEst ImpactPointEstimator
-    Config(const ImpactPointEstimator& ipEst) : ipEstimator(ipEst) {}
+    explicit Config(const ImpactPointEstimator& ipEst) : ipEstimator(ipEst) {}
 
     // ImpactPointEstimator
     ImpactPointEstimator ipEstimator;
@@ -72,9 +72,10 @@ class ZScanVertexFinder final : public IVertexFinder {
   ///
   /// @param cfg Configuration object
   /// @param logger Logging instance
-  ZScanVertexFinder(const Config& cfg,
-                    std::unique_ptr<const Logger> logger =
-                        getDefaultLogger("ZScanVertexFinder", Logging::INFO));
+  explicit ZScanVertexFinder(const Config& cfg,
+                             std::unique_ptr<const Logger> logger =
+                                 getDefaultLogger("ZScanVertexFinder",
+                                                  Logging::INFO));
 
   /// @brief Function that determines single vertex,
   /// based on z0 values of input tracks,

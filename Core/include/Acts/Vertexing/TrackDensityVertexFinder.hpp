@@ -66,7 +66,7 @@ class TrackDensityVertexFinder final : public IVertexFinder {
   /// @brief Constructor for user-defined InputTrack type
   ///
   /// @param cfg Configuration object
-  TrackDensityVertexFinder(const Config& cfg) : m_cfg(cfg) {}
+  explicit TrackDensityVertexFinder(const Config& cfg) : m_cfg(cfg) {}
 
  private:
   Config m_cfg;

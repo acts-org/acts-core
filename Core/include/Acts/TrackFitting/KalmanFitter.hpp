@@ -15,6 +15,7 @@
 #include "Acts/EventData/MultiTrajectoryHelpers.hpp"
 #include "Acts/EventData/SourceLink.hpp"
 #include "Acts/EventData/TrackParameters.hpp"
+#include "Acts/EventData/TrackStateType.hpp"
 #include "Acts/EventData/VectorMultiTrajectory.hpp"
 #include "Acts/Geometry/GeometryContext.hpp"
 #include "Acts/MagneticField/MagneticFieldContext.hpp"
@@ -267,9 +268,9 @@ class KalmanFitter {
       std::is_same_v<KalmanNavigator, DirectNavigator>;
 
  public:
-  KalmanFitter(propagator_t pPropagator,
-               std::unique_ptr<const Logger> _logger =
-                   getDefaultLogger("KalmanFitter", Logging::INFO))
+  explicit KalmanFitter(propagator_t pPropagator,
+                        std::unique_ptr<const Logger> _logger =
+                            getDefaultLogger("KalmanFitter", Logging::INFO))
       : m_propagator(std::move(pPropagator)),
         m_logger{std::move(_logger)},
         m_actorLogger{m_logger->cloneWithSuffix("Actor")} {}
@@ -406,8 +407,8 @@ class KalmanFitter {
           // Remove the missing surfaces that occur after the last measurement
           result.missedActiveSurfaces.resize(result.measurementHoles);
           // now get track state proxy for the smoothing logic
-          auto trackStateProxy =
-              result.fittedStates->getTrackState(result.lastMeasurementIndex);
+          typename traj_t::ConstTrackStateProxy trackStateProxy{
+              result.fittedStates->getTrackState(result.lastMeasurementIndex)};
           if (reversedFiltering ||
               extensions.reverseFilteringLogic(trackStateProxy)) {
             // Start to run reversed filtering:

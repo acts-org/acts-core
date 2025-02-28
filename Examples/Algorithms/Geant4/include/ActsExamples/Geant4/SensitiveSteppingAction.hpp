@@ -50,10 +50,10 @@ class SensitiveSteppingAction : public G4UserSteppingAction {
   ///
   /// @param cfg the configuration struct
   /// @param logger the ACTS logging instance
-  SensitiveSteppingAction(const Config& cfg,
-                          std::unique_ptr<const Acts::Logger> logger =
-                              Acts::getDefaultLogger("SensitiveSteppingAction",
-                                                     Acts::Logging::INFO));
+  explicit SensitiveSteppingAction(
+      const Config& cfg,
+      std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
+          "SensitiveSteppingAction", Acts::Logging::INFO));
   ~SensitiveSteppingAction() override = default;
 
   /// @brief Interface Method doing the step and records the data

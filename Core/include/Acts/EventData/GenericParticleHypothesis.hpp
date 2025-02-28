@@ -45,7 +45,7 @@ class GenericParticleHypothesis {
   /// If the lookup fails an exception is thrown.
   ///
   /// @param absPdg the absolute PDG
-  GenericParticleHypothesis(PdgParticle absPdg)
+  explicit GenericParticleHypothesis(PdgParticle absPdg)
       : m_absPdg{absPdg},
         m_mass{findMass(absPdg).value()},
         m_chargeType{std::abs(findCharge(absPdg).value())} {
@@ -57,7 +57,7 @@ class GenericParticleHypothesis {
   ///
   /// @note This enables implicit conversion.
   template <typename other_charge_t>
-  constexpr GenericParticleHypothesis(
+  explicit constexpr GenericParticleHypothesis(
       const GenericParticleHypothesis<other_charge_t>& other)
       : m_absPdg{other.absolutePdg()},
         m_mass{other.mass()},

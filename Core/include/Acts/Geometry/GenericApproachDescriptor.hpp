@@ -35,7 +35,7 @@ class GenericApproachDescriptor : public ApproachDescriptor {
   /// passing ownership
   ///
   /// @param aSurfaces are the approach surfaces
-  GenericApproachDescriptor(
+  explicit GenericApproachDescriptor(
       std::vector<std::shared_ptr<const Surface>> aSurfaces)
       : ApproachDescriptor(),
         m_surfaces(std::move(aSurfaces)),

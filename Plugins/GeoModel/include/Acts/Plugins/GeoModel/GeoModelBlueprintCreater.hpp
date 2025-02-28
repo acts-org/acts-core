@@ -98,10 +98,10 @@ class GeoModelBlueprintCreater {
   ///
   /// @param cfg the configuration struct
   /// @param mlogger a screen output logger
-  GeoModelBlueprintCreater(const Config& cfg,
-                           std::unique_ptr<const Logger> mlogger =
-                               getDefaultLogger("GeoModelBlueprintCreater",
-                                                Acts::Logging::INFO));
+  explicit GeoModelBlueprintCreater(
+      const Config& cfg,
+      std::unique_ptr<const Logger> mlogger =
+          getDefaultLogger("GeoModelBlueprintCreater", Acts::Logging::INFO));
 
   /// Method that reads the GeoModel blueprint from database
   ///

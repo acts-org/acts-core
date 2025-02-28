@@ -97,7 +97,7 @@ class PathSeeder {
   };
 
   /// @brief Constructor
-  PathSeeder(const Config& config) : m_cfg(config) {};
+  explicit PathSeeder(const Config& config) : m_cfg(config) {};
 
   /// @brief Destructor
   ~PathSeeder() = default;

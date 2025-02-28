@@ -20,7 +20,7 @@ class NullBField final : public MagneticFieldProvider {
  public:
   struct Cache {
     /// @brief constructor with context
-    Cache(const MagneticFieldContext& /*mcfg*/) {}
+    explicit Cache(const MagneticFieldContext& /*mcfg*/) {}
   };
 
   /// @brief Default constructor

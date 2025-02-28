@@ -59,7 +59,7 @@ class GaussianTrackDensity {
 
   /// @brief The Config struct
   struct Config {
-    Config(double d0Sig = 3.5, double z0Sig = 12.)
+    explicit Config(double d0Sig = 3.5, double z0Sig = 12.)
         : d0MaxSignificance(d0Sig),
           z0MaxSignificance(z0Sig),
           d0SignificanceCut(d0Sig * d0Sig),
@@ -84,13 +84,13 @@ class GaussianTrackDensity {
   /// @brief The State struct
   struct State {
     // Constructor with size track map
-    State(unsigned int nTracks) { trackEntries.reserve(nTracks); }
+    explicit State(unsigned int nTracks) { trackEntries.reserve(nTracks); }
     // Vector to cache track information
     std::vector<TrackEntry> trackEntries;
   };
 
   /// Constructor with config
-  GaussianTrackDensity(const Config& cfg) : m_cfg(cfg) {
+  explicit GaussianTrackDensity(const Config& cfg) : m_cfg(cfg) {
     if (!m_cfg.extractParameters.connected()) {
       throw std::invalid_argument(
           "GaussianTrackDensity: "
@@ -175,7 +175,8 @@ class GaussianTrackDensity {
   class GaussianTrackDensityStore {
    public:
     // Initialise at the z coordinate at which the density is to be evaluated
-    GaussianTrackDensityStore(double z_coordinate) : m_z(z_coordinate) {}
+    explicit GaussianTrackDensityStore(double z_coordinate)
+        : m_z(z_coordinate) {}
 
     // Add the contribution of a single track to the density
     void addTrackToDensity(const TrackEntry& entry);

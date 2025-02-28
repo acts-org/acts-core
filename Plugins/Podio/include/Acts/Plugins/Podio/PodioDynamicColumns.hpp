@@ -68,8 +68,8 @@ struct DynamicColumnBase : public ConstDynamicColumnBase {
 
 template <typename T>
 struct DynamicColumn : public DynamicColumnBase {
-  DynamicColumn(std::string_view name,
-                podio::UserDataCollection<T> collection = {})
+  explicit DynamicColumn(std::string_view name,
+                         podio::UserDataCollection<T> collection = {})
       : DynamicColumnBase(name), m_collection{std::move(collection)} {}
 
   std::any get(std::size_t i) override { return &m_collection.vec().at(i); }

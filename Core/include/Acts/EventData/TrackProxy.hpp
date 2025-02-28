@@ -111,16 +111,29 @@ class TrackProxy {
   ///
   /// @{
 
-  /// Copy constructor from a mutable track proxy. This is always valid, either
-  /// mutable to mutable or mutable to const
-  /// @param other the other track state proxy
-  TrackProxy(const MutableTrackProxy& other)
+  /// Copy constructor: const to const or mutable to mutable
+  /// @param other the other track proxy
+  TrackProxy(const TrackProxy& other) = default;
+
+  /// Copy assignment operator: const to const or mutable to mutable
+  /// @param other the other track proxy
+  /// @return reference to this track proxy
+  TrackProxy& operator=(const TrackProxy& other) = default;
+
+  /// Constructor from mutable track proxy
+  /// @note Only available if the track proxy is read-only
+  /// @param other the other track proxy
+  explicit TrackProxy(const MutableTrackProxy& other)
+    requires ReadOnly
       : m_container{other.m_container}, m_index{other.m_index} {}
 
-  /// Copy assignment operator from mutable track proxy. This is always valid,
-  /// either mutable to mutable or mutable to const
-  /// @param other the other track state proxy
-  TrackProxy& operator=(const MutableTrackProxy& other) {
+  /// Copy assignment operator from mutable track proxy
+  /// @note Only available if the track proxy is read-only
+  /// @param other the other track proxy
+  /// @return reference to this track proxy
+  TrackProxy& operator=(const MutableTrackProxy& other)
+    requires ReadOnly
+  {
     m_container = other.m_container;
     m_index = other.m_index;
     return *this;

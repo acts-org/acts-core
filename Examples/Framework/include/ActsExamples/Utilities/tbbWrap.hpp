@@ -49,7 +49,8 @@ class task_arena {
   std::optional<tbb::task_arena> tbb;
 
  public:
-  task_arena(int nthreads = tbb::task_arena::automatic, unsigned res = 1) {
+  explicit task_arena(int nthreads = tbb::task_arena::automatic,
+                      unsigned res = 1) {
     if (enableTBB(nthreads)) {
       tbb.emplace(nthreads, res);
     }

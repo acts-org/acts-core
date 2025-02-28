@@ -52,9 +52,10 @@ class GeometryIdMapper final : public IGeometryIdGenerator {
   ///
   /// @param cfg is the geometry configuration object
   /// @param mlogger is the logging instance
-  GeometryIdMapper(const Config& cfg,
-                   std::unique_ptr<const Logger> mlogger =
-                       getDefaultLogger("GeometryIdMapper", Logging::INFO))
+  explicit GeometryIdMapper(const Config& cfg,
+                            std::unique_ptr<const Logger> mlogger =
+                                getDefaultLogger("GeometryIdMapper",
+                                                 Logging::INFO))
       : m_cfg(cfg), m_logger(std::move(mlogger)) {}
 
   ~GeometryIdMapper() override = default;

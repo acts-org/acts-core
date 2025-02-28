@@ -38,8 +38,8 @@ class GaussianGridTrackDensity {
     /// in the d0-z0 plane. Note: trkGridSize has to be an odd value.
     /// @note The value of @p zMinMax_ together with @p mainGridSize_ determines the
     /// overall bin size to be used as seen below
-    Config(float zMinMax_ = 100, int mainGridSize_ = 2000,
-           int trkGridSize_ = 15)
+    explicit Config(float zMinMax_ = 100, int mainGridSize_ = 2000,
+                    int trkGridSize_ = 15)
         : mainGridSize(mainGridSize_),
           trkGridSize(trkGridSize_),
           zMinMax(zMinMax_) {
@@ -79,7 +79,7 @@ class GaussianGridTrackDensity {
     float maxRelativeDensityDev = 0.01;
   };
 
-  GaussianGridTrackDensity(const Config& cfg) : m_cfg(cfg) {}
+  explicit GaussianGridTrackDensity(const Config& cfg) : m_cfg(cfg) {}
 
   /// @brief Returns the z position of maximum track density
   ///

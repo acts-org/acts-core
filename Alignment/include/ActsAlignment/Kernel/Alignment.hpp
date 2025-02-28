@@ -136,9 +136,10 @@ struct Alignment {
   Alignment() = delete;
 
   /// Constructor from arguments
-  Alignment(fitter_t fitter,
-            std::unique_ptr<const Acts::Logger> _logger =
-                Acts::getDefaultLogger("Alignment", Acts::Logging::INFO))
+  explicit Alignment(fitter_t fitter,
+                     std::unique_ptr<const Acts::Logger> _logger =
+                         Acts::getDefaultLogger("Alignment",
+                                                Acts::Logging::INFO))
       : m_fitter(std::move(fitter)), m_logger{std::move(_logger)} {}
 
   /// @brief evaluate alignment state for a single track

@@ -33,7 +33,7 @@ namespace ActsExamples {
 /// Its lifetime is bound to the lifetime of the white board.
 class WhiteBoard {
  public:
-  WhiteBoard(
+  explicit WhiteBoard(
       std::unique_ptr<const Acts::Logger> logger =
           Acts::getDefaultLogger("WhiteBoard", Acts::Logging::INFO),
       std::unordered_multimap<std::string, std::string> objectAliases = {});

@@ -67,12 +67,14 @@ struct ActorList {
   /// Constructor from tuple
   ///
   /// @param actors Source extensions tuple
-  ActorList(const std::tuple<actors_t...>& actors) : m_actors(actors) {}
+  explicit ActorList(const std::tuple<actors_t...>& actors)
+      : m_actors(actors) {}
 
   /// Constructor from tuple move
   ///
   /// @param actors Source extensions tuple
-  ActorList(std::tuple<actors_t...>&& actors) : m_actors(std::move(actors)) {}
+  explicit ActorList(std::tuple<actors_t...>&& actors)
+      : m_actors(std::move(actors)) {}
 
   /// Const retrieval of an actor of a specific type
   ///

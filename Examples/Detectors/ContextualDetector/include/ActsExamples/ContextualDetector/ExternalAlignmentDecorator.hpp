@@ -46,7 +46,7 @@ class ExternalAlignmentDecorator : public AlignmentDecorator {
   ///
   /// @param cfg Configuration struct
   /// @param logger The logging framework
-  ExternalAlignmentDecorator(
+  explicit ExternalAlignmentDecorator(
       const Config& cfg,
       std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
           "ExternalAlignmentDecorator", Acts::Logging::INFO));

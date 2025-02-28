@@ -41,10 +41,10 @@ class MaterialSteppingAction final : public G4UserSteppingAction {
   ///
   /// @param cfg the configuration struct for this Stepping action
   /// @param logger is an Acts::Logger for unique logging
-  MaterialSteppingAction(const Config& cfg,
-                         std::unique_ptr<const Acts::Logger> logger =
-                             Acts::getDefaultLogger("SimParticleTranslation",
-                                                    Acts::Logging::INFO));
+  explicit MaterialSteppingAction(
+      const Config& cfg,
+      std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
+          "SimParticleTranslation", Acts::Logging::INFO));
   ~MaterialSteppingAction() override;
 
   /// @brief Action per step to be performed

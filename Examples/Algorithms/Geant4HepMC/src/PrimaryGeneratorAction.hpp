@@ -29,7 +29,8 @@ namespace ActsExamples::Geant4::HepMC3 {
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
  public:
   /// Constructor
-  PrimaryGeneratorAction(G4int randomSeed1 = 12345, G4int randomSeed2 = 23456);
+  explicit PrimaryGeneratorAction(G4int randomSeed1 = 12345,
+                                  G4int randomSeed2 = 23456);
   /// Destructor
   ~PrimaryGeneratorAction() override;
 

@@ -97,7 +97,9 @@ struct Factory {
 
   MapHelper m_helper;
 
-  MutablePodioTrackStateContainer create() { return {m_helper}; }
+  MutablePodioTrackStateContainer create() {
+    return MutablePodioTrackStateContainer{m_helper};
+  }
 };
 
 using CommonTests = MultiTrajectoryTestsCommon<Factory>;

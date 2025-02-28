@@ -67,7 +67,7 @@ class CylindricalContainerBuilder : public IDetectorComponentBuilder {
   ///
   /// @param cfg is the configuration struct
   /// @param logger logging instance for screen output
-  CylindricalContainerBuilder(
+  explicit CylindricalContainerBuilder(
       const Config& cfg,
       std::unique_ptr<const Logger> logger =
           getDefaultLogger("CylindricalContainerBuilder", Logging::INFO));
@@ -86,7 +86,7 @@ class CylindricalContainerBuilder : public IDetectorComponentBuilder {
   /// @note that the naming of the builders is taken from the bluprint nodes
   ///
   /// @return a cylindrical container builder representing this blueprint
-  CylindricalContainerBuilder(
+  explicit CylindricalContainerBuilder(
       const Acts::Experimental::Gen2Blueprint::Node& bpNode,
       Acts::Logging::Level logLevel = Acts::Logging::INFO);
 

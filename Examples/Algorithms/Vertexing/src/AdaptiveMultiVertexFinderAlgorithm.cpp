@@ -118,7 +118,8 @@ AdaptiveMultiVertexFinderAlgorithm::makeVertexSeeder() const {
     Acts::GaussianTrackDensity::Config trkDensityCfg;
     trkDensityCfg.extractParameters
         .connect<&Acts::InputTrack::extractParameters>();
-    return std::make_unique<Seeder>(Seeder::Config{trkDensityCfg});
+    return std::make_unique<Seeder>(
+        Seeder::Config{Acts::GaussianTrackDensity(trkDensityCfg)});
   }
 
   if (m_cfg.seedFinder == SeedFinder::AdaptiveGridSeeder) {

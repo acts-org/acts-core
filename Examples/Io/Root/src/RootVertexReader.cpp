@@ -126,7 +126,7 @@ ProcessCode RootVertexReader::read(const AlgorithmContext& context) {
     // TODO ingoing particles
 
     for (auto& id : (*m_outgoingParticles)[i]) {
-      v.outgoing.insert(static_cast<std::uint64_t>(id));
+      v.outgoing.insert(SimBarcode{id});
     }
 
     vertices.insert(v);

@@ -58,7 +58,8 @@ class DiamondBounds : public PlanarBounds {
   /// Constructor - from fixed size array
   ///
   /// @param values The parameter values
-  DiamondBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit DiamondBounds(const std::array<double, eSize>& values) noexcept(
+      false)
       : m_values(values),
         m_boundingBox(
             Vector2{-(*std::max_element(values.begin(), values.begin() + 2)),

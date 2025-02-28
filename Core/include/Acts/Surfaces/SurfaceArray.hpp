@@ -357,12 +357,13 @@ class SurfaceArray {
   struct SingleElementLookup : ISurfaceGridLookup {
     /// @brief Default constructor.
     /// @param element the one and only element.
-    SingleElementLookup(SurfaceVector::value_type element)
+    explicit SingleElementLookup(SurfaceVector::value_type element)
         : m_element({element}) {}
 
     /// @brief Default constructor.
     /// @param elements the surfaces that are provided through a single lookup
-    SingleElementLookup(const SurfaceVector& elements) : m_element(elements) {}
+    explicit SingleElementLookup(const SurfaceVector& elements)
+        : m_element(elements) {}
 
     /// @brief Lookup, always returns @c element
     /// @return reference to vector containing only @c element
@@ -437,13 +438,13 @@ class SurfaceArray {
   /// @param surfaces The input vector of surfaces. This is only for
   /// bookkeeping, so we can ask
   /// @param transform Optional additional transform for this SurfaceArray
-  SurfaceArray(std::unique_ptr<ISurfaceGridLookup> gridLookup,
-               std::vector<std::shared_ptr<const Surface>> surfaces,
-               const Transform3& transform = Transform3::Identity());
+  explicit SurfaceArray(std::unique_ptr<ISurfaceGridLookup> gridLookup,
+                        std::vector<std::shared_ptr<const Surface>> surfaces,
+                        const Transform3& transform = Transform3::Identity());
 
   /// @brief Constructor with a single surface
   /// @param srf The one and only surface
-  SurfaceArray(std::shared_ptr<const Surface> srf);
+  explicit SurfaceArray(std::shared_ptr<const Surface> srf);
 
   /// @brief Get all surfaces in bin given by position.
   /// @param position the lookup position

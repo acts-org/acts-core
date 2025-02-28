@@ -257,7 +257,8 @@ SimParticleContainer RootAthenaDumpReader::readParticles() const {
       continue;
     }
 
-    auto dummyBarcode = concatInts(Part_barcode[ip], Part_event_number[ip]);
+    SimBarcode dummyBarcode{
+        concatInts(Part_barcode[ip], Part_event_number[ip])};
     SimParticleState particle(dummyBarcode,
                               static_cast<Acts::PdgParticle>(Part_pdg_id[ip]));
 
@@ -453,7 +454,7 @@ RootAthenaDumpReader::readMeasurements(
     for (const auto& [subevt, barcode] :
          Acts::zip(CLparticleLink_eventIndex->at(im),
                    CLparticleLink_barcode->at(im))) {
-      auto dummyBarcode = concatInts(barcode, subevt);
+      SimBarcode dummyBarcode{concatInts(barcode, subevt)};
       // If we don't find the particle, create one with default values
       if (particles.find(dummyBarcode) == particles.end()) {
         ACTS_VERBOSE("Particle with subevt " << subevt << ", barcode "

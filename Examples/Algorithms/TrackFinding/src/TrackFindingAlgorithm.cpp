@@ -286,7 +286,7 @@ TrackFindingAlgorithm::TrackFindingAlgorithm(Config config,
   if (m_cfg.trackSelectorCfg.has_value()) {
     m_trackSelector = std::visit(
         [](const auto& cfg) -> std::optional<Acts::TrackSelector> {
-          return {cfg};
+          return Acts::TrackSelector(cfg);
         },
         m_cfg.trackSelectorCfg.value());
   }
@@ -502,8 +502,8 @@ ProcessCode TrackFindingAlgorithm::execute(const AlgorithmContext& ctx) const {
       auto trackCandidate = tracksTemp.makeTrack();
       trackCandidate.copyFrom(firstTrack, true);
 
-      auto firstSmoothingResult =
-          Acts::smoothTrack(ctx.geoContext, trackCandidate, logger());
+      Acts::Result<void> firstSmoothingResult{
+          Acts::smoothTrack(ctx.geoContext, trackCandidate, logger())};
       if (!firstSmoothingResult.ok()) {
         m_nFailedSmoothing++;
         ACTS_ERROR("First smoothing for seed "
@@ -536,10 +536,13 @@ ProcessCode TrackFindingAlgorithm::execute(const AlgorithmContext& ctx) const {
         }
 
         if (firstMeasurementOpt.has_value()) {
-          auto& firstMeasurement = firstMeasurementOpt.value();
+          TrackContainer::TrackStateProxy firstMeasurement{
+              firstMeasurementOpt.value()};
+          TrackContainer::ConstTrackStateProxy firstMeasurementConst{
+              firstMeasurement};
 
           Acts::BoundTrackParameters secondInitialParameters =
-              trackCandidate.createParametersFromState(firstMeasurement);
+              trackCandidate.createParametersFromState(firstMeasurementConst);
 
           if (!secondInitialParameters.referenceSurface().insideBounds(
                   secondInitialParameters.localPosition())) {

@@ -50,9 +50,9 @@ class EllipseBounds : public PlanarBounds {
   /// @param outerRy The outer ellipse radius in y
   /// @param halfPhi spanning phi sector (is set to pi as default)
   /// @param averagePhi average phi (is set to 0. as default)
-  EllipseBounds(double innerRx, double innerRy, double outerRx, double outerRy,
-                double halfPhi = std::numbers::pi,
-                double averagePhi = 0.) noexcept(false)
+  explicit EllipseBounds(double innerRx, double innerRy, double outerRx,
+                         double outerRy, double halfPhi = std::numbers::pi,
+                         double averagePhi = 0.) noexcept(false)
       : m_values({innerRx, innerRy, outerRx, outerRy, halfPhi, averagePhi}),
         m_boundingBox(m_values[eInnerRy], m_values[eOuterRy]) {
     checkConsistency();
@@ -61,7 +61,8 @@ class EllipseBounds : public PlanarBounds {
   /// Constructor - from fixed size array
   ///
   /// @param values The parameter values
-  EllipseBounds(const std::array<double, eSize>& values) noexcept(false)
+  explicit EllipseBounds(const std::array<double, eSize>& values) noexcept(
+      false)
       : m_values(values), m_boundingBox(values[eInnerRy], values[eOuterRy]) {
     checkConsistency();
   }

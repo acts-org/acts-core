@@ -231,16 +231,17 @@ class MultiEigenStepperLoop : public EigenStepper<extension_t> {
   };
 
   /// Constructor from a magnetic field and a optionally provided Logger
-  MultiEigenStepperLoop(std::shared_ptr<const MagneticFieldProvider> bField,
-                        std::unique_ptr<const Logger> logger =
-                            getDefaultLogger("GSF", Logging::INFO))
+  explicit MultiEigenStepperLoop(
+      std::shared_ptr<const MagneticFieldProvider> bField,
+      std::unique_ptr<const Logger> logger = getDefaultLogger("GSF",
+                                                              Logging::INFO))
       : EigenStepper<extension_t>(std::move(bField)),
         m_logger(std::move(logger)) {}
 
   /// Constructor from a configuration and optionally provided Logger
-  MultiEigenStepperLoop(const Config& config,
-                        std::unique_ptr<const Logger> logger =
-                            getDefaultLogger("GSF", Logging::INFO))
+  explicit MultiEigenStepperLoop(const Config& config,
+                                 std::unique_ptr<const Logger> logger =
+                                     getDefaultLogger("GSF", Logging::INFO))
       : EigenStepper<extension_t>(config), m_logger(std::move(logger)) {}
 
   State makeState(const Options& options) const {

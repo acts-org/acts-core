@@ -61,8 +61,8 @@ class DiscSurface : public RegularSurface {
   /// @param rmax The outer radius of the disc surface
   /// @param hphisec The opening angle of the disc surface and is optional
   ///        the default is a full disc
-  DiscSurface(const Transform3& transform, double rmin, double rmax,
-              double hphisec = std::numbers::pi);
+  explicit DiscSurface(const Transform3& transform, double rmin, double rmax,
+                       double hphisec = std::numbers::pi);
 
   /// Constructor for Discs from Transform3, \f$ r_{min}, r_{max}, hx_{min},
   /// hx_{max} \f$
@@ -75,22 +75,23 @@ class DiscSurface : public RegularSurface {
   /// @param maxR The inner radius of the disc surface
   /// @param avephi The position in phi (default is 0.)
   /// @param stereo The optional stereo angle
-  DiscSurface(const Transform3& transform, double minhalfx, double maxhalfx,
-              double minR, double maxR, double avephi = 0., double stereo = 0.);
+  explicit DiscSurface(const Transform3& transform, double minhalfx,
+                       double maxhalfx, double minR, double maxR,
+                       double avephi = 0., double stereo = 0.);
 
   /// Constructor for Discs from Transform3 and shared DiscBounds
   ///
   /// @param transform The transform that positions the disc in global 3D
   /// @param dbounds The disc bounds describing the surface coverage
-  DiscSurface(const Transform3& transform,
-              std::shared_ptr<const DiscBounds> dbounds = nullptr);
+  explicit DiscSurface(const Transform3& transform,
+                       std::shared_ptr<const DiscBounds> dbounds = nullptr);
 
   /// Constructor from DetectorElementBase : Element proxy
   ///
   /// @param dbounds The disc bounds describing the surface coverage
   /// @param detelement The detector element represented by this surface
-  DiscSurface(std::shared_ptr<const DiscBounds> dbounds,
-              const DetectorElementBase& detelement);
+  explicit DiscSurface(std::shared_ptr<const DiscBounds> dbounds,
+                       const DetectorElementBase& detelement);
 
   /// Copy Constructor
   ///

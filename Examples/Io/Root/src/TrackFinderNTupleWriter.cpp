@@ -208,8 +208,8 @@ struct TrackFinderNTupleWriter::Impl {
         for (const auto& phc : particleMatch.contributingParticles) {
           trkParticleId.push_back(phc.particleId.value());
           // count total number of hits for this particle
-          auto trueParticleHits = makeRange(
-              particleMeasurementsMap.equal_range(phc.particleId.value()));
+          auto trueParticleHits =
+              makeRange(particleMeasurementsMap.equal_range(phc.particleId));
           trkParticleNumHitsTotal.push_back(trueParticleHits.size());
           trkParticleNumHitsOnTrack.push_back(phc.hitCount);
         }

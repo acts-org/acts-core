@@ -42,7 +42,8 @@ class GridGlobalIterator {
   /// @param [in] idx The global bin
   ///
   /// @pre Global bin index must be a valid index for the grid
-  GridGlobalIterator(const Acts::Grid<T, Axes...>& grid, std::size_t idx = 0ul);
+  explicit GridGlobalIterator(const Acts::Grid<T, Axes...>& grid,
+                              std::size_t idx = 0ul);
 
   /// @brief Copy constructor
   /// @param [in] other The GlobalBinIterator to be copied

@@ -41,7 +41,7 @@ class Adapter {
   using ValueType = value_type;
 
   Adapter(SpacePointCollection&&) = delete;
-  Adapter(const SpacePointCollection& externalCollection)
+  explicit Adapter(const SpacePointCollection& externalCollection)
       : m_storage(&externalCollection) {}
 
  private:

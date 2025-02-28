@@ -34,12 +34,12 @@ class PerigeeSurface : public LineSurface {
   /// Constructor from GlobalPosition
   ///
   /// @param gp position where the perigee is centered
-  PerigeeSurface(const Vector3& gp);
+  explicit PerigeeSurface(const Vector3& gp);
 
   /// Constructor with a Transform - needed for tilt
   ///
   /// @param transform is the transform for position and tilting
-  PerigeeSurface(const Transform3& transform);
+  explicit PerigeeSurface(const Transform3& transform);
 
   /// Copy constructor
   ///

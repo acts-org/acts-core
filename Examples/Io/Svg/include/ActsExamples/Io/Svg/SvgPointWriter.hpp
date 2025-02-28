@@ -105,8 +105,8 @@ class SvgPointWriter final : public WriterT<GeometryIdMultiset<T>> {
         s_backgroundTrackingGeometryOptions;
   };
 
-  SvgPointWriter(const Config& cfg,
-                 Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit SvgPointWriter(const Config& cfg,
+                          Acts::Logging::Level level = Acts::Logging::INFO);
 
  protected:
   ActsExamples::ProcessCode writeT(

@@ -44,13 +44,13 @@ struct Extendable {
   /// Constructor from tuple
   ///
   /// @param extensions Source extensions tuple
-  Extendable(const std::tuple<extensions_t...>& extensions)
+  explicit Extendable(const std::tuple<extensions_t...>& extensions)
       : m_extensions(extensions) {}
 
   /// Constructor from tuple move
   ///
   /// @param extensions source extensions tuple
-  Extendable(std::tuple<extensions_t...>&& extensions)
+  explicit Extendable(std::tuple<extensions_t...>&& extensions)
       : m_extensions(std::move(extensions)) {}
 
   /// Default move assignment operator

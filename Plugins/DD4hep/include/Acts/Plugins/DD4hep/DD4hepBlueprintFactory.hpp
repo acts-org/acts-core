@@ -50,10 +50,10 @@ class DD4hepBlueprintFactory {
   ///
   /// @param cfg the config object
   /// @param mlogger the logging instance
-  DD4hepBlueprintFactory(const Config& cfg,
-                         std::unique_ptr<const Logger> mlogger =
-                             getDefaultLogger("DD4hepBlueprintFactory",
-                                              Acts::Logging::INFO));
+  explicit DD4hepBlueprintFactory(const Config& cfg,
+                                  std::unique_ptr<const Logger> mlogger =
+                                      getDefaultLogger("DD4hepBlueprintFactory",
+                                                       Acts::Logging::INFO));
 
   /// @brief Create a blueprint from a DD4hep detector element
   ///

@@ -53,7 +53,7 @@ class GeoModelDetectorObjectFactory {
     std::vector<GeoModelBoundingBox> boundingBoxes;
   };
 
-  GeoModelDetectorObjectFactory(
+  explicit GeoModelDetectorObjectFactory(
       const Config& cfg,
       std::unique_ptr<const Logger> mlogger = getDefaultLogger(
           "GeoModelDetectorObjectFactory", Acts::Logging::WARNING));

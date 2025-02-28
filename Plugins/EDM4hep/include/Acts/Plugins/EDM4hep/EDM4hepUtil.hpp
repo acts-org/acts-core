@@ -170,7 +170,7 @@ void writeTrack(const Acts::GeometryContext& gctx, track_proxy_t track,
 }
 
 template <TrackProxyConcept track_proxy_t>
-void readTrack(const edm4hep::Track& from, track_proxy_t track, double Bz,
+void readTrack(const edm4hep::Track& from, track_proxy_t& track, double Bz,
                const Logger& logger = getDummyLogger()) {
   ACTS_VERBOSE("Reading track from EDM4hep");
   TrackStatePropMask mask = TrackStatePropMask::Smoothed;

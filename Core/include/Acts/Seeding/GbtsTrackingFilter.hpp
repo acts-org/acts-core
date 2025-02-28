@@ -33,7 +33,7 @@ struct GbtsEdgeState {
 
   GbtsEdgeState() = default;
 
-  GbtsEdgeState(bool f) : m_initialized(f) {}
+  explicit GbtsEdgeState(bool f) : m_initialized(f) {}
 
   void initialize(GbtsEdge<external_spacepoint_t>* pS) {
     m_initialized = true;

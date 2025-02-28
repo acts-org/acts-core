@@ -52,7 +52,7 @@ struct ValueHolder {
   // @FIXME: Ideally we want this to be explicit, but cannot be explicit,
   // because using an explicit constructor and a deduction guide leads to
   // a SEGFAULT in GCC11 (an up?). Re-evaluate down the line
-  /* explicit */ ValueHolder(T&& _val) : val{std::move(_val)} {}
+  /* explicit */ ValueHolder(T&& _val) : val{std::move(_val)} {}  // NOLINT
 
   // Does it make sense to allow copy operations?
 

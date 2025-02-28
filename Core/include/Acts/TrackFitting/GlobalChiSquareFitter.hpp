@@ -683,9 +683,9 @@ class Gx2Fitter {
       std::is_same_v<Gx2fNavigator, DirectNavigator>;
 
  public:
-  Gx2Fitter(propagator_t pPropagator,
-            std::unique_ptr<const Logger> _logger =
-                getDefaultLogger("Gx2Fitter", Logging::INFO))
+  explicit Gx2Fitter(propagator_t pPropagator,
+                     std::unique_ptr<const Logger> _logger =
+                         getDefaultLogger("Gx2Fitter", Logging::INFO))
       : m_propagator(std::move(pPropagator)),
         m_logger{std::move(_logger)},
         m_actorLogger{m_logger->cloneWithSuffix("Actor")},
@@ -1336,6 +1336,9 @@ class Gx2Fitter {
       // effective number of needed measurements. We might encounter the case,
       // where we cannot use some (parts of a) measurements, maybe if we do not
       // support that kind of measurement. This is also taken into account here.
+      // We skip the check during the first iteration, since we cannot guarantee
+      // to hit all/enough measurement surfaces with the initial parameter
+      // guess.
       // We skip the check during the first iteration, since we cannot guarantee
       // to hit all/enough measurement surfaces with the initial parameter
       // guess.

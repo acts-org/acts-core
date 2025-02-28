@@ -88,7 +88,7 @@ class RiddersPropagator {
   ///
   /// @param [in] propagator Underlying propagator that will be used
   /// @param [in] config Config for the Ridders propagation
-  RiddersPropagator(propagator_t propagator, Config config = {})
+  explicit RiddersPropagator(propagator_t propagator, Config config = {})
       : m_propagator(std::move(propagator)), m_config(std::move(config)) {}
 
   /// @brief Constructor building a propagator
@@ -100,8 +100,9 @@ class RiddersPropagator {
   /// @param [in] navigator Navigator that will be used
   /// @param [in] config Config for the Ridders propagation
   template <typename stepper_t, typename navigator_t = VoidNavigator>
-  RiddersPropagator(stepper_t stepper, navigator_t navigator = navigator_t(),
-                    Config config = {})
+  explicit RiddersPropagator(stepper_t stepper,
+                             navigator_t navigator = navigator_t(),
+                             Config config = {})
       : m_propagator(std::move(stepper), std::move(navigator)),
         m_config(std::move(config)) {}
 

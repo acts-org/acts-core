@@ -259,9 +259,9 @@ class TryAllNavigator : public TryAllNavigatorBase {
   ///
   /// @param cfg The navigator configuration
   /// @param logger a logger instance
-  TryAllNavigator(Config cfg,
-                  std::unique_ptr<const Logger> logger =
-                      getDefaultLogger("TryAllNavigator", Logging::INFO))
+  explicit TryAllNavigator(Config cfg, std::unique_ptr<const Logger> logger =
+                                           getDefaultLogger("TryAllNavigator",
+                                                            Logging::INFO))
       : TryAllNavigatorBase(std::move(cfg), std::move(logger)) {}
 
   State makeState(const Options& options) const {
@@ -583,10 +583,9 @@ class TryAllOverstepNavigator : public TryAllNavigatorBase {
   ///
   /// @param cfg The navigator configuration
   /// @param logger a logger instance
-  TryAllOverstepNavigator(Config cfg,
-                          std::unique_ptr<const Logger> logger =
-                              getDefaultLogger("TryAllOverstepNavigator",
-                                               Logging::INFO))
+  explicit TryAllOverstepNavigator(
+      Config cfg, std::unique_ptr<const Logger> logger = getDefaultLogger(
+                      "TryAllOverstepNavigator", Logging::INFO))
       : TryAllNavigatorBase(std::move(cfg), std::move(logger)) {}
 
   State makeState(const Options& options) const {

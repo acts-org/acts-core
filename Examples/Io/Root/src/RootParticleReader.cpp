@@ -155,7 +155,7 @@ ProcessCode RootParticleReader::read(const AlgorithmContext& context) {
     p.setPdg(static_cast<Acts::PdgParticle>((*m_particleType).at(i)));
     p.setCharge((*m_q).at(i) * Acts::UnitConstants::e);
     p.setMass((*m_m).at(i) * Acts::UnitConstants::GeV);
-    p.setParticleId((*m_particleId).at(i));
+    p.setParticleId(SimBarcode((*m_particleId).at(i)));
 
     SimParticleState& initialState = p.initial();
 

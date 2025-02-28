@@ -133,9 +133,10 @@ class TGeoLayerBuilder : public ILayerBuilder {
   /// Constructor
   /// @param config is the configuration struct
   /// @param logger the local logging instance
-  TGeoLayerBuilder(const Config& config,
-                   std::unique_ptr<const Logger> logger =
-                       getDefaultLogger("TGeoLayerBuilder", Logging::INFO));
+  explicit TGeoLayerBuilder(const Config& config,
+                            std::unique_ptr<const Logger> logger =
+                                getDefaultLogger("TGeoLayerBuilder",
+                                                 Logging::INFO));
 
   /// Destructor
   ~TGeoLayerBuilder() override;

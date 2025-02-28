@@ -46,10 +46,10 @@ class InternalAlignmentDecorator : public AlignmentDecorator {
   ///
   /// @param cfg Configuration struct
   /// @param logger The logging framework
-  InternalAlignmentDecorator(const Config& cfg,
-                             std::unique_ptr<const Acts::Logger> logger =
-                                 Acts::getDefaultLogger("AlignmentDecorator",
-                                                        Acts::Logging::INFO));
+  explicit InternalAlignmentDecorator(
+      const Config& cfg,
+      std::unique_ptr<const Acts::Logger> logger =
+          Acts::getDefaultLogger("AlignmentDecorator", Acts::Logging::INFO));
 
   /// Virtual destructor
   ~InternalAlignmentDecorator() override = default;

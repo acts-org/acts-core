@@ -39,10 +39,10 @@ class ParticleTrackingAction : public G4UserTrackingAction {
   ///
   /// @param cfg the configuration struct
   /// @param logger the ACTS logging instance
-  ParticleTrackingAction(const Config& cfg,
-                         std::unique_ptr<const Acts::Logger> logger =
-                             Acts::getDefaultLogger("ParticleTrackingAction",
-                                                    Acts::Logging::INFO));
+  explicit ParticleTrackingAction(
+      const Config& cfg,
+      std::unique_ptr<const Acts::Logger> logger = Acts::getDefaultLogger(
+          "ParticleTrackingAction", Acts::Logging::INFO));
   ~ParticleTrackingAction() override = default;
 
   /// Action before the track is processed in the

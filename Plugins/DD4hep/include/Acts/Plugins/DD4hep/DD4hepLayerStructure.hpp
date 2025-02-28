@@ -44,7 +44,7 @@ class DD4hepLayerStructure {
   /// @param logger is the screen output logger
   ///
   /// @note this needs to be provided
-  DD4hepLayerStructure(
+  explicit DD4hepLayerStructure(
       std::shared_ptr<DD4hepDetectorSurfaceFactory> surfaceFactory,
       std::unique_ptr<const Logger> logger =
           getDefaultLogger("DD4hepLayerStructure", Acts::Logging::INFO));

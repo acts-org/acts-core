@@ -55,8 +55,8 @@ class CoreMaterialMapping : public IAlgorithm {
   ///
   /// @param cfg The configuration struct carrying the used tools
   /// @param level The output logging level
-  CoreMaterialMapping(const Config& cfg,
-                      Acts::Logging::Level level = Acts::Logging::INFO);
+  explicit CoreMaterialMapping(
+      const Config& cfg, Acts::Logging::Level level = Acts::Logging::INFO);
 
   /// Destructor
   /// - it also writes out the file

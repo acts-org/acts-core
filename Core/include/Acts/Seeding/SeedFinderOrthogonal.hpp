@@ -56,7 +56,7 @@ class SeedFinderOrthogonal {
    * @param config The configuration parameters for this seed finder.
    * @param logger The ACTS logger.
    */
-  SeedFinderOrthogonal(
+  explicit SeedFinderOrthogonal(
       const Acts::SeedFinderOrthogonalConfig<external_spacepoint_t> &config,
       std::unique_ptr<const Acts::Logger> logger =
           Acts::getDefaultLogger("Finder", Logging::Level::INFO));

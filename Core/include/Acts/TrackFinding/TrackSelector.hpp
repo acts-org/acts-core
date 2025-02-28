@@ -159,20 +159,20 @@ class TrackSelector {
     /// Constructor to create a config object that is not upper-bounded.
     /// This is useful to use the "fluent" API to populate the configuration.
     /// @param etaMin Minimum eta bin edge
-    EtaBinnedConfig(double etaMin) : cutSets{}, absEtaEdges{etaMin} {}
+    explicit EtaBinnedConfig(double etaMin) : cutSets{}, absEtaEdges{etaMin} {}
 
     /// Constructor from a vector of eta bin edges. This automatically
     /// initializes all the cuts to be the same for all eta and be essentially
     /// no-op.
     /// @param absEtaEdgesIn is the vector of eta bin edges
-    EtaBinnedConfig(std::vector<double> absEtaEdgesIn)
+    explicit EtaBinnedConfig(std::vector<double> absEtaEdgesIn)
         : absEtaEdges{std::move(absEtaEdgesIn)} {
       cutSets.resize(nEtaBins());
     }
 
     /// Auto-converting constructor from a single cut configuration.
     /// Results in a single absolute eta bin from 0 to infinity.
-    EtaBinnedConfig(Config cutSet) : cutSets{std::move(cutSet)} {}
+    explicit EtaBinnedConfig(Config cutSet) : cutSets{std::move(cutSet)} {}
 
     /// Add a new eta bin with the given upper bound.
     /// @param etaMax Upper bound of the new eta bin
@@ -217,11 +217,11 @@ class TrackSelector {
 
   /// Constructor from a single cut config object
   /// @param config is the configuration object
-  TrackSelector(const Config& config);
+  explicit TrackSelector(const Config& config);
 
   /// Constructor from a multi-eta
   /// @param config is the configuration object
-  TrackSelector(const EtaBinnedConfig& config);
+  explicit TrackSelector(const EtaBinnedConfig& config);
 
   /// Select tracks from an input container and copy them into an output
   /// container

@@ -39,9 +39,10 @@ class LayerArrayCreator : public ILayerArrayCreator {
   /// Constructor
   ///
   /// @param logger logging instance
-  LayerArrayCreator(const Config& /*cfg*/,
-                    std::unique_ptr<const Logger> logger =
-                        getDefaultLogger("LayerArrayCreator", Logging::INFO))
+  explicit LayerArrayCreator(const Config& /*cfg*/,
+                             std::unique_ptr<const Logger> logger =
+                                 getDefaultLogger("LayerArrayCreator",
+                                                  Logging::INFO))
       : m_logger(std::move(logger)) {}
 
   /// Destructor

@@ -45,7 +45,7 @@ class BinnedSurfaceMaterialAccumulater final
   ///
   /// @param cfg the configuration struct
   /// @param mlogger the logger
-  BinnedSurfaceMaterialAccumulater(
+  explicit BinnedSurfaceMaterialAccumulater(
       const Config& cfg,
       std::unique_ptr<const Logger> mlogger =
           getDefaultLogger("BinnedSurfaceMaterialAccumulater", Logging::INFO));

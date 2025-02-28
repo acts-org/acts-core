@@ -64,7 +64,7 @@ class KDTreeTrackingGeometryBuilder : public ITrackingGeometryBuilder {
   ///
   /// @param [in] cfg is the configuration struct for this builder
   /// @param [in] logger logging instance
-  KDTreeTrackingGeometryBuilder(
+  explicit KDTreeTrackingGeometryBuilder(
       const Config& cfg,
       std::unique_ptr<const Logger> logger =
           getDefaultLogger("KDTreeTrackingGeometryBuilder", Logging::INFO));

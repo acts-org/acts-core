@@ -95,16 +95,18 @@ class SurfaceArrayCreator {
   /// Constructor with default config
   ///
   /// @param logger logging instance
-  SurfaceArrayCreator(std::unique_ptr<const Logger> logger = getDefaultLogger(
-                          "SurfaceArrayCreator", Logging::INFO))
+  explicit SurfaceArrayCreator(std::unique_ptr<const Logger> logger =
+                                   getDefaultLogger("SurfaceArrayCreator",
+                                                    Logging::INFO))
       : m_cfg(Config()), m_logger(std::move(logger)) {}
   /// Constructor with explicit config
   ///
   /// @param cfg Explicit config struct
   /// @param logger logging instance
-  SurfaceArrayCreator(const Config& cfg,
-                      std::unique_ptr<const Logger> logger = getDefaultLogger(
-                          "SurfaceArrayCreator", Logging::INFO))
+  explicit SurfaceArrayCreator(const Config& cfg,
+                               std::unique_ptr<const Logger> logger =
+                                   getDefaultLogger("SurfaceArrayCreator",
+                                                    Logging::INFO))
       : m_cfg(cfg), m_logger(std::move(logger)) {}
 
   /// Destructor
