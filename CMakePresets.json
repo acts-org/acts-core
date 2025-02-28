@@ -65,6 +65,7 @@
                 "ACTS_BUILD_PLUGIN_EXATRKX": "OFF",
                 "ACTS_BUILD_PLUGIN_JSON": "ON",
                 "ACTS_BUILD_PLUGIN_ONNX": "OFF",
+                "ACTS_BUILD_PLUGIN_ROOT": "ON",
                 "ACTS_BUILD_PLUGIN_TGEO": "ON",
                 "ACTS_BUILD_EXAMPLES_EDM4HEP": "ON",
                 "ACTS_BUILD_EXAMPLES_EXATRKX": "OFF",

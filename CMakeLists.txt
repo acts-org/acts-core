@@ -86,6 +86,7 @@ option(ACTS_EXATRKX_ENABLE_CUDA "Enable CUDA for the exatrkx plugin" OFF)
 option(ACTS_BUILD_PLUGIN_JSON "Build json plugin" OFF)
 option(ACTS_BUILD_PLUGIN_LEGACY "Build legacy plugin" OFF)
 option(ACTS_BUILD_PLUGIN_ONNX "Build ONNX plugin" OFF)
+option(ACTS_BUILD_PLUGIN_ROOT "Build ROOT plugin" OFF)
 option(ACTS_BUILD_PLUGIN_TGEO "Build TGeo plugin" OFF)
 option(ACTS_SETUP_ANNOY "Explicitly set up Annoy for the project" OFF)
 option(ACTS_BUILD_PLUGIN_HASHING "Build Hashing plugin" OFF)
@@ -169,6 +170,14 @@ set_option_if(
   ACTS_BUILD_PLUGIN_TGEO
   ACTS_BUILD_PLUGIN_DD4HEP OR
   ACTS_BUILD_EXAMPLES
+)
+set_option_if(
+  ACTS_BUILD_PLUGIN_ROOT
+  ACTS_BUILD_PLUGIN_TGEO
+)
+set_option_if(
+  ACTS_BUILD_PLUGIN_ROOT
+  ACTS_BUILD_ANALYSIS_APPS
 )
 set_option_if(
   ACTS_BUILD_PLUGIN_IDENTIFICATION
@@ -408,17 +417,17 @@ if(ACTS_BUILD_PLUGIN_GEOMODEL)
     # find other GeoModel components of EXACT same version
     find_package(GeoModelIO ${GeoModelCore_VERSION} REQUIRED EXACT CONFIG)
 endif()
-if(ACTS_BUILD_PLUGIN_TGEO)
+if(ACTS_BUILD_PLUGIN_ROOT)
     find_package(
         ROOT
         ${_acts_root_version}
         REQUIRED
         CONFIG
-        COMPONENTS Geom Graf
+        COMPONENTS RIO ROOTDataFrame
     )
     check_root_compatibility()
 endif()
-if(ACTS_BUILD_ANALYSIS_APPS)
+if(ACTS_BUILD_PLUGIN_TGEO)
     find_package(
         ROOT
         ${_acts_root_version}

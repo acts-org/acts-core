@@ -15,6 +15,7 @@ add_component_if(Covfie PluginCovfie ACTS_BUILD_PLUGIN_TRACCC)
 add_component_if(Hashing PluginHashing ACTS_BUILD_PLUGIN_HASHING)
 
 # dependent plugins. depend either on a independent plugins or on one another
+add_component_if(Root PluginRoot ACTS_BUILD_PLUGIN_ROOT)
 add_component_if(TGeo PluginTGeo ACTS_BUILD_PLUGIN_TGEO)
 add_component_if(DD4hep PluginDD4hep ACTS_BUILD_PLUGIN_DD4HEP)
 add_component_if(Podio PluginPodio ACTS_BUILD_PLUGIN_PODIO OR ACTS_PLUGIN_EDM4HEP)
