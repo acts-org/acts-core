@@ -165,7 +165,7 @@ std::unique_ptr<TrackingGeometry> Blueprint::construct(
       ACTS_VERBOSE("Volume: " << volume.volumeName());
 
       // Increment the volume ID for this volume
-      m_volumeID = GeometryIdentifier().setVolume(m_volumeID.volume() + 1);
+      m_volumeID = GeometryIdentifier().withVolume(m_volumeID.volume() + 1);
       // Reset portal id for this volume
       m_iportal = 0;
       // Reset sensitive id for this volume
@@ -180,7 +180,7 @@ std::unique_ptr<TrackingGeometry> Blueprint::construct(
       // Increment the portal ID for this portal
       m_iportal += 1;
       // create the portal ID
-      auto portalID = GeometryIdentifier(m_volumeID).setBoundary(m_iportal);
+      auto portalID = GeometryIdentifier(m_volumeID).withBoundary(m_iportal);
       ACTS_VERBOSE("~> Portal ID: " << portalID);
 
       portal.surface().assignGeometryId(portalID);
@@ -192,7 +192,7 @@ std::unique_ptr<TrackingGeometry> Blueprint::construct(
 
         m_isensitive += 1;
         auto surfaceID =
-            GeometryIdentifier(m_volumeID).setSensitive(m_isensitive);
+            GeometryIdentifier(m_volumeID).withSensitive(m_isensitive);
         ACTS_VERBOSE("~> Surface ID: " << surfaceID);
 
         surface.assignGeometryId(surfaceID);

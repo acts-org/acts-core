@@ -60,8 +60,7 @@ class CompBuilder final : public Acts::Experimental::IDetectorComponentBuilder {
       portalContainer[ip] = p;
     }
 
-    Acts::GeometryIdentifier geoID;
-    geoID.setVolume(1);
+    auto geoID = Acts::GeometryIdentifier().withVolume(1);
     dVolume->assignGeometryId(geoID);
 
     return Acts::Experimental::DetectorComponent{
@@ -85,8 +84,7 @@ class SurfaceGeoIdGenerator : public Acts::Experimental::IGeometryIdGenerator {
       Acts::Experimental::IGeometryIdGenerator::GeoIdCache& /*cache*/,
       Acts::Experimental::DetectorVolume& dVolume) const final {
     for (auto [is, s] : Acts::enumerate(dVolume.surfacePtrs())) {
-      Acts::GeometryIdentifier geoID;
-      geoID.setSensitive(is + 1);
+      auto geoID = Acts::GeometryIdentifier().withSensitive(is + 1);
       s->assignGeometryId(geoID);
     }
   }

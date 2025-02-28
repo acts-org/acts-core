@@ -93,9 +93,7 @@ class SurfaceGeoIdGenerator : public Acts::Experimental::IGeometryIdGenerator {
       Acts::Experimental::IGeometryIdGenerator::GeoIdCache& /*cache*/,
       Acts::Experimental::DetectorVolume& dVolume) const final {
     for (auto [is, s] : Acts::enumerate(dVolume.surfacePtrs())) {
-      Acts::GeometryIdentifier geoID;
-      geoID.setPassive(is + 1);
-      s->assignGeometryId(geoID);
+      s->assignGeometryId(GeometryIdentifier().withPassive(is + 1));
     }
   }
 

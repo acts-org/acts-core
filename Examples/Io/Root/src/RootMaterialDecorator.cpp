@@ -112,12 +112,12 @@ ActsExamples::RootMaterialDecorator::RootMaterialDecorator(
       Acts::GeometryIdentifier::Value senID = std::stoi(splitNames[1]);
 
       // Reconstruct the geometry ID
-      Acts::GeometryIdentifier geoID;
-      geoID.setVolume(volID);
-      geoID.setBoundary(bouID);
-      geoID.setLayer(layID);
-      geoID.setApproach(appID);
-      geoID.setSensitive(senID);
+      auto geoID = Acts::GeometryIdentifier()
+                       .withVolume(volID)
+                       .withBoundary(bouID)
+                       .withLayer(layID)
+                       .withApproach(appID)
+                       .withSensitive(senID);
       ACTS_VERBOSE("GeometryIdentifier re-constructed as " << geoID);
 
       // Construct the names
@@ -225,8 +225,7 @@ ActsExamples::RootMaterialDecorator::RootMaterialDecorator(
       Acts::GeometryIdentifier::Value volID = std::stoi(splitNames[0]);
 
       // Reconstruct the geometry ID
-      Acts::GeometryIdentifier geoID;
-      geoID.setVolume(volID);
+      auto geoID = Acts::GeometryIdentifier().withVolume(volID);
       ACTS_VERBOSE("GeometryIdentifier re-constructed as " << geoID);
 
       // Construct the names

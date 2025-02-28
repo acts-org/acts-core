@@ -14,11 +14,11 @@
 void ActsExamples::from_json(const nlohmann::json& data,
                              Acts::GeometryIdentifier& geoId) {
   Acts::GeometryIdentifier::Value null(0u);
-  geoId.setVolume(data.value("volume", null));
-  geoId.setBoundary(data.value("boundary", null));
-  geoId.setLayer(data.value("layer", null));
-  geoId.setApproach(data.value("approach", null));
-  geoId.setSensitive(data.value("sensitive", null));
+  geoId = geoId.withVolume(data.value("volume", null))
+              .withBoundary(data.value("boundary", null))
+              .withLayer(data.value("layer", null))
+              .withApproach(data.value("approach", null))
+              .withSensitive(data.value("sensitive", null));
 }
 
 void ActsExamples::to_json(nlohmann::json& data,

@@ -349,11 +349,11 @@ ProcessCode RootMaterialTrackWriter::writeT(
           vlayerID = mint.volume.geometryId();
           m_vol_id.push_back(vlayerID.value());
         } else {
-          vlayerID.setVolume(0);
-          vlayerID.setBoundary(0);
-          vlayerID.setLayer(0);
-          vlayerID.setApproach(0);
-          vlayerID.setSensitive(0);
+          vlayerID = vlayerID.withVolume(0)
+                         .withBoundary(0)
+                         .withLayer(0)
+                         .withApproach(0)
+                         .withSensitive(0);
           m_vol_id.push_back(vlayerID.value());
         }
       }

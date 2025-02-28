@@ -142,19 +142,36 @@ void addGeometry(Context& ctx) {
     py::class_<Acts::GeometryIdentifier>(m, "GeometryIdentifier")
         .def(py::init<>())
         .def(py::init<Acts::GeometryIdentifier::Value>())
-
-        .def_property("volume", &Acts::GeometryIdentifier::volume,
-                      &Acts::GeometryIdentifier::setVolume)
-        .def_property("layer", &Acts::GeometryIdentifier::layer,
-                      &Acts::GeometryIdentifier::setLayer)
-        .def_property("boundary", &Acts::GeometryIdentifier::boundary,
-                      &Acts::GeometryIdentifier::setBoundary)
-        .def_property("approach", &Acts::GeometryIdentifier::approach,
-                      &Acts::GeometryIdentifier::setApproach)
-        .def_property("sensitive", &Acts::GeometryIdentifier::sensitive,
-                      &Acts::GeometryIdentifier::setSensitive)
-        .def_property("extra", &Acts::GeometryIdentifier::extra,
-                      &Acts::GeometryIdentifier::setExtra)
+        .def_property(
+            "layer", &Acts::GeometryIdentifier::layer,
+            [](GeometryIdentifier& self, GeometryIdentifier::Value value) {
+              self = self.withLayer(value);
+            })
+        .def_property(
+            "volume", &Acts::GeometryIdentifier::volume,
+            [](GeometryIdentifier& self, GeometryIdentifier::Value value) {
+              self = self.withVolume(value);
+            })
+        .def_property(
+            "boundary", &Acts::GeometryIdentifier::boundary,
+            [](GeometryIdentifier& self, GeometryIdentifier::Value value) {
+              self = self.withBoundary(value);
+            })
+        .def_property(
+            "approach", &Acts::GeometryIdentifier::approach,
+            [](GeometryIdentifier& self, GeometryIdentifier::Value value) {
+              self = self.withApproach(value);
+            })
+        .def_property(
+            "sensitive", &Acts::GeometryIdentifier::sensitive,
+            [](GeometryIdentifier& self, GeometryIdentifier::Value value) {
+              self = self.withSensitive(value);
+            })
+        .def_property(
+            "extra", &Acts::GeometryIdentifier::extra,
+            [](GeometryIdentifier& self, GeometryIdentifier::Value value) {
+              self = self.withExtra(value);
+            })
         .def_property_readonly("value", &Acts::GeometryIdentifier::value)
         .def("__str__", [](const Acts::GeometryIdentifier& self) {
           std::stringstream ss;

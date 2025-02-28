@@ -36,7 +36,7 @@ class Gen1GeometryClosureVisitor : public TrackingGeometryMutableVisitor {
     ACTS_DEBUG("Volume: " << volume.volumeName());
 
     // Increment the volume ID for this volume
-    m_volumeID = GeometryIdentifier().setVolume(m_volumeID.volume() + 1);
+    m_volumeID = GeometryIdentifier().withVolume(m_volumeID.volume() + 1);
     // Reset boundary id for this volume
     m_iboundary = 0;
     // Reset layer id for this volume
@@ -70,7 +70,7 @@ class Gen1GeometryClosureVisitor : public TrackingGeometryMutableVisitor {
     auto& bSurface = boundary.surfaceRepresentation();
     // create the boundary surface id
     m_iboundary += 1;
-    auto boundaryID = GeometryIdentifier(m_volumeID).setBoundary(m_iboundary);
+    auto boundaryID = GeometryIdentifier(m_volumeID).withBoundary(m_iboundary);
     ACTS_VERBOSE("~> boundaryID: " << boundaryID);
     // now assign to the boundary surface
     auto& mutableBSurface = *(const_cast<RegularSurface*>(&bSurface));
@@ -91,7 +91,7 @@ class Gen1GeometryClosureVisitor : public TrackingGeometryMutableVisitor {
     ACTS_DEBUG("Close Layer");
     // create the layer identification
     m_ilayer += 1;
-    auto layerID = GeometryIdentifier(m_volumeID).setLayer(m_ilayer);
+    auto layerID = GeometryIdentifier(m_volumeID).withLayer(m_ilayer);
     ACTS_VERBOSE("~> layerID: " << layerID);
 
     // now close the geometry

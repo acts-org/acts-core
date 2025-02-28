@@ -102,8 +102,7 @@ class VolumeGeoIdGenerator : public IGeometryIdGenerator {
                         DetectorVolume& dVolume) const final {
     auto& ccache = std::any_cast<Cache&>(cache);
     ccache.volumeCount += 1;
-    Acts::GeometryIdentifier geoID;
-    geoID.setVolume(ccache.volumeCount);
+    auto geoID = Acts::GeometryIdentifier().withVolume(ccache.volumeCount);
     dVolume.assignGeometryId(geoID);
   }
 

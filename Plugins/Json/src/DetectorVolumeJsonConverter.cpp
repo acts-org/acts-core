@@ -83,8 +83,7 @@ std::shared_ptr<Acts::Experimental::DetectorVolume>
 Acts::DetectorVolumeJsonConverter::fromJson(const GeometryContext& gctx,
                                             const nlohmann::json& jVolume) {
   std::string name = jVolume["name"];
-  GeometryIdentifier geoId;
-  geoId.setVolume(jVolume["geometryId"]);
+  auto geoId = GeometryIdentifier().withVolume(jVolume["geometryId"]);
   Transform3 transform =
       Transform3JsonConverter::fromJson(jVolume["transform"]);
   auto bounds = VolumeBoundsJsonConverter::fromJson(jVolume["bounds"]);

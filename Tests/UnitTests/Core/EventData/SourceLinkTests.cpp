@@ -44,7 +44,7 @@ struct MySourceLink {
 
 BOOST_AUTO_TEST_CASE(Construct) {
   MySourceLink msl;
-  msl.m_geometryId.setSensitive(42);
+  msl.m_geometryId = Acts::GeometryIdentifier().withSensitive(42);
   {
     Acts::SourceLink sl{msl};
     BOOST_CHECK_EQUAL(sl.get<MySourceLink>().geometryId(), msl.geometryId());

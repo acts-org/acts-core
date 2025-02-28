@@ -11,78 +11,56 @@
 #include <ActsExamples/Alignment/AlignmentAlgorithm.hpp>
 
 BOOST_AUTO_TEST_CASE(Single_sensitive_Test) {
-  Acts::GeometryIdentifier geoId;
-  geoId.setSensitive(1);
+  auto geoId = Acts::GeometryIdentifier().withSensitive(1);
   ActsExamples::AlignmentGroup aGroup("test", {geoId});
   BOOST_CHECK(aGroup.has(geoId));
 
-  Acts::GeometryIdentifier badId;
-  badId.setSensitive(2);
+  auto badId = Acts::GeometryIdentifier().withSensitive(2);
   BOOST_CHECK(!aGroup.has(badId));
 }
 
 BOOST_AUTO_TEST_CASE(Single_layer_Test) {
-  Acts::GeometryIdentifier geoId;
-  geoId.setLayer(1);
+  auto geoId = Acts::GeometryIdentifier().withLayer(1);
   ActsExamples::AlignmentGroup aGroup("test", {geoId});
   BOOST_CHECK(aGroup.has(geoId));
 
-  Acts::GeometryIdentifier badId;
-  badId.setLayer(2);
+  auto badId = Acts::GeometryIdentifier().withLayer(2);
   BOOST_CHECK(!aGroup.has(badId));
 }
 
 BOOST_AUTO_TEST_CASE(Single_volume_Test) {
-  Acts::GeometryIdentifier geoId;
-  geoId.setVolume(1);
+  auto geoId = Acts::GeometryIdentifier().withVolume(1);
   ActsExamples::AlignmentGroup aGroup("test", {geoId});
   BOOST_CHECK(aGroup.has(geoId));
 
-  Acts::GeometryIdentifier badId;
-  badId.setVolume(2);
+  auto badId = Acts::GeometryIdentifier().withVolume(2);
   BOOST_CHECK(!aGroup.has(badId));
 }
 
 BOOST_AUTO_TEST_CASE(Hierarchy_test) {
-  Acts::GeometryIdentifier geoId;
-  geoId.setVolume(1);
+  auto geoId = Acts::GeometryIdentifier().withVolume(1);
   ActsExamples::AlignmentGroup aGroup("test", {geoId});
 
-  Acts::GeometryIdentifier geoId2;
-  geoId2.setVolume(1);
-  geoId2.setLayer(2);
+  auto geoId2 = Acts::GeometryIdentifier().withVolume(1).withLayer(2);
   BOOST_CHECK(aGroup.has(geoId2));
 
-  Acts::GeometryIdentifier geoId3;
-  geoId3.setVolume(1);
-  geoId3.setLayer(3);
+  auto geoId3 = Acts::GeometryIdentifier().withVolume(1).withLayer(3);
   BOOST_CHECK(aGroup.has(geoId3));
 }
 
 BOOST_AUTO_TEST_CASE(Hierarchy_test_2) {
-  Acts::GeometryIdentifier geoId;
-  geoId.setVolume(1);
-  geoId.setLayer(1);
+  auto geoId = Acts::GeometryIdentifier().withVolume(1).withLayer(1);
   ActsExamples::AlignmentGroup aGroup("test", {geoId});
 
-  Acts::GeometryIdentifier badId;
-  badId.setVolume(1);
+  auto badId = Acts::GeometryIdentifier().withVolume(1);
   BOOST_CHECK(!aGroup.has(badId));
 }
 
 BOOST_AUTO_TEST_CASE(Multiple_test) {
-  Acts::GeometryIdentifier geoId1;
-  geoId1.setVolume(1);
-  geoId1.setLayer(1);
-  Acts::GeometryIdentifier geoId2;
-  geoId2.setVolume(2);
-  geoId2.setLayer(2);
-  Acts::GeometryIdentifier geoId3;
-  geoId3.setVolume(3);
-  geoId3.setLayer(3);
-  Acts::GeometryIdentifier geoId4;
-  geoId4.setVolume(4);
-  geoId4.setLayer(4);
+  auto geoId1 = Acts::GeometryIdentifier().withVolume(1).withLayer(1);
+  auto geoId2 = Acts::GeometryIdentifier().withVolume(2).withLayer(2);
+  auto geoId3 = Acts::GeometryIdentifier().withVolume(3).withLayer(3);
+  auto geoId4 = Acts::GeometryIdentifier().withVolume(4).withLayer(4);
 
   ActsExamples::AlignmentGroup aGroup("test", {geoId1, geoId2, geoId3});
 

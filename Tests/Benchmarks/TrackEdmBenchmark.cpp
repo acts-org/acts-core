@@ -68,10 +68,7 @@ int main(int /*argc*/, char** /*argv[]*/) {
   VectorTrackContainer vtcOut;
   TrackContainer output{vtcOut, mtjOut};
 
-  GeometryIdentifier gid;
-  gid.setVolume(5);
-  gid.setLayer(3);
-  gid.setSensitive(1);
+  auto gid = GeometryIdentifier().withVolume(5).withLayer(3).withSensitive(1);
 
   static_assert(sizeof(BenchmarkSourceLink) <= ACTS_SOURCELINK_SBO_SIZE);
 

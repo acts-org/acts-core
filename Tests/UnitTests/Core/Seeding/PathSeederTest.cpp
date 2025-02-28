@@ -159,9 +159,7 @@ struct ConstructSourceLinkGrid {
 
       Grid grid(std::make_tuple(xAxis, yAxis));
 
-      GeometryIdentifier geoId;
-
-      geoId.setSensitive(i);
+      auto geoId = GeometryIdentifier().withSensitive(i);
 
       lookupTable.insert({geoId, grid});
     }
@@ -202,29 +200,21 @@ std::shared_ptr<Experimental::Detector> constructTelescopeDetector() {
   auto transform0 = Transform3::Identity();
   auto surf0 = Surface::makeShared<PlaneSurface>(
       transform0 * Transform3(rotation), std::move(surf0bounds));
-  auto geoId0 = GeometryIdentifier();
-  geoId0.setSensitive(1);
 
   auto transform1 =
       Transform3::Identity() * Translation3(Vector3(2 * deltaX, 0, 0));
   auto surf1 = Surface::makeShared<PlaneSurface>(
       transform1 * Transform3(rotation), std::move(surf1bounds));
-  auto geoId1 = GeometryIdentifier();
-  geoId1.setSensitive(2);
 
   auto transform2 =
       Transform3::Identity() * Translation3(Vector3(4 * deltaX, 0, 0));
   auto surf2 = Surface::makeShared<PlaneSurface>(
       transform2 * Transform3(rotation), std::move(surf2bounds));
-  auto geoId2 = GeometryIdentifier();
-  geoId2.setSensitive(3);
 
   auto transform3 =
       Transform3::Identity() * Translation3(Vector3(6 * deltaX, 0, 0));
   auto surf3 = Surface::makeShared<PlaneSurface>(
       transform3 * Transform3(rotation), std::move(surf3bounds));
-  auto geoId3 = GeometryIdentifier();
-  geoId3.setSensitive(4);
 
   // Create a bunch of volume bounds
   auto vol0bounds = std::make_unique<CuboidVolumeBounds>(
@@ -288,8 +278,7 @@ std::shared_ptr<Experimental::Detector> constructTelescopeDetector() {
   }
   // Surface ids
   for (auto& surf : {surf0, surf1, surf2, surf3}) {
-    auto geoId = GeometryIdentifier();
-    geoId.setSensitive(id);
+    auto geoId = GeometryIdentifier().withSensitive(id);
     surf->assignGeometryId(geoId);
     id++;
   }
@@ -380,8 +369,7 @@ BOOST_AUTO_TEST_CASE(PathSeederZeroField) {
   pathSeederCfg.pathWidthProvider.connect<&PathWidthProvider::operator()>(
       &pathWidthProvider);
 
-  GeometryIdentifier geoId;
-  geoId.setSensitive(14);
+  auto geoId = GeometryIdentifier().withSensitive(14);
   pathSeederCfg.refLayerIds.push_back(geoId);
 
   // Create the PathSeeder
