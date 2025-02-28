@@ -25,7 +25,8 @@ geo_dir = pathlib.Path("acts-itk")
 outputDir = pathlib.Path.cwd() / "itk_output"
 # acts.examples.dump_args_calls(locals())  # show acts.examples python binding calls
 
-detector, trackingGeometry, decorators = acts.examples.itk.buildITkGeometry(geo_dir)
+detector = acts.examples.itk.buildITkGeometry(geo_dir)
+trackingGeometry = detector.trackingGeometry()
 field = acts.examples.MagneticFieldMapXyz(str(geo_dir / "bfield/ATLAS-BField-xyz.root"))
 rnd = acts.examples.RandomNumbers(seed=42)
 

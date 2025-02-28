@@ -131,10 +131,12 @@ if "__main__" == __name__:
     assert geo_example_dir.exists(), "Detector example input directory missing"
     from acts.examples.itk import buildITkGeometry
 
-    detector, trackingGeometry, decorators = buildITkGeometry(
+    detector = buildITkGeometry(
         geo_example_dir,
         material=not args.no_material,
     )
+    trackingGeometry = detector.trackingGeometry()
+    decorators = detector.contextDecorators()
 
     runITk(
         trackingGeometry=trackingGeometry,
