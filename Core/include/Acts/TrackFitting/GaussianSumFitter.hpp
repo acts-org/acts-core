@@ -136,13 +136,18 @@ struct GaussianSumFitter {
     static_assert(std::is_same_v<Navigator, typename propagator_t::Navigator>);
 
     // Initialize the forward propagation with the DirectNavigator
-    auto fwdPropInitializer = [this](const auto& opts) {
+    auto fwdPropInitializer = [&](const auto& opts) {
       using Actors = ActorList<GsfActor, EndOfWorldReached>;
       using PropagatorOptions = typename propagator_t::template Options<Actors>;
 
       PropagatorOptions propOptions(opts.geoContext, opts.magFieldContext);
 
       propOptions.setPlainOptions(opts.propagatorPlainOptions);
+
+      for (auto it = begin; it != end; ++it) {
+        propOptions.navigation.insertExternalSurface(
+            options.extensions.surfaceAccessor(SourceLink{*it})->geometryId());
+      }
 
       propOptions.actorList.template get<GsfActor>()
           .m_cfg.bethe_heitler_approx = &m_betheHeitlerApproximation;
@@ -151,13 +156,18 @@ struct GaussianSumFitter {
     };
 
     // Initialize the backward propagation with the DirectNavigator
-    auto bwdPropInitializer = [this](const auto& opts) {
+    auto bwdPropInitializer = [&](const auto& opts) {
       using Actors = ActorList<GsfActor, EndOfWorldReached>;
       using PropagatorOptions = typename propagator_t::template Options<Actors>;
 
       PropagatorOptions propOptions(opts.geoContext, opts.magFieldContext);
 
       propOptions.setPlainOptions(opts.propagatorPlainOptions);
+
+      for (auto it = begin; it != end; ++it) {
+        propOptions.navigation.insertExternalSurface(
+            options.extensions.surfaceAccessor(SourceLink{*it})->geometryId());
+      }
 
       propOptions.actorList.template get<GsfActor>()
           .m_cfg.bethe_heitler_approx = &m_betheHeitlerApproximation;
