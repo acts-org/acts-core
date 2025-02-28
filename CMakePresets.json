@@ -112,7 +112,7 @@
         },
         {
             "name": "gitlab-ci-exatrkx",
-            "displayName": "GitLab-CI",
+            "displayName": "GitLab-CI ExaTrkX",
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_CXX_STANDARD": "20",
@@ -129,6 +129,19 @@
                 "ACTS_EXATRKX_ENABLE_CUDA": "ON",
                 "ACTS_BUILD_EXAMPLES_PYTHON_BINDINGS": "ON",
                 "ACTS_ENABLE_LOG_FAILURE_THRESHOLD": "ON"
+            }
+        },
+        {
+            "name": "gitlab-ci-tensorrt",
+            "displayName": "GitLab-CI Tensorrt",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_CXX_STANDARD": "20",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+                "ACTS_BUILD_PLUGIN_EXATRKX": "ON",
+                "ACTS_EXATRKX_ENABLE_TORCH": "OFF",
+                "ACTS_EXATRKX_ENABLE_CUDA": "ON",
+                "ACTS_EXATRKX_ENABLE_TENSORRT": "ON"
             }
         }
     ]
