@@ -22,6 +22,7 @@ target_sources(
         StrawSurface.cpp
         Surface.cpp
         SurfaceArray.cpp
+        SurfaceBounds.cpp
         SurfaceError.cpp
         TrapezoidBounds.cpp
         detail/VerticesHelper.cpp

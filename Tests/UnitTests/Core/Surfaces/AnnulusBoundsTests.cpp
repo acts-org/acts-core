@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(AnnulusBoundsNegativeTolerance) {
     BOOST_CHECK(!check(tolerance, {maxRadius + 1.7, 0}));
 
     // Check points near axial boundaries
-    BOOST_CHECK(!check(tolerance, {midRadius, -hlPhi * 1.5}));
+    BOOST_CHECK(check(tolerance, {midRadius, -hlPhi * 1.5}));
     BOOST_CHECK(check(tolerance, {midRadius, -hlPhi * 1.1}));
     BOOST_CHECK(check(tolerance, {midRadius, -hlPhi * 0.8}));
     BOOST_CHECK(check(tolerance, {midRadius, -hlPhi * 0.5}));
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE(AnnulusBoundsNegativeTolerance) {
     BOOST_CHECK(check(tolerance, {midRadius, hlPhi * 0.5}));
     BOOST_CHECK(check(tolerance, {midRadius, hlPhi * 0.8}));
     BOOST_CHECK(check(tolerance, {midRadius, hlPhi * 1.1}));
-    BOOST_CHECK(!check(tolerance, {midRadius, hlPhi * 1.5}));
+    BOOST_CHECK(check(tolerance, {midRadius, hlPhi * 1.5}));
   }
 
   {
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE(AnnulusBoundsNegativeTolerance) {
     BOOST_CHECK(!check(tolerance, {minRadius - 1.5, 0}));
     BOOST_CHECK(!check(tolerance, {minRadius - 0.1, 0}));
     BOOST_CHECK(!check(tolerance, {minRadius + 0.4, 0}));
-    BOOST_CHECK(check(tolerance, {minRadius + 0.5, 0}));
+    BOOST_CHECK(!check(tolerance, {minRadius + 0.5, 0}));
     BOOST_CHECK(check(tolerance, {minRadius + 1.5, 0}));
 
     BOOST_CHECK(check(tolerance, {maxRadius - 1.5, 0}));
@@ -263,9 +263,9 @@ BOOST_AUTO_TEST_CASE(AnnulusBoundsNegativeTolerance) {
     BOOST_CHECK(!check(tolerance, {midRadius, -hlPhi * 1.5}));
     BOOST_CHECK(!check(tolerance, {midRadius, -hlPhi * 1.1}));
     BOOST_CHECK(!check(tolerance, {midRadius, -hlPhi * 0.8}));
-    BOOST_CHECK(check(tolerance, {midRadius, -hlPhi * 0.5}));
+    BOOST_CHECK(!check(tolerance, {midRadius, -hlPhi * 0.5}));
 
-    BOOST_CHECK(check(tolerance, {midRadius, hlPhi * 0.5}));
+    BOOST_CHECK(!check(tolerance, {midRadius, hlPhi * 0.5}));
     BOOST_CHECK(!check(tolerance, {midRadius, hlPhi * 0.8}));
     BOOST_CHECK(!check(tolerance, {midRadius, hlPhi * 1.1}));
     BOOST_CHECK(!check(tolerance, {midRadius, hlPhi * 1.5}));

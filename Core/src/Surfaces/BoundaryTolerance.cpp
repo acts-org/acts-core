@@ -43,8 +43,9 @@ bool BoundaryTolerance::hasChi2Bound() const {
   return holdsVariant<Chi2BoundParams>();
 }
 
-BoundaryTolerance::ToleranceMode BoundaryTolerance::toleranceMode() const {
-  using enum ToleranceMode;
+BoundaryTolerance::Mode BoundaryTolerance::mode() const {
+  using enum Mode;
+
   if (isInfinite()) {
     return Extend;
   }
@@ -187,27 +188,6 @@ bool BoundaryTolerance::isTolerated(
   }
 
   throw std::logic_error("Unsupported tolerance type");
-}
-
-bool BoundaryTolerance::hasMetric(bool hasJacobian) const {
-  return hasJacobian || hasChi2Bound();
-}
-
-SquareMatrix2 BoundaryTolerance::getMetric(
-    const std::optional<SquareMatrix2>& jacobianOpt) const {
-  bool isCartesian = !jacobianOpt.has_value();
-  SquareMatrix2 metric = SquareMatrix2::Identity();
-
-  if (const auto* chi2Bound =
-          getVariantPtr<BoundaryTolerance::Chi2BoundParams>();
-      chi2Bound != nullptr) {
-    metric = chi2Bound->weight;
-  } else if (!isCartesian) {
-    const auto& jacobian = *jacobianOpt;
-    metric = jacobian.transpose() * jacobian;
-  }
-
-  return metric;
 }
 
 }  // namespace Acts
